@@ -2,113 +2,141 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <div class="logo">
-      <img src="logo.png" alt="INTAKEE Logo" class="logo-img">
+    <img src="logo.png" alt="INTAKEE Logo" class="logo" />
+    <div class="search-bar">
+      <input type="text" placeholder="Search..." />
     </div>
   </header>
 
   <main>
-    <!-- Home Tab -->
+    <!-- HOME -->
     <section id="home" class="tab active">
       <h2>Welcome to INTAKEE</h2>
-      <input type="text" placeholder="Search content...">
-      <p>Discover all types of content here.</p>
+      <p>Watch trending videos, clips, and podcasts. Log in to like, follow, and more.</p>
     </section>
 
-    <!-- Videos Tab -->
+    <!-- VIDEOS -->
     <section id="videos" class="tab">
-      <h2>Videos Feed</h2>
-      <input type="text" placeholder="Search videos...">
-      <p>No videos yet. Please log in to follow creators and see new content.</p>
+      <h2>Videos</h2>
+      <div class="search-bar"><input type="text" placeholder="Search videos..." /></div>
+      <p>No videos yet. Log in to view your feed and follow creators.</p>
     </section>
 
-    <!-- Podcasts Tab -->
+    <!-- PODCASTS -->
     <section id="podcasts" class="tab">
       <h2>Podcasts</h2>
-      <input type="text" placeholder="Search podcasts...">
-      <p>Only logged-in users can like or dislike podcasts.</p>
+      <div class="search-bar"><input type="text" placeholder="Search podcasts..." /></div>
+      <p>Log in to like/dislike podcasts.</p>
     </section>
 
-    <!-- Upload Tab -->
+    <!-- CLIPS -->
+    <section id="clips" class="tab">
+      <h2>Clips</h2>
+      <div class="search-bar"><input type="text" placeholder="Search clips..." /></div>
+      <p>Discover short clips. Scroll to explore more. Log in to like or dislike.</p>
+    </section>
+
+    <!-- UPLOAD -->
     <section id="upload" class="tab">
-      <h2>Upload</h2>
+      <h2>Upload Content</h2>
       <form>
-        <input type="file">
+        <label>Choose Type:</label>
         <select>
           <option>Video</option>
           <option>Clip</option>
-          <option>Podcast - Audio</option>
-          <option>Podcast - Video</option>
+          <option>Podcast (Audio)</option>
+          <option>Podcast (Video)</option>
         </select>
-        <input type="file" accept="image/*" placeholder="Upload thumbnail">
+        <label>Title:</label>
+        <input type="text" placeholder="Enter title..." />
+        <label>Description:</label>
+        <textarea placeholder="Enter description..."></textarea>
+        <label>Thumbnail Image:</label>
+        <input type="file" />
+        <label>Upload File:</label>
+        <input type="file" />
         <button type="submit">Upload</button>
+        <button type="button" id="go-live-btn">Go Live</button>
       </form>
     </section>
 
-    <!-- Clips Tab -->
-    <section id="clips" class="tab">
-      <h2>Clips</h2>
-      <input type="text" placeholder="Search clips...">
-      <p>Scroll through the latest short-form content.</p>
-    </section>
-
-    <!-- Profile Tab -->
+    <!-- PROFILE -->
     <section id="profile" class="tab">
       <h2>Your Profile</h2>
-      <div class="profile-box">
-        <div class="profile-info">
-          <img src="default-profile.png" alt="Profile Pic" class="profile-pic">
-          <div>
-            <strong>@YourUsername</strong><br>
-            <small>Edit Profile | Log Out</small>
-          </div>
-        </div>
-
-        <div class="profile-actions">
-          <button>Uploads</button>
-          <button>Likes</button>
-          <button>Saved</button>
-          <button>Playlists</button>
-        </div>
-
-        <div class="profile-section">
-          <h4>Privacy Settings</h4>
-          <label><input type="checkbox"> Make Likes Private</label><br>
-          <label><input type="checkbox"> Make Saved Private</label><br>
-          <label><input type="checkbox"> Make Playlists Private</label>
-        </div>
+      <div class="profile-section">
+        <h3>Your Uploads</h3>
+        <button class="privacy-toggle">Make Private</button>
+        <p>You haven’t uploaded anything yet.</p>
+      </div>
+      <div class="profile-section">
+        <h3>Liked Posts</h3>
+        <button class="privacy-toggle">Make Private</button>
+        <p>No liked posts yet.</p>
+      </div>
+      <div class="profile-section">
+        <h3>Saved</h3>
+        <button class="privacy-toggle">Make Private</button>
+        <p>Nothing saved. Save videos, podcasts, or clips to view later.</p>
+      </div>
+      <div class="profile-section">
+        <h3>Playlists</h3>
+        <button class="privacy-toggle">Make Private</button>
+        <p>You have no playlists. Create one to start organizing content.</p>
       </div>
     </section>
 
-    <!-- Settings Tab -->
+    <!-- SETTINGS -->
     <section id="settings" class="tab">
-      <h2>⚙️ INTAKEE Settings</h2>
-      <ul>
-        <li><strong>🔐 Privacy Policy</strong> – Explains how user data is handled</li>
-        <li><strong>📜 Terms of Service</strong> – Legal agreement, not liable for user content</li>
-        <li><strong>📘 Community Guidelines</strong> – What is and isn’t allowed</li>
-        <li><strong>🚫 Report Content</strong> – Report user posts or profiles</li>
-        <li><strong>⛔ Block User List</strong> – View and manage blocked accounts</li>
-        <li><strong>📧 Contact Support</strong> – Email or in-app message support</li>
-      </ul>
+      <h2>Settings</h2>
+
+      <div class="settings-section">
+        <h3>Privacy Policy</h3>
+        <p>We collect limited data necessary to operate INTAKEE. No user data is sold. Your information is protected and never shared without consent.</p>
+      </div>
+
+      <div class="settings-section">
+        <h3>Terms of Service</h3>
+        <p>By using INTAKEE, you agree that all content you post is your responsibility. INTAKEE supports free speech but is not liable for any user-generated content.</p>
+      </div>
+
+      <div class="settings-section">
+        <h3>Community Guidelines</h3>
+        <p>We do not allow pornography, threats, or illegal activity. Age restrictions apply where appropriate. Freedom of speech is supported within legal boundaries.</p>
+      </div>
+
+      <div class="settings-section">
+        <h3>Report Content</h3>
+        <p>Use our in-app tools to report inappropriate content. Reporters will no longer see the reported user's content.</p>
+      </div>
+
+      <div class="settings-section">
+        <h3>Blocked Users</h3>
+        <p>Manage your block list here. Unblock at any time.</p>
+      </div>
+
+      <div class="settings-section">
+        <h3>Contact Support</h3>
+        <p>Need help? Email us at support@intakee.com or use the in-app support form.</p>
+      </div>
     </section>
   </main>
 
+  <!-- Bottom Navigation Tabs -->
   <footer>
     <nav>
-      <button onclick="showTab('home')">Home</button>
-      <button onclick="showTab('videos')">Videos</button>
-      <button onclick="showTab('podcasts')">Podcasts</button>
-      <button onclick="showTab('upload')">Upload</button>
-      <button onclick="showTab('clips')">Clips</button>
-      <button onclick="showTab('profile')">Profile</button>
-      <button onclick="showTab('settings')">Settings</button>
+      <button data-tab="home" class="active">Home</button>
+      <button data-tab="videos">Videos</button>
+      <button data-tab="podcasts">Podcasts</button>
+      <button data-tab="upload">Upload</button>
+      <button data-tab="clips">Clips</button>
+      <button data-tab="profile">Profile</button>
+      <button data-tab="settings">Settings</button>
     </nav>
   </footer>
 
