@@ -1,43 +1,67 @@
-// script.js
-
-// Handle tab switching
-function showTab(tabId) {
+document.addEventListener("DOMContentLoaded", function () {
   const tabs = document.querySelectorAll(".tab");
-  tabs.forEach(tab => tab.classList.remove("active"));
+  const navButtons = document.querySelectorAll("footer nav button");
 
-  const activeTab = document.getElementById(tabId);
-  if (activeTab) activeTab.classList.add("active");
+  function activateTab(tabId) {
+    tabs.forEach((tab) => tab.classList.remove("active"));
+    document.getElementById(tabId).classList.add("active");
 
-  const buttons = document.querySelectorAll("footer nav button");
-  buttons.forEach(button => button.classList.remove("active"));
-  const targetButton = Array.from(buttons).find(btn => btn.innerText.toLowerCase() === tabId.toLowerCase());
-  if (targetButton) targetButton.classList.add("active");
-}
+    navButtons.forEach((btn) => btn.classList.remove("active"));
+    document
+      .querySelector(`footer nav button[data-tab="${tabId}"]`)
+      .classList.add("active");
+  }
 
-// Highlight default tab
-window.onload = () => {
-  showTab('home');
-};
-
-// Toggle privacy view per profile section
-const privacyToggles = document.querySelectorAll(".profile-privacy-toggle input[type='checkbox']");
-privacyToggles.forEach(toggle => {
-  toggle.addEventListener("change", () => {
-    const section = toggle.closest(".profile-section");
-    const list = section.querySelector("ul");
-    list.style.display = toggle.checked ? "none" : "block";
+  // Switch tabs on nav click
+  navButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tabId = btn.getAttribute("data-tab");
+      activateTab(tabId);
+    });
   });
-});
 
-// Upload form functionality
-const uploadForm = document.querySelector("#upload form");
-uploadForm?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  alert("Upload submitted (demo only).");
-});
+  // Default to home tab
+  activateTab("home");
 
-// Go Live button functionality
-const goLiveButton = uploadForm?.querySelector("button[type='button']");
-goLiveButton?.addEventListener("click", () => {
-  alert("Go Live feature coming soon.");
+  // Profile Privacy Toggles (for Uploads, Likes, Saved, Playlists)
+  const privacyToggles = document.querySelectorAll(".privacy-toggle");
+  privacyToggles.forEach((toggle) => {
+    toggle.addEventListener("click", () => {
+      const section = toggle.closest(".profile-section");
+      const isPrivate = section.classList.toggle("private");
+      toggle.textContent = isPrivate ? "Make Public" : "Make Private";
+    });
+  });
+
+  // Placeholder: Upload Tab "Go Live" button
+  const goLiveBtn = document.getElementById("go-live-btn");
+  if (goLiveBtn) {
+    goLiveBtn.addEventListener("click", () => {
+      alert("Go Live feature coming soon!");
+    });
+  }
+
+  // Restrict likes/comments if not logged in
+  const likeButtons = document.querySelectorAll(".like-btn");
+  const commentFields = document.querySelectorAll(".comment-field");
+  const isLoggedIn = false; // Replace with auth logic
+
+  likeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (!isLoggedIn) {
+        alert("Please log in to like or dislike content.");
+      } else {
+        // Like/dislike logic
+      }
+    });
+  });
+
+  commentFields.forEach((field) => {
+    field.addEventListener("focus", () => {
+      if (!isLoggedIn) {
+        alert("You must be signed in to comment.");
+        field.blur();
+      }
+    });
+  });
 });
