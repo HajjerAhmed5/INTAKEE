@@ -1,4 +1,4 @@
-/* Global Reset & Dark Theme */
+/* Global styles */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -6,132 +6,125 @@ body {
   color: #fff;
 }
 
-header {
-  background-color: #111;
-  padding: 12px 20px;
+h2 {
+  margin: 20px;
+  font-size: 24px;
+}
+
+h3 {
+  margin: 15px 0 10px;
+}
+
+/* Header */
+.top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background-color: #111;
+  padding: 10px 16px;
+  border-bottom: 1px solid #222;
 }
 
-header img.logo {
-  height: 32px;
+.logo {
+  height: 30px;
 }
 
-.search-bar {
-  background-color: #222;
-  padding: 8px;
-  margin: 10px;
-  border-radius: 5px;
+.search-container {
   display: flex;
   align-items: center;
+  background-color: #222;
+  border-radius: 6px;
+  padding: 5px 10px;
 }
 
-.search-bar input {
-  width: 100%;
+.search-container input {
   background: transparent;
   border: none;
   color: #fff;
   outline: none;
-  font-size: 14px;
+  width: 200px;
 }
 
-/* Tabs Content */
-main {
-  padding: 16px;
+.search-icon {
+  margin-left: 8px;
 }
 
+/* Tabs */
 .tab {
   display: none;
+  padding: 16px;
 }
 
 .tab.active {
   display: block;
 }
 
-/* Upload Form */
-form label {
-  display: block;
-  margin-top: 10px;
-  color: #ccc;
+/* Feeds */
+.grid-feed {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 16px;
 }
 
-form input,
-form select,
-form textarea,
-form button {
-  width: 100%;
-  margin-top: 6px;
-  padding: 8px;
-  border: 1px solid #333;
-  border-radius: 4px;
-  background-color: #111;
-  color: #fff;
+.vertical-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
 }
 
-#go-live-btn {
-  background-color: #e50914;
-  border: none;
-  margin-top: 12px;
-  cursor: pointer;
-}
-
-#go-live-btn:hover {
-  background-color: #ff1a1a;
-}
-
-/* Profile Page */
-.profile-section {
-  margin-bottom: 20px;
-  border: 1px solid #222;
+.video-card,
+.podcast-card,
+.clip-card {
+  background-color: #1a1a1a;
   padding: 12px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
-.profile-section h3 {
-  margin: 0 0 10px;
+/* Upload */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background-color: #111;
+  border-radius: 8px;
 }
 
-.privacy-toggle {
-  background-color: #333;
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
+form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+/* Profile */
+.profile-section {
+  background-color: #1a1a1a;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
 }
 
 .profile-section.private {
   opacity: 0.5;
 }
 
-/* Settings Page */
+.privacy-toggle {
+  margin-left: 12px;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+/* Settings */
 .settings-section {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   padding: 16px;
-  background-color: #111;
-  border-radius: 6px;
+  background-color: #1c1c1c;
+  border-radius: 8px;
 }
 
-.settings-section h3 {
-  margin-top: 0;
-  border-bottom: 1px solid #222;
-  padding-bottom: 6px;
-}
-
-.settings-section p,
-.settings-section a {
-  font-size: 14px;
-  color: #ccc;
-  text-decoration: none;
-}
-
-.settings-section a:hover {
-  text-decoration: underline;
-}
-
-/* Footer Navigation Tabs */
+/* Footer Navigation */
 footer {
   position: fixed;
   bottom: 0;
@@ -143,33 +136,22 @@ footer {
 footer nav {
   display: flex;
   justify-content: space-around;
-  padding: 8px 0;
+  align-items: center;
 }
 
 footer nav button {
+  flex: 1;
+  padding: 10px;
   background: none;
   border: none;
   color: #aaa;
   font-size: 14px;
   cursor: pointer;
-  flex: 1;
-  padding: 10px 0;
-  transition: color 0.3s ease;
+  transition: background-color 0.3s;
 }
 
+footer nav button:hover,
 footer nav button.active {
+  background-color: #222;
   color: #fff;
-  border-top: 2px solid #fff;
-}
-
-/* Responsive */
-@media screen and (max-width: 600px) {
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .search-bar {
-    margin: 10px 0;
-  }
 }
