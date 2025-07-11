@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="script.js"></script>
 </head>
 <body>
   <header>
@@ -29,106 +30,99 @@
     <section id="podcasts" class="tab">
       <h2>Podcasts</h2>
       <input type="text" placeholder="Search Podcasts...">
-      <p>Only logged-in users can like/dislike podcasts. Comments are disabled.</p>
+      <p>Only logged-in users can like or dislike podcast content.</p>
     </section>
 
     <section id="upload" class="tab">
       <h2>Upload</h2>
       <form>
-        <label>Select Type:</label>
-        <select>
+        <label for="type">Select Type:</label>
+        <select id="type">
           <option>Video</option>
-          <option>Podcast (Audio Only)</option>
-          <option>Podcast (Video)</option>
+          <option>Podcast - Audio Only</option>
+          <option>Podcast - Video</option>
           <option>Clip</option>
-        </select><br><br>
-        <button type="button">Go Live</button><br><br>
-        <label>Thumbnail Image:</label>
-        <input type="file"><br><br>
-        <label>Upload File:</label>
-        <input type="file"><br><br>
+        </select>
+
+        <label for="thumbnail">Thumbnail Image:</label>
+        <input type="file" id="thumbnail">
+
+        <label for="upload">Upload File:</label>
+        <input type="file" id="upload">
+
         <button type="submit">Upload</button>
+        <button type="button">Go Live</button>
       </form>
     </section>
 
     <section id="clips" class="tab">
-      <h2>Short Clips</h2>
+      <h2>Clips</h2>
       <input type="text" placeholder="Search Clips...">
-      <p>Scroll to discover vertical content. Login to engage.</p>
+      <p>Short-form content will appear here. Scroll vertically to explore.</p>
     </section>
 
     <section id="profile" class="tab">
       <h2>Your Profile</h2>
-      <p>Log in to see your saved content, likes, and uploads.</p>
+      <p>Welcome to your profile. Manage your content and settings here.</p>
     </section>
 
     <section id="settings" class="tab">
       <h2>INTAKEE Settings</h2>
+
       <details>
-        <summary><strong>Terms of Service</strong></summary>
-        <ul>
-          <li><strong>User Responsibility:</strong> All content uploaded by users is the sole responsibility of the individual creator. INTAKEE is not responsible for any user-generated content.</li>
-          <li><strong>Freedom of Expression:</strong> We support freedom of speech and do not censor opinions, but content must comply with Community Guidelines.</li>
-          <li><strong>Liability:</strong> INTAKEE is not liable for user content. We may remove content if it violates our rules.</li>
-          <li><strong>Account Requirements:</strong> You must be 13 or older. Likes, comments, and uploads require an account.</li>
-          <li><strong>Termination:</strong> We reserve the right to remove abusive accounts.</li>
-        </ul>
+        <summary>▼ Terms of Service</summary>
+        <p><strong>User Responsibility:</strong> All content uploaded by users is the sole responsibility of the individual creator. INTAKEE is not responsible for any user-generated content.</p>
+        <p><strong>Freedom of Expression:</strong> We support freedom of speech and do not censor opinions, but content must comply with Community Guidelines.</p>
+        <p><strong>Liability:</strong> INTAKEE is not liable for user content. We may remove content if it violates our rules.</p>
+        <p><strong>Account Requirements:</strong> You must be 13 or older. Likes, comments, and uploads require an account.</p>
+        <p><strong>Termination:</strong> We reserve the right to remove abusive accounts.</p>
       </details>
 
       <details>
-        <summary><strong>Community Guidelines</strong></summary>
+        <summary>▼ Community Guidelines</summary>
         <ul>
           <li><strong>Not Allowed:</strong> Pornography, threats, harassment, hate speech, illegal activity.</li>
           <li><strong>Allowed:</strong> Political views, debates, comedy, creative expression.</li>
           <li><strong>Age-Restricted:</strong> Mature content must be flagged. Only logged-in users can view.</li>
-          <li><strong>Reports:</strong> Repeatedly reported content may be reviewed and removed.</li>
+          <li><strong>Reports:</strong> Repeatedly reported content may be removed.</li>
         </ul>
       </details>
 
       <details>
-        <summary><strong>Privacy Policy</strong></summary>
-        <ul>
-          <li><strong>We Collect:</strong> Account info, uploads, engagement data.</li>
-          <li><strong>We Don’t:</strong> Sell your data or track you off-site.</li>
-          <li><strong>Control:</strong> You can delete your account at any time.</li>
-        </ul>
+        <summary>▼ Privacy Policy</summary>
+        <p><strong>We Collect:</strong> Account info, uploads, engagement data.</p>
+        <p><strong>We Don’t:</strong> Sell your data or track you off-site.</p>
+        <p><strong>Control:</strong> You can delete your account any time.</p>
       </details>
 
       <details>
-        <summary><strong>Report Content</strong></summary>
-        <p>Use the in-app form to report any content or users that violate our guidelines. Reports are reviewed by our moderation team. Users who report someone will no longer see their content unless unblocked manually.</p>
+        <summary>▼ Report Content</summary>
+        <p>Use this section to report any user or content violating INTAKEE’s policies. Reports are reviewed and action may be taken if guidelines are breached.</p>
       </details>
 
       <details>
-        <summary><strong>Blocked Users</strong></summary>
-        <p>This section lets you manage users you’ve blocked. Blocked users cannot view or interact with your content.</p>
+        <summary>▼ Blocked Users</summary>
+        <p>View and manage accounts you've blocked. Blocked users cannot interact with your content.</p>
       </details>
 
       <details>
-        <summary><strong>Contact Support</strong></summary>
-        <p>Need help? Email support@intakee.com or use our in-app support chat.</p>
+        <summary>▼ Contact Support</summary>
+        <p>Need help? Reach out to INTAKEE Support via email or in-app messaging for technical issues or feedback.</p>
       </details>
+
     </section>
   </main>
 
   <footer>
     <nav>
-      <button onclick="openTab('home')">Home</button>
-      <button onclick="openTab('videos')">Videos</button>
-      <button onclick="openTab('podcasts')">Podcasts</button>
-      <button onclick="openTab('upload')">Upload</button>
-      <button onclick="openTab('clips')">Clips</button>
-      <button onclick="openTab('profile')">Profile</button>
-      <button onclick="openTab('settings')">Settings</button>
+      <button data-tab="home">Home</button>
+      <button data-tab="videos">Videos</button>
+      <button data-tab="podcasts">Podcasts</button>
+      <button data-tab="upload">Upload</button>
+      <button data-tab="clips">Clips</button>
+      <button data-tab="profile">Profile</button>
+      <button data-tab="settings">Settings</button>
     </nav>
   </footer>
-
-  <script>
-    function openTab(tabId) {
-      const tabs = document.querySelectorAll('.tab');
-      tabs.forEach(tab => tab.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-    }
-  </script>
 </body>
 </html>
