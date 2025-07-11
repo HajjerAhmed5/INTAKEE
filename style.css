@@ -1,3 +1,5 @@
+/* style.css */
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -5,43 +7,14 @@ body {
   color: white;
 }
 
-header {
-  background-color: #111;
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo-img {
-  height: 40px;
-}
-
-nav button {
-  background: none;
-  border: none;
-  color: white;
-  padding: 10px;
-  margin: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.2s;
-}
-
-nav button:hover {
-  background-color: #333;
-  border-radius: 5px;
-}
-
 main {
   padding: 20px;
+  padding-bottom: 100px; /* space for footer */
+}
+
+h2 {
+  margin-top: 0;
+  color: white;
 }
 
 .tab {
@@ -52,59 +25,85 @@ main {
   display: block;
 }
 
-input[type="search"] {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  background-color: #222;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 5px;
-}
-
+/* Upload Form */
 form {
   background-color: #111;
   padding: 20px;
   border-radius: 10px;
+  max-width: 600px;
+  margin-top: 10px;
 }
 
-form label, form select, form input, form button {
+label {
   display: block;
-  margin: 10px 0;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+input[type="file"],
+select,
+button {
   width: 100%;
-  background-color: #222;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 5px;
   padding: 10px;
+  background-color: #222;
+  border: 1px solid #444;
+  color: white;
+  border-radius: 5px;
+  margin-bottom: 10px;
 }
 
-form button {
-  background-color: #444;
-  cursor: pointer;
-}
-
-form button:hover {
-  background-color: #666;
-}
-
-details {
-  margin-bottom: 20px;
+/* Footer nav */
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   background-color: #111;
+  border-top: 1px solid #222;
+  padding: 10px 0;
+  z-index: 1000;
+}
+
+nav {
+  display: flex;
+  justify-content: space-around;
+}
+
+nav button {
+  background: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+nav button:hover {
+  text-decoration: underline;
+}
+
+/* Settings and Details */
+details {
+  background-color: #111;
+  border-radius: 8px;
+  margin: 15px 0;
   padding: 15px;
-  border-radius: 10px;
+  border: 1px solid #333;
 }
 
 details summary {
-  font-size: 18px;
+  font-weight: bold;
+  font-size: 16px;
   cursor: pointer;
 }
 
-ul {
-  list-style-type: none;
-  padding-left: 0;
+details p,
+details li {
+  color: #ccc;
+  margin-left: 10px;
+  margin-bottom: 5px;
 }
 
-ul li {
-  margin-bottom: 8px;
+ul {
+  list-style-type: disc;
+  padding-left: 20px;
 }
