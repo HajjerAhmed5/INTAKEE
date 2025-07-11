@@ -1,5 +1,3 @@
-/* INTAKEE Updated CSS */
-
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -10,17 +8,14 @@ body {
 header {
   background-color: #111;
   padding: 10px 20px;
-  display: flex;
-  align-items: center;
 }
 
 .logo img {
-  height: 45px;
+  height: 40px;
 }
 
 main {
   padding: 20px;
-  padding-bottom: 90px; /* space for bottom nav */
 }
 
 section {
@@ -31,99 +26,83 @@ section.active {
   display: block;
 }
 
-/* Search Bar */
+/* Search Bar Styling */
 input[type="text"] {
   width: 100%;
   max-width: 500px;
-  padding: 12px 18px;
-  margin: 15px 0 25px;
+  padding: 10px 15px;
+  margin-bottom: 15px;
   border: none;
   border-radius: 20px;
-  font-size: 15px;
-  background-color: #1f1f1f;
+  background-color: #222;
   color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
+  font-size: 1rem;
+  outline: none;
 }
 
-input[type="text"]::placeholder {
-  color: #aaa;
-}
-
-/* Upload Form */
+/* Upload Section */
 form {
-  background-color: #111;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
-  max-width: 600px;
-  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-form label, form select, form input[type="file"], form button {
-  display: block;
-  margin: 10px 0;
-  width: 100%;
+form label {
+  font-weight: bold;
+}
+
+form input,
+form select,
+form button {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: none;
+}
+
+form input[type="file"] {
+  background-color: #222;
+  color: white;
 }
 
 form button {
-  padding: 12px;
-  background-color: #333;
+  background-color: #444;
   color: white;
-  border: none;
-  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
 }
 
 form button:hover {
-  background-color: #555;
+  background-color: #666;
 }
 
-/* Legal & Settings Sections */
-details {
-  background-color: #111;
-  margin-bottom: 12px;
-  padding: 18px;
-  border-radius: 8px;
-}
-
-details summary {
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* Bottom Navigation Bar */
+/* Bottom Nav Bar */
 footer {
   position: fixed;
   bottom: 0;
   width: 100%;
   background-color: #111;
-  border-top: 1px solid #333;
+  padding: 10px 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+
+nav {
   display: flex;
   justify-content: space-around;
-  padding: 10px 0;
-  z-index: 10;
+  align-items: center;
 }
 
 nav button {
-  flex: 1;
   background: none;
   border: none;
   color: white;
-  font-size: 13px;
+  font-size: 0.95rem;
+  padding: 8px 12px;
   cursor: pointer;
-  padding: 10px 5px;
-  text-align: center;
-  transition: color 0.3s;
+  transition: background-color 0.3s;
+  border-radius: 8px;
 }
 
 nav button:hover {
-  color: #1db954;
-  font-weight: bold;
-}
-
-/* Hide Search Bar in Profile */
-#profile input[type="text"] {
-  display: none;
+  background-color: #333;
 }
