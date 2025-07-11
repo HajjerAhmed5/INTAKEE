@@ -1,151 +1,27 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #000;
-  color: white;
-}
-
-header {
+.profile-section {
+  margin-bottom: 30px;
   background-color: #111;
-  padding: 10px;
-  text-align: center;
-  border-bottom: 1px solid #333;
-}
-
-.logo img {
-  height: 40px;
-}
-
-main {
-  padding: 20px;
-}
-
-.tab {
-  display: none;
-}
-
-.tab.active {
-  display: block;
-}
-
-input[type="text"] {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  background-color: #222;
-  border: none;
-  border-radius: 20px;
-  color: white;
-  font-size: 14px;
-}
-
-form label,
-form select,
-form input[type="file"],
-form button {
-  display: block;
-  margin-bottom: 10px;
-  width: 100%;
-}
-
-form select,
-form input[type="file"] {
-  padding: 10px;
-  background-color: #222;
-  color: white;
-  border: 1px solid #333;
-  border-radius: 5px;
-}
-
-form button {
-  padding: 10px;
-  background-color: #444;
-  border: none;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-form button:hover {
-  background-color: #666;
-}
-
-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #111;
-  border-top: 1px solid #333;
-  padding: 10px 0;
-  z-index: 1000;
-}
-
-footer nav {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-footer nav button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 14px;
-  flex: 1;
-  padding: 10px;
-  cursor: pointer;
-  text-align: center;
-}
-
-footer nav button:hover {
-  text-decoration: underline;
-}
-
-.profile-box {
-  background-color: #111;
-  padding: 20px;
+  padding: 15px;
   border-radius: 10px;
   border: 1px solid #333;
-  margin-bottom: 20px;
-}
-
-.profile-info {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.profile-pic {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  margin-right: 15px;
-  border: 2px solid #333;
-}
-
-.profile-actions button {
-  margin-right: 10px;
-  padding: 10px 15px;
-  background-color: #333;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.profile-actions button:hover {
-  background-color: #555;
-}
-
-.profile-section {
-  margin-bottom: 20px;
 }
 
 .profile-section h4 {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #fff;
   border-bottom: 1px solid #333;
   padding-bottom: 5px;
+}
+
+.profile-section .privacy-toggle {
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.privacy-toggle label {
+  font-size: 13px;
+  margin-left: 6px;
 }
 
 .profile-section ul {
@@ -155,40 +31,18 @@ footer nav button:hover {
 }
 
 .profile-section li {
-  margin-bottom: 5px;
-  padding: 8px;
+  margin-bottom: 8px;
+  padding: 10px;
   background-color: #1a1a1a;
   border: 1px solid #333;
   border-radius: 5px;
+  font-size: 14px;
+  color: #ddd;
 }
-
 .profile-privacy-toggle {
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: -10px;
   margin-bottom: 10px;
-}
-
-.profile-privacy-toggle label {
-  font-size: 13px;
-  margin-left: 8px;
-}
-
-.profile-privacy-toggle input[type="checkbox"] {
-  vertical-align: middle;
-}
-
-details {
-  margin-bottom: 15px;
-  background-color: #111;
-  border: 1px solid #333;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-details summary {
-  font-weight: bold;
-  cursor: pointer;
-}
-
-hr {
-  border-color: #333;
 }
