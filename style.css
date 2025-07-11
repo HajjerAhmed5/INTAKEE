@@ -7,7 +7,9 @@ body {
 
 header {
   background-color: #111;
-  padding: 10px 20px;
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #333;
 }
 
 .logo img {
@@ -18,56 +20,49 @@ main {
   padding: 20px;
 }
 
-section {
+.tab {
   display: none;
 }
 
-section.active {
+.tab.active {
   display: block;
 }
 
-/* Search Bar Styling */
 input[type="text"] {
   width: 100%;
-  max-width: 500px;
-  padding: 10px 15px;
+  padding: 10px;
   margin-bottom: 15px;
+  background-color: #222;
   border: none;
   border-radius: 20px;
+  color: white;
+  font-size: 14px;
+}
+
+form label,
+form select,
+form input[type="file"],
+form button {
+  display: block;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+form select,
+form input[type="file"] {
+  padding: 10px;
   background-color: #222;
   color: white;
-  font-size: 1rem;
-  outline: none;
+  border: 1px solid #333;
+  border-radius: 5px;
 }
 
-/* Upload Section */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-form label {
-  font-weight: bold;
-}
-
-form input,
-form select,
 form button {
   padding: 10px;
-  font-size: 1rem;
-  border-radius: 5px;
-  border: none;
-}
-
-form input[type="file"] {
-  background-color: #222;
-  color: white;
-}
-
-form button {
   background-color: #444;
+  border: none;
   color: white;
+  border-radius: 5px;
   cursor: pointer;
 }
 
@@ -75,34 +70,79 @@ form button:hover {
   background-color: #666;
 }
 
-/* Bottom Nav Bar */
 footer {
   position: fixed;
   bottom: 0;
-  width: 100%;
+  left: 0;
+  right: 0;
   background-color: #111;
+  border-top: 1px solid #333;
   padding: 10px 0;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.4);
-  z-index: 999;
+  text-align: center;
+  z-index: 1000;
 }
 
-nav {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-nav button {
+footer nav button {
   background: none;
   border: none;
   color: white;
-  font-size: 0.95rem;
-  padding: 8px 12px;
+  font-size: 14px;
+  margin: 0 10px;
   cursor: pointer;
-  transition: background-color 0.3s;
+}
+
+footer nav button:hover {
+  text-decoration: underline;
+}
+
+.profile-box {
+  background-color: #111;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #333;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.profile-pic {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 15px;
+  border: 2px solid #333;
+}
+
+.profile-actions button {
+  margin-right: 10px;
+  padding: 10px 15px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.profile-actions button:hover {
+  background-color: #555;
+}
+
+details {
+  margin-bottom: 15px;
+  background-color: #111;
+  border: 1px solid #333;
+  padding: 10px;
   border-radius: 8px;
 }
 
-nav button:hover {
-  background-color: #333;
+details summary {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+hr {
+  border-color: #333;
 }
