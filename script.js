@@ -1,15 +1,25 @@
-// Handle tab switching
-function openTab(tabId) {
-  const tabs = document.querySelectorAll('.tab');
-  tabs.forEach(tab => tab.classList.remove('active'));
-  const target = document.getElementById(tabId);
-  if (target) {
-    target.classList.add('active');
-  }
-}
+// script.js for INTAKEE app navigation and functionality
 
-// Placeholder for future login status logic
-function isLoggedIn() {
-  // In future: use Firebase auth
-  return false;
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const tabs = document.querySelectorAll("nav button");
+  const sections = document.querySelectorAll("main section");
+
+  // Switch tab function
+  function showTab(tabId) {
+    sections.forEach(section => {
+      section.classList.remove("active");
+    });
+    document.getElementById(tabId).classList.add("active");
+  }
+
+  // Set up tab clicks
+  tabs.forEach(button => {
+    button.addEventListener("click", () => {
+      const target = button.getAttribute("data-tab");
+      showTab(target);
+    });
+  });
+
+  // Default tab on load
+  showTab("home");
+});
