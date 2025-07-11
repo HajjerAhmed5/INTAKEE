@@ -1,48 +1,134 @@
-.profile-section {
-  margin-bottom: 30px;
+/* style.css */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  color: #fff;
+}
+
+header {
   background-color: #111;
-  padding: 15px;
+  padding: 10px;
+  text-align: center;
+}
+
+.logo img {
+  height: 50px;
+}
+
+main {
+  padding: 20px;
+  min-height: 80vh;
+}
+
+.tab {
+  display: none;
+}
+
+.tab.active {
+  display: block;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0 20px;
+  border-radius: 6px;
+  border: none;
+  background-color: #1c1c1c;
+  color: white;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+}
+
+form input[type="file"],
+form select,
+form button {
+  padding: 10px;
+  background-color: #222;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+}
+
+form button:hover {
+  background-color: #444;
+  cursor: pointer;
+}
+
+.profile-box {
+  background-color: #1c1c1c;
+  padding: 20px;
   border-radius: 10px;
-  border: 1px solid #333;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.profile-pic {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+}
+
+.profile-actions button {
+  margin-right: 10px;
+  padding: 8px 16px;
+  background-color: #333;
+  border: none;
+  color: white;
+  border-radius: 5px;
+}
+
+.profile-actions button:hover {
+  background-color: #555;
+}
+
+.profile-section {
+  margin-bottom: 20px;
 }
 
 .profile-section h4 {
-  margin-bottom: 15px; 
-  font-size: 16px;
-  color: #fff;
-  border-bottom: 1px solid #333;
-  padding-bottom: 5px;
+  margin-bottom: 5px;
 }
 
-.profile-section .privacy-toggle {
-  text-align: right;
-  margin-bottom: 10px;
-}
-
-.privacy-toggle label {
-  font-size: 13px;
-  margin-left: 6px;
-}
-
-.profile-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.profile-section li {
-  margin-bottom: 8px;
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #111;
   padding: 10px;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 5px;
-  font-size: 14px;
-  color: #ddd;
-}
-.profile-privacy-toggle {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-top: -10px;
-  margin-bottom: 10px;
+  justify-content: space-around;
+  border-top: 1px solid #333;
+}
+
+footer nav button {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 16px;
+  padding: 10px;
+}
+
+footer nav button.active,
+footer nav button:hover {
+  color: #fff;
+  font-weight: bold;
+  border-bottom: 2px solid #fff;
 }
