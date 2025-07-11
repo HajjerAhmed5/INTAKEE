@@ -7,12 +7,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById(tabId).classList.add("active");
 
     navButtons.forEach((btn) => btn.classList.remove("active"));
-    document
-      .querySelector(`footer nav button[data-tab="${tabId}"]`)
-      .classList.add("active");
+    document.querySelector(`footer nav button[data-tab="${tabId}"]`).classList.add("active");
   }
 
-  // Switch tabs on nav click
   navButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const tabId = btn.getAttribute("data-tab");
@@ -20,48 +17,26 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Default to home tab
+  // Load the home tab by default
   activateTab("home");
 
-  // Profile Privacy Toggles (for Uploads, Likes, Saved, Playlists)
-  const privacyToggles = document.querySelectorAll(".privacy-toggle");
-  privacyToggles.forEach((toggle) => {
-    toggle.addEventListener("click", () => {
-      const section = toggle.closest(".profile-section");
-      const isPrivate = section.classList.toggle("private");
-      toggle.textContent = isPrivate ? "Make Public" : "Make Private";
+  // Profile: Privacy toggle buttons
+  const privacyButtons = document.querySelectorAll(".privacy-toggle");
+  privacyButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const section = button.closest(".profile-section");
+      section.classList.toggle("private");
+      button.textContent = section.classList.contains("private")
+        ? "Make Public"
+        : "Make Private";
     });
   });
 
-  // Placeholder: Upload Tab "Go Live" button
-  const goLiveBtn = document.getElementById("go-live-btn");
-  if (goLiveBtn) {
-    goLiveBtn.addEventListener("click", () => {
-      alert("Go Live feature coming soon!");
+  // Optional: Handle Go Live button (placeholder)
+  const goLiveButton = document.getElementById("go-live-btn");
+  if (goLiveButton) {
+    goLiveButton.addEventListener("click", () => {
+      alert("Go Live feature coming soon.");
     });
   }
-
-  // Restrict likes/comments if not logged in
-  const likeButtons = document.querySelectorAll(".like-btn");
-  const commentFields = document.querySelectorAll(".comment-field");
-  const isLoggedIn = false; // Replace with auth logic
-
-  likeButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      if (!isLoggedIn) {
-        alert("Please log in to like or dislike content.");
-      } else {
-        // Like/dislike logic
-      }
-    });
-  });
-
-  commentFields.forEach((field) => {
-    field.addEventListener("focus", () => {
-      if (!isLoggedIn) {
-        alert("You must be signed in to comment.");
-        field.blur();
-      }
-    });
-  });
 });
