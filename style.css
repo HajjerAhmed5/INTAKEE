@@ -1,26 +1,44 @@
-/* style.css */
-
+/* Global Reset & Dark Theme */
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0;
+  font-family: Arial, sans-serif;
   background-color: #000;
   color: #fff;
 }
 
 header {
   background-color: #111;
-  padding: 10px;
-  text-align: center;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.logo img {
-  height: 50px;
+header img.logo {
+  height: 32px;
 }
 
+.search-bar {
+  background-color: #222;
+  padding: 8px;
+  margin: 10px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.search-bar input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #fff;
+  outline: none;
+  font-size: 14px;
+}
+
+/* Tabs Content */
 main {
-  padding: 20px;
-  min-height: 80vh;
+  padding: 16px;
 }
 
 .tab {
@@ -31,104 +49,127 @@ main {
   display: block;
 }
 
-input[type="text"] {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0 20px;
-  border-radius: 6px;
-  border: none;
-  background-color: #1c1c1c;
-  color: white;
+/* Upload Form */
+form label {
+  display: block;
+  margin-top: 10px;
+  color: #ccc;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 400px;
-}
-
-form input[type="file"],
+form input,
 form select,
+form textarea,
 form button {
-  padding: 10px;
-  background-color: #222;
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background-color: #111;
   color: #fff;
-  border: none;
-  border-radius: 5px;
 }
 
-form button:hover {
-  background-color: #444;
+#go-live-btn {
+  background-color: #e50914;
+  border: none;
+  margin-top: 12px;
   cursor: pointer;
 }
 
-.profile-box {
-  background-color: #1c1c1c;
-  padding: 20px;
-  border-radius: 10px;
+#go-live-btn:hover {
+  background-color: #ff1a1a;
 }
 
-.profile-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.profile-pic {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #fff;
-}
-
-.profile-actions button {
-  margin-right: 10px;
-  padding: 8px 16px;
-  background-color: #333;
-  border: none;
-  color: white;
-  border-radius: 5px;
-}
-
-.profile-actions button:hover {
-  background-color: #555;
-}
-
+/* Profile Page */
 .profile-section {
   margin-bottom: 20px;
+  border: 1px solid #222;
+  padding: 12px;
+  border-radius: 6px;
 }
 
-.profile-section h4 {
-  margin-bottom: 5px;
+.profile-section h3 {
+  margin: 0 0 10px;
 }
 
+.privacy-toggle {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.profile-section.private {
+  opacity: 0.5;
+}
+
+/* Settings Page */
+.settings-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: #111;
+  border-radius: 6px;
+}
+
+.settings-section h3 {
+  margin-top: 0;
+  border-bottom: 1px solid #222;
+  padding-bottom: 6px;
+}
+
+.settings-section p,
+.settings-section a {
+  font-size: 14px;
+  color: #ccc;
+  text-decoration: none;
+}
+
+.settings-section a:hover {
+  text-decoration: underline;
+}
+
+/* Footer Navigation Tabs */
 footer {
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
+  width: 100%;
   background-color: #111;
-  padding: 10px;
+  border-top: 1px solid #222;
+}
+
+footer nav {
   display: flex;
   justify-content: space-around;
-  border-top: 1px solid #333;
+  padding: 8px 0;
 }
 
 footer nav button {
-  flex: 1;
   background: none;
   border: none;
   color: #aaa;
-  font-size: 16px;
-  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  flex: 1;
+  padding: 10px 0;
+  transition: color 0.3s ease;
 }
 
-footer nav button.active,
-footer nav button:hover {
+footer nav button.active {
   color: #fff;
-  font-weight: bold;
-  border-bottom: 2px solid #fff;
+  border-top: 2px solid #fff;
+}
+
+/* Responsive */
+@media screen and (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-bar {
+    margin: 10px 0;
+  }
 }
