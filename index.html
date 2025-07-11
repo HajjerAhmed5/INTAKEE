@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INTAKEE</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <div class="logo">👁️▶ INTAKEE</div>
+    <div class="logo">
+      <img src="IMG_6447.jpeg" alt="INTAKEE Logo" class="logo-img">
+    </div>
     <nav>
       <button onclick="openTab('videos')">🎥 Videos</button>
       <button onclick="openTab('podcasts')">🎧 Podcasts</button>
@@ -29,7 +31,7 @@
     <section id="podcasts" class="tab">
       <input type="search" placeholder="Search Podcasts...">
       <h2>Podcasts</h2>
-      <p>Only logged-in users can like/dislike. Comments are disabled. Audio continues in background.</p>
+      <p>Only logged-in users can like/dislike podcasts. Comments are disabled.</p>
     </section>
 
     <section id="upload" class="tab">
@@ -44,7 +46,7 @@
           <option>Go Live</option>
         </select><br><br>
         <label>Thumbnail Image:</label>
-        <input type="file" accept="image/*"><br><br>
+        <input type="file"><br><br>
         <label>Upload File:</label>
         <input type="file"><br><br>
         <button type="submit">Upload</button>
@@ -54,52 +56,51 @@
     <section id="clips" class="tab">
       <input type="search" placeholder="Search Clips...">
       <h2>Short Clips</h2>
-      <p>Scroll to discover vertical content. Log in to like or dislike. No comments.</p>
+      <p>Scroll to discover vertical content. Login to engage.</p>
     </section>
 
     <section id="profile" class="tab">
       <input type="search" placeholder="Search Creators...">
       <h2>Your Profile</h2>
-      <p>Log in to see your content, saved posts, and followers.</p>
+      <p>Log in to see your saved content, likes, and uploads.</p>
     </section>
 
     <section id="settings" class="tab">
       <h2>⚙️ INTAKEE Settings</h2>
-
       <details>
         <summary><strong>📜 Terms of Service</strong></summary>
         <ul>
-          <li><strong>User Responsibility:</strong> All content uploaded by users is their own. INTAKEE is not responsible.</li>
-          <li><strong>Freedom of Expression:</strong> We don’t censor speech. Content must follow the guidelines.</li>
-          <li><strong>Liability:</strong> INTAKEE is a platform, not a publisher. We don’t produce or endorse content.</li>
-          <li><strong>Account Requirements:</strong> Must be 13+. Accounts are needed to like, dislike, upload, or follow.</li>
-          <li><strong>Termination:</strong> We may suspend or remove accounts that break rules or are repeatedly reported.</li>
+          <li><strong>User Responsibility:</strong> All content uploaded by users is the sole responsibility of the individual creator. INTAKEE is not responsible for any user-generated content.</li>
+          <li><strong>Freedom of Expression:</strong> We support freedom of speech and do not censor opinions, but content must comply with Community Guidelines.</li>
+          <li><strong>Liability:</strong> INTAKEE is not liable for user content. We may remove content if it violates our rules.</li>
+          <li><strong>Account Requirements:</strong> You must be 13 or older. Likes, comments, and uploads require an account.</li>
+          <li><strong>Termination:</strong> We reserve the right to remove abusive accounts.</li>
         </ul>
       </details>
 
       <details>
         <summary><strong>📘 Community Guidelines</strong></summary>
         <ul>
-          <li><strong>What’s Not Allowed:</strong> Pornography, nudity, threats, hate, child exploitation, illegal activity.</li>
-          <li><strong>What’s Allowed:</strong> Political views, satire, cultural debate, art, music, comedy.</li>
-          <li><strong>Age-Restricted:</strong> Mature content must be flagged. Only logged-in users can view it.</li>
-          <li><strong>Reports:</strong> Content can be reported. INTAKEE decides what actions to take.</li>
+          <li><strong>Not Allowed:</strong> Pornography, threats, harassment, hate speech, illegal activity.</li>
+          <li><strong>Allowed:</strong> Political views, debates, comedy, creative expression.</li>
+          <li><strong>Age-Restricted:</strong> Mature content must be flagged. Only logged-in users can view.</li>
+          <li><strong>Reports:</strong> Repeatedly reported content may be removed.</li>
         </ul>
       </details>
 
       <details>
         <summary><strong>🔐 Privacy Policy</strong></summary>
         <ul>
-          <li><strong>We Collect:</strong> Email, username, password, uploads, likes, views, follows.</li>
-          <li><strong>We Don’t:</strong> Sell your data or track users off-platform.</li>
-          <li><strong>Control:</strong> Users can delete accounts and data at any time.</li>
+          <li><strong>We Collect:</strong> Account info, uploads, engagement data.</li>
+          <li><strong>We Don’t:</strong> Sell your data or track you off-site.</li>
+          <li><strong>Control:</strong> You can delete your account any time.</li>
         </ul>
       </details>
 
       <ul>
-        <li>🚫 <strong>Report Content:</strong> Flag inappropriate content/accounts.</li>
-        <li>⛔ <strong>Blocked Users:</strong> Manage who you blocked.</li>
-        <li>📧 <strong>Contact Support:</strong> Email our team for help.</li>
+        <li>🚫 <strong>Report Content</strong></li>
+        <li>⛔ <strong>Blocked Users</strong></li>
+        <li>📧 <strong>Contact Support</strong></li>
       </ul>
     </section>
   </main>
@@ -113,3 +114,4 @@
   </script>
 </body>
 </html>
+
