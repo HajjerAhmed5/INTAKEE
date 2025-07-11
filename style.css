@@ -14,13 +14,10 @@ header {
 
 .logo img {
   height: 40px;
-  display: block;
-  margin: 0 auto;
 }
 
 main {
   padding: 20px;
-  padding-bottom: 80px; /* Leave space for the fixed bottom nav */
 }
 
 .tab {
@@ -40,7 +37,6 @@ input[type="text"] {
   border-radius: 20px;
   color: white;
   font-size: 14px;
-  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
 }
 
 form label,
@@ -87,26 +83,23 @@ footer {
 
 footer nav {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
-  padding: 0 10px;
 }
 
 footer nav button {
   background: none;
   border: none;
   color: white;
-  font-size: 13px;
-  padding: 5px 8px;
+  font-size: 14px;
+  flex: 1;
+  padding: 10px;
   cursor: pointer;
   text-align: center;
-  flex: 1;
 }
 
 footer nav button:hover {
   text-decoration: underline;
-  background-color: #222;
-  border-radius: 6px;
 }
 
 .profile-box {
@@ -114,7 +107,7 @@ footer nav button:hover {
   padding: 20px;
   border-radius: 10px;
   border: 1px solid #333;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .profile-info {
@@ -145,6 +138,44 @@ footer nav button:hover {
   background-color: #555;
 }
 
+.profile-section {
+  margin-bottom: 20px;
+}
+
+.profile-section h4 {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 5px;
+}
+
+.profile-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.profile-section li {
+  margin-bottom: 5px;
+  padding: 8px;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 5px;
+}
+
+.profile-privacy-toggle {
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.profile-privacy-toggle label {
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+.profile-privacy-toggle input[type="checkbox"] {
+  vertical-align: middle;
+}
+
 details {
   margin-bottom: 15px;
   background-color: #111;
@@ -160,21 +191,4 @@ details summary {
 
 hr {
   border-color: #333;
-}
-
-/* Additional refinements */
-.profile-box p {
-  margin: 6px 0;
-  font-size: 14px;
-}
-
-.profile-box h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.profile-box .stats {
-  margin-top: 15px;
-  font-size: 14px;
-  line-height: 1.6;
 }
