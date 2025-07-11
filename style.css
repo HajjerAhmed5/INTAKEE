@@ -14,10 +14,13 @@ header {
 
 .logo img {
   height: 40px;
+  display: block;
+  margin: 0 auto;
 }
 
 main {
   padding: 20px;
+  padding-bottom: 80px; /* Leave space for the fixed bottom nav */
 }
 
 .tab {
@@ -37,6 +40,7 @@ input[type="text"] {
   border-radius: 20px;
   color: white;
   font-size: 14px;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
 }
 
 form label,
@@ -78,21 +82,31 @@ footer {
   background-color: #111;
   border-top: 1px solid #333;
   padding: 10px 0;
-  text-align: center;
   z-index: 1000;
+}
+
+footer nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
 }
 
 footer nav button {
   background: none;
   border: none;
   color: white;
-  font-size: 14px;
-  margin: 0 10px;
+  font-size: 13px;
+  padding: 5px 8px;
   cursor: pointer;
+  text-align: center;
+  flex: 1;
 }
 
 footer nav button:hover {
   text-decoration: underline;
+  background-color: #222;
+  border-radius: 6px;
 }
 
 .profile-box {
@@ -100,6 +114,7 @@ footer nav button:hover {
   padding: 20px;
   border-radius: 10px;
   border: 1px solid #333;
+  margin-bottom: 15px;
 }
 
 .profile-info {
@@ -145,4 +160,21 @@ details summary {
 
 hr {
   border-color: #333;
+}
+
+/* Additional refinements */
+.profile-box p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.profile-box h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.profile-box .stats {
+  margin-top: 15px;
+  font-size: 14px;
+  line-height: 1.6;
 }
