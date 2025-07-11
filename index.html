@@ -4,119 +4,99 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <div class="logo">
-      <img src="logo.png" alt="INTAKEE Logo">
+      <img src="logo.png" alt="INTAKEE Logo" class="logo-img">
     </div>
   </header>
 
   <main>
+    <!-- Home Tab -->
     <section id="home" class="tab active">
       <h2>Welcome to INTAKEE</h2>
-      <input type="text" placeholder="Search content..." />
+      <input type="text" placeholder="Search content...">
+      <p>Discover all types of content here.</p>
     </section>
 
+    <!-- Videos Tab -->
     <section id="videos" class="tab">
       <h2>Videos Feed</h2>
-      <input type="text" placeholder="Search videos..." />
+      <input type="text" placeholder="Search videos...">
       <p>No videos yet. Please log in to follow creators and see new content.</p>
     </section>
 
+    <!-- Podcasts Tab -->
     <section id="podcasts" class="tab">
       <h2>Podcasts</h2>
-      <input type="text" placeholder="Search podcasts..." />
-      <p>Only logged-in users can like/dislike podcasts.</p>
+      <input type="text" placeholder="Search podcasts...">
+      <p>Only logged-in users can like or dislike podcasts.</p>
     </section>
 
+    <!-- Upload Tab -->
     <section id="upload" class="tab">
       <h2>Upload</h2>
       <form>
-        <label for="uploadType">Select type:</label>
-        <select id="uploadType">
-          <option value="video">Video</option>
-          <option value="clip">Clip</option>
-          <option value="podcast-audio">Podcast (Audio)</option>
-          <option value="podcast-video">Podcast (Video)</option>
+        <input type="file">
+        <select>
+          <option>Video</option>
+          <option>Clip</option>
+          <option>Podcast - Audio</option>
+          <option>Podcast - Video</option>
         </select>
-
-        <label for="thumbnail">Thumbnail Image:</label>
-        <input type="file" id="thumbnail" />
-
-        <label for="media">Upload File:</label>
-        <input type="file" id="media" />
-
+        <input type="file" accept="image/*" placeholder="Upload thumbnail">
         <button type="submit">Upload</button>
-        <button type="button">Go Live</button>
       </form>
     </section>
 
+    <!-- Clips Tab -->
     <section id="clips" class="tab">
       <h2>Clips</h2>
-      <input type="text" placeholder="Search clips..." />
-      <p>Scroll through trending clips here.</p>
+      <input type="text" placeholder="Search clips...">
+      <p>Scroll through the latest short-form content.</p>
     </section>
 
+    <!-- Profile Tab -->
     <section id="profile" class="tab">
+      <h2>Your Profile</h2>
       <div class="profile-box">
         <div class="profile-info">
-          <img src="profile-pic.png" alt="Profile Picture" class="profile-pic" />
+          <img src="default-profile.png" alt="Profile Pic" class="profile-pic">
           <div>
-            <h3>@username</h3>
-            <p>Joined July 2025</p>
+            <strong>@YourUsername</strong><br>
+            <small>Edit Profile | Log Out</small>
           </div>
         </div>
+
         <div class="profile-actions">
-          <button>Edit Profile</button>
-          <button>Settings</button>
+          <button>Uploads</button>
+          <button>Likes</button>
+          <button>Saved</button>
+          <button>Playlists</button>
         </div>
 
         <div class="profile-section">
-          <div class="profile-privacy-toggle">
-            <label>Private <input type="checkbox" /></label>
-          </div>
-          <h4>Uploads</h4>
-          <ul>
-            <li>My first video</li>
-            <li>My podcast episode</li>
-          </ul>
-        </div>
-
-        <div class="profile-section">
-          <div class="profile-privacy-toggle">
-            <label>Private <input type="checkbox" /></label>
-          </div>
-          <h4>Likes</h4>
-          <ul>
-            <li>Video: Motivation Speech</li>
-            <li>Clip: Funny Cat</li>
-          </ul>
-        </div>
-
-        <div class="profile-section">
-          <div class="profile-privacy-toggle">
-            <label>Private <input type="checkbox" /></label>
-          </div>
-          <h4>Saved</h4>
-          <ul>
-            <li>Podcast: True Crime</li>
-            <li>Video: How to Code</li>
-          </ul>
-        </div>
-
-        <div class="profile-section">
-          <div class="profile-privacy-toggle">
-            <label>Private <input type="checkbox" /></label>
-          </div>
-          <h4>Playlists</h4>
-          <ul>
-            <li>My Favorites</li>
-            <li>Learning Series</li>
-          </ul>
+          <h4>Privacy Settings</h4>
+          <label><input type="checkbox"> Make Likes Private</label><br>
+          <label><input type="checkbox"> Make Saved Private</label><br>
+          <label><input type="checkbox"> Make Playlists Private</label>
         </div>
       </div>
+    </section>
+
+    <!-- Settings Tab -->
+    <section id="settings" class="tab">
+      <h2>⚙️ INTAKEE Settings</h2>
+      <ul>
+        <li><strong>🔐 Privacy Policy</strong> – Explains how user data is handled</li>
+        <li><strong>📜 Terms of Service</strong> – Legal agreement, not liable for user content</li>
+        <li><strong>📘 Community Guidelines</strong> – What is and isn’t allowed</li>
+        <li><strong>🚫 Report Content</strong> – Report user posts or profiles</li>
+        <li><strong>⛔ Block User List</strong> – View and manage blocked accounts</li>
+        <li><strong>📧 Contact Support</strong> – Email or in-app message support</li>
+      </ul>
     </section>
   </main>
 
@@ -128,6 +108,7 @@
       <button onclick="showTab('upload')">Upload</button>
       <button onclick="showTab('clips')">Clips</button>
       <button onclick="showTab('profile')">Profile</button>
+      <button onclick="showTab('settings')">Settings</button>
     </nav>
   </footer>
 
