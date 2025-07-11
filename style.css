@@ -1,4 +1,4 @@
-/* style.css */
+/* Updated style.css for INTAKEE */
 
 body {
   margin: 0;
@@ -7,103 +7,109 @@ body {
   color: white;
 }
 
+header {
+  background-color: #111;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 40px;
+}
+
 main {
   padding: 20px;
-  padding-bottom: 100px; /* space for footer */
 }
 
-h2 {
-  margin-top: 0;
-  color: white;
-}
-
-.tab {
+section {
   display: none;
 }
 
-.tab.active {
+section.active {
   display: block;
 }
 
-/* Upload Form */
-form {
-  background-color: #111;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 600px;
-  margin-top: 10px;
-}
-
-label {
-  display: block;
-  margin-top: 10px;
-  margin-bottom: 5px;
-}
-
-input[type="file"],
-select,
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #222;
-  border: 1px solid #444;
-  color: white;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-
-/* Footer nav */
 footer {
   position: fixed;
   bottom: 0;
   width: 100%;
   background-color: #111;
-  border-top: 1px solid #222;
-  padding: 10px 0;
-  z-index: 1000;
-}
-
-nav {
   display: flex;
   justify-content: space-around;
+  padding: 10px 0;
+  z-index: 10;
+  border-top: 1px solid #333;
 }
 
 nav button {
   background: none;
   border: none;
   color: white;
-  font-weight: bold;
-  cursor: pointer;
   font-size: 14px;
+  cursor: pointer;
+  padding: 5px 10px;
 }
 
 nav button:hover {
   text-decoration: underline;
 }
 
-/* Settings and Details */
+input[type="text"] {
+  width: 100%;
+  max-width: 500px;
+  padding: 10px 15px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+input[type="text"]::placeholder {
+  color: #aaa;
+}
+
+form {
+  background-color: #111;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  max-width: 600px;
+}
+
+form label, form select, form input[type="file"], form button {
+  display: block;
+  margin: 10px 0;
+  width: 100%;
+}
+
+form button {
+  padding: 10px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+form button:hover {
+  background-color: #444;
+}
+
 details {
   background-color: #111;
-  border-radius: 8px;
-  margin: 15px 0;
+  margin-bottom: 10px;
   padding: 15px;
-  border: 1px solid #333;
+  border-radius: 5px;
 }
 
 details summary {
   font-weight: bold;
-  font-size: 16px;
   cursor: pointer;
 }
 
-details p,
-details li {
-  color: #ccc;
-  margin-left: 10px;
+ul li {
   margin-bottom: 5px;
-}
-
-ul {
-  list-style-type: disc;
-  padding-left: 20px;
 }
