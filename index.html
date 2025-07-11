@@ -1,41 +1,115 @@
-<section id="settings" class="tab">
-  <h2>⚙️ INTAKEE Settings</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>INTAKEE</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">👁️▶ INTAKEE</div>
+    <nav>
+      <button onclick="openTab('videos')">🎥 Videos</button>
+      <button onclick="openTab('podcasts')">🎧 Podcasts</button>
+      <button onclick="openTab('upload')">➕ Upload</button>
+      <button onclick="openTab('clips')">📱 Clips</button>
+      <button onclick="openTab('profile')">👤 Profile</button>
+      <button onclick="openTab('settings')">⚙️ Settings</button>
+    </nav>
+  </header>
 
-  <details>
-    <summary><strong>📜 Terms of Service</strong></summary>
-    <p><strong>Effective Date:</strong> July 2025</p>
-    <p>Welcome to INTAKEE. By using this platform, you agree to the following terms:</p>
-    <ul>
-      <li><strong>User Responsibility:</strong> All content uploaded by users is the sole responsibility of the individual creator. INTAKEE is not responsible for any user-generated content, including videos, clips, podcasts, titles, thumbnails, or comments.</li>
-      <li><strong>Freedom of Expression:</strong> We support freedom of speech and do not censor opinions, political beliefs, or controversial topics. However, content must comply with our Community Guidelines.</li>
-      <li><strong>Liability:</strong> INTAKEE is a content-hosting platform. We do not produce, review, or endorse user content. If content is reported and violates our policies, we reserve the right to remove it.</li>
-      <li><strong>Account Requirements:</strong> You must be 13 or older to use INTAKEE. Certain features (likes, comments, uploads) require account creation.</li>
-      <li><strong>Termination:</strong> INTAKEE reserves the right to suspend or delete accounts that repeatedly violate our terms or are reported for abuse.</li>
-    </ul>
-  </details>
+  <main>
+    <section id="videos" class="tab active">
+      <input type="search" placeholder="Search Videos...">
+      <h2>Videos Feed</h2>
+      <p>No videos yet. Please log in to follow creators and see new content.</p>
+    </section>
 
-  <details>
-    <summary><strong>📘 Community Guidelines</strong></summary>
-    <ul>
-      <li><strong>What’s Not Allowed:</strong> Pornography, nudity, or sexually explicit material; threats, hate speech, harassment, or bullying; calls to violence or real-world harm; child exploitation, animal cruelty, or illegal activity; spam, scams, or impersonation.</li>
-      <li><strong>What’s Allowed:</strong> Political commentary, controversial opinions, debates; religious, cultural, or ideological views; art, comedy, satire, and creative expression.</li>
-      <li><strong>Age-Restricted Content:</strong> Mature content must be marked accordingly. Only logged-in users can view age-restricted material.</li>
-      <li><strong>Enforcement:</strong> Users can report violations. Repeated reports may result in review and removal.</li>
-    </ul>
-  </details>
+    <section id="podcasts" class="tab">
+      <input type="search" placeholder="Search Podcasts...">
+      <h2>Podcasts</h2>
+      <p>Only logged-in users can like/dislike. Comments are disabled. Audio continues in background.</p>
+    </section>
 
-  <details>
-    <summary><strong>🔐 Privacy Policy</strong></summary>
-    <ul>
-      <li><strong>What We Collect:</strong> Account details (email, username, password); content uploads (videos, audio files, images); usage data (likes, views, follows).</li>
-      <li><strong>What We Don’t Do:</strong> We do <strong>not</strong> sell your data to third parties. We do <strong>not</strong> track users off-platform.</li>
-      <li><strong>Data Rights:</strong> You can delete your account and data at any time. We use encryption and security best practices to protect your information.</li>
-    </ul>
-  </details>
+    <section id="upload" class="tab">
+      <h2>Upload</h2>
+      <form>
+        <label>Select Type:</label>
+        <select>
+          <option>Video</option>
+          <option>Podcast (Audio Only)</option>
+          <option>Podcast (Video)</option>
+          <option>Clip</option>
+          <option>Go Live</option>
+        </select><br><br>
+        <label>Thumbnail Image:</label>
+        <input type="file" accept="image/*"><br><br>
+        <label>Upload File:</label>
+        <input type="file"><br><br>
+        <button type="submit">Upload</button>
+      </form>
+    </section>
 
-  <ul>
-    <li>🚫 <strong>Report Content</strong> — Flag inappropriate content/accounts.</li>
-    <li>⛔ <strong>Blocked Users</strong> — Manage blocked accounts.</li>
-    <li>📧 <strong>Contact Support</strong> — Message our team for help.</li>
-  </ul>
-</section>
+    <section id="clips" class="tab">
+      <input type="search" placeholder="Search Clips...">
+      <h2>Short Clips</h2>
+      <p>Scroll to discover vertical content. Log in to like or dislike. No comments.</p>
+    </section>
+
+    <section id="profile" class="tab">
+      <input type="search" placeholder="Search Creators...">
+      <h2>Your Profile</h2>
+      <p>Log in to see your content, saved posts, and followers.</p>
+    </section>
+
+    <section id="settings" class="tab">
+      <h2>⚙️ INTAKEE Settings</h2>
+
+      <details>
+        <summary><strong>📜 Terms of Service</strong></summary>
+        <ul>
+          <li><strong>User Responsibility:</strong> All content uploaded by users is their own. INTAKEE is not responsible.</li>
+          <li><strong>Freedom of Expression:</strong> We don’t censor speech. Content must follow the guidelines.</li>
+          <li><strong>Liability:</strong> INTAKEE is a platform, not a publisher. We don’t produce or endorse content.</li>
+          <li><strong>Account Requirements:</strong> Must be 13+. Accounts are needed to like, dislike, upload, or follow.</li>
+          <li><strong>Termination:</strong> We may suspend or remove accounts that break rules or are repeatedly reported.</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary><strong>📘 Community Guidelines</strong></summary>
+        <ul>
+          <li><strong>What’s Not Allowed:</strong> Pornography, nudity, threats, hate, child exploitation, illegal activity.</li>
+          <li><strong>What’s Allowed:</strong> Political views, satire, cultural debate, art, music, comedy.</li>
+          <li><strong>Age-Restricted:</strong> Mature content must be flagged. Only logged-in users can view it.</li>
+          <li><strong>Reports:</strong> Content can be reported. INTAKEE decides what actions to take.</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary><strong>🔐 Privacy Policy</strong></summary>
+        <ul>
+          <li><strong>We Collect:</strong> Email, username, password, uploads, likes, views, follows.</li>
+          <li><strong>We Don’t:</strong> Sell your data or track users off-platform.</li>
+          <li><strong>Control:</strong> Users can delete accounts and data at any time.</li>
+        </ul>
+      </details>
+
+      <ul>
+        <li>🚫 <strong>Report Content:</strong> Flag inappropriate content/accounts.</li>
+        <li>⛔ <strong>Blocked Users:</strong> Manage who you blocked.</li>
+        <li>📧 <strong>Contact Support:</strong> Email our team for help.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    function openTab(tabId) {
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+  </script>
+</body>
+</html>
