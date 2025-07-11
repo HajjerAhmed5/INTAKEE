@@ -7,29 +7,13 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <img src="IMG_6447.jpeg" alt="INTAKEE Logo" class="logo-img">
-    </div>
-    <nav>
-      <button onclick="openTab('videos')">🎥 Videos</button>
-      <button onclick="openTab('podcasts')">🎧 Podcasts</button>
-      <button onclick="openTab('upload')">➕ Upload</button>
-      <button onclick="openTab('clips')">📱 Clips</button>
-      <button onclick="openTab('profile')">👤 Profile</button>
-      <button onclick="openTab('settings')">⚙️ Settings</button>
-    </nav>
-  </header>
-
   <main>
     <section id="videos" class="tab active">
-      <input type="search" placeholder="Search Videos...">
       <h2>Videos Feed</h2>
       <p>No videos yet. Please log in to follow creators and see new content.</p>
     </section>
 
     <section id="podcasts" class="tab">
-      <input type="search" placeholder="Search Podcasts...">
       <h2>Podcasts</h2>
       <p>Only logged-in users can like/dislike podcasts. Comments are disabled.</p>
     </section>
@@ -43,8 +27,8 @@
           <option>Podcast (Audio Only)</option>
           <option>Podcast (Video)</option>
           <option>Clip</option>
-          <option>Go Live</option>
         </select><br><br>
+        <button type="button">Go Live</button><br><br>
         <label>Thumbnail Image:</label>
         <input type="file"><br><br>
         <label>Upload File:</label>
@@ -54,21 +38,19 @@
     </section>
 
     <section id="clips" class="tab">
-      <input type="search" placeholder="Search Clips...">
       <h2>Short Clips</h2>
       <p>Scroll to discover vertical content. Login to engage.</p>
     </section>
 
     <section id="profile" class="tab">
-      <input type="search" placeholder="Search Creators...">
       <h2>Your Profile</h2>
       <p>Log in to see your saved content, likes, and uploads.</p>
     </section>
 
     <section id="settings" class="tab">
-      <h2>⚙️ INTAKEE Settings</h2>
+      <h2>INTAKEE Settings</h2>
       <details>
-        <summary><strong>📜 Terms of Service</strong></summary>
+        <summary><strong>Terms of Service</strong></summary>
         <ul>
           <li><strong>User Responsibility:</strong> All content uploaded by users is the sole responsibility of the individual creator. INTAKEE is not responsible for any user-generated content.</li>
           <li><strong>Freedom of Expression:</strong> We support freedom of speech and do not censor opinions, but content must comply with Community Guidelines.</li>
@@ -79,31 +61,51 @@
       </details>
 
       <details>
-        <summary><strong>📘 Community Guidelines</strong></summary>
+        <summary><strong>Community Guidelines</strong></summary>
         <ul>
           <li><strong>Not Allowed:</strong> Pornography, threats, harassment, hate speech, illegal activity.</li>
           <li><strong>Allowed:</strong> Political views, debates, comedy, creative expression.</li>
           <li><strong>Age-Restricted:</strong> Mature content must be flagged. Only logged-in users can view.</li>
-          <li><strong>Reports:</strong> Repeatedly reported content may be removed.</li>
+          <li><strong>Reports:</strong> Repeatedly reported content may be reviewed and removed.</li>
         </ul>
       </details>
 
       <details>
-        <summary><strong>🔐 Privacy Policy</strong></summary>
+        <summary><strong>Privacy Policy</strong></summary>
         <ul>
           <li><strong>We Collect:</strong> Account info, uploads, engagement data.</li>
           <li><strong>We Don’t:</strong> Sell your data or track you off-site.</li>
-          <li><strong>Control:</strong> You can delete your account any time.</li>
+          <li><strong>Control:</strong> You can delete your account at any time.</li>
         </ul>
       </details>
 
-      <ul>
-        <li>🚫 <strong>Report Content</strong></li>
-        <li>⛔ <strong>Blocked Users</strong></li>
-        <li>📧 <strong>Contact Support</strong></li>
-      </ul>
+      <details>
+        <summary><strong>Report Content</strong></summary>
+        <p>Use the in-app form to report any content or users that violate our guidelines. Reports are reviewed by our moderation team.</p>
+      </details>
+
+      <details>
+        <summary><strong>Blocked Users</strong></summary>
+        <p>You can block any user to prevent them from interacting with you. Manage your blocked users in this section.</p>
+      </details>
+
+      <details>
+        <summary><strong>Contact Support</strong></summary>
+        <p>Need help? Email support@intakee.com or use the in-app messaging system to reach us directly.</p>
+      </details>
     </section>
   </main>
+
+  <footer>
+    <nav>
+      <button onclick="openTab('videos')">Videos</button>
+      <button onclick="openTab('podcasts')">Podcasts</button>
+      <button onclick="openTab('upload')">Upload</button>
+      <button onclick="openTab('clips')">Clips</button>
+      <button onclick="openTab('profile')">Profile</button>
+      <button onclick="openTab('settings')">Settings</button>
+    </nav>
+  </footer>
 
   <script>
     function openTab(tabId) {
@@ -114,4 +116,3 @@
   </script>
 </body>
 </html>
-
