@@ -10,10 +10,11 @@
   <header class="header">
     <img src="INTAKEE_logo.png" alt="INTAKEE Logo" class="logo" />
     <input type="text" placeholder="Search..." class="search-bar" />
+    <button id="darkModeToggle">Toggle Dark Mode</button>
+    <button id="loginBtn">Login</button>
   </header>
 
   <main id="main-content">
-    <!-- HOME -->
     <section id="home" class="tab-content active">
       <h1 class="welcome">Welcome to INTAKEE</h1>
       <div class="grid">
@@ -32,103 +33,55 @@
       </div>
     </section>
 
-    <!-- VIDEOS -->
-    <section id="videos" class="tab-content">
-      <h2 class="tab-title">Videos</h2>
-      <div class="grid">
-        <div class="card"><img src="vid1.jpg" /><h3>Spacecraft View</h3><p>1.4K views</p></div>
-        <div class="card"><img src="vid2.jpg" /><h3>Ocean Waves</h3><p>1.5K views</p></div>
-      </div>
-    </section>
+    <section id="videos" class="tab-content"><h2 class="tab-title">Videos</h2></section>
+    <section id="podcasts" class="tab-content"><h2 class="tab-title">Podcasts</h2></section>
 
-    <!-- PODCASTS -->
-    <section id="podcasts" class="tab-content">
-      <h2 class="tab-title">Podcasts</h2>
-      <div class="grid">
-        <div class="card"><img src="pod1.jpg" /><h3>The Tech Talk</h3></div>
-        <div class="card"><img src="pod2.jpg" /><h3>Health & Wellness</h3></div>
-      </div>
-    </section>
-
-    <!-- UPLOAD -->
     <section id="upload" class="tab-content">
-      <h2 class="tab-title">Upload to INTAKEE</h2>
+      <h2 class="tab-title">Upload</h2>
       <form>
         <label>Type:
-          <select>
-            <option>Video</option>
-            <option>Clip</option>
-            <option>Podcast</option>
-          </select>
-        </label><br />
-        <label>Title:
-          <input type="text" placeholder="Enter" />
-        </label><br />
-        <label>Description:
-          <textarea placeholder="Write a description..."></textarea>
-        </label><br />
-        <label>Thumbnail:
-          <input type="file" />
-        </label><br />
-        <label>Privacy:
-          <select>
-            <option>Public</option>
-            <option>Private</option>
-          </select>
-        </label><br />
-        <label><input type="checkbox" /> Enable downloads</label><br />
-        <label><input type="checkbox" /> Allow likes</label><br />
+          <select><option>Video</option><option>Clip</option><option>Podcast</option></select>
+        </label>
+        <label>Title:<input type="text" /></label>
+        <label>Description:<textarea></textarea></label>
+        <label>Thumbnail:<input type="file" /></label>
         <button type="submit">Upload</button>
         <button type="button">Go Live</button>
       </form>
     </section>
 
-    <!-- CLIPS -->
-    <section id="clips" class="tab-content">
-      <h2 class="tab-title">Clips</h2>
-      <div class="card">
-        <img src="clip1.jpg" />
-        <h3>Sample Clip</h3>
-        <p>Example clip content</p>
-        <p>1,234 Likes • 56 Comments</p>
-        <input type="text" placeholder="Add comment..." />
-      </div>
-    </section>
+    <section id="clips" class="tab-content"><h2 class="tab-title">Clips</h2></section>
+    <section id="profile" class="tab-content"><h2 class="tab-title">Profile</h2></section>
 
-    <!-- PROFILE -->
-    <section id="profile" class="tab-content">
-      <h2 class="tab-title">Profile</h2>
-      <img src="profile.jpg" class="profile-pic" />
-      <h3>Hajer Ahmed</h3>
-      <p>Creator</p>
-      <p>5 Videos | 8,294 Followers | 307 Following</p>
-      <button>Edit Profile</button>
-    </section>
-
-    <!-- SETTINGS -->
     <section id="settings" class="tab-content">
       <h2 class="tab-title">Settings</h2>
       <ul class="settings-list">
-        <li><strong>Privacy Policy:</strong> How INTAKEE collects and protects your data.</li>
-        <li><strong>Terms of Service:</strong> Creators are responsible for their content.</li>
-        <li><strong>Community Guidelines:</strong> No pornographic, threatening, or abusive content allowed.</li>
-        <li><strong>Report Content:</strong> Use this to flag content for review.</li>
-        <li><strong>Blocked Users:</strong> Manage your blocked accounts list.</li>
-        <li><strong>Contact Support:</strong> Email us at <a href="mailto:Intakee@gmail.com">Intakee@gmail.com</a></li>
+        <li><strong>Privacy Policy:</strong> INTAKEE protects your data.</li>
+        <li><strong>Terms of Service:</strong> Creators are responsible for content.</li>
+        <li><strong>Contact:</strong> Intakee@gmail.com</li>
       </ul>
     </section>
   </main>
 
-  <!-- TABS -->
   <footer class="tabs">
     <button class="tab" onclick="showTab('home')">Home</button>
     <button class="tab" onclick="showTab('videos')">Videos</button>
-    <button class="tab" onclick="showTab('podcasts')">Podcasts</button>
+    <button class="tab" onclick="showTab('podcasts')">Podcast</button>
     <button class="tab" onclick="showTab('upload')">Upload</button>
     <button class="tab" onclick="showTab('clips')">Clips</button>
     <button class="tab" onclick="showTab('profile')">Profile</button>
     <button class="tab" onclick="showTab('settings')">Settings</button>
   </footer>
+
+  <div id="loginModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Login</h2>
+      <input type="text" placeholder="Username" />
+      <input type="password" placeholder="Password" />
+      <button>Login</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
