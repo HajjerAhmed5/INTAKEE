@@ -1,5 +1,4 @@
-/* General Layout */
-body {
+ body {
   margin: 0;
   background: #000;
   color: #fff;
@@ -8,12 +7,10 @@ body {
 main {
   padding-bottom: 70px;
 }
-
-/* Header */
 .header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   background: #000;
   padding: 12px;
   border-bottom: 1px solid #222;
@@ -37,8 +34,6 @@ main {
   top: 50%;
   transform: translateY(-50%);
 }
-
-/* Grid and Cards */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -54,36 +49,42 @@ main {
   width: 100%;
   border-radius: 6px;
 }
-
-/* Upload Form */
-.upload-form {
+.upload-info {
+  padding: 20px;
+  text-align: center;
+}
+.upload-info p {
+  margin-bottom: 10px;
+}
+.upload-info button {
+  background: #333;
+  border: none;
+  color: #888;
+  padding: 10px 20px;
+  border-radius: 6px;
+  margin: 5px;
+  cursor: not-allowed;
+}
+.profile-placeholder {
+  text-align: center;
+  padding: 40px;
+  color: #aaa;
+}
+.settings {
   padding: 20px;
 }
-.upload-form label,
-.upload-form input,
-.upload-form select,
-.upload-form textarea {
-  display: block;
-  width: 100%;
-  margin-bottom: 12px;
+.legal h3 {
+  margin-top: 20px;
+  color: #0af;
 }
-.upload-form button {
-  padding: 10px;
-  width: 100%;
-  background: #222;
-  color: white;
-  border: none;
-  border-radius: 6px;
+.legal p {
+  font-size: 14px;
+  line-height: 1.6;
 }
-.button-group {
-  display: flex;
-  gap: 10px;
+.legal a {
+  color: #0af;
+  text-decoration: underline;
 }
-.button-group button {
-  flex: 1;
-}
-
-/* Tabs at the Bottom */
 .tabs {
   position: fixed;
   bottom: 0;
@@ -104,50 +105,9 @@ main {
 .tabs button:hover {
   background: #222;
 }
-
-/* Tab Content Display Logic */
 .tab-content {
   display: none;
 }
 .tab-content.active {
   display: block;
-}
-
-/* Profile Tab (No Accounts Yet) */
-.profile-box {
-  text-align: center;
-  padding: 24px;
-}
-.profile-pic {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 3px solid #fff;
-  margin-bottom: 12px;
-}
-.username {
-  font-size: 20px;
-  margin: 0;
-}
-.bio {
-  font-size: 14px;
-  color: #aaa;
-  margin-bottom: 16px;
-}
-
-/* Settings + Legal */
-.settings {
-  padding: 20px;
-}
-.legal h3 {
-  margin-top: 20px;
-  color: #0af;
-}
-.legal p {
-  font-size: 14px;
-  line-height: 1.6;
-}
-.legal a {
-  color: #0af;
-  text-decoration: underline;
 }
