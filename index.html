@@ -37,7 +37,6 @@
     }
     .tab-content {
       display: none;
-      color: white;
       padding: 20px;
     }
     .tab-content.active {
@@ -48,9 +47,35 @@
       padding: 50px;
       color: #999;
     }
+    .upload-section select,
+    .upload-section input,
+    .upload-section textarea {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      background: #1e1e1e;
+      border: none;
+      color: white;
+      border-radius: 4px;
+    }
+    .upload-section label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+    .upload-section button {
+      padding: 10px 20px;
+      background-color: white;
+      color: black;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
     .profile-pic-wrapper {
       position: relative;
       display: inline-block;
+      margin-bottom: 15px;
     }
     .circle-profile-pic {
       width: 100px;
@@ -107,22 +132,65 @@
     <div class="placeholder-content">No content yet. Be the first to upload something on INTAKEE!</div>
   </div>
   <div id="videos" class="tab-content">
-    <div class="placeholder-content">No videos have been posted yet.</div>
+    <div class="placeholder-content">No videos available.</div>
   </div>
   <div id="podcasts" class="tab-content">
-    <div class="placeholder-content">No podcasts have been published yet.</div>
+    <div class="placeholder-content">No podcasts available yet.</div>
   </div>
   <div id="upload" class="tab-content">
-    <div class="placeholder-content">Upload tab under construction. Coming soon!</div>
+    <div class="upload-section">
+      <label>Choose Content Type</label>
+      <select>
+        <option>Video</option>
+        <option>Podcast (audio or video)</option>
+        <option>Clip</option>
+      </select>
+      <label>Title</label>
+      <input type="text" placeholder="Enter title" />
+      <label>Description</label>
+      <textarea placeholder="Enter description"></textarea>
+      <label>Upload File</label>
+      <input type="file" />
+      <label>Optional Thumbnail</label>
+      <input type="file" />
+      <button>Go Live</button>
+    </div>
   </div>
   <div id="clips" class="tab-content">
-    <div class="placeholder-content">No clips have been shared yet.</div>
+    <div class="placeholder-content">No clips uploaded yet.</div>
   </div>
   <div id="profile" class="tab-content">
-    <div class="placeholder-content">Your profile will appear here. Upload your profile picture and bio.</div>
+    <h2>Your Profile</h2>
+    <div class="profile-pic-wrapper">
+      <img class="circle-profile-pic" id="profilePreview" src="" alt="Preview" />
+    </div>
+    <input type="file" onchange="previewProfilePic(event)" />
+    <label>Username</label>
+    <input type="text" placeholder="Enter your username" />
+    <label>Bio</label>
+    <textarea placeholder="Write something about yourself..."></textarea>
+    <h3>Your Uploads</h3>
+    <p>No uploads yet.</p>
+    <h3>Saved Content</h3>
+    <p>You haven't saved anything yet.</p>
+    <h3>Your Playlists</h3>
+    <p>No playlists created.</p>
   </div>
   <div id="settings" class="tab-content">
-    <div class="placeholder-content">Settings panel under construction. Full policies and controls coming soon.</div>
+    <h2>Settings</h2>
+    <h3>Privacy Policy</h3>
+    <p>Explains what data is collected and how it's used. Data is not sold. Users can request deletion.</p>
+    <h3>Terms of Service</h3>
+    <p>Users are responsible for content. INTAKEE is not liable for user posts. Illegal content is banned.</p>
+    <h3>Community Guidelines</h3>
+    <p>No porn, threats, hate, or spam. Freedom of expression is supported. Violations may lead to bans.</p>
+    <h3>Report Content</h3>
+    <p>Allows reporting users or content. INTAKEE reviews reports and takes action.</p>
+    <h3>Blocked Users</h3>
+    <p>Blocked users can't interact with or see your posts.</p>
+    <h3>Contact Support</h3>
+    <p>Email: intakee2025@gmail.com</p>
+    <footer style="margin-top: 40px; font-size: 12px; color: #888">INTAKEE is a content-sharing platform. All opinions and content expressed are solely those of the creator. INTAKEE assumes no responsibility for user-generated content.</footer>
   </div>
 
   <!-- Navigation Bar -->
@@ -161,6 +229,15 @@
     document.addEventListener("DOMContentLoaded", () => {
       showTab("#home");
     });
+
+    function previewProfilePic(event) {
+      const reader = new FileReader();
+      reader.onload = function(){
+        const preview = document.getElementById('profilePreview');
+        preview.src = reader.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
   </script>
 </body>
 </html>
