@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -21,18 +21,6 @@
     .logo {
       font-size: 20px;
       font-weight: bold;
-    }
-    .search-container {
-      flex-grow: 1;
-      display: flex;
-      justify-content: flex-end;
-      padding-right: 16px;
-    }
-    .search-bar {
-      max-width: 300px;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 4px;
     }
     .tabs {
       display: flex;
@@ -60,34 +48,6 @@
     .tab-content.active {
       display: block;
     }
-    .content-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: space-between;
-    }
-    .video-card, .clip-card, .podcast-card {
-      background-color: #111;
-      padding: 12px;
-      border-radius: 10px;
-      width: 48%;
-      box-sizing: border-box;
-      color: white;
-    }
-    video, audio {
-      width: 100%;
-      border-radius: 6px;
-    }
-    h4 {
-      font-size: 16px;
-      margin: 10px 0 5px;
-    }
-    .video-meta, .clip-meta, .podcast-meta {
-      display: flex;
-      gap: 15px;
-      font-size: 14px;
-      opacity: 0.8;
-    }
     input, textarea {
       width: 100%;
       margin-bottom: 10px;
@@ -106,69 +66,95 @@
       font-size: 12px;
       color: #888;
     }
+    .profile-subsection {
+      margin-bottom: 20px;
+    }
+    .legal-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
+    }
+    .extra-content {
+      margin-top: 40px;
+      padding: 20px;
+      background-color: #111;
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="logo">👁️ INTAKEE</div>
-    <div class="search-container" id="search-wrapper">
-      <input type="text" class="search-bar" placeholder="Search..." id="global-search">
-    </div>
+    <div class="logo">INTAKEE</div>
   </div>
 
-  <div class="tab-content active" id="home">Home Feed</div>
+  <div class="tab-content active" id="home">
+    <h2>Welcome to INTAKEE</h2>
+    <p>No posts yet. Once users sign up and upload content, you’ll see it here.</p>
+  </div>
+
   <div class="tab-content" id="videos">
-    <div class="content-grid">
-      <div class="video-card">
-        <video controls poster="thumbnail1.jpg">
-          <source src="video1.mp4" type="video/mp4">
-        </video>
-        <h4>Video Title 1</h4>
-        <div class="video-meta">
-          <span>👍 10</span>
-          <span>👎 2</span>
-          <span>💬 5</span>
-        </div>
-      </div>
-      <div class="video-card">
-        <video controls poster="thumbnail2.jpg">
-          <source src="video2.mp4" type="video/mp4">
-        </video>
-        <h4>Video Title 2</h4>
-        <div class="video-meta">
-          <span>👍 8</span>
-          <span>👎 1</span>
-          <span>💬 3</span>
-        </div>
-      </div>
+    <h2>Videos</h2>
+    <p>No videos uploaded yet.</p>
+    <div class="extra-content">
+      <p>Video previews will appear here when uploaded. Users can like, dislike, and comment on videos when logged in. Logged out users can only view and read comments.</p>
     </div>
   </div>
 
-  <div class="tab-content" id="podcasts">Podcast Feed</div>
+  <div class="tab-content" id="podcasts">
+    <h2>Podcasts</h2>
+    <p>No podcasts available at the moment.</p>
+    <div class="extra-content">
+      <p>Podcasts support both audio-only and video formats. Comments are disabled, but like/dislike is allowed for logged-in users.</p>
+    </div>
+  </div>
 
   <div class="tab-content" id="upload">
     <div class="upload-section">
-      <h3>Upload</h3>
+      <h2>Upload Content</h2>
       <label>Title</label>
-      <input type="text" placeholder="Enter title">
+      <input type="text" placeholder="Enter a title for your upload">
       <label>Description</label>
-      <textarea placeholder="Enter description"></textarea>
-      <label>File</label>
+      <textarea placeholder="Write a brief description..."></textarea>
+      <label>Select File</label>
       <input type="file">
       <button style="margin-top:10px; padding:10px; background:white; color:black; border:none; border-radius:5px;">Go Live</button>
     </div>
   </div>
 
-  <div class="tab-content" id="clips">Clips Feed</div>
+  <div class="tab-content" id="clips">
+    <h2>Clips</h2>
+    <p>No clips posted yet.</p>
+    <div class="extra-content">
+      <p>Short-form content will be displayed here. Logged-in users can interact; guests can only view.</p>
+    </div>
+  </div>
 
   <div class="tab-content" id="profile">
     <div class="profile-section">
-      <label for="profile-pic">Profile Picture</label>
-      <input type="file" id="profile-pic">
-      <label>Username</label>
-      <input type="text" placeholder="Enter username">
-      <label>Bio</label>
-      <textarea placeholder="Enter your bio"></textarea>
+      <div class="profile-subsection">
+        <label for="profile-pic">Upload Profile Picture</label>
+        <input type="file" id="profile-pic">
+      </div>
+      <div class="profile-subsection">
+        <label>Username</label>
+        <input type="text" placeholder="Enter your username">
+      </div>
+      <div class="profile-subsection">
+        <label>Bio</label>
+        <textarea placeholder="Write something about yourself..."></textarea>
+      </div>
+      <div class="profile-subsection">
+        <h4>Your Uploads</h4>
+        <p>No uploads yet.</p>
+      </div>
+      <div class="profile-subsection">
+        <h4>Saved Content</h4>
+        <p>You haven’t saved anything yet.</p>
+      </div>
+      <div class="profile-subsection">
+        <h4>Your Playlists</h4>
+        <p>You haven’t created any playlists yet.</p>
+      </div>
     </div>
   </div>
 
@@ -186,6 +172,9 @@
       <p>Manage users you've blocked. They can’t see or interact with your content.</p>
       <h3>Contact Support</h3>
       <p>Email us at intakee2025@gmail.com</p>
+      <div class="legal-section">
+        <p>INTAKEE is a content-sharing platform. All opinions and content expressed are solely those of the creator. INTAKEE assumes no responsibility for user-generated content.</p>
+      </div>
     </div>
   </div>
 
@@ -206,6 +195,7 @@
   <script>
     const tabs = document.querySelectorAll('.tab a');
     const contents = document.querySelectorAll('.tab-content');
+
     tabs.forEach(tab => {
       tab.addEventListener('click', e => {
         e.preventDefault();
