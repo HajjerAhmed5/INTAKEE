@@ -38,9 +38,17 @@
       <label for="upload-type">Select Content Type</label>
       <select id="upload-type">
         <option value="video">Video</option>
-        <option value="podcast">Podcast (audio or video)</option>
+        <option value="podcast">Podcast</option>
         <option value="clip">Clip</option>
       </select>
+
+      <div id="podcast-options" style="display:none;">
+        <label for="podcast-format">Podcast Format</label>
+        <select id="podcast-format">
+          <option value="audio">Audio-only</option>
+          <option value="video">Video podcast</option>
+        </select>
+      </div>
 
       <label for="upload-title">Title</label>
       <input type="text" id="upload-title" placeholder="Enter title" />
@@ -168,6 +176,15 @@
         reader.readAsDataURL(event.target.files[0]);
       }
     }
+
+    document.getElementById('upload-type').addEventListener('change', function () {
+      const podcastOptions = document.getElementById('podcast-options');
+      if (this.value === 'podcast') {
+        podcastOptions.style.display = 'block';
+      } else {
+        podcastOptions.style.display = 'none';
+      }
+    });
 
     // Default tab shown on load
     document.addEventListener("DOMContentLoaded", () => {
