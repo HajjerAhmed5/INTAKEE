@@ -1,13 +1,14 @@
-// Tab navigation logic
+// script.js - Full JavaScript Logic for INTAKEE
+
+document.addEventListener("DOMContentLoaded", () => {
+  showTab("#home");
+});
+
 function showTab(tabId) {
   const contents = document.querySelectorAll('.tab-content');
-  contents.forEach(content => content.classList.remove('active'));
-  const target = document.getElementById(tabId.replace('#', ''));
-  if (target) {
-    target.classList.add('active');
-  }
+  contents.forEach(c => c.classList.remove('active'));
+  document.getElementById(tabId.replace('#', '')).classList.add('active');
 
-  // Show/hide search bar
   const searchBar = document.getElementById('search-bar');
   if (["#upload", "#settings"].includes(tabId)) {
     searchBar.style.display = 'none';
@@ -16,26 +17,41 @@ function showTab(tabId) {
   }
 }
 
-// Listen for tab click events
-document.querySelectorAll('.tab-bar a').forEach(link => {
-  link.addEventListener('click', function (e) {
+document.querySelectorAll('.tab a').forEach(link => {
+  link.addEventListener('click', function(e) {
     e.preventDefault();
-    const tabId = this.getAttribute('href');
-    showTab(tabId);
+    showTab(this.getAttribute('href'));
   });
 });
 
-// Default to Home tab on load
-document.addEventListener('DOMContentLoaded', () => {
-  showTab('#home');
-});
-
-// Profile Picture Preview
 function previewProfilePic(event) {
   const reader = new FileReader();
-  reader.onload = function () {
+  reader.onload = function() {
     const preview = document.getElementById('profilePreview');
     preview.src = reader.result;
   };
   reader.readAsDataURL(event.target.files[0]);
+}
+
+document.querySelector("#profile button").addEventListener("click", () => {
+  alert("Profile saved!");
+});
+
+// Upload form submission
+const goLiveButton = document.getElementById("goLiveBtn");
+if (goLiveButton) {
+  goLiveButton.addEventListener("click", () => {
+    const type = document.getElementById("contentType").value;
+    const title = document.getElementById("title").value;
+    const desc = document.getElementById("description").value;
+    const file = document.getElementById("uploadFile").files[0];
+
+    if (!type || !title || !desc || !file) {
+      alert("Please fill out all fields and choose a file.");
+      return;
+    }
+
+    alert(`Going live with a ${type}!\nTitle: ${title}\nDescription: ${desc}`);
+    // Add actual upload logic here later
+  });
 }
