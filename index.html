@@ -3,116 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>INTAKEE Platform</title>
+  <title>INTAKEE</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>INTAKEE</h1>
-    <div id="search-bar">
-      <input type="text" placeholder="Search INTAKEE..." />
-      <span class="magnifier">🔍</span>
-    </div>
+  <header class="header">
+    <img src="INTAKEE_logo.png" alt="INTAKEE Logo" class="logo" />
+    <input type="text" placeholder="Search..." class="search-bar" />
   </header>
 
-  <main>
-    <!-- Home Tab -->
-    <section id="home" class="tab-content">
-      <p>No content yet. Be the first to upload something on INTAKEE!</p>
-    </section>
-
-    <!-- Videos Tab -->
-    <section id="videos" class="tab-content">
-      <p>No videos yet.</p>
-    </section>
-
-    <!-- Podcasts Tab -->
-    <section id="podcasts" class="tab-content">
-      <p>No podcasts yet.</p>
-    </section>
-
-    <!-- Upload Tab -->
-    <section id="upload" class="tab-content">
-      <h2>Upload Content</h2>
-      <label>Choose Content Type</label>
-      <select>
-        <option value="video">Video</option>
-        <option value="podcast-audio">Podcast (Audio Only)</option>
-        <option value="podcast-video">Podcast (Video)</option>
-        <option value="clip">Clip</option>
-      </select>
-
-      <input type="text" placeholder="Enter title" />
-      <textarea placeholder="Enter description"></textarea>
-
-      <label>Upload File</label>
-      <input type="file" />
-
-      <label>Optional Thumbnail</label>
-      <input type="file" />
-
-      <button class="live">Go Live</button>
-    </section>
-
-    <!-- Clips Tab -->
-    <section id="clips" class="tab-content">
-      <p>No clips uploaded yet.</p>
-    </section>
-
-    <!-- Profile Tab -->
-    <section id="profile" class="tab-content">
-      <h2>Your Profile</h2>
-      <div class="profile-pic-container">
-        <img id="profilePreview" src="" alt="Profile Preview" />
-        <label class="upload-icon" for="profilePic">+</label>
-        <input type="file" id="profilePic" onchange="previewProfilePic(event)" />
+  <main id="main-content">
+    <!-- HOME -->
+    <section id="home" class="tab-content active">
+      <h1 class="welcome">Welcome to INTAKEE</h1>
+      <div class="grid">
+        <div class="card">
+          <img src="video1.jpg" alt="First Video" />
+          <h2>First Video</h2>
+          <p>Welcome to INTAKEE</p>
+          <div class="stats"><span>15K Likes</span><span>250 Comments</span><span>120 Shares</span></div>
+        </div>
+        <div class="card">
+          <img src="video2.jpg" alt="Guitar Solo" />
+          <h2>Amazing Guitar Solo</h2>
+          <p>Watch this incredible performance</p>
+          <div class="stats"><span>23K Likes</span><span>180 Comments</span><span>305 Shares</span></div>
+        </div>
       </div>
-      <input type="text" placeholder="Enter your username" />
-      <textarea placeholder="Write something about yourself..."></textarea>
-      <button>Save Profile</button>
-
-      <h3>Your Uploads</h3>
-      <p>No uploads yet.</p>
-
-      <h3>Saved Content</h3>
-      <p>You haven't saved anything yet.</p>
-
-      <h3>Your Playlists</h3>
-      <p>No playlists created.</p>
     </section>
 
-    <!-- Settings Tab -->
+    <!-- VIDEOS -->
+    <section id="videos" class="tab-content">
+      <h2 class="tab-title">Videos</h2>
+      <div class="grid">
+        <div class="card"><img src="vid1.jpg" /><h3>Spacecraft View</h3><p>1.4K views</p></div>
+        <div class="card"><img src="vid2.jpg" /><h3>Ocean Waves</h3><p>1.5K views</p></div>
+      </div>
+    </section>
+
+    <!-- PODCASTS -->
+    <section id="podcasts" class="tab-content">
+      <h2 class="tab-title">Podcasts</h2>
+      <div class="grid">
+        <div class="card"><img src="pod1.jpg" /><h3>The Tech Talk</h3></div>
+        <div class="card"><img src="pod2.jpg" /><h3>Health & Wellness</h3></div>
+      </div>
+    </section>
+
+    <!-- UPLOAD -->
+    <section id="upload" class="tab-content">
+      <h2 class="tab-title">Upload to INTAKEE</h2>
+      <form>
+        <label>Type:
+          <select>
+            <option>Video</option>
+            <option>Clip</option>
+            <option>Podcast</option>
+          </select>
+        </label><br />
+        <label>Title:
+          <input type="text" placeholder="Enter" />
+        </label><br />
+        <label>Description:
+          <textarea placeholder="Write a description..."></textarea>
+        </label><br />
+        <label>Thumbnail:
+          <input type="file" />
+        </label><br />
+        <label>Privacy:
+          <select>
+            <option>Public</option>
+            <option>Private</option>
+          </select>
+        </label><br />
+        <label><input type="checkbox" /> Enable downloads</label><br />
+        <label><input type="checkbox" /> Allow likes</label><br />
+        <button type="submit">Upload</button>
+        <button type="button">Go Live</button>
+      </form>
+    </section>
+
+    <!-- CLIPS -->
+    <section id="clips" class="tab-content">
+      <h2 class="tab-title">Clips</h2>
+      <div class="card">
+        <img src="clip1.jpg" />
+        <h3>Sample Clip</h3>
+        <p>Example clip content</p>
+        <p>1,234 Likes • 56 Comments</p>
+        <input type="text" placeholder="Add comment..." />
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="profile" class="tab-content">
+      <h2 class="tab-title">Profile</h2>
+      <img src="profile.jpg" class="profile-pic" />
+      <h3>Hajer Ahmed</h3>
+      <p>Creator</p>
+      <p>5 Videos | 8,294 Followers | 307 Following</p>
+      <button>Edit Profile</button>
+    </section>
+
+    <!-- SETTINGS -->
     <section id="settings" class="tab-content">
-      <h2>Settings</h2>
-      <h3>Privacy Policy</h3>
-      <p>We value your privacy and do not share your data...</p>
-
-      <h3>Terms of Service</h3>
-      <p>INTAKEE is not liable for user-generated content...</p>
-
-      <h3>Community Guidelines</h3>
-      <p>No nudity, threats, or hate speech allowed on the platform.</p>
-
-      <h3>Report Content</h3>
-      <p>If you see something inappropriate, please report it.</p>
-
-      <h3>Blocked Users</h3>
-      <p>You haven't blocked anyone yet.</p>
-
-      <h3>Contact Support</h3>
-      <p>Reach us at: intakee2025@gmail.com</p>
+      <h2 class="tab-title">Settings</h2>
+      <ul class="settings-list">
+        <li><strong>Privacy Policy:</strong> How INTAKEE collects and protects your data.</li>
+        <li><strong>Terms of Service:</strong> Creators are responsible for their content.</li>
+        <li><strong>Community Guidelines:</strong> No pornographic, threatening, or abusive content allowed.</li>
+        <li><strong>Report Content:</strong> Use this to flag content for review.</li>
+        <li><strong>Blocked Users:</strong> Manage your blocked accounts list.</li>
+        <li><strong>Contact Support:</strong> Email us at <a href="mailto:Intakee@gmail.com">Intakee@gmail.com</a></li>
+      </ul>
     </section>
   </main>
 
-  <!-- Bottom Navigation -->
+  <!-- TABS -->
   <footer class="tabs">
-    <a href="#home" class="tab">Home</a>
-    <a href="#videos" class="tab">Videos</a>
-    <a href="#podcasts" class="tab">Podcasts</a>
-    <a href="#upload" class="tab">Upload</a>
-    <a href="#clips" class="tab">Clips</a>
-    <a href="#profile" class="tab">Profile</a>
-    <a href="#settings" class="tab">Settings</a>
+    <button class="tab" onclick="showTab('home')">Home</button>
+    <button class="tab" onclick="showTab('videos')">Videos</button>
+    <button class="tab" onclick="showTab('podcasts')">Podcasts</button>
+    <button class="tab" onclick="showTab('upload')">Upload</button>
+    <button class="tab" onclick="showTab('clips')">Clips</button>
+    <button class="tab" onclick="showTab('profile')">Profile</button>
+    <button class="tab" onclick="showTab('settings')">Settings</button>
   </footer>
 
   <script src="script.js"></script>
