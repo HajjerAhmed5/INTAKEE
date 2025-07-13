@@ -1,9 +1,15 @@
- body {
+/* General Layout */
+body {
   margin: 0;
   background: #000;
   color: #fff;
   font-family: Arial, sans-serif;
 }
+main {
+  padding-bottom: 70px;
+}
+
+/* Header */
 .header {
   display: flex;
   align-items: center;
@@ -31,9 +37,8 @@
   top: 50%;
   transform: translateY(-50%);
 }
-main {
-  padding-bottom: 70px;
-}
+
+/* Grid and Cards */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -49,6 +54,8 @@ main {
   width: 100%;
   border-radius: 6px;
 }
+
+/* Upload Form */
 .upload-form {
   padding: 20px;
 }
@@ -75,31 +82,8 @@ main {
 .button-group button {
   flex: 1;
 }
-.profile {
-  text-align: center;
-  padding: 20px;
-}
-.profile-pic {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-}
-.stats {
-  margin: 10px 0;
-  font-size: 14px;
-  color: #aaa;
-}
-.settings {
-  padding: 20px;
-}
-.legal h3 {
-  margin-top: 20px;
-  color: #0af;
-}
-.legal p {
-  font-size: 14px;
-  line-height: 1.6;
-}
+
+/* Tabs at the Bottom */
 .tabs {
   position: fixed;
   bottom: 0;
@@ -120,9 +104,50 @@ main {
 .tabs button:hover {
   background: #222;
 }
+
+/* Tab Content Display Logic */
 .tab-content {
   display: none;
 }
 .tab-content.active {
   display: block;
+}
+
+/* Profile Tab (No Accounts Yet) */
+.profile-box {
+  text-align: center;
+  padding: 24px;
+}
+.profile-pic {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  margin-bottom: 12px;
+}
+.username {
+  font-size: 20px;
+  margin: 0;
+}
+.bio {
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 16px;
+}
+
+/* Settings + Legal */
+.settings {
+  padding: 20px;
+}
+.legal h3 {
+  margin-top: 20px;
+  color: #0af;
+}
+.legal p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.legal a {
+  color: #0af;
+  text-decoration: underline;
 }
