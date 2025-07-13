@@ -1,57 +1,24 @@
-// script.js - Full JavaScript Logic for INTAKEE
-
-document.addEventListener("DOMContentLoaded", () => {
-  showTab("#home");
-});
-
-function showTab(tabId) {
-  const contents = document.querySelectorAll('.tab-content');
-  contents.forEach(c => c.classList.remove('active'));
-  document.getElementById(tabId.replace('#', '')).classList.add('active');
-
-  const searchBar = document.getElementById('search-bar');
-  if (["#upload", "#settings"].includes(tabId)) {
-    searchBar.style.display = 'none';
-  } else {
-    searchBar.style.display = 'flex';
-  }
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+  localStorage.setItem('activeTab', id);
 }
 
-document.querySelectorAll('.tab a').forEach(link => {
-  link.addEventListener('click', function(e) {
-    e.preventDefault();
-    showTab(this.getAttribute('href'));
+document.addEventListener('DOMContentLoaded', () => {
+  const savedTab = localStorage.getItem('activeTab');
+  if (savedTab) showTab(savedTab);
+
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    document.getElementById('loginModal').classList.remove('hidden');
+  });
+
+  document.querySelector('.close').addEventListener('click', () => {
+    document.getElementById('loginModal').classList.add('hidden');
+  });
+
+  document.getElementById('darkModeToggle').addEventListener('click', () => {
+    document.body.classList.toggle('dark');
   });
 });
-
-function previewProfilePic(event) {
-  const reader = new FileReader();
-  reader.onload = function() {
-    const preview = document.getElementById('profilePreview');
-    preview.src = reader.result;
-  };
-  reader.readAsDataURL(event.target.files[0]);
-}
-
-document.querySelector("#profile button").addEventListener("click", () => {
-  alert("Profile saved!");
-});
-
-// Upload form submission
-const goLiveButton = document.getElementById("goLiveBtn");
-if (goLiveButton) {
-  goLiveButton.addEventListener("click", () => {
-    const type = document.getElementById("contentType").value;
-    const title = document.getElementById("title").value;
-    const desc = document.getElementById("description").value;
-    const file = document.getElementById("uploadFile").files[0];
-
-    if (!type || !title || !desc || !file) {
-      alert("Please fill out all fields and choose a file.");
-      return;
-    }
-
-    alert(`Going live with a ${type}!\nTitle: ${title}\nDescription: ${desc}`);
-    // Add actual upload logic here later
-  });
-}
