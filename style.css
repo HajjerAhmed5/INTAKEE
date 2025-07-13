@@ -1,170 +1,131 @@
-/* INTAKEE Style Sheet */
+/* intakee.css */
 
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
   background-color: #000;
-  color: #fff;
+  color: white;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding-bottom: 60px;
 }
 
 .header {
-  background-color: #111;
-  padding: 1rem;
-  text-align: left;
-  font-size: 1.5rem;
+  padding: 20px;
+  font-size: 24px;
   font-weight: bold;
-  color: #fff;
-}
-
-.logo {
-  display: inline-block;
+  background-color: #111;
 }
 
 .search-bar {
-  margin: 1rem;
+  display: flex;
+  align-items: center;
+  background-color: #121212;
+  padding: 10px;
 }
 
 .search-bar input[type="text"] {
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 1rem;
+  flex: 1;
+  padding: 8px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   background-color: #222;
-  color: #fff;
+  color: white;
+}
+
+.search-bar .icon {
+  margin-left: 10px;
+  color: white;
+  font-size: 20px;
 }
 
 .tab-content {
   display: none;
-  padding: 1rem;
+  padding: 20px;
 }
 
 .tab-content.active {
   display: block;
 }
 
-.upload-section,
-.profile-section,
-.settings-section {
-  margin: 1rem;
+.placeholder-content {
+  text-align: center;
+  padding: 50px;
+  color: #999;
 }
 
-.upload-section label,
-.profile-subsection label {
-  display: block;
-  margin-top: 1rem;
-  font-weight: bold;
-}
-
+.upload-section select,
 .upload-section input,
-.upload-section textarea,
-.profile-subsection input,
-.profile-subsection textarea {
+.upload-section textarea {
   width: 100%;
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  border-radius: 5px;
-  border: none;
-  background-color: #222;
-  color: #fff;
-}
-
-.upload-section input[type="file"] {
-  background: none;
-  color: #fff;
-}
-
-.upload-section button {
-  margin-top: 10px;
+  margin: 10px 0;
   padding: 10px;
-  background: #fff;
-  color: #000;
+  background: #1e1e1e;
   border: none;
-  border-radius: 5px;
+  color: white;
+  border-radius: 4px;
+}
+
+.upload-section label {
   font-weight: bold;
+  display: block;
+  margin-top: 15px;
+}
+
+.upload-section .go-live-btn {
+  margin-top: 30px;
+  padding: 12px 24px;
+  background: #f00;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-.tabs {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #111;
-  display: flex;
-  justify-content: space-around;
-  padding: 0.5rem 0;
-  border-top: 1px solid #222;
+.profile-pic-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 15px;
 }
 
-.tab a {
-  color: #fff;
-  text-decoration: none;
-  font-weight: bold;
-  padding: 0.5rem;
-  display: block;
-}
-
-.tab a:hover {
-  text-decoration: underline;
-}
-
-.profile-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
-.profile-subsection {
-  margin-bottom: 2rem;
-  width: 100%;
-}
-
-.profile-subsection label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.profile-pic-container {
-  width: 120px;
-  height: 120px;
+.circle-profile-pic {
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  overflow: hidden;
-  background: #444;
-  border: 2px solid #777;
-  margin-bottom: 1rem;
+  object-fit: cover;
+  border: 2px solid #fff;
+  background-color: #333;
+}
+
+.profile-pic-wrapper::after {
+  content: '+';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #fff;
+  color: #000;
+  font-size: 18px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px solid #000;
 }
 
-#profile-pic-preview {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.tab-bar {
+  display: flex;
+  justify-content: space-around;
+  background-color: #111;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 0;
 }
 
-footer {
-  background: #111;
-  color: #666;
-  text-align: center;
-  padding: 1rem;
-  font-size: 0.875rem;
-}
-
-.legal-section {
-  margin-top: 2rem;
-  font-size: 0.875rem;
-  color: #aaa;
-}
-
-/* Image preview fix */
-input[type="file"] {
-  color: #fff;
-}
-
-img#profile-pic-preview[src=""] {
-  display: none;
+.tab-bar a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
 }
