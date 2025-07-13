@@ -9,22 +9,17 @@
 <body>
   <header class="header">
     <img src="INTAKEE_logo.png" class="logo" alt="INTAKEE Logo">
-    <input type="text" class="search" placeholder="Search...">
+    <div id="searchContainer" class="search-container">
+      <span class="icon">🔍</span>
+      <input type="text" id="searchBar" class="search" placeholder="Search..." />
+    </div>
   </header>
 
   <main>
     <section id="home" class="tab-content active">
       <div class="grid">
-        <div class="card">
-          <img src="video1.jpg" class="thumb" />
-          <h3>Welcome Video</h3>
-          <p>Intro to INTAKEE</p>
-        </div>
-        <div class="card">
-          <img src="video2.jpg" class="thumb" />
-          <h3>Clip Highlight</h3>
-          <p>Top trending post</p>
-        </div>
+        <div class="card"><img src="video1.jpg" class="thumb" /><h3>Welcome Video</h3><p>Intro to INTAKEE</p></div>
+        <div class="card"><img src="video2.jpg" class="thumb" /><h3>Clip Highlight</h3><p>Top trending post</p></div>
       </div>
     </section>
 
@@ -36,9 +31,9 @@
     </section>
 
     <section id="podcasts" class="tab-content">
-      <div class="list">
-        <div class="card"><h3>The Real Talk</h3><p>Podcast episode</p></div>
-        <div class="card"><h3>QuickCast</h3><p>Daily drop</p></div>
+      <div class="grid">
+        <div class="card"><h3>Tech Talk</h3><p>Audio Episode</p></div>
+        <div class="card"><h3>Mindset Daily</h3><p>Audio Episode</p></div>
       </div>
     </section>
 
@@ -55,12 +50,15 @@
         <label>Title:<input type="text"></label>
         <label>Description:<textarea></textarea></label>
         <label>Thumbnail:<input type="file"></label>
-        <button type="submit">Upload</button>
+        <div class="button-group">
+          <button type="submit">Upload</button>
+          <button type="button">Go Live</button>
+        </div>
       </form>
     </section>
 
     <section id="clips" class="tab-content">
-      <div class="vertical">
+      <div class="grid">
         <div class="card"><img src="clip1.jpg" class="thumb"><p>Funny moment</p></div>
         <div class="card"><img src="clip2.jpg" class="thumb"><p>Motivation</p></div>
       </div>
@@ -68,23 +66,36 @@
 
     <section id="profile" class="tab-content">
       <div class="profile">
-        <img src="profile.jpg" class="profile-pic">
+        <img src="profile.jpg" class="profile-pic" />
         <h3>Hajer Ahmed</h3>
-        <p>8,200 Followers</p>
+        <p>Content Creator</p>
+        <div class="stats">5 Uploads • 8,200 Followers • 307 Following</div>
+        <div class="grid">
+          <div class="card"><img src="vid1.jpg" class="thumb"><p>My Trip</p></div>
+          <div class="card"><img src="vid2.jpg" class="thumb"><p>City Views</p></div>
+        </div>
       </div>
     </section>
 
     <section id="settings" class="tab-content">
       <div class="settings">
-        <h2>Settings</h2>
-        <ul>
-          <li>Privacy Policy</li>
-          <li>Terms of Service</li>
-          <li>Community Guidelines</li>
-          <li>Report Content</li>
-          <li>Blocked Users</li>
-          <li>Contact: Intakee@gmail.com</li>
-        </ul>
+        <h2>Settings & Legal</h2>
+        <div class="legal">
+          <h3>Privacy Policy</h3>
+          <p>We collect minimal data. No personal information is sold or shared. Uploaded content is tied to your account and may be removed if it violates our guidelines.</p>
+
+          <h3>Terms of Service</h3>
+          <p>By using INTAKEE, you agree that you are solely responsible for the content you upload. INTAKEE is a platform provider and does not take legal responsibility for user-generated content.</p>
+
+          <h3>Community Guidelines</h3>
+          <p>We support freedom of speech, but content with hate speech, threats, nudity, or illegal activity is not allowed. Violations may lead to account suspension.</p>
+
+          <h3>Report Content</h3>
+          <p>You may report content that violates our policies. Repeated reports will trigger review, but INTAKEE reserves the final decision on action.</p>
+
+          <h3>Blocked Users</h3>
+          <p>Users you block will not be able to see your posts or interact with your profile. You can manage blocked users from this tab.</p>
+        </div>
       </div>
     </section>
   </main>
