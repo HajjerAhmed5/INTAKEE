@@ -22,7 +22,6 @@
       align-items: center;
       background-color: #121212;
       padding: 10px;
-      display: none;
     }
     .search-bar input[type="text"] {
       flex: 1;
@@ -31,7 +30,7 @@
       border-radius: 4px;
     }
     .search-bar .icon {
-      margin-left: 8px;
+      margin-left: 10px;
       color: white;
       font-size: 20px;
     }
@@ -71,6 +70,16 @@
       border: none;
       border-radius: 4px;
       margin-top: 20px;
+    }
+    .go-live-btn {
+      margin-top: 30px;
+      padding: 12px 24px;
+      background: #f00;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      display: inline-block;
     }
     .profile-pic-wrapper {
       position: relative;
@@ -120,14 +129,10 @@
 </head>
 <body>
   <div class="header">INTAKEE</div>
-
-  <!-- Search Bar -->
   <div class="search-bar" id="search-bar">
     <input type="text" placeholder="Search INTAKEE..." />
     <span class="icon"><i class="fas fa-search"></i></span>
   </div>
-
-  <!-- Tabs -->
   <div id="home" class="tab-content">
     <div class="placeholder-content">No content yet. Be the first to upload something on INTAKEE!</div>
   </div>
@@ -153,7 +158,7 @@
       <input type="file" />
       <label>Optional Thumbnail</label>
       <input type="file" />
-      <button>Go Live</button>
+      <div><button class="go-live-btn">🎥 Go Live</button></div>
     </div>
   </div>
   <div id="clips" class="tab-content">
@@ -169,6 +174,7 @@
     <input type="text" placeholder="Enter your username" />
     <label>Bio</label>
     <textarea placeholder="Write something about yourself..."></textarea>
+    <button>Save Profile</button>
     <h3>Your Uploads</h3>
     <p>No uploads yet.</p>
     <h3>Saved Content</h3>
@@ -188,12 +194,7 @@
     <p>Allows reporting users or content. INTAKEE reviews reports and takes action.</p>
     <h3>Blocked Users</h3>
     <p>Blocked users can't interact with or see your posts.</p>
-    <h3>Contact Support</h3>
-    <p>Email: intakee2025@gmail.com</p>
-    <footer style="margin-top: 40px; font-size: 12px; color: #888">INTAKEE is a content-sharing platform. All opinions and content expressed are solely those of the creator. INTAKEE assumes no responsibility for user-generated content.</footer>
   </div>
-
-  <!-- Navigation Bar -->
   <div class="tab-bar tab">
     <a href="#home">Home</a>
     <a href="#videos">Videos</a>
@@ -203,14 +204,11 @@
     <a href="#profile">Profile</a>
     <a href="#settings">Settings</a>
   </div>
-
-  <!-- JavaScript -->
   <script>
     function showTab(tabId) {
       const contents = document.querySelectorAll('.tab-content');
       contents.forEach(c => c.classList.remove('active'));
       document.getElementById(tabId.replace('#', '')).classList.add('active');
-
       const searchBar = document.getElementById('search-bar');
       if (["#upload", "#settings"].includes(tabId)) {
         searchBar.style.display = 'none';
@@ -218,18 +216,15 @@
         searchBar.style.display = 'flex';
       }
     }
-
     document.querySelectorAll('.tab a').forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
         showTab(this.getAttribute('href'));
       });
     });
-
     document.addEventListener("DOMContentLoaded", () => {
       showTab("#home");
     });
-
     function previewProfilePic(event) {
       const reader = new FileReader();
       reader.onload = function(){
