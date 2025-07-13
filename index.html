@@ -1,32 +1,61 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="header">
-    <img src="INTAKEE_logo.png" class="logo" alt="INTAKEE Logo">
+    <img src="INTAKEE_logo.png" alt="INTAKEE Logo" class="logo">
     <div id="searchContainer" class="search-container">
       <span class="icon">🔍</span>
-      <input type="text" id="searchBar" class="search" placeholder="Search..." />
+      <input type="text" id="searchBar" class="search" placeholder="Search...">
     </div>
   </header>
 
   <main>
-    <!-- other sections (home, videos, clips, etc.) here -->
+    <section id="home" class="tab-content active">
+      <div class="grid">
+        <div class="card"><img src="video1.jpg" class="thumb"><h3>Welcome Video</h3></div>
+        <div class="card"><img src="video2.jpg" class="thumb"><h3>Clip Highlight</h3></div>
+      </div>
+    </section>
+
+    <section id="videos" class="tab-content">
+      <div class="grid">
+        <div class="card"><img src="vid1.jpg" class="thumb"><h3>Nature</h3></div>
+        <div class="card"><img src="vid2.jpg" class="thumb"><h3>City Views</h3></div>
+      </div>
+    </section>
+
+    <section id="podcasts" class="tab-content">
+      <div class="grid">
+        <div class="card"><h3>Mindset Daily</h3><p>Audio Podcast</p></div>
+        <div class="card"><h3>Tech Talk</h3><p>Weekly Episode</p></div>
+      </div>
+    </section>
+
+    <section id="upload" class="tab-content">
+      <div class="upload-info">
+        <p>This is the upload layout. Upload functionality will be added when accounts are live.</p>
+        <button disabled>Upload</button>
+        <button disabled>Go Live</button>
+      </div>
+    </section>
+
+    <section id="clips" class="tab-content">
+      <div class="grid">
+        <div class="card"><img src="clip1.jpg" class="thumb"><p>Funny Clip</p></div>
+        <div class="card"><img src="clip2.jpg" class="thumb"><p>Quick Tips</p></div>
+      </div>
+    </section>
 
     <section id="profile" class="tab-content">
-      <div class="profile-box">
-        <img src="profile.jpg" class="profile-pic" />
-        <h2 class="username">Creator Profile</h2>
-        <p class="bio">This is a preview layout. Account creation is not available yet.</p>
-        <div class="grid">
-          <div class="card"><img src="vid1.jpg" class="thumb"><p>Sample Post</p></div>
-          <div class="card"><img src="vid2.jpg" class="thumb"><p>Another Post</p></div>
-        </div>
+      <div class="profile-placeholder">
+        <h3>Sign in to view your profile</h3>
+        <p>Once account creation is available, your uploads, followers, and stats will appear here.</p>
       </div>
     </section>
 
@@ -35,22 +64,22 @@
         <h2>Settings & Legal</h2>
         <div class="legal">
           <h3>Privacy Policy</h3>
-          <p>We collect minimal data. No personal information is sold or shared. Content you upload is stored for playback and moderation purposes.</p>
+          <p>We collect minimal data. No personal info is sold or shared. Content is reviewed only if reported.</p>
 
           <h3>Terms of Service</h3>
-          <p>By using INTAKEE, you agree that you are solely responsible for the content you post. INTAKEE is not liable for anything posted by users. We simply provide the platform.</p>
+          <p>You are responsible for the content you post. INTAKEE only provides the platform and is not legally liable for user content.</p>
 
           <h3>Community Guidelines</h3>
-          <p>No nudity, hate speech, violence, or illegal content is allowed. Breaking these rules may result in content removal or future bans.</p>
+          <p>No nudity, hate speech, violence, or illegal content. Violations can result in removal or bans.</p>
 
           <h3>Report Content</h3>
-          <p>You can report posts that break our rules. Reports will be reviewed, but INTAKEE has the final say on what action is taken.</p>
+          <p>You may report posts that break our rules. We will review them and act accordingly.</p>
 
           <h3>Blocked Users</h3>
-          <p>Blocking functionality will be added in the future when user accounts become available.</p>
+          <p>Blocking will be available once accounts are live.</p>
 
           <h3>Business Contact</h3>
-          <p>For legal or business matters, contact us at: <a href="mailto:Intakee@gmail.com">Intakee@gmail.com</a></p>
+          <p>For legal or support questions: <a href="mailto:Intakee@gmail.com">Intakee@gmail.com</a></p>
         </div>
       </div>
     </section>
