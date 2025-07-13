@@ -1,157 +1,90 @@
-/* Updated CSS for INTAKEE Platform */
-
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #000;
-  color: #fff;
+  background: #000;
+  color: white;
 }
-
-header {
+.header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  background-color: #111;
-  padding: 10px 20px;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-#search-bar {
-  display: flex;
   align-items: center;
-  background: #222;
-  padding: 5px 10px;
-  border-radius: 5px;
-  margin: 10px;
+  background: #000;
+  padding: 10px;
 }
-
-#search-bar input[type="text"] {
-  background: #333;
-  border: none;
-  color: white;
+.logo {
+  height: 40px;
+}
+.search-bar {
+  flex: 1;
+  margin: 0 10px;
   padding: 8px;
+  border-radius: 5px;
+  border: none;
+}
+button {
+  padding: 6px 12px;
+  margin-left: 5px;
+}
+.tabs {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  justify-content: space-around;
   width: 100%;
+  background: #111;
+  border-top: 1px solid #333;
 }
-
-#search-bar::before {
-  content: "\1F50D";
+.tab {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: none;
   color: white;
-  margin-right: 8px;
+  font-size: 14px;
+  cursor: pointer;
 }
-
+.tab:hover {
+  background: #222;
+}
 .tab-content {
   display: none;
   padding: 20px;
 }
-
 .tab-content.active {
   display: block;
 }
-
-nav {
+.modal {
   position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #111;
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 0;
-  border-top: 1px solid #333;
-}
-
-nav a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-nav a:hover {
-  text-decoration: underline;
-}
-
-.upload-section, .profile-section {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-}
-
-input[type="text"], textarea, select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  background-color: #222;
-  color: white;
-  border: none;
-  border-radius: 5px;
-}
-
-button, .upload-section button, .profile-section button {
-  background-color: red;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: darkred;
-}
-
-.profile-pic-wrapper {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  margin-bottom: 10px;
-}
-
-.profile-pic-wrapper img {
+  top: 0;
+  left: 0;
+  background: rgba(0,0,0,0.8);
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid white;
 }
-
-.profile-pic-wrapper::after {
-  content: '+';
-  position: absolute;
-  right: -10px;
-  bottom: -10px;
-  width: 25px;
-  height: 25px;
-  background-color: white;
-  color: black;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.settings-section h3 {
-  border-bottom: 1px solid #444;
-  padding-bottom: 5px;
-  margin-top: 30px;
-}
-
-.settings-section p {
-  margin-top: 5px;
-  color: #ccc;
-  line-height: 1.5;
-}
-
-.settings-section a {
-  color: red;
-  text-decoration: underline;
-}
-
-.no-content-message {
+.modal-content {
+  background: #222;
+  padding: 20px;
+  width: 300px;
+  margin: 100px auto;
+  border-radius: 10px;
   text-align: center;
-  margin-top: 50px;
-  font-size: 18px;
-  color: #aaa;
+}
+.modal input {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+}
+.hidden {
+  display: none;
+}
+body.dark {
+  background: #f0f0f0;
+  color: #000;
+}
+body.dark .tabs {
+  background: #ddd;
+}
+body.dark .tab {
+  color: #000;
 }
