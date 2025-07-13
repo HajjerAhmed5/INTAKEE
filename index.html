@@ -22,6 +22,16 @@
       font-size: 20px;
       font-weight: bold;
     }
+    .search-bar {
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+    }
     .tabs {
       display: flex;
       justify-content: space-around;
@@ -66,6 +76,19 @@
       font-size: 12px;
       color: #888;
     }
+    .profile-pic-container {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: #333;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .profile-pic-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
     .profile-subsection {
       margin-bottom: 20px;
     }
@@ -88,11 +111,13 @@
   </div>
 
   <div class="tab-content active" id="home">
+    <div class="search-bar"><input type="text" placeholder="Search..."></div>
     <h2>Welcome to INTAKEE</h2>
     <p>No posts yet. Once users sign up and upload content, you’ll see it here.</p>
   </div>
 
   <div class="tab-content" id="videos">
+    <div class="search-bar"><input type="text" placeholder="Search videos..."></div>
     <h2>Videos</h2>
     <p>No videos uploaded yet.</p>
     <div class="extra-content">
@@ -101,6 +126,7 @@
   </div>
 
   <div class="tab-content" id="podcasts">
+    <div class="search-bar"><input type="text" placeholder="Search podcasts..."></div>
     <h2>Podcasts</h2>
     <p>No podcasts available at the moment.</p>
     <div class="extra-content">
@@ -122,6 +148,7 @@
   </div>
 
   <div class="tab-content" id="clips">
+    <div class="search-bar"><input type="text" placeholder="Search clips..."></div>
     <h2>Clips</h2>
     <p>No clips posted yet.</p>
     <div class="extra-content">
@@ -133,7 +160,10 @@
     <div class="profile-section">
       <div class="profile-subsection">
         <label for="profile-pic">Upload Profile Picture</label>
-        <input type="file" id="profile-pic">
+        <div class="profile-pic-container">
+          <img id="profile-pic-preview" src="" alt="Profile Picture Preview">
+        </div>
+        <input type="file" id="profile-pic" onchange="previewProfilePic(event)">
       </div>
       <div class="profile-subsection">
         <label>Username</label>
@@ -204,6 +234,15 @@
         document.getElementById(target).classList.add('active');
       });
     });
+
+    function previewProfilePic(event) {
+      const reader = new FileReader();
+      reader.onload = function(){
+        const output = document.getElementById('profile-pic-preview');
+        output.src = reader.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
   </script>
 </body>
 </html>
