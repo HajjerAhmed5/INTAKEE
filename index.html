@@ -1,132 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <div class="top-bar">
-      <img src="logo.png" alt="INTAKEE Logo" class="logo" />
-      <div class="search-container">
-        <input type="text" placeholder="Search..." />
-        <span class="search-icon">🔍</span>
-      </div>
-    </div>
-  </header>
 
+  <!-- Header -->
+  <header class="header">
+  <div class="logo">
+    <div class="logo-icon"></div>
+    <div class="logo-text">INTAKEE</div>
+  </div>
+  <div class="search-container" id="search-wrapper">
+  <input type="text" class="search-bar" placeholder="Search..." id="global-search">
+</div>
+</header>
+
+  <!-- Tab Content -->
   <main>
-    <section id="home" class="tab active">
-      <h2>Home Feed</h2>
-      <div class="grid-feed">
-        <div class="video-card">Suggested Video 1</div>
-        <div class="video-card">Suggested Video 2</div>
-        <!-- More cards will load here -->
+    <section class="tab-content" id="home-tab">
+      <div class="container">
+        <h2>Home Feed</h2>
+        <div class="content-grid">
+          <p class="empty-state">No posts yet.</p>
+        </div>
       </div>
     </section>
 
-    <section id="videos" class="tab">
-      <h2>Videos</h2>
-      <div class="grid-feed">
-        <div class="video-card">Video A</div>
-        <div class="video-card">Video B</div>
+    <section class="tab-content" id="videos-tab">
+      <div class="container">
+        <h2>Videos</h2>
+        <div class="content-grid">
+          <p class="empty-state">No videos available.</p>
+        </div>
       </div>
     </section>
 
-    <section id="podcasts" class="tab">
-      <h2>Podcasts</h2>
-      <div class="vertical-feed">
-        <div class="podcast-card">Podcast 1</div>
-        <div class="podcast-card">Podcast 2</div>
+    <section class="tab-content" id="podcasts-tab">
+      <div class="container">
+        <h2>Podcasts</h2>
+        <div class="vertical-scroll">
+          <p class="empty-state">No podcasts available.</p>
+        </div>
       </div>
     </section>
 
-    <section id="clips" class="tab">
-      <h2>Clips</h2>
-      <div class="vertical-feed">
-        <div class="clip-card">Clip 1</div>
-        <div class="clip-card">Clip 2</div>
-      </div>
-    </section>
+    <section class="tab-content" id="upload-tab" data-hide-search="true">
+      <div class="container">
+        <h2>Upload Content</h2>
+        <form class="upload-form">
+          <label for="title">Title:</label>
+          <input type="text" id="title" name="title" placeholder="Enter title...">
 
-    <section id="upload" class="tab">
-      <h2>Upload</h2>
-      <form>
-        <label>Choose content type:
-          <select>
-            <option value="video">Video</option>
-            <option value="clip">Clip</option>
-            <option value="podcast">Podcast</option>
+          <label for="description">Description:</label>
+          <textarea id="description" name="description" placeholder="Enter description..." rows="4"></textarea>
+
+          <label for="upload-type">Choose Type:</label>
           </select>
-        </label>
-        <label>Upload file: <input type="file" /></label>
-        <label>Thumbnail: <input type="file" accept="image/*" /></label>
-        <label><input type="checkbox" /> Go Live Now</label>
-        <button type="submit">Submit</button>
-      </form>
-    </section>
 
-    <section id="profile" class="tab">
-      <h2>Your Profile</h2>
-      <div class="profile-section">
-        <h3>Your Uploads <button class="privacy-toggle">Make Private</button></h3>
-        <div class="item">Upload A</div>
-        <div class="item">Upload B</div>
-      </div>
-      <div class="profile-section">
-        <h3>Saved <button class="privacy-toggle">Make Private</button></h3>
-        <div class="item">Saved Video</div>
-        <div class="item">Saved Podcast</div>
-      </div>
-      <div class="profile-section">
-        <h3>Playlists <button class="privacy-toggle">Make Private</button></h3>
-        <div class="item">Playlist A</div>
+          <label for="file-upload">Upload File:</label>
+          <input type="file" id="file-upload" name="file-upload">
+
+          <label for="thumbnail">Optional Thumbnail:</label>
+          <input type="file" id="thumbnail" name="thumbnail">
+
+          <button type="submit">Upload</button>
+        </form>
+        <div style="background-color: black; padding: 16px; text-align: center;">
+  <button class="go-live-button" style="background-color: white; color: black; border: none; padding: 12px 24px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;">Go Live</button>
+</div>
       </div>
     </section>
 
-    <section id="settings" class="tab">
-      <h2>Settings</h2>
-      <div class="settings-section">
-        <h3>Privacy Policy</h3>
-        <p>We collect minimal data and only use it for improving your experience. Your information is never sold.</p>
-      </div>
-      <div class="settings-section">
-        <h3>Terms of Service</h3>
-        <p>INTAKEE is not responsible for user content. Users are responsible for what they post. No nudity or illegal content allowed.</p>
-      </div>
-      <div class="settings-section">
-        <h3>Community Guidelines</h3>
-        <p>No hate, threats, or adult content. Respect others. Report violations responsibly.</p>
-      </div>
-      <div class="settings-section">
-        <h3>Report Content</h3>
-        <p>Use this form to report inappropriate posts or users. We will review all flagged content.</p>
-      </div>
-      <div class="settings-section">
-        <h3>Blocked Users</h3>
-        <p>View and manage your block list.</p>
-      </div>
-      <div class="settings-section">
-        <h3>Contact Support</h3>
-        <p>Email: support@intakee.app</p>
+    <section class="tab-content" id="profile-tab">
+      <div class="container">
+        <h2>User Profile</h2>
+        <div class="profile-header">
+          <div class="profile-pic-placeholder"></div>
+          <div class="profile-info">
+            <p class="username">@username</p>
+            <p class="bio">This is your bio. Edit from settings.</p>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Your Uploads</h3>
+          <div class="privacy-toggle">Public / Private</div>
+          <div class="content-grid uploads">
+            <p>No uploads yet.</p>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Liked Content</h3>
+          <div class="privacy-toggle">Public / Private</div>
+          <div class="content-grid liked">
+            <p>No liked posts yet.</p>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Saved Content</h3>
+          <div class="privacy-toggle">Public / Private</div>
+          <div class="content-grid saved">
+            <p>No saved content yet.</p>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>Playlists</h3>
+          <div class="privacy-toggle">Public / Private</div>
+          <div class="content-grid playlists">
+            <p>No playlists created yet.</p>
+          </div>
+        </div>
       </div>
     </section>
+
+    <section class="tab-content" id="settings-tab" data-hide-search="true">
+  <div class="container">
+    <h2>Settings</h2>
+    <div class="settings-section">
+      <h3>Privacy Policy</h3>
+      <p>We collect your email, device info, IP address, uploads, and interactions. This data is used for personalization, security, and analytics. We do not sell your data. You can request deletion anytime. Cookies are used for login and performance. This complies with GDPR and CCPA.</p>
+    </div>
+    <div class="settings-section">
+      <h3>Terms of Service</h3>
+      <p>Users are fully responsible for their content. INTAKEE is not liable for anything posted. Users must not post porn, threats, or illegal material. Content reported multiple times may be removed. Legal disputes go to the user, not INTAKEE. We may ban violators.</p>
+    </div>
+    <div class="settings-section">
+      <h3>Community Guidelines</h3>
+      <p>Allowed: Freedom of expression and opinion. Not allowed: nudity, porn, threats, copyright violations, spam, scams. Violators may be suspended after review.</p>
+    </div>
+    <div class="settings-section">
+      <h3>Report Content</h3>
+      <p>Report posts or users for violations. Choose a reason (hate, porn, spam, harassment). Once reported, that user’s content will no longer be visible to you unless unblocked.</p>
+    </div>
+    <div class="settings-section">
+      <h3>Blocked Users</h3>
+      <p>View and manage blocked accounts. Blocked users cannot see or interact with your content. You can unblock them anytime.</p>
+    </div>
+    <div class="settings-section">
+      <h3>Contact Support</h3>
+      <p>Email: intakee2025@gmail.com — for reporting bugs, legal inquiries, or account deletion requests.</p>
+    </div>
+  </div>
+</section>
   </main>
 
-  <footer>
-    <nav>
-      <button data-tab="home" class="active">Home</button>
-      <button data-tab="videos">Videos</button>
-      <button data-tab="podcasts">Podcasts</button>
-      <button data-tab="upload">Upload</button>
-      <button data-tab="clips">Clips</button>
-      <button data-tab="profile">Profile</button>
-      <button data-tab="settings">Settings</button>
-    </nav>
+  <!-- Footer -->
+  <footer class="legal-footer">
+    <p>INTAKEE is a content-sharing platform. All opinions and content expressed are solely those of the creator. INTAKEE assumes no responsibility for user-generated content.</p>
   </footer>
 
-  <script src="script.js"></script>
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+  <div class="nav-container">
+    <a href="#" class="nav-item" data-tab="home"><span class="nav-text">Home</span></a>
+    <a href="#" class="nav-item" data-tab="videos"><span class="nav-text">Videos</span></a>
+    <a href="#" class="nav-item" data-tab="podcasts"><span class="nav-text">Podcasts</span></a>
+    <a href="#" class="nav-item" data-tab="upload"><span class="nav-text">Upload</span></a>
+    <a href="#" class="nav-item" data-tab="clips"><span class="nav-text">Clips</span></a>
+    <a href="#" class="nav-item" data-tab="profile"><span class="nav-text">Profile</span></a>
+    <a href="#" class="nav-item" data-tab="settings"><span class="nav-text">Settings</span></a>
+  </div>
+</nav>
+
+  <script>
+  const allTabs = document.querySelectorAll('.tab-content');
+  const navItems = document.querySelectorAll('.nav-item');
+  const searchWrapper = document.getElementById('search-wrapper');
+
+  function showTab(tabName) {
+    allTabs.forEach(tab => {
+      tab.style.display = tab.id === `${tabName}-tab` ? 'block' : 'none';
+    });
+
+    const activeTab = document.getElementById(`${tabName}-tab`);
+    if (activeTab && activeTab.dataset.hideSearch === 'true') {
+      searchWrapper.style.display = 'none';
+    } else {
+      searchWrapper.style.display = 'block';
+    }
+  }
+
+  navItems.forEach(item => {
+    item.addEventListener('click', e => {
+      e.preventDefault();
+      const tab = item.getAttribute('data-tab');
+      showTab(tab);
+    });
+  });
+
+  // Show home tab by default
+  showTab('home');
+</script>
 </body>
 </html>
