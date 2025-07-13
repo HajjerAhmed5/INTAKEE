@@ -1,157 +1,149 @@
-/* Global styles */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #000;
-  color: #fff;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INTAKEE</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <div class="logo">INTAKEE</div>
+  </div>
 
-h2 {
-  margin: 20px;
-  font-size: 24px;
-}
+  <div class="tab-content active" id="home">
+    <div class="search-bar"><input type="text" placeholder="Search home..."></div>
+    <h2>Welcome to INTAKEE</h2>
+    <p>No posts yet. Once users sign up and upload content, you’ll see it here.</p>
+  </div>
 
-h3 {
-  margin: 15px 0 10px;
-}
+  <div class="tab-content" id="videos">
+    <div class="search-bar"><input type="text" placeholder="Search videos..."></div>
+    <h2>Videos</h2>
+    <p>No videos uploaded yet.</p>
+    <div class="extra-content">
+      <p>Video previews will appear here when uploaded. Users can like, dislike, and comment on videos when logged in. Logged out users can only view and read comments.</p>
+    </div>
+  </div>
 
-/* Header */
-.top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #111;
-  padding: 10px 16px;
-  border-bottom: 1px solid #222;
-}
+  <div class="tab-content" id="podcasts">
+    <div class="search-bar"><input type="text" placeholder="Search podcasts..."></div>
+    <h2>Podcasts</h2>
+    <p>No podcasts available at the moment.</p>
+    <div class="extra-content">
+      <p>Podcasts support both audio-only and video formats. Comments are disabled, but like/dislike is allowed for logged-in users.</p>
+    </div>
+  </div>
 
-.logo {
-  height: 30px;
-}
+  <div class="tab-content" id="upload">
+    <div class="upload-section">
+      <h2>Upload Content</h2>
+      <label>Title</label>
+      <input type="text" placeholder="Enter a title for your upload">
+      <label>Description</label>
+      <textarea placeholder="Write a brief description..."></textarea>
+      <label>Select File</label>
+      <input type="file">
+      <button style="margin-top:10px; padding:10px; background:white; color:black; border:none; border-radius:5px;">Go Live</button>
+    </div>
+  </div>
 
-.search-container {
-  display: flex;
-  align-items: center;
-  background-color: #222;
-  border-radius: 6px;
-  padding: 5px 10px;
-}
+  <div class="tab-content" id="clips">
+    <div class="search-bar"><input type="text" placeholder="Search clips..."></div>
+    <h2>Clips</h2>
+    <p>No clips posted yet.</p>
+    <div class="extra-content">
+      <p>Short-form content will be displayed here. Logged-in users can interact; guests can only view.</p>
+    </div>
+  </div>
 
-.search-container input {
-  background: transparent;
-  border: none;
-  color: #fff;
-  outline: none;
-  width: 200px;
-}
+  <div class="tab-content" id="profile">
+    <div class="profile-section">
+      <div class="profile-subsection">
+        <label for="profile-pic">Upload Profile Picture</label>
+        <div class="profile-pic-container">
+          <img id="profile-pic-preview" src="" alt="Profile Picture Preview">
+        </div>
+        <input type="file" id="profile-pic" onchange="previewProfilePic(event)">
+      </div>
+      <div class="profile-subsection">
+        <label>Username</label>
+        <input type="text" placeholder="Enter your username">
+      </div>
+      <div class="profile-subsection">
+        <label>Bio</label>
+        <textarea placeholder="Write something about yourself..."></textarea>
+      </div>
+      <div class="profile-subsection">
+        <h4>Your Uploads</h4>
+        <p>No uploads yet.</p>
+      </div>
+      <div class="profile-subsection">
+        <h4>Saved Content</h4>
+        <p>You haven’t saved anything yet.</p>
+      </div>
+      <div class="profile-subsection">
+        <h4>Your Playlists</h4>
+        <p>You haven’t created any playlists yet.</p>
+      </div>
+    </div>
+  </div>
 
-.search-icon {
-  margin-left: 8px;
-}
+  <div class="tab-content" id="settings">
+    <div class="settings-section">
+      <h3>Privacy Policy</h3>
+      <p>We collect email, device info, IP, uploads, and interactions. No data is sold. Users may request deletion.</p>
+      <h3>Terms of Service</h3>
+      <p>Users are responsible for their own content. INTAKEE is not liable. No porn, illegal material, or threats allowed.</p>
+      <h3>Community Guidelines</h3>
+      <p>No nudity, violence, threats, copyright violations, or impersonation. Freedom of speech is respected.</p>
+      <h3>Report Content</h3>
+      <p>Use this section to report content violating the rules. You will not see reported content until unblocked.</p>
+      <h3>Blocked Users</h3>
+      <p>Manage users you've blocked. They can’t see or interact with your content.</p>
+      <h3>Contact Support</h3>
+      <p>Email us at intakee2025@gmail.com</p>
+      <div class="legal-section">
+        <p>INTAKEE is a content-sharing platform. All opinions and content expressed are solely those of the creator. INTAKEE assumes no responsibility for user-generated content.</p>
+      </div>
+    </div>
+  </div>
 
-/* Tabs */
-.tab {
-  display: none;
-  padding: 16px;
-}
+  <div class="tabs">
+    <div class="tab"><a href="#home">Home</a></div>
+    <div class="tab"><a href="#videos">Videos</a></div>
+    <div class="tab"><a href="#podcasts">Podcasts</a></div>
+    <div class="tab"><a href="#upload">Upload</a></div>
+    <div class="tab"><a href="#clips">Clips</a></div>
+    <div class="tab"><a href="#profile">Profile</a></div>
+    <div class="tab"><a href="#settings">Settings</a></div>
+  </div>
 
-.tab.active {
-  display: block;
-}
+  <footer>
+    INTAKEE is a content-sharing platform. All opinions and content expressed are solely those of the creator. INTAKEE assumes no responsibility for user-generated content.
+  </footer>
 
-/* Feeds */
-.grid-feed {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  padding: 16px;
-}
+  <script>
+    const tabs = document.querySelectorAll('.tab a');
+    const contents = document.querySelectorAll('.tab-content');
 
-.vertical-feed {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-}
+    tabs.forEach(tab => {
+      tab.addEventListener('click', e => {
+        e.preventDefault();
+        const target = tab.getAttribute('href').replace('#', '');
+        contents.forEach(c => c.classList.remove('active'));
+        document.getElementById(target).classList.add('active');
+      });
+    });
 
-.video-card,
-.podcast-card,
-.clip-card {
-  background-color: #1a1a1a;
-  padding: 12px;
-  border-radius: 8px;
-}
-
-/* Upload */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  background-color: #111;
-  border-radius: 8px;
-}
-
-form label {
-  display: flex;
-  flex-direction: column;
-  font-size: 14px;
-}
-
-/* Profile */
-.profile-section {
-  background-color: #1a1a1a;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-}
-
-.profile-section.private {
-  opacity: 0.5;
-}
-
-.privacy-toggle {
-  margin-left: 12px;
-  font-size: 12px;
-  padding: 4px 8px;
-}
-
-/* Settings */
-.settings-section {
-  margin-bottom: 20px;
-  padding: 16px;
-  background-color: #1c1c1c;
-  border-radius: 8px;
-}
-
-/* Footer Navigation */
-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #111;
-  border-top: 1px solid #222;
-}
-
-footer nav {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-footer nav button {
-  flex: 1;
-  padding: 10px;
-  background: none;
-  border: none;
-  color: #aaa;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-footer nav button:hover,
-footer nav button.active {
-  background-color: #222;
-  color: #fff;
-}
+    function previewProfilePic(event) {
+      const reader = new FileReader();
+      reader.onload = function(){
+        const output = document.getElementById('profile-pic-preview');
+        output.src = reader.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  </script>
+</body>
+</html>
