@@ -5,6 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INTAKEE - Platform</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background-color: #121212;
+      padding: 10px;
+    }
+    .search-bar input[type="text"] {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+    }
+    .search-bar .icon {
+      margin-left: 8px;
+      color: white;
+      font-size: 20px;
+    }
+
+    .profile-pic-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    .circle-profile-pic {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+      background-color: #333;
+    }
+    .profile-pic-wrapper::after {
+      content: '+';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background-color: #fff;
+      color: #000;
+      font-size: 18px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #000;
+    }
+    .tab-content {
+      display: none;
+      color: white;
+      padding: 20px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .placeholder-content {
+      text-align: center;
+      padding: 50px;
+      color: #999;
+    }
+  </style>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="header">
@@ -14,136 +76,25 @@
   <!-- Search Bar: Visible on Home, Videos, Podcasts, Clips -->
   <div class="search-bar" id="search-bar">
     <input type="text" placeholder="Search INTAKEE..." />
+    <span class="icon"><i class="fas fa-search"></i></span>
   </div>
 
   <!-- Tab Contents -->
-  <div id="home" class="tab-content">
-    <h2>Home Feed</h2>
-    <p>Welcome to INTAKEE. No posts yet. Follow creators or explore trending content.</p>
+  <div id="home" class="tab-content active">
+    <div class="placeholder-content">No content yet. Be the first to upload something on INTAKEE!</div>
   </div>
-
   <div id="videos" class="tab-content">
-    <h2>Videos</h2>
-    <p>No videos available. Upload or follow creators to see content. Videos appear in a side-by-side layout with thumbnails, titles, like/dislike buttons, and comments (for logged-in users).</p>
+    <div class="placeholder-content">No videos have been posted yet.</div>
   </div>
-
   <div id="podcasts" class="tab-content">
-    <h2>Podcasts</h2>
-    <p>No podcasts uploaded yet. INTAKEE supports both audio-only and video podcasts. Vertical scrolling layout. Background playback enabled. Like/dislike only, no comments allowed.</p>
+    <div class="placeholder-content">No podcasts have been published yet.</div>
   </div>
-
-  <div id="upload" class="tab-content">
-    <h2>Upload Content</h2>
-    <div class="upload-section">
-      <label for="upload-type">Select Content Type</label>
-      <select id="upload-type">
-        <option value="video">Video</option>
-        <option value="podcast">Podcast</option>
-        <option value="clip">Clip</option>
-      </select>
-
-      <div id="podcast-options" style="display:none;">
-        <label for="podcast-format">Podcast Format</label>
-        <select id="podcast-format">
-          <option value="audio">Audio-only</option>
-          <option value="video">Video podcast</option>
-        </select>
-      </div>
-
-      <label for="upload-title">Title</label>
-      <input type="text" id="upload-title" placeholder="Enter title" />
-
-      <label for="upload-description">Description</label>
-      <textarea id="upload-description" placeholder="Enter description"></textarea>
-
-      <label for="upload-file">Upload File</label>
-      <input type="file" id="upload-file" accept="video/*,audio/*" />
-
-      <label for="thumbnail">Optional Thumbnail</label>
-      <input type="file" id="thumbnail" accept="image/*" />
-
-      <button class="live-button">Go Live</button>
-    </div>
-  </div>
-
   <div id="clips" class="tab-content">
-    <h2>Clips</h2>
-    <p>No clips posted yet. This section is vertical-scroll style, like TikTok. Users can like or dislike (not both), and comment if logged in. Everyone can view comments.</p>
+    <div class="placeholder-content">No clips have been shared yet.</div>
   </div>
+  <!-- Upload, Profile, Settings tabs would be included separately -->
 
-  <div id="profile" class="tab-content">
-    <h2>Your Profile</h2>
-    <div class="profile-section">
-      <div class="profile-subsection">
-        <label for="profile-pic">Upload Profile Picture</label>
-        <div class="profile-pic-container">
-          <img id="profile-pic-preview" src="" alt="Profile Picture Preview" class="circle-profile-pic" />
-        </div>
-        <input type="file" id="profile-pic" accept="image/*" onchange="previewProfilePic(event)" />
-      </div>
-
-      <div class="profile-subsection">
-        <label for="username">Username</label>
-        <input type="text" id="username" placeholder="Enter your username" />
-      </div>
-
-      <div class="profile-subsection">
-        <label for="bio">Bio</label>
-        <textarea id="bio" placeholder="Write something about yourself..."></textarea>
-      </div>
-
-      <div class="profile-subsection">
-        <h3>Your Uploads</h3>
-        <p>No uploads yet.</p>
-      </div>
-
-      <div class="profile-subsection">
-        <h3>Saved Content</h3>
-        <p>You haven’t saved anything yet.</p>
-      </div>
-
-      <div class="profile-subsection">
-        <h3>Your Playlists</h3>
-        <p>You haven’t created any playlists yet.</p>
-      </div>
-    </div>
-  </div>
-
-  <div id="settings" class="tab-content">
-    <h2>Settings</h2>
-    <div class="settings-section">
-      <h3>Privacy Policy</h3>
-      <p>INTAKEE collects user data including email, device info, IP address, uploads, and interactions to provide and improve services. Data is not sold. Users may request data deletion at intakee2025@gmail.com.</p>
-
-      <h3>Terms of Service</h3>
-      <p>By using INTAKEE, you accept our terms: do not post illegal, pornographic, or harmful material. You are responsible for your content. We may remove repeated violations. We are not legally responsible for what users post.</p>
-
-      <h3>Community Guidelines</h3>
-      <p>INTAKEE allows free expression but bans: nudity, violence, hate speech, spam, scams, impersonation. Violators can be suspended. INTAKEE reviews all reports fairly and in-house.</p>
-
-      <h3>Report Content</h3>
-      <p>Use this to report content or users. Choose a reason and submit. After reporting, the content/user will be hidden from you unless unblocked.</p>
-
-      <h3>Blocked Users</h3>
-      <p>Shows who you’ve blocked. Blocked users cannot see or interact with your content. You may unblock them at any time.</p>
-
-      <h3>Contact Support</h3>
-      <p>Email us at intakee2025@gmail.com for support, bug reports, legal concerns, or account removal.</p>
-    </div>
-  </div>
-
-  <!-- Bottom Tab Navigation -->
-  <div class="tabs">
-    <div class="tab"><a href="#home">Home</a></div>
-    <div class="tab"><a href="#videos">Videos</a></div>
-    <div class="tab"><a href="#podcasts">Podcasts</a></div>
-    <div class="tab"><a href="#upload">Upload</a></div>
-    <div class="tab"><a href="#clips">Clips</a></div>
-    <div class="tab"><a href="#profile">Profile</a></div>
-    <div class="tab"><a href="#settings">Settings</a></div>
-  </div>
-
-  <!-- JavaScript Section -->
+  <!-- Existing JavaScript -->
   <script>
     function showTab(tabId) {
       const contents = document.querySelectorAll('.tab-content');
@@ -154,7 +105,7 @@
       if (["#upload", "#settings"].includes(tabId)) {
         searchBar.style.display = 'none';
       } else {
-        searchBar.style.display = 'block';
+        searchBar.style.display = 'flex';
       }
     }
 
@@ -177,7 +128,7 @@
       }
     }
 
-    document.getElementById('upload-type').addEventListener('change', function () {
+    document.getElementById('upload-type')?.addEventListener('change', function () {
       const podcastOptions = document.getElementById('podcast-options');
       if (this.value === 'podcast') {
         podcastOptions.style.display = 'block';
@@ -186,7 +137,6 @@
       }
     });
 
-    // Default tab shown on load
     document.addEventListener("DOMContentLoaded", () => {
       showTab("#home");
     });
