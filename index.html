@@ -3,226 +3,118 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>INTAKEE - Platform</title>
+  <title>INTAKEE Platform</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-  <style>
-    body {
-      background-color: #000;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    .header {
-      padding: 20px;
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .search-bar {
-      display: flex;
-      align-items: center;
-      background-color: #121212;
-      padding: 10px;
-    }
-    .search-bar input[type="text"] {
-      flex: 1;
-      padding: 8px;
-      border: none;
-      border-radius: 4px;
-    }
-    .search-bar .icon {
-      margin-left: 10px;
-      color: white;
-      font-size: 20px;
-    }
-    .tab-content {
-      display: none;
-      padding: 20px;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    .placeholder-content {
-      text-align: center;
-      padding: 50px;
-      color: #999;
-    }
-    .upload-section select,
-    .upload-section input,
-    .upload-section textarea {
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      background: #1e1e1e;
-      border: none;
-      color: white;
-      border-radius: 4px;
-    }
-    .upload-section label {
-      font-weight: bold;
-      display: block;
-      margin-top: 15px;
-    }
-    .upload-section .go-live-btn {
-      margin-top: 30px;
-      padding: 12px 24px;
-      background: #f00;
-      color: white;
-      font-weight: bold;
-      border: none;
-      border-radius: 4px;
-    }
-    .profile-pic-wrapper {
-      position: relative;
-      display: inline-block;
-      margin-bottom: 15px;
-    }
-    .circle-profile-pic {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #fff;
-      background-color: #333;
-    }
-    .profile-pic-wrapper::after {
-      content: '+';
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      background-color: #fff;
-      color: #000;
-      font-size: 18px;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #000;
-    }
-    .tab-bar {
-      display: flex;
-      justify-content: space-around;
-      background-color: #111;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 10px 0;
-    }
-    .tab-bar a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-  </style>
 </head>
 <body>
-  <div class="header">INTAKEE</div>
-  <div class="search-bar" id="search-bar">
-    <input type="text" placeholder="Search INTAKEE..." />
-    <span class="icon"><i class="fas fa-search"></i></span>
-  </div>
-  <div id="home" class="tab-content">
-    <div class="placeholder-content">No content yet. Be the first to upload something on INTAKEE!</div>
-  </div>
-  <div id="videos" class="tab-content">
-    <div class="placeholder-content">No videos available.</div>
-  </div>
-  <div id="podcasts" class="tab-content">
-    <div class="placeholder-content">No podcasts available yet.</div>
-  </div>
-  <div id="upload" class="tab-content">
-    <div class="upload-section">
+  <header>
+    <h1>INTAKEE</h1>
+    <div id="search-bar">
+      <input type="text" placeholder="Search INTAKEE..." />
+      <span class="magnifier">🔍</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Home Tab -->
+    <section id="home" class="tab-content">
+      <p>No content yet. Be the first to upload something on INTAKEE!</p>
+    </section>
+
+    <!-- Videos Tab -->
+    <section id="videos" class="tab-content">
+      <p>No videos yet.</p>
+    </section>
+
+    <!-- Podcasts Tab -->
+    <section id="podcasts" class="tab-content">
+      <p>No podcasts yet.</p>
+    </section>
+
+    <!-- Upload Tab -->
+    <section id="upload" class="tab-content">
+      <h2>Upload Content</h2>
       <label>Choose Content Type</label>
       <select>
-        <option>Video</option>
-        <option>Podcast (audio or video)</option>
-        <option>Clip</option>
+        <option value="video">Video</option>
+        <option value="podcast-audio">Podcast (Audio Only)</option>
+        <option value="podcast-video">Podcast (Video)</option>
+        <option value="clip">Clip</option>
       </select>
-      <label>Title</label>
+
       <input type="text" placeholder="Enter title" />
-      <label>Description</label>
       <textarea placeholder="Enter description"></textarea>
+
       <label>Upload File</label>
       <input type="file" />
+
       <label>Optional Thumbnail</label>
       <input type="file" />
-      <button class="go-live-btn">Go Live</button>
-    </div>
-  </div>
-  <div id="clips" class="tab-content">
-    <div class="placeholder-content">No clips uploaded yet.</div>
-  </div>
-  <div id="profile" class="tab-content">
-    <h2>Your Profile</h2>
-    <div class="profile-pic-wrapper">
-      <img class="circle-profile-pic" id="profilePreview" src="" alt="Preview" />
-    </div>
-    <input type="file" onchange="previewProfilePic(event)" />
-    <label>Username</label>
-    <input type="text" placeholder="Enter your username" />
-    <label>Bio</label>
-    <textarea placeholder="Write something about yourself..."></textarea>
-    <button>Save Profile</button>
-    <h3>Your Uploads</h3>
-    <p>No uploads yet.</p>
-    <h3>Saved Content</h3>
-    <p>You haven't saved anything yet.</p>
-    <h3>Your Playlists</h3>
-    <p>No playlists created.</p>
-  </div>
-  <div id="settings" class="tab-content">
-    <h2>Settings</h2>
-    <h3>Privacy Policy</h3>
-    <p>Explains what data is collected and how it's used. Data is not sold. Users can request deletion.</p>
-    <h3>Terms of Service</h3>
-    <p>Users are responsible for content. INTAKEE is not liable for user posts. Illegal content is banned.</p>
-    <h3>Community Guidelines</h3>
-    <p>No porn, threats, hate, or spam. Freedom of expression is supported. Violations may lead to bans.</p>
-    <h3>Report Content</h3>
-    <p>Allows reporting users or content. INTAKEE reviews reports and takes action.</p>
-    <h3>Blocked Users</h3>
-    <p>Blocked users can't interact with or see your posts.</p>
-  </div>
-  <div class="tab-bar tab">
-    <a href="#home">Home</a>
-    <a href="#videos">Videos</a>
-    <a href="#podcasts">Podcasts</a>
-    <a href="#upload">Upload</a>
-    <a href="#clips">Clips</a>
-    <a href="#profile">Profile</a>
-    <a href="#settings">Settings</a>
-  </div>
-  <script>
-    function showTab(tabId) {
-      const contents = document.querySelectorAll('.tab-content');
-      contents.forEach(c => c.classList.remove('active'));
-      document.getElementById(tabId.replace('#', '')).classList.add('active');
-      const searchBar = document.getElementById('search-bar');
-      if (["#upload", "#settings"].includes(tabId)) {
-        searchBar.style.display = 'none';
-      } else {
-        searchBar.style.display = 'flex';
-      }
-    }
-    document.querySelectorAll('.tab a').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        showTab(this.getAttribute('href'));
-      });
-    });
-    document.addEventListener("DOMContentLoaded", () => {
-      showTab("#home");
-    });
-    function previewProfilePic(event) {
-      const reader = new FileReader();
-      reader.onload = function(){
-        const preview = document.getElementById('profilePreview');
-        preview.src = reader.result;
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
-  </script>
+
+      <button class="live">Go Live</button>
+    </section>
+
+    <!-- Clips Tab -->
+    <section id="clips" class="tab-content">
+      <p>No clips uploaded yet.</p>
+    </section>
+
+    <!-- Profile Tab -->
+    <section id="profile" class="tab-content">
+      <h2>Your Profile</h2>
+      <div class="profile-pic-container">
+        <img id="profilePreview" src="" alt="Profile Preview" />
+        <label class="upload-icon" for="profilePic">+</label>
+        <input type="file" id="profilePic" onchange="previewProfilePic(event)" />
+      </div>
+      <input type="text" placeholder="Enter your username" />
+      <textarea placeholder="Write something about yourself..."></textarea>
+      <button>Save Profile</button>
+
+      <h3>Your Uploads</h3>
+      <p>No uploads yet.</p>
+
+      <h3>Saved Content</h3>
+      <p>You haven't saved anything yet.</p>
+
+      <h3>Your Playlists</h3>
+      <p>No playlists created.</p>
+    </section>
+
+    <!-- Settings Tab -->
+    <section id="settings" class="tab-content">
+      <h2>Settings</h2>
+      <h3>Privacy Policy</h3>
+      <p>We value your privacy and do not share your data...</p>
+
+      <h3>Terms of Service</h3>
+      <p>INTAKEE is not liable for user-generated content...</p>
+
+      <h3>Community Guidelines</h3>
+      <p>No nudity, threats, or hate speech allowed on the platform.</p>
+
+      <h3>Report Content</h3>
+      <p>If you see something inappropriate, please report it.</p>
+
+      <h3>Blocked Users</h3>
+      <p>You haven't blocked anyone yet.</p>
+
+      <h3>Contact Support</h3>
+      <p>Reach us at: intakee2025@gmail.com</p>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <footer class="tabs">
+    <a href="#home" class="tab">Home</a>
+    <a href="#videos" class="tab">Videos</a>
+    <a href="#podcasts" class="tab">Podcasts</a>
+    <a href="#upload" class="tab">Upload</a>
+    <a href="#clips" class="tab">Clips</a>
+    <a href="#profile" class="tab">Profile</a>
+    <a href="#settings" class="tab">Settings</a>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
