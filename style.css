@@ -113,10 +113,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  align-items: flex-start;
 }
 
 .profile-subsection {
   margin-bottom: 2rem;
+  width: 100%;
 }
 
 .profile-subsection label {
@@ -133,6 +135,9 @@ body {
   background: #444;
   border: 2px solid #777;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #profile-pic-preview {
@@ -153,4 +158,13 @@ footer {
   margin-top: 2rem;
   font-size: 0.875rem;
   color: #aaa;
+}
+
+/* Image preview fix */
+input[type="file"] {
+  color: #fff;
+}
+
+img#profile-pic-preview[src=""] {
+  display: none;
 }
