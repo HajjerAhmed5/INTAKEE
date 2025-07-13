@@ -1,149 +1,110 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="header">
-    <div class="logo">INTAKEE</div>
-  </div>
+/* INTAKEE Style Sheet */
 
-  <div class="tab-content active" id="home">
-    <div class="search-bar"><input type="text" placeholder="Search home..."></div>
-    <h2>Welcome to INTAKEE</h2>
-    <p>No posts yet. Once users sign up and upload content, you’ll see it here.</p>
-  </div>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #000;
+  color: #fff;
+}
 
-  <div class="tab-content" id="videos">
-    <div class="search-bar"><input type="text" placeholder="Search videos..."></div>
-    <h2>Videos</h2>
-    <p>No videos uploaded yet.</p>
-    <div class="extra-content">
-      <p>Video previews will appear here when uploaded. Users can like, dislike, and comment on videos when logged in. Logged out users can only view and read comments.</p>
-    </div>
-  </div>
+.header {
+  background-color: #111;
+  padding: 1rem;
+  text-align: left;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+}
 
-  <div class="tab-content" id="podcasts">
-    <div class="search-bar"><input type="text" placeholder="Search podcasts..."></div>
-    <h2>Podcasts</h2>
-    <p>No podcasts available at the moment.</p>
-    <div class="extra-content">
-      <p>Podcasts support both audio-only and video formats. Comments are disabled, but like/dislike is allowed for logged-in users.</p>
-    </div>
-  </div>
+.logo {
+  display: inline-block;
+}
 
-  <div class="tab-content" id="upload">
-    <div class="upload-section">
-      <h2>Upload Content</h2>
-      <label>Title</label>
-      <input type="text" placeholder="Enter a title for your upload">
-      <label>Description</label>
-      <textarea placeholder="Write a brief description..."></textarea>
-      <label>Select File</label>
-      <input type="file">
-      <button style="margin-top:10px; padding:10px; background:white; color:black; border:none; border-radius:5px;">Go Live</button>
-    </div>
-  </div>
+.search-bar {
+  margin: 1rem;
+}
 
-  <div class="tab-content" id="clips">
-    <div class="search-bar"><input type="text" placeholder="Search clips..."></div>
-    <h2>Clips</h2>
-    <p>No clips posted yet.</p>
-    <div class="extra-content">
-      <p>Short-form content will be displayed here. Logged-in users can interact; guests can only view.</p>
-    </div>
-  </div>
+.search-bar input[type="text"] {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+}
 
-  <div class="tab-content" id="profile">
-    <div class="profile-section">
-      <div class="profile-subsection">
-        <label for="profile-pic">Upload Profile Picture</label>
-        <div class="profile-pic-container">
-          <img id="profile-pic-preview" src="" alt="Profile Picture Preview">
-        </div>
-        <input type="file" id="profile-pic" onchange="previewProfilePic(event)">
-      </div>
-      <div class="profile-subsection">
-        <label>Username</label>
-        <input type="text" placeholder="Enter your username">
-      </div>
-      <div class="profile-subsection">
-        <label>Bio</label>
-        <textarea placeholder="Write something about yourself..."></textarea>
-      </div>
-      <div class="profile-subsection">
-        <h4>Your Uploads</h4>
-        <p>No uploads yet.</p>
-      </div>
-      <div class="profile-subsection">
-        <h4>Saved Content</h4>
-        <p>You haven’t saved anything yet.</p>
-      </div>
-      <div class="profile-subsection">
-        <h4>Your Playlists</h4>
-        <p>You haven’t created any playlists yet.</p>
-      </div>
-    </div>
-  </div>
+.tab-content {
+  display: none;
+  padding: 1rem;
+}
 
-  <div class="tab-content" id="settings">
-    <div class="settings-section">
-      <h3>Privacy Policy</h3>
-      <p>We collect email, device info, IP, uploads, and interactions. No data is sold. Users may request deletion.</p>
-      <h3>Terms of Service</h3>
-      <p>Users are responsible for their own content. INTAKEE is not liable. No porn, illegal material, or threats allowed.</p>
-      <h3>Community Guidelines</h3>
-      <p>No nudity, violence, threats, copyright violations, or impersonation. Freedom of speech is respected.</p>
-      <h3>Report Content</h3>
-      <p>Use this section to report content violating the rules. You will not see reported content until unblocked.</p>
-      <h3>Blocked Users</h3>
-      <p>Manage users you've blocked. They can’t see or interact with your content.</p>
-      <h3>Contact Support</h3>
-      <p>Email us at intakee2025@gmail.com</p>
-      <div class="legal-section">
-        <p>INTAKEE is a content-sharing platform. All opinions and content expressed are solely those of the creator. INTAKEE assumes no responsibility for user-generated content.</p>
-      </div>
-    </div>
-  </div>
+.tab-content.active {
+  display: block;
+}
 
-  <div class="tabs">
-    <div class="tab"><a href="#home">Home</a></div>
-    <div class="tab"><a href="#videos">Videos</a></div>
-    <div class="tab"><a href="#podcasts">Podcasts</a></div>
-    <div class="tab"><a href="#upload">Upload</a></div>
-    <div class="tab"><a href="#clips">Clips</a></div>
-    <div class="tab"><a href="#profile">Profile</a></div>
-    <div class="tab"><a href="#settings">Settings</a></div>
-  </div>
+.upload-section,
+.profile-section,
+.settings-section {
+  margin: 1rem;
+}
 
-  <footer>
-    INTAKEE is a content-sharing platform. All opinions and content expressed are solely those of the creator. INTAKEE assumes no responsibility for user-generated content.
-  </footer>
+.upload-section input,
+.upload-section textarea,
+.profile-subsection input,
+.profile-subsection textarea {
+  width: 100%;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: none;
+}
 
-  <script>
-    const tabs = document.querySelectorAll('.tab a');
-    const contents = document.querySelectorAll('.tab-content');
+.tabs {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #111;
+  display: flex;
+  justify-content: space-around;
+  padding: 0.5rem 0;
+  border-top: 1px solid #222;
+}
 
-    tabs.forEach(tab => {
-      tab.addEventListener('click', e => {
-        e.preventDefault();
-        const target = tab.getAttribute('href').replace('#', '');
-        contents.forEach(c => c.classList.remove('active'));
-        document.getElementById(target).classList.add('active');
-      });
-    });
+.tab a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
 
-    function previewProfilePic(event) {
-      const reader = new FileReader();
-      reader.onload = function(){
-        const output = document.getElementById('profile-pic-preview');
-        output.src = reader.result;
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
-  </script>
-</body>
-</html>
+.tab a:hover {
+  text-decoration: underline;
+}
+
+.profile-pic-container {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #333;
+  margin-bottom: 1rem;
+}
+
+.profile-pic-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+footer {
+  background: #111;
+  color: #666;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.875rem;
+}
+
+.legal-section {
+  margin-top: 2rem;
+  font-size: 0.875rem;
+  color: #aaa;
+}
