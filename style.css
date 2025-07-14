@@ -1,8 +1,8 @@
  body {
   margin: 0;
+  font-family: Arial, sans-serif;
   background: #000;
   color: #fff;
-  font-family: Arial, sans-serif;
 }
 main {
   padding-bottom: 70px;
@@ -11,9 +11,8 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #000;
   padding: 12px;
-  border-bottom: 1px solid #222;
+  background: #000;
 }
 .logo {
   height: 40px;
@@ -22,19 +21,22 @@ main {
   position: relative;
   width: 60%;
 }
-.search {
-  width: 100%;
-  padding: 8px 12px 8px 30px;
-  border-radius: 6px;
-  border: none;
-}
 .search-container .icon {
   position: absolute;
-  left: 8px;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
+  color: #aaa;
 }
-.grid {
+.search {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  border-radius: 6px;
+  border: none;
+  background: #111;
+  color: #fff;
+}
+.grid, .profile-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 16px;
@@ -49,42 +51,6 @@ main {
   width: 100%;
   border-radius: 6px;
 }
-.upload-info {
-  padding: 20px;
-  text-align: center;
-}
-.upload-info p {
-  margin-bottom: 10px;
-}
-.upload-info button {
-  background: #333;
-  border: none;
-  color: #888;
-  padding: 10px 20px;
-  border-radius: 6px;
-  margin: 5px;
-  cursor: not-allowed;
-}
-.profile-placeholder {
-  text-align: center;
-  padding: 40px;
-  color: #aaa;
-}
-.settings {
-  padding: 20px;
-}
-.legal h3 {
-  margin-top: 20px;
-  color: #0af;
-}
-.legal p {
-  font-size: 14px;
-  line-height: 1.6;
-}
-.legal a {
-  color: #0af;
-  text-decoration: underline;
-}
 .tabs {
   position: fixed;
   bottom: 0;
@@ -97,9 +63,9 @@ main {
 .tabs button {
   flex: 1;
   padding: 12px 0;
-  border: none;
   background: none;
-  color: #fff;
+  border: none;
+  color: white;
   font-size: 14px;
 }
 .tabs button:hover {
@@ -110,4 +76,54 @@ main {
 }
 .tab-content.active {
   display: block;
+}
+.empty-tab {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #999;
+}
+.upload-section {
+  text-align: center;
+  padding: 30px;
+}
+.upload-section button {
+  background: #333;
+  color: #888;
+  padding: 10px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: not-allowed;
+}
+.profile-preview {
+  text-align: center;
+  padding: 30px;
+}
+.profile-pic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+.username {
+  font-size: 20px;
+}
+.bio {
+  color: #bbb;
+  font-size: 14px;
+}
+.settings {
+  padding: 20px;
+}
+.legal h3 {
+  margin-top: 20px;
+  color: #0af;
+}
+.legal p, .legal a {
+  font-size: 14px;
+  color: #ccc;
+}
+.legal a {
+  text-decoration: underline;
 }
