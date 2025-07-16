@@ -1,129 +1,147 @@
- body {
+ /* Base styles */
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #000;
+  padding: 0;
+}
+
+body {
+  background-color: #000;
   color: #fff;
+  font-family: 'Helvetica Neue', sans-serif;
+  padding-bottom: 70px; /* space for nav bar */
 }
-main {
-  padding-bottom: 70px;
-}
-.header {
+
+/* Search bar */
+.search-bar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 12px;
-  background: #000;
-}
-.logo {
-  height: 40px;
-}
-.search-container {
-  position: relative;
-  width: 60%;
-}
-.search-container .icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #aaa;
-}
-.search {
-  width: 100%;
-  padding: 8px 12px 8px 32px;
-  border-radius: 6px;
-  border: none;
-  background: #111;
-  color: #fff;
-}
-.grid, .profile-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 16px;
-  padding: 16px;
-}
-.card {
-  background: #111;
   padding: 10px;
-  border-radius: 8px;
+  border-bottom: 1px solid #333;
+  background-color: #111;
 }
-.thumb {
-  width: 100%;
+
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  background: #222;
+  border: none;
+  color: #fff;
   border-radius: 6px;
+  outline: none;
 }
-.tabs {
+
+.search-bar .icon {
+  margin-left: 8px;
+  font-size: 18px;
+}
+
+/* Tabs */
+.tab {
+  padding: 15px;
+}
+
+.tab h2 {
+  margin-bottom: 15px;
+}
+
+.tab p {
+  margin: 10px 0;
+}
+
+/* Bottom Nav */
+.bottom-nav {
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: #111;
+  background-color: #111;
   display: flex;
   justify-content: space-around;
   border-top: 1px solid #333;
+  z-index: 10;
 }
-.tabs button {
+
+.tab-btn {
   flex: 1;
   padding: 12px 0;
   background: none;
+  color: #fff;
   border: none;
-  color: white;
   font-size: 14px;
+  cursor: pointer;
 }
-.tabs button:hover {
-  background: #222;
-}
-.tab-content {
-  display: none;
-}
-.tab-content.active {
-  display: block;
-}
-.empty-tab {
-  text-align: center;
-  padding: 40px;
-  font-size: 16px;
-  color: #999;
-}
-.upload-section {
-  text-align: center;
-  padding: 30px;
-}
-.upload-section button {
-  background: #333;
-  color: #888;
-  padding: 10px 20px;
-  margin: 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: not-allowed;
-}
-.profile-preview {
-  text-align: center;
-  padding: 30px;
-}
-.profile-pic {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin-bottom: 10px;
-}
-.username {
+
+.upload-btn {
   font-size: 20px;
-}
-.bio {
-  color: #bbb;
-  font-size: 14px;
-}
-.settings {
-  padding: 20px;
-}
-.legal h3 {
-  margin-top: 20px;
+  font-weight: bold;
   color: #0af;
 }
-.legal p, .legal a {
-  font-size: 14px;
-  color: #ccc;
+
+/* Upload Page */
+.upload-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  background-color: #111;
+  border-radius: 10px;
 }
-.legal a {
-  text-decoration: underline;
+
+.upload-wrapper label {
+  font-size: 14px;
+}
+
+.upload-wrapper input,
+.upload-wrapper textarea,
+.upload-wrapper select {
+  padding: 10px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+}
+
+.upload-wrapper .note {
+  font-size: 12px;
+  color: #888;
+}
+
+/* Profile */
+.profile-section {
+  padding: 15px;
+}
+
+.profile-info {
+  margin-bottom: 20px;
+}
+
+.profile-pic-placeholder {
+  width: 80px;
+  height: 80px;
+  background: #333;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #aaa;
+}
+
+.profile-tabs h3 {
+  margin-top: 20px;
+}
+
+/* Settings Page */
+.settings-page {
+  padding: 15px;
+}
+
+.settings-page section {
+  margin-bottom: 20px;
+}
+
+.settings-page h3 {
+  font-size: 16px;
+  margin-bottom: 5px;
 }
