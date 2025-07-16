@@ -1,4 +1,4 @@
- /* Base styles */
+/* Base styles */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -145,15 +145,13 @@ body {
   font-size: 16px;
   margin-bottom: 5px;
 }
-.app-header {
-  background-color: #000;
-  padding: 10px 15px;
-  text-align: center;
-  border-bottom: 1px solid #222;
+
+/* Logo Header (used inside each tab) */
+.logo-header {
+  padding: 15px 20px 10px;
 }
 
-.logo {
-  height: 40px;
-  max-width: 160px;
+.logo-header img {
+  height: 38px;
   object-fit: contain;
 }
