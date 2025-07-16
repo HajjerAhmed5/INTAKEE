@@ -157,4 +157,15 @@ body {
 .logo-header img {
   height: 50px;
   object-fit: contain;
+/* Logo Header */
+.logo-header {
+  display: flex;
+  align-items: center;
+  padding: 20px 20px 10px;
+  background-color: #000;
+}
 
+.logo-header img {
+  height: 50px;
+  object-fit: contain;
+}
