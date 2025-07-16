@@ -1,3 +1,4 @@
+// Force Vercel rebuild
 // Simulated login status (change this to true to simulate being logged in)
 let isLoggedIn = false;
 
