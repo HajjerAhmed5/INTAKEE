@@ -1,13 +1,25 @@
-function showTab(id) {
-  document.querySelectorAll('.tab-content').forEach(tab => {
-    tab.classList.remove('active');
-  });
-  document.getElementById(id).classList.add('active');
+// Handle tab switching
+const tabButtons = document.querySelectorAll('.tab-btn');
+const tabs = document.querySelectorAll('.tab');
 
-  const search = document.getElementById('searchContainer');
-  if (id === 'upload' || id === 'settings') {
-    search.style.display = 'none';
-  } else {
-    search.style.display = 'flex';
-  }
-}
+tabButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const target = button.getAttribute('data-tab');
+
+    tabs.forEach(tab => {
+      tab.style.display = tab.id === target ? 'block' : 'none';
+    });
+  });
+});
+
+// Optional: Search bar interaction (just clears on Enter key)
+const searchInputs = document.querySelectorAll('.search-bar input');
+
+searchInputs.forEach(input => {
+  input.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      alert(`Searching for: ${input.value}`);
+      input.value = '';
+    }
+  });
+});
