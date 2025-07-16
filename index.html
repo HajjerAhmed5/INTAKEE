@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -6,9 +6,8 @@
   <title>INTAKEE</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body> <header class="app-header">
-  <img src="logo.png" alt="INTAKEE Logo" class="logo" />
-</header>
+<body>
+
   <!-- NAVIGATION TABS -->
   <nav class="bottom-nav">
     <button class="tab-btn" data-tab="home">Home</button>
@@ -22,6 +21,7 @@
 
   <!-- HOME TAB -->
   <div class="tab" id="home">
+    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
     <div class="search-bar">
       <input type="text" placeholder="Search..." />
       <span class="icon">🔍</span>
@@ -33,6 +33,7 @@
 
   <!-- VIDEOS TAB -->
   <div class="tab" id="videos" style="display: none;">
+    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
     <div class="search-bar">
       <input type="text" placeholder="Search videos..." />
       <span class="icon">🔍</span>
@@ -44,6 +45,7 @@
 
   <!-- PODCAST TAB -->
   <div class="tab" id="podcast" style="display: none;">
+    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
     <div class="search-bar">
       <input type="text" placeholder="Search podcasts..." />
       <span class="icon">🔍</span>
@@ -52,12 +54,13 @@
       <p>No posts yet</p>
     </div>
   </div>
+
   <!-- UPLOAD TAB -->
   <div class="tab" id="upload" style="display: none;">
+    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
     <div class="upload-wrapper">
       <h2>Upload Content</h2>
 
-      <!-- Select Type -->
       <label>Choose Type:</label>
       <select>
         <option>Video</option>
@@ -67,37 +70,31 @@
         <option>Go Live</option>
       </select>
 
-      <!-- Title -->
       <label for="title">Title:</label>
       <input type="text" id="title" placeholder="Enter title..." disabled />
 
-      <!-- Description -->
       <label for="description">Description:</label>
       <textarea id="description" placeholder="Add a description..." disabled></textarea>
 
-      <!-- Thumbnail -->
       <label for="thumbnail">Thumbnail:</label>
       <input type="file" id="thumbnail" accept="image/*" disabled />
 
-      <!-- Hashtags / Category -->
       <label for="hashtags">Hashtags or Category:</label>
       <input type="text" id="hashtags" placeholder="#music #comedy..." disabled />
 
-      <!-- Tag Users -->
       <label for="tags">Tag Users:</label>
       <input type="text" id="tags" placeholder="@creator1 @friend2..." disabled />
 
-      <!-- Schedule Upload -->
       <label for="schedule">Schedule Upload:</label>
       <input type="datetime-local" id="schedule" disabled />
 
-      <!-- Note -->
       <p class="note">You must be logged in to upload content.</p>
     </div>
   </div>
 
   <!-- CLIPS TAB -->
   <div class="tab" id="clips" style="display: none;">
+    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
     <div class="search-bar">
       <input type="text" placeholder="Search clips..." />
       <span class="icon">🔍</span>
@@ -106,32 +103,24 @@
       <p>No posts yet</p>
     </div>
   </div>
+
   <!-- PROFILE TAB -->
   <div class="tab" id="profile" style="display: none;">
+    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
     <div class="profile-section">
       <h2>Your Profile</h2>
       <p>You must be logged in to edit your profile or interact with content.</p>
 
-      <!-- Profile Image + Bio -->
       <div class="profile-info">
         <div class="profile-pic-placeholder">No image</div>
         <textarea placeholder="Bio (only editable if logged in)" disabled></textarea>
       </div>
 
-      <!-- Sections -->
       <div class="profile-tabs">
-        <h3>Uploads</h3>
-        <p>No uploads</p>
-
-        <h3>Liked</h3>
-        <p>No liked posts</p>
-
-        <h3>Saved</h3>
-        <p>No saved content</p>
-
-        <h3>Playlists</h3>
-        <p>No playlists</p>
-
+        <h3>Uploads</h3><p>No uploads</p>
+        <h3>Liked</h3><p>No liked posts</p>
+        <h3>Saved</h3><p>No saved content</p>
+        <h3>Playlists</h3><p>No playlists</p>
         <p class="note">All sections can be made private (only when logged in)</p>
       </div>
     </div>
@@ -139,42 +128,18 @@
 
   <!-- SETTINGS TAB -->
   <div class="tab" id="settings" style="display: none;">
+    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
     <div class="settings-page">
       <h2>Settings</h2>
-
-      <section>
-        <h3>Privacy Policy</h3>
-        <p>We respect your privacy. Data is not sold or shared. See full policy at intakee.com/privacy.</p>
-      </section>
-
-      <section>
-        <h3>Terms of Service</h3>
-        <p>By using INTAKEE, you agree that all content uploaded is your responsibility. We are not liable for user posts.</p>
-      </section>
-
-      <section>
-        <h3>Community Guidelines</h3>
-        <p>No nudity, illegal activity, or hate speech. Freedom of speech is respected, but we moderate abuse.</p>
-      </section>
-
-      <section>
-        <h3>Report Content</h3>
-        <p>Report inappropriate content. Offenders may be reviewed or blocked.</p>
-      </section>
-
-      <section>
-        <h3>Blocked Users</h3>
-        <p>View and manage users you've blocked.</p>
-      </section>
-
-      <section>
-        <h3>Contact Support</h3>
-        <p>Email us at <strong>Intakee@gmail.com</strong> for help.</p>
-      </section>
+      <section><h3>Privacy Policy</h3><p>We respect your privacy. Data is not sold or shared. See full policy at intakee.com/privacy.</p></section>
+      <section><h3>Terms of Service</h3><p>By using INTAKEE, you agree that all content uploaded is your responsibility. We are not liable for user posts.</p></section>
+      <section><h3>Community Guidelines</h3><p>No nudity, illegal activity, or hate speech. Freedom of speech is respected, but we moderate abuse.</p></section>
+      <section><h3>Report Content</h3><p>Report inappropriate content. Offenders may be reviewed or blocked.</p></section>
+      <section><h3>Blocked Users</h3><p>View and manage users you've blocked.</p></section>
+      <section><h3>Contact Support</h3><p>Email us at <strong>Intakee@gmail.com</strong> for help.</p></section>
     </div>
   </div>
 
-  <!-- SCRIPTS -->
   <script src="script.js"></script>
 </body>
 </html>
