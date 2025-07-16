@@ -1,89 +1,178 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="header">
-    <img src="INTAKEE_logo.png" alt="INTAKEE Logo" class="logo" />
-    <div id="searchContainer" class="search-container">
+  <!-- NAVIGATION TABS -->
+  <nav class="bottom-nav">
+    <button class="tab-btn" data-tab="home">Home</button>
+    <button class="tab-btn" data-tab="videos">Videos</button>
+    <button class="tab-btn" data-tab="podcast">Podcast</button>
+    <button class="tab-btn upload-btn" data-tab="upload">+</button>
+    <button class="tab-btn" data-tab="clips">Clips</button>
+    <button class="tab-btn" data-tab="profile">Profile</button>
+    <button class="tab-btn" data-tab="settings">Settings</button>
+  </nav>
+
+  <!-- HOME TAB -->
+  <div class="tab" id="home">
+    <div class="search-bar">
+      <input type="text" placeholder="Search..." />
       <span class="icon">🔍</span>
-      <input type="text" id="searchBar" class="search" placeholder="Search content..." />
     </div>
-  </header>
+    <div class="content-feed">
+      <p>No posts yet</p>
+    </div>
+  </div>
 
-  <main>
-    <section id="home" class="tab-content active">
-      <div class="grid">
-        <div class="card"><img src="video1.jpg" class="thumb"><h3>Welcome to INTAKEE</h3></div>
+  <!-- VIDEOS TAB -->
+  <div class="tab" id="videos" style="display: none;">
+    <div class="search-bar">
+      <input type="text" placeholder="Search videos..." />
+      <span class="icon">🔍</span>
+    </div>
+    <div class="content-feed">
+      <p>No posts yet</p>
+    </div>
+  </div>
+
+  <!-- PODCAST TAB -->
+  <div class="tab" id="podcast" style="display: none;">
+    <div class="search-bar">
+      <input type="text" placeholder="Search podcasts..." />
+      <span class="icon">🔍</span>
+    </div>
+    <div class="content-feed">
+      <p>No posts yet</p>
+    </div>
+  </div>
+  <!-- UPLOAD TAB -->
+  <div class="tab" id="upload" style="display: none;">
+    <div class="upload-wrapper">
+      <h2>Upload Content</h2>
+
+      <!-- Select Type -->
+      <label>Choose Type:</label>
+      <select>
+        <option>Video</option>
+        <option>Clip</option>
+        <option>Podcast - Audio</option>
+        <option>Podcast - Video</option>
+        <option>Go Live</option>
+      </select>
+
+      <!-- Title -->
+      <label for="title">Title:</label>
+      <input type="text" id="title" placeholder="Enter title..." disabled />
+
+      <!-- Description -->
+      <label for="description">Description:</label>
+      <textarea id="description" placeholder="Add a description..." disabled></textarea>
+
+      <!-- Thumbnail -->
+      <label for="thumbnail">Thumbnail:</label>
+      <input type="file" id="thumbnail" accept="image/*" disabled />
+
+      <!-- Hashtags / Category -->
+      <label for="hashtags">Hashtags or Category:</label>
+      <input type="text" id="hashtags" placeholder="#music #comedy..." disabled />
+
+      <!-- Tag Users -->
+      <label for="tags">Tag Users:</label>
+      <input type="text" id="tags" placeholder="@creator1 @friend2..." disabled />
+
+      <!-- Schedule Upload -->
+      <label for="schedule">Schedule Upload:</label>
+      <input type="datetime-local" id="schedule" disabled />
+
+      <!-- Note -->
+      <p class="note">You must be logged in to upload content.</p>
+    </div>
+  </div>
+
+  <!-- CLIPS TAB -->
+  <div class="tab" id="clips" style="display: none;">
+    <div class="search-bar">
+      <input type="text" placeholder="Search clips..." />
+      <span class="icon">🔍</span>
+    </div>
+    <div class="content-feed">
+      <p>No posts yet</p>
+    </div>
+  </div>
+  <!-- PROFILE TAB -->
+  <div class="tab" id="profile" style="display: none;">
+    <div class="profile-section">
+      <h2>Your Profile</h2>
+      <p>You must be logged in to edit your profile or interact with content.</p>
+
+      <!-- Profile Image + Bio -->
+      <div class="profile-info">
+        <div class="profile-pic-placeholder">No image</div>
+        <textarea placeholder="Bio (only editable if logged in)" disabled></textarea>
       </div>
-    </section>
 
-    <section id="videos" class="tab-content">
-      <div class="empty-tab"><p>No posts yet.</p></div>
-    </section>
+      <!-- Sections -->
+      <div class="profile-tabs">
+        <h3>Uploads</h3>
+        <p>No uploads</p>
 
-    <section id="podcasts" class="tab-content">
-      <div class="empty-tab"><p>No posts yet.</p></div>
-    </section>
+        <h3>Liked</h3>
+        <p>No liked posts</p>
 
-    <section id="upload" class="tab-content">
-      <div class="upload-section">
-        <h3>Upload Content</h3>
-        <p>This is a layout preview. Upload functionality will be enabled when accounts are live.</p>
-        <button disabled>Upload</button>
-        <button disabled>Go Live</button>
+        <h3>Saved</h3>
+        <p>No saved content</p>
+
+        <h3>Playlists</h3>
+        <p>No playlists</p>
+
+        <p class="note">All sections can be made private (only when logged in)</p>
       </div>
-    </section>
+    </div>
+  </div>
 
-    <section id="clips" class="tab-content">
-      <div class="empty-tab"><p>No posts yet.</p></div>
-    </section>
+  <!-- SETTINGS TAB -->
+  <div class="tab" id="settings" style="display: none;">
+    <div class="settings-page">
+      <h2>Settings</h2>
 
-    <section id="profile" class="tab-content">
-      <div class="profile-preview">
-        <img src="default-profile.png" class="profile-pic" />
-        <h2 class="username">Your Profile</h2>
-        <p class="bio">Sign in to upload a profile picture and add a bio.</p>
-        <div class="profile-grid">
-          <div class="card"><img src="placeholder1.jpg" class="thumb"><p>Sample Upload</p></div>
-          <div class="card"><img src="placeholder2.jpg" class="thumb"><p>Sample Upload</p></div>
-        </div>
-      </div>
-    </section>
+      <section>
+        <h3>Privacy Policy</h3>
+        <p>We respect your privacy. Data is not sold or shared. See full policy at intakee.com/privacy.</p>
+      </section>
 
-    <section id="settings" class="tab-content">
-      <div class="settings">
-        <h2>Settings & Legal</h2>
-        <div class="legal">
-          <h3>Privacy Policy</h3>
-          <p>We collect minimal data and do not sell or share personal information.</p>
-          <h3>Terms of Service</h3>
-          <p>You are responsible for the content you post. INTAKEE is not legally liable for user-generated content.</p>
-          <h3>Community Guidelines</h3>
-          <p>No nudity, hate speech, threats, or illegal content allowed. Violations may lead to removal or bans.</p>
-          <h3>Report Content</h3>
-          <p>Content may be reported for review. INTAKEE reserves the right to remove or retain content at its discretion.</p>
-          <h3>Business Contact</h3>
-          <p>Email: <a href="mailto:Intakee@gmail.com">Intakee@gmail.com</a></p>
-        </div>
-      </div>
-    </section>
-  </main>
+      <section>
+        <h3>Terms of Service</h3>
+        <p>By using INTAKEE, you agree that all content uploaded is your responsibility. We are not liable for user posts.</p>
+      </section>
 
-  <footer class="tabs">
-    <button onclick="showTab('home')">Home</button>
-    <button onclick="showTab('videos')">Videos</button>
-    <button onclick="showTab('podcasts')">Podcast</button>
-    <button onclick="showTab('upload')">Upload</button>
-    <button onclick="showTab('clips')">Clips</button>
-    <button onclick="showTab('profile')">Profile</button>
-    <button onclick="showTab('settings')">Settings</button>
-  </footer>
+      <section>
+        <h3>Community Guidelines</h3>
+        <p>No nudity, illegal activity, or hate speech. Freedom of speech is respected, but we moderate abuse.</p>
+      </section>
 
+      <section>
+        <h3>Report Content</h3>
+        <p>Report inappropriate content. Offenders may be reviewed or blocked.</p>
+      </section>
+
+      <section>
+        <h3>Blocked Users</h3>
+        <p>View and manage users you've blocked.</p>
+      </section>
+
+      <section>
+        <h3>Contact Support</h3>
+        <p>Email us at <strong>Intakee@gmail.com</strong> for help.</p>
+      </section>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
   <script src="script.js"></script>
 </body>
 </html>
