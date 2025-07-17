@@ -22,7 +22,7 @@ body {
 }
 
 .home-logo {
-  height: 140px;
+  height: 160px;
   width: auto;
   margin-right: 20px;
   filter: brightness(1.4) contrast(1.15) drop-shadow(0 0 8px rgba(255, 255, 255, 0.1));
