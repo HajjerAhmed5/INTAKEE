@@ -22,46 +22,56 @@
 
   <!-- HOME TAB -->
   <div class="tab" id="home">
-    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
-    <div class="search-bar">
-      <input type="text" placeholder="Search..." />
-      <span class="icon"><i class="fas fa-search"></i></span>
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+      <div class="search-bar">
+        <input type="text" placeholder="Search..." />
+        <span class="icon"><i class="fas fa-search"></i></span>
+      </div>
     </div>
-    <div class="content-feed">
-      <p>No posts yet</p>
+    <h1 class="home-title">Welcome to INTAKEE</h1>
+    <div class="video-grid">
+      <!-- Example Cards -->
     </div>
   </div>
 
   <!-- VIDEOS TAB -->
   <div class="tab" id="videos" style="display: none;">
-    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
-    <div class="search-bar">
-      <input type="text" placeholder="Search videos..." />
-      <span class="icon"><i class="fas fa-search"></i></span>
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+      <div class="search-bar">
+        <input type="text" placeholder="Search videos..." />
+        <span class="icon"><i class="fas fa-search"></i></span>
+      </div>
     </div>
-    <div class="content-feed">
-      <p>No posts yet</p>
+    <h1 class="home-title">Videos</h1>
+    <div class="video-grid">
+      <!-- Example Cards -->
     </div>
   </div>
 
   <!-- PODCAST TAB -->
   <div class="tab" id="podcast" style="display: none;">
-    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
-    <div class="search-bar">
-      <input type="text" placeholder="Search podcasts..." />
-      <span class="icon"><i class="fas fa-search"></i></span>
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+      <div class="search-bar">
+        <input type="text" placeholder="Search podcasts..." />
+        <span class="icon"><i class="fas fa-search"></i></span>
+      </div>
     </div>
-    <div class="content-feed">
-      <p>No posts yet</p>
+    <h1 class="home-title">Podcasts</h1>
+    <div class="video-grid">
+      <!-- Example Cards -->
     </div>
   </div>
 
   <!-- UPLOAD TAB -->
   <div class="tab" id="upload" style="display: none;">
-    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+    </div>
     <div class="upload-wrapper">
       <h2>Upload Content</h2>
-
       <label>Choose Type:</label>
       <select>
         <option>Video</option>
@@ -70,74 +80,96 @@
         <option>Podcast - Video</option>
         <option>Go Live</option>
       </select>
-
       <label for="title">Title:</label>
       <input type="text" id="title" placeholder="Enter title..." disabled />
-
       <label for="description">Description:</label>
       <textarea id="description" placeholder="Add a description..." disabled></textarea>
-
       <label for="thumbnail">Thumbnail:</label>
       <input type="file" id="thumbnail" accept="image/*" disabled />
-
       <label for="hashtags">Hashtags or Category:</label>
       <input type="text" id="hashtags" placeholder="#music #comedy..." disabled />
-
       <label for="tags">Tag Users:</label>
       <input type="text" id="tags" placeholder="@creator1 @friend2..." disabled />
-
       <label for="schedule">Schedule Upload:</label>
       <input type="datetime-local" id="schedule" disabled />
-
       <p class="note">You must be logged in to upload content.</p>
     </div>
   </div>
 
   <!-- CLIPS TAB -->
   <div class="tab" id="clips" style="display: none;">
-    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
-    <div class="search-bar">
-      <input type="text" placeholder="Search clips..." />
-      <span class="icon"><i class="fas fa-search"></i></span>
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+      <div class="search-bar">
+        <input type="text" placeholder="Search clips..." />
+        <span class="icon"><i class="fas fa-search"></i></span>
+      </div>
     </div>
-    <div class="content-feed">
-      <p>No posts yet</p>
+    <h1 class="home-title">Clips</h1>
+    <div class="video-grid">
+      <!-- Example Cards -->
     </div>
   </div>
 
   <!-- PROFILE TAB -->
   <div class="tab" id="profile" style="display: none;">
-    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+      <div class="search-bar">
+        <input type="text" placeholder="Search your content..." />
+        <span class="icon"><i class="fas fa-search"></i></span>
+      </div>
+    </div>
     <div class="profile-section">
-      <h2>Your Profile</h2>
+      <h1 class="home-title">Your Profile</h1>
       <p>You must be logged in to edit your profile or interact with content.</p>
-
       <div class="profile-info">
         <div class="profile-pic-placeholder">No image</div>
         <textarea placeholder="Bio (only editable if logged in)" disabled></textarea>
       </div>
-
-      <div class="profile-tabs">
-        <h3>Uploads</h3><p>No uploads</p>
-        <h3>Liked</h3><p>No liked posts</p>
-        <h3>Saved</h3><p>No saved content</p>
-        <h3>Playlists</h3><p>No playlists</p>
-        <p class="note">All sections can be made private (only when logged in)</p>
-      </div>
+      <h3 class="home-title">Uploads</h3>
+      <div class="video-grid"><p>No uploads</p></div>
+      <h3 class="home-title">Liked</h3>
+      <div class="video-grid"><p>No liked posts</p></div>
+      <h3 class="home-title">Saved</h3>
+      <div class="video-grid"><p>No saved content</p></div>
+      <h3 class="home-title">Playlists</h3>
+      <div class="video-grid"><p>No playlists</p></div>
+      <p class="note" style="padding: 0 20px;">All sections can be made private (only when logged in)</p>
     </div>
   </div>
 
   <!-- SETTINGS TAB -->
   <div class="tab" id="settings" style="display: none;">
-    <div class="logo-header"><img src="logo.png" alt="INTAKEE Logo" /></div>
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+    </div>
     <div class="settings-page">
-      <h2>Settings</h2>
-      <section><h3>Privacy Policy</h3><p>We respect your privacy. Data is not sold or shared.</p></section>
-      <section><h3>Terms of Service</h3><p>By using INTAKEE, you agree that all content uploaded is your responsibility. We are not liable for user posts.</p></section>
-      <section><h3>Community Guidelines</h3><p>No nudity, illegal activity, or hate speech. Freedom of speech is respected, but we moderate abuse.</p></section>
-      <section><h3>Report Content</h3><p>Report inappropriate content. Offenders may be reviewed or blocked.</p></section>
-      <section><h3>Blocked Users</h3><p>View and manage users you've blocked.</p></section>
-      <section><h3>Contact Support</h3><p>Email us at <strong>Intakee@gmail.com</strong> for help.</p></section>
+      <h1 class="home-title">Settings</h1>
+      <div class="video-card">
+        <h3>Privacy Policy</h3>
+        <p>We respect your privacy. Data is never sold or shared.</p>
+      </div>
+      <div class="video-card">
+        <h3>Terms of Service</h3>
+        <p>You are responsible for all uploaded content. INTAKEE is not liable for anything user-generated.</p>
+      </div>
+      <div class="video-card">
+        <h3>Community Guidelines</h3>
+        <p>No nudity, illegal activity, or hate speech. We moderate abuse fairly and support speech freedom.</p>
+      </div>
+      <div class="video-card">
+        <h3>Report Content</h3>
+        <p>Flag abusive or inappropriate content. Repeated violations lead to content review or action.</p>
+      </div>
+      <div class="video-card">
+        <h3>Blocked Users</h3>
+        <p>View and manage users you’ve blocked from seeing your content.</p>
+      </div>
+      <div class="video-card">
+        <h3>Contact Support</h3>
+        <p>Email <strong>Intakee@gmail.com</strong> for help or technical issues.</p>
+      </div>
     </div>
   </div>
 
