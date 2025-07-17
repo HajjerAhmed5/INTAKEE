@@ -31,6 +31,7 @@ body {
   box-shadow: none;
 }
 
+/* Search Bar */
 .search-bar {
   display: flex;
   align-items: center;
@@ -58,6 +59,7 @@ body {
   cursor: pointer;
 }
 
+/* Title */
 .home-title {
   font-size: 24px;
   font-weight: bold;
@@ -66,7 +68,7 @@ body {
   margin-bottom: 20px;
 }
 
-/* Grid for cards */
+/* Grid for Cards */
 .video-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
