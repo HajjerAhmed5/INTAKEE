@@ -22,10 +22,10 @@ body {
 }
 
 .home-logo {
-  height: 120px;
+  height: 140px;
   width: auto;
   margin-right: 20px;
-  filter: brightness(1.2) contrast(1.1);
+  filter: brightness(1.4) contrast(1.15) drop-shadow(0 0 8px rgba(255, 255, 255, 0.1));
 }
 
 .search-bar {
