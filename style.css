@@ -23,10 +23,10 @@ body {
 }
 
 .home-logo {
-  height: 160px;
+  height: 200px;
   width: auto;
   margin-right: 20px;
-  filter: brightness(1.4) contrast(1.15);
+  filter: brightness(1.5) contrast(1.3) drop-shadow(0 0 20px rgba(255, 255, 255, 0.25));
   background-color: transparent;
   border-radius: 0;
   box-shadow: none;
@@ -230,3 +230,4 @@ body {
 .tab.active {
   display: block;
 }
+
