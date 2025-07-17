@@ -1,24 +1,23 @@
-// Simulate login status (change this to true to simulate being logged in)
+// Simulate login status (change to true to simulate being logged in)
 let isLoggedIn = false;
 
-// Handle tab switching
+// Tab logic
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabs = document.querySelectorAll('.tab');
 
-// Set initial tab
+// Set initial active tab
 document.getElementById('home').classList.add('active');
 
+// Tab switch handler
 tabButtons.forEach(button => {
   button.addEventListener('click', () => {
     const target = button.getAttribute('data-tab');
 
-    // Block access to Upload tab if not logged in
     if (target === 'upload' && !isLoggedIn) {
       alert("You must be logged in to upload content.");
       return;
     }
 
-    // Show selected tab and hide others
     tabs.forEach(tab => {
       tab.classList.remove('active');
       if (tab.id === target) {
@@ -28,7 +27,7 @@ tabButtons.forEach(button => {
   });
 });
 
-// Search input behavior (basic alert)
+// Search bar behavior
 const searchInputs = document.querySelectorAll('.search-bar input');
 const searchIcons = document.querySelectorAll('.search-bar .icon');
 
