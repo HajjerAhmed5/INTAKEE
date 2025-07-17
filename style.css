@@ -164,3 +164,63 @@ body {
   font-size: 16px;
   margin-bottom: 6px;
 }
+/* Home Tab Styling */
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+}
+
+.home-logo {
+  height: 40px;
+}
+
+.home-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+/* Video Grid */
+.video-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 0 20px 100px;
+}
+
+.video-card {
+  background-color: #111;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.video-card img {
+  width: 100%;
+  border-radius: 6px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.video-card h3 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.video-card p {
+  font-size: 14px;
+  color: #bbb;
+  margin-bottom: 8px;
+}
+
+.video-stats {
+  display: flex;
+  gap: 15px;
+  font-size: 13px;
+  color: #888;
+}
