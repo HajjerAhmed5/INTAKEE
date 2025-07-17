@@ -21,7 +21,9 @@ body {
 }
 
 .home-logo {
-  height: 60px;
+  height: 70px;
+  width: auto;
+  margin-right: 20px;
 }
 
 .search-bar {
@@ -132,77 +134,6 @@ body {
 
 /* Profile */
 .profile-section {
-  padding: 20px;
-}
-
-.profile-info {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.profile-pic-placeholder {
-  width: 80px;
-  height: 80px;
-  background: #333;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  color: #aaa;
-}
-
-textarea[disabled] {
-  resize: none;
-  opacity: 0.6;
-}
-
-/* Settings */
-.settings-page {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* Bottom Nav */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #111;
-  display: flex;
-  justify-content: space-around;
-  border-top: 1px solid #333;
-  z-index: 10;
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 12px 0;
-  background: none;
-  color: #fff;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.upload-btn {
-  font-size: 20px;
-  font-weight: bold;
-  color: #0af;
-}
-
-.tab {
-  display: none;
-}
-
-.tab.active {
-  display: block;
-}
-.profile-section {
   padding: 30px 20px;
   max-width: 800px;
   margin: 0 auto;
@@ -249,4 +180,48 @@ textarea[disabled] {
 
 .video-grid p {
   padding: 0 10px;
+}
+
+/* Settings */
+.settings-page {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #111;
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid #333;
+  z-index: 10;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 0;
+  background: none;
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.upload-btn {
+  font-size: 20px;
+  font-weight: bold;
+  color: #0af;
+}
+
+.tab {
+  display: none;
+}
+
+.tab.active {
+  display: block;
 }
