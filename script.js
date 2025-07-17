@@ -1,10 +1,12 @@
-// Force Vercel rebuild
-// Simulated login status (change this to true to simulate being logged in)
+// Simulate login status (change this to true to simulate being logged in)
 let isLoggedIn = false;
 
 // Handle tab switching
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabs = document.querySelectorAll('.tab');
+
+// Set initial tab
+document.getElementById('home').classList.add('active');
 
 tabButtons.forEach(button => {
   button.addEventListener('click', () => {
@@ -16,21 +18,31 @@ tabButtons.forEach(button => {
       return;
     }
 
-    // Show the selected tab, hide others
+    // Show selected tab and hide others
     tabs.forEach(tab => {
-      tab.style.display = tab.id === target ? 'block' : 'none';
+      tab.classList.remove('active');
+      if (tab.id === target) {
+        tab.classList.add('active');
+      }
     });
   });
 });
 
-// Optional: Basic search bar behavior
+// Search input behavior (basic alert)
 const searchInputs = document.querySelectorAll('.search-bar input');
+const searchIcons = document.querySelectorAll('.search-bar .icon');
 
 searchInputs.forEach(input => {
   input.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
       alert(`Searching for: ${input.value}`);
-      input.value = '';
     }
+  });
+});
+
+searchIcons.forEach(icon => {
+  icon.addEventListener('click', function () {
+    const input = this.parentElement.querySelector('input');
+    alert(`Searching for: ${input.value}`);
   });
 });
