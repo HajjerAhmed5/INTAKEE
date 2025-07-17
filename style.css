@@ -17,8 +17,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 40px 20px 10px;
   flex-wrap: wrap;
+  gap: 20px;
 }
 
 .home-logo {
@@ -31,7 +32,6 @@ body {
   box-shadow: none;
 }
 
-/* Search Bar */
 .search-bar {
   display: flex;
   align-items: center;
@@ -59,16 +59,14 @@ body {
   cursor: pointer;
 }
 
-/* Title */
 .home-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
   text-align: center;
-  margin-top: 10px;
-  margin-bottom: 20px;
+  margin: 10px 0 30px;
 }
 
-/* Grid for Cards */
+/* Grid for cards */
 .video-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
