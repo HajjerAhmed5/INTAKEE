@@ -1,31 +1,46 @@
-// Simulate login status (change to true to simulate being logged in)
-let isLoggedIn = false;
+let isLoggedIn = false; // simulate login state
 
-// Tab logic
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabs = document.querySelectorAll('.tab');
 
-// Set initial active tab
+// Always show Upload tab, just restrict actions
 document.getElementById('home').classList.add('active');
 
-// Tab switch handler
 tabButtons.forEach(button => {
   button.addEventListener('click', () => {
     const target = button.getAttribute('data-tab');
 
-    if (target === 'upload' && !isLoggedIn) {
-      alert("You must be logged in to upload content.");
-      return;
-    }
-
+    // Show tab content
     tabs.forEach(tab => {
       tab.classList.remove('active');
-      if (tab.id === target) {
-        tab.classList.add('active');
-      }
+      if (tab.id === target) tab.classList.add('active');
     });
   });
 });
+
+// Action buttons inside Upload tab
+const uploadTrigger = document.getElementById('upload-trigger');
+const goLiveTrigger = document.getElementById('go-live-trigger');
+
+if (uploadTrigger) {
+  uploadTrigger.addEventListener('click', () => {
+    if (!isLoggedIn) {
+      alert("You must be logged in to upload.");
+    } else {
+      alert("Upload function would go here.");
+    }
+  });
+}
+
+if (goLiveTrigger) {
+  goLiveTrigger.addEventListener('click', () => {
+    if (!isLoggedIn) {
+      alert("You must be logged in to go live.");
+    } else {
+      alert("Go Live function would go here.");
+    }
+  });
+}
 
 // Search bar behavior
 const searchInputs = document.querySelectorAll('.search-bar input');
