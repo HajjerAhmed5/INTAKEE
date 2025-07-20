@@ -3,7 +3,7 @@ let isLoggedIn = false;
 
 /* ---------- TAB NAVIGATION ---------- */
 const tabButtons = document.querySelectorAll('.tab-btn');
-const tabs       = document.querySelectorAll('.tab');
+const tabs = document.querySelectorAll('.tab');
 
 tabButtons.forEach(button => {
   button.addEventListener('click', () => {
@@ -49,23 +49,25 @@ document.querySelectorAll('.search-bar .icon').forEach(icon => {
 });
 
 /* ---------- AUTH MODAL ---------- */
-const authModal      = document.getElementById('auth-modal');
-const authTitle      = document.getElementById('auth-title');
-const authAction     = document.getElementById('auth-action');
-const toggleAuth     = document.getElementById('toggle-auth');
-const closeAuth      = document.querySelector('.close-auth');
-const passwordInput  = document.getElementById('auth-password');
+const authModal = document.getElementById('auth-modal');
+const authTitle = document.getElementById('auth-title');
+const authAction = document.getElementById('auth-action');
+const toggleAuth = document.getElementById('toggle-auth');
+const closeAuth = document.querySelector('.close-auth');
+const passwordInput = document.getElementById('auth-password');
 const togglePassword = document.getElementById('toggle-password');
-let   isLogin        = true;
+let isLogin = true;
 
-function showAuthModal() { authModal.classList.remove('hidden'); }
+function showAuthModal() {
+  authModal.classList.remove('hidden');
+}
 closeAuth.addEventListener('click', () => authModal.classList.add('hidden'));
 
 toggleAuth.addEventListener('click', () => {
   isLogin = !isLogin;
-  authTitle.textContent  = isLogin ? 'Login to INTAKEE' : 'Sign Up for INTAKEE';
-  authAction.textContent = isLogin ? 'Login'           : 'Sign Up';
-  toggleAuth.textContent = isLogin ? 'Sign Up'         : 'Login';
+  authTitle.textContent = isLogin ? 'Login to INTAKEE' : 'Sign Up for INTAKEE';
+  authAction.textContent = isLogin ? 'Login' : 'Sign Up';
+  toggleAuth.textContent = isLogin ? 'Sign Up' : 'Login';
 });
 
 togglePassword.addEventListener('click', () => {
@@ -80,7 +82,7 @@ document.getElementById('forgot-password').addEventListener('click', () => {
 
 /* ---------- LOGIN / SIGN-UP FLOW ---------- */
 authAction.addEventListener('click', () => {
-  const email    = document.getElementById('auth-email').value.trim();
+  const email = document.getElementById('auth-email').value.trim();
   const password = passwordInput.value.trim();
   const remember = document.getElementById('remember-me').checked;
 
@@ -117,26 +119,42 @@ window.addEventListener('load', () => {
 
 /* ---------- GLOBAL UI REFRESH ---------- */
 function updateUI() {
-  /*   HOME HEADER LOGIN CONTROLS   */
-  const homeLoginBtn  = document.getElementById('home-login-btn');
+  /* HOME HEADER LOGIN CONTROLS */
+  const homeLoginBtn = document.getElementById('home-login-btn');
   const homeUserEmail = document.getElementById('home-user-email');
 
   if (homeLoginBtn && homeUserEmail) {
-    homeLoginBtn.style.display  = isLoggedIn ? 'none'  : 'inline-block';
+    homeLoginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
     homeUserEmail.style.display = isLoggedIn ? 'block' : 'none';
-    homeUserEmail.textContent   = localStorage.getItem('intakeeUserEmail') || 'User';
+    homeUserEmail.textContent = localStorage.getItem('intakeeUserEmail') || 'User';
   }
 
-  /*   PROFILE TAB ELEMENTS   */
-  document.getElementById('logged-in-panel').style.display  = isLoggedIn ? 'block' : 'none';
-  document.getElementById('logged-out-message').style.display = isLoggedIn ? 'none'  : 'block';
-  document.querySelector('#profile textarea').disabled = !isLoggedIn;
+  /* PROFILE TAB ELEMENTS */
+  document.getElementById('logged-in-panel').style.display = isLoggedIn ? 'block' : 'none';
+  document.getElementById('logged-out-message').style.display = isLoggedIn ? 'none' : 'block';
+  const bio = document.querySelector('#profile textarea');
+  if (bio) {
+    bio.disabled = !isLoggedIn;
+    bio.style.opacity = isLoggedIn ? '1' : '0.7';
+  }
 
-  /*   ENABLE / DISABLE UPLOAD FIELDS   */
+  const profilePic = document.querySelector('.profile-pic-placeholder');
+  if (isLoggedIn && profilePic && !document.getElementById('profile-img-input')) {
+    profilePic.innerHTML = \`
+      <label for="profile-img-input" style="cursor:pointer;">
+        <span style="font-size:12px;">Upload</span>
+        <input type="file" id="profile-img-input" accept="image/*" style="display:none;" />
+      </label>
+    \`;
+  } else if (!isLoggedIn && profilePic) {
+    profilePic.textContent = 'No image';
+  }
+
+  /* ENABLE / DISABLE UPLOAD FIELDS */
   document.querySelectorAll('#upload input, #upload textarea, #upload select')
     .forEach(el => el.disabled = !isLoggedIn);
 
-  /*   Upload tab note text   */
+  /* Upload tab note text */
   const note = document.getElementById('upload-note');
   if (note) note.textContent = isLoggedIn ? 'You can now upload content.' : 'You must be logged in to upload content.';
 }
@@ -159,7 +177,7 @@ function handleDeleteAccount() {
   }
 }
 
-/* ---------- EXPOSE GLOBALLY (for inline buttons) ---------- */
-window.showAuthModal      = showAuthModal;
-window.handleLogout       = handleLogout;
+/* ---------- EXPOSE GLOBALLY ---------- */
+window.showAuthModal = showAuthModal;
+window.handleLogout = handleLogout;
 window.handleDeleteAccount = handleDeleteAccount;
