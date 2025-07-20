@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -124,7 +124,18 @@
         Please read them carefully — this is your responsibility as a user.
       </p>
       <h1 class="home-title">Your Profile</h1>
-      <p>You must be logged in to edit your profile or interact with content.</p>
+
+      <div id="logged-out-message">
+        <p>You must be logged in to edit your profile or interact with content.</p>
+        <button onclick="showAuthModal()">Login / Sign Up</button>
+      </div>
+
+      <div id="logged-in-panel" style="display: none;">
+        <p>Welcome, <span id="user-email"></span></p>
+        <button onclick="handleLogout()">Log Out</button>
+        <button onclick="handleDeleteAccount()">Delete Account</button>
+      </div>
+
       <div class="profile-info">
         <div class="profile-pic-placeholder">No image</div>
         <textarea placeholder="Bio (only editable if logged in)" disabled></textarea>
@@ -149,30 +160,32 @@
     <div class="settings-page">
       <p style="font-size: 14px; color: #fff; font-weight: bold; padding: 0 10px 20px;">By creating an account on INTAKEE, you are personally agreeing to our <a href="#tos" style="color: #0af;">Terms of Service</a>, <a href="#privacy" style="color: #0af;">Privacy Policy</a>, and <a href="#guidelines" style="color: #0af;">Community Guidelines</a>. Please read them carefully — this is your responsibility as a user.</p>
       <h1 class="home-title">Settings</h1>
-      <div class="video-card">
-        <h3>Privacy Policy</h3>
-        <p>We respect your privacy. Data is never sold or shared.</p>
+      <div class="video-card"><h3>Privacy Policy</h3><p>We respect your privacy. Data is never sold or shared.</p></div>
+      <div class="video-card"><h3>Terms of Service</h3><p>You are responsible for all uploaded content. INTAKEE is not liable for anything user-generated.</p></div>
+      <div class="video-card"><h3>Community Guidelines</h3><p>No nudity, illegal activity, or hate speech. We moderate abuse fairly and support speech freedom.</p></div>
+      <div class="video-card"><h3>Report Content</h3><p>Flag abusive or inappropriate content. Repeated violations lead to content review or action.</p></div>
+      <div class="video-card"><h3>Blocked Users</h3><p>View and manage users you’ve blocked from seeing your content.</p></div>
+      <div class="video-card"><h3>Contact Support</h3><p>Email <strong>Intakee2025@gmail.com</strong> for help or technical issues.</p></div>
+    </div>
+  </div>
+
+  <!-- LOGIN / SIGNUP MODAL -->
+  <div id="auth-modal" class="auth-modal hidden">
+    <div class="auth-box">
+      <h2 id="auth-title">Login to INTAKEE</h2>
+      <input type="email" id="auth-email" placeholder="Email" />
+      <div class="password-wrapper">
+        <input type="password" id="auth-password" placeholder="Password" />
+        <i class="fas fa-eye toggle-password" id="toggle-password"></i>
       </div>
-      <div class="video-card">
-        <h3>Terms of Service</h3>
-        <p>You are responsible for all uploaded content. INTAKEE is not liable for anything user-generated.</p>
-      </div>
-      <div class="video-card">
-        <h3>Community Guidelines</h3>
-        <p>No nudity, illegal activity, or hate speech. We moderate abuse fairly and support speech freedom.</p>
-      </div>
-      <div class="video-card">
-        <h3>Report Content</h3>
-        <p>Flag abusive or inappropriate content. Repeated violations lead to content review or action.</p>
-      </div>
-      <div class="video-card">
-        <h3>Blocked Users</h3>
-        <p>View and manage users you’ve blocked from seeing your content.</p>
-      </div>
-      <div class="video-card">
-        <h3>Contact Support</h3>
-        <p>Email <strong>Intakee2025@gmail.com</strong> for help or technical issues.</p>
-      </div>
+      <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; margin-top: 10px; color: #ccc;">
+        <input type="checkbox" id="remember-me" />
+        Remember Me
+      </label>
+      <button id="auth-action">Login</button>
+      <p id="auth-toggle-text">Don’t have an account? <span id="toggle-auth">Sign Up</span></p>
+      <p class="forgot-link"><span id="forgot-password">Forgot Password?</span></p>
+      <button class="close-auth">&times;</button>
     </div>
   </div>
 
