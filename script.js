@@ -9,12 +9,12 @@ tabButtons.forEach(button => {
   button.addEventListener('click', () => {
     const target = button.getAttribute('data-tab');
 
-    // switch visible tab
+    // Always switch tab
     tabs.forEach(tab => {
       tab.classList.toggle('active', tab.id === target);
     });
 
-    // block Upload tab when logged-out
+    // Then show modal if needed
     if (target === 'upload' && !isLoggedIn) {
       showAuthModal();
     }
