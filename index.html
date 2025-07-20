@@ -24,9 +24,16 @@
   <div class="tab active" id="home">
     <div class="home-header">
       <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
-      <div class="search-bar">
-        <input type="text" placeholder="Search..." />
-        <span class="icon"><i class="fas fa-search"></i></span>
+
+      <div class="right-home-controls">
+        <div class="search-bar">
+          <input type="text" placeholder="Search..." />
+          <span class="icon"><i class="fas fa-search"></i></span>
+        </div>
+        <div id="home-auth-controls">
+          <button id="home-login-btn" onclick="showAuthModal()">Login / Sign Up</button>
+          <span id="home-user-email" style="display:none;"></span>
+        </div>
       </div>
     </div>
     <h1 class="home-title">Welcome to INTAKEE</h1>
@@ -67,7 +74,7 @@
     <div class="upload-wrapper">
       <h2>Upload Content</h2>
       <label>Choose Type:</label>
-      <select>
+      <select disabled>
         <option>Video</option>
         <option>Clip</option>
         <option>Podcast - Audio</option>
@@ -85,7 +92,7 @@
       <input type="text" id="tags" placeholder="@creator1 @friend2..." disabled />
       <label for="schedule">Schedule Upload:</label>
       <input type="datetime-local" id="schedule" disabled />
-      <p class="note">You must be logged in to upload content.</p>
+      <p class="note" id="upload-note">You must be logged in to upload content.</p>
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <button id="upload-trigger">Upload</button>
         <button id="go-live-trigger">Go Live</button>
@@ -130,12 +137,6 @@
         <button onclick="showAuthModal()">Login / Sign Up</button>
       </div>
 
-      <div id="logged-in-panel" style="display: none;">
-        <p>Welcome, <span id="user-email"></span></p>
-        <button onclick="handleLogout()">Log Out</button>
-        <button onclick="handleDeleteAccount()">Delete Account</button>
-      </div>
-
       <div class="profile-info">
         <div class="profile-pic-placeholder">No image</div>
         <textarea placeholder="Bio (only editable if logged in)" disabled></textarea>
@@ -166,6 +167,13 @@
       <div class="video-card"><h3>Report Content</h3><p>Flag abusive or inappropriate content. Repeated violations lead to content review or action.</p></div>
       <div class="video-card"><h3>Blocked Users</h3><p>View and manage users you’ve blocked from seeing your content.</p></div>
       <div class="video-card"><h3>Contact Support</h3><p>Email <strong>Intakee2025@gmail.com</strong> for help or technical issues.</p></div>
+
+      <div class="video-card auth-settings">
+        <h3>Account Controls</h3>
+        <button onclick="handleLogout()">Log Out</button>
+        <button onclick="handleDeleteAccount()">Delete Account</button>
+        <button onclick="alert('Your account is now private (simulated).')">Make Account Private</button>
+      </div>
     </div>
   </div>
 
