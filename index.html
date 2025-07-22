@@ -38,18 +38,41 @@
     <div class="video-grid"><p>No posts yet</p></div>
   </div>
 
-  <!-- VIDEOS, PODCAST, CLIPS -->
+  <!-- VIDEOS TAB -->
   <div class="tab" id="videos">
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+      <div class="search-bar">
+        <input type="text" placeholder="Search videos..." />
+        <span class="icon"><i class="fas fa-search"></i></span>
+      </div>
+    </div>
     <h1 class="home-title">Videos</h1>
     <div class="video-grid"><p>No posts yet</p></div>
   </div>
 
+  <!-- PODCAST TAB -->
   <div class="tab" id="podcast">
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+      <div class="search-bar">
+        <input type="text" placeholder="Search podcasts..." />
+        <span class="icon"><i class="fas fa-search"></i></span>
+      </div>
+    </div>
     <h1 class="home-title">Podcasts</h1>
     <div class="video-grid"><p>No posts yet</p></div>
   </div>
 
+  <!-- CLIPS TAB -->
   <div class="tab" id="clips">
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+      <div class="search-bar">
+        <input type="text" placeholder="Search clips..." />
+        <span class="icon"><i class="fas fa-search"></i></span>
+      </div>
+    </div>
     <h1 class="home-title">Clips</h1>
     <div class="video-grid"><p>No posts yet</p></div>
   </div>
@@ -85,6 +108,13 @@
 
   <!-- PROFILE TAB -->
   <div class="tab" id="profile">
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+      <div class="search-bar">
+        <input type="text" placeholder="Search your content..." />
+        <span class="icon"><i class="fas fa-search"></i></span>
+      </div>
+    </div>
     <h1 class="home-title">Your Profile</h1>
     <div id="logged-out-message">
       <p>You must be logged in to edit your profile or interact with content.</p>
@@ -107,15 +137,23 @@
 
   <!-- SETTINGS TAB -->
   <div class="tab" id="settings">
-    <h1 class="home-title">Settings</h1>
-    <div class="video-card"><h3>Privacy Policy</h3><p>We respect your privacy. Data is never sold or shared.</p></div>
-    <div class="video-card"><h3>Terms of Service</h3><p>You are responsible for all uploaded content. INTAKEE is not liable for anything user-generated.</p></div>
-    <div class="video-card"><h3>Community Guidelines</h3><p>No nudity, illegal activity, or hate speech. We moderate abuse fairly and support speech freedom.</p></div>
-    <div class="video-card auth-settings">
-      <h3>Account Controls</h3>
-      <button onclick="handleLogout()">Log Out</button>
-      <button onclick="handleDeleteAccount()">Delete Account</button>
-      <button onclick="alert('Your account is now private (simulated).')">Make Account Private</button>
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+    </div>
+    <div class="settings-page">
+      <h1 class="home-title">Settings</h1>
+      <div class="video-card"><h3>Privacy Policy</h3><p>We respect your privacy. Data is never sold or shared.</p></div>
+      <div class="video-card"><h3>Terms of Service</h3><p>You are responsible for all uploaded content. INTAKEE is not liable for anything user-generated.</p></div>
+      <div class="video-card"><h3>Community Guidelines</h3><p>No nudity, illegal activity, or hate speech. We moderate abuse fairly and support speech freedom.</p></div>
+      <div class="video-card"><h3>Report Content</h3><p>Flag abusive or inappropriate content. Repeated violations lead to content review or action.</p></div>
+      <div class="video-card"><h3>Blocked Users</h3><p>View and manage users you’ve blocked from seeing your content.</p></div>
+      <div class="video-card"><h3>Contact Support</h3><p>Email <strong>Intakee2025@gmail.com</strong> for help or technical issues.</p></div>
+      <div class="video-card auth-settings">
+        <h3>Account Controls</h3>
+        <button onclick="handleLogout()">Log Out</button>
+        <button onclick="handleDeleteAccount()">Delete Account</button>
+        <button onclick="alert('Your account is now private (simulated).')">Make Account Private</button>
+      </div>
     </div>
   </div>
 
