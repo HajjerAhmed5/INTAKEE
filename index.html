@@ -19,7 +19,7 @@
     <button class="tab-btn" data-tab="settings">Settings</button>
   </nav>
 
-  <!-- HOME TAB -->
+  <!-- TABS -->
   <div class="tab active" id="home">
     <div class="home-header">
       <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
@@ -38,7 +38,6 @@
     <div class="video-grid"><p>No posts yet</p></div>
   </div>
 
-  <!-- VIDEOS TAB -->
   <div class="tab" id="videos">
     <div class="home-header">
       <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
@@ -51,7 +50,6 @@
     <div class="video-grid"><p>No posts yet</p></div>
   </div>
 
-  <!-- PODCAST TAB -->
   <div class="tab" id="podcast">
     <div class="home-header">
       <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
@@ -64,7 +62,6 @@
     <div class="video-grid"><p>No posts yet</p></div>
   </div>
 
-  <!-- CLIPS TAB -->
   <div class="tab" id="clips">
     <div class="home-header">
       <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
@@ -77,10 +74,12 @@
     <div class="video-grid"><p>No posts yet</p></div>
   </div>
 
-  <!-- UPLOAD TAB -->
   <div class="tab" id="upload">
-    <h1 class="home-title">Upload</h1>
+    <div class="home-header">
+      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
+    </div>
     <div class="upload-wrapper">
+      <h2>Upload Content</h2>
       <label>Choose Type:</label>
       <select disabled>
         <option>Video</option>
@@ -88,25 +87,26 @@
         <option>Podcast - Audio</option>
         <option>Podcast - Video</option>
       </select>
-      <label>Title:</label>
-      <input type="text" disabled />
-      <label>Description:</label>
-      <textarea disabled></textarea>
-      <label>Thumbnail:</label>
-      <input type="file" disabled />
-      <label>Hashtags or Category:</label>
-      <input type="text" disabled />
-      <label>Tag Users:</label>
-      <input type="text" disabled />
-      <label>Schedule Upload:</label>
-      <input type="datetime-local" disabled />
+      <label for="title">Title:</label>
+      <input type="text" id="title" placeholder="Enter title..." disabled />
+      <label for="description">Description:</label>
+      <textarea id="description" placeholder="Add a description..." disabled></textarea>
+      <label for="thumbnail">Thumbnail:</label>
+      <input type="file" id="thumbnail" accept="image/*" disabled />
+      <label for="hashtags">Hashtags or Category:</label>
+      <input type="text" id="hashtags" placeholder="#music #comedy..." disabled />
+      <label for="tags">Tag Users:</label>
+      <input type="text" id="tags" placeholder="@creator1 @friend2..." disabled />
+      <label for="schedule">Schedule Upload:</label>
+      <input type="datetime-local" id="schedule" disabled />
       <p class="note" id="upload-note">You must be logged in to upload content.</p>
-      <button id="upload-trigger">Upload</button>
-      <button id="go-live-trigger">Go Live</button>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button id="upload-trigger">Upload</button>
+        <button id="go-live-trigger">Go Live</button>
+      </div>
     </div>
   </div>
 
-  <!-- PROFILE TAB -->
   <div class="tab" id="profile">
     <div class="home-header">
       <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
@@ -115,49 +115,49 @@
         <span class="icon"><i class="fas fa-search"></i></span>
       </div>
     </div>
-    <h1 class="home-title">Your Profile</h1>
-    <div id="logged-out-message">
-      <p>You must be logged in to edit your profile or interact with content.</p>
-    </div>
-    <div id="logged-in-panel" style="display:none">
-      <div class="profile-info">
-        <div class="profile-pic-placeholder">No image</div>
-        <textarea placeholder="Bio (only editable if logged in)" disabled></textarea>
+    <div class="profile-section">
+      <h1 class="home-title">Your Profile</h1>
+      <div id="logged-out-message">
+        <p>You must be logged in to edit your profile or interact with content.</p>
       </div>
-      <h3 class="home-title">Uploads</h3>
-      <div class="video-grid"><p>No uploads</p></div>
-      <h3 class="home-title">Liked</h3>
-      <div class="video-grid"><p>No liked posts</p></div>
-      <h3 class="home-title">Saved</h3>
-      <div class="video-grid"><p>No saved content</p></div>
-      <h3 class="home-title">Playlists</h3>
-      <div class="video-grid"><p>No playlists</p></div>
+      <div id="logged-in-panel" style="display:none">
+        <div class="profile-info">
+          <div class="profile-pic-placeholder">No image</div>
+          <textarea placeholder="Bio (only editable if logged in)" disabled></textarea>
+        </div>
+        <h3 class="home-title">Uploads</h3>
+        <div class="video-grid"><p>No uploads</p></div>
+        <h3 class="home-title">Liked</h3>
+        <div class="video-grid"><p>No liked posts</p></div>
+        <h3 class="home-title">Saved</h3>
+        <div class="video-grid"><p>No saved content</p></div>
+        <h3 class="home-title">Playlists</h3>
+        <div class="video-grid"><p>No playlists</p></div>
+      </div>
     </div>
   </div>
 
-  <!-- SETTINGS TAB -->
   <div class="tab" id="settings">
     <div class="home-header">
       <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
     </div>
     <div class="settings-page">
       <h1 class="home-title">Settings</h1>
-      <div class="video-card"><h3>Privacy Policy</h3><p>We respect your privacy. Data is never sold or shared.</p></div>
-      <div class="video-card"><h3>Terms of Service</h3><p>You are responsible for all uploaded content. INTAKEE is not liable for anything user-generated.</p></div>
-      <div class="video-card"><h3>Community Guidelines</h3><p>No nudity, illegal activity, or hate speech. We moderate abuse fairly and support speech freedom.</p></div>
-      <div class="video-card"><h3>Report Content</h3><p>Flag abusive or inappropriate content. Repeated violations lead to content review or action.</p></div>
-      <div class="video-card"><h3>Blocked Users</h3><p>View and manage users you’ve blocked from seeing your content.</p></div>
-      <div class="video-card"><h3>Contact Support</h3><p>Email <strong>Intakee2025@gmail.com</strong> for help or technical issues.</p></div>
+      <div class="video-card"><h3>Privacy Policy</h3><p>We respect your privacy. Data is never sold or shared. Your account data is only used for platform functionality.</p></div>
+      <div class="video-card"><h3>Terms of Service</h3><p>You are responsible for all uploaded content. INTAKEE is not liable for any user-generated content.</p></div>
+      <div class="video-card"><h3>Community Guidelines</h3><p>No nudity, illegal content, or hate speech. Freedom of speech is supported, but abuse will be moderated.</p></div>
+      <div class="video-card"><h3>Report Content</h3><p>Use this feature to flag offensive or inappropriate content. Reports are reviewed manually.</p></div>
+      <div class="video-card"><h3>Blocked Users</h3><p>Users you block will no longer see your content. You can manage your blocked list here.</p></div>
+      <div class="video-card"><h3>Contact Support</h3><p>Email <strong>Intakee2025@gmail.com</strong> with questions or for help.</p></div>
       <div class="video-card auth-settings">
         <h3>Account Controls</h3>
         <button onclick="handleLogout()">Log Out</button>
         <button onclick="handleDeleteAccount()">Delete Account</button>
-        <button onclick="alert('Your account is now private (simulated).')">Make Account Private</button>
+        <button onclick="alert('Your account is now private.')">Make Account Private</button>
       </div>
     </div>
   </div>
 
-  <!-- AUTH MODAL -->
   <div id="auth-modal" class="auth-modal hidden">
     <div class="auth-box">
       <h2 id="auth-title">Login to INTAKEE</h2>
@@ -176,18 +176,7 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT -->
-  <script>
-    const tabs = document.querySelectorAll('.tab');
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = btn.getAttribute('data-tab');
-        tabs.forEach(tab => tab.classList.remove('active'));
-        document.getElementById(target).classList.add('active');
-      });
-    });
-  </script>
+  <!-- JS SCRIPTS -->
   <script src="script.js"></script>
 </body>
 </html>
