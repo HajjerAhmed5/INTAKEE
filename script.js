@@ -1,4 +1,3 @@
-/* ---------- GLOBAL STATE ---------- */
 let isLoggedIn = false;
 
 /* ---------- TAB NAVIGATION ---------- */
@@ -8,34 +7,12 @@ const tabs = document.querySelectorAll('.tab');
 tabButtons.forEach(button => {
   button.addEventListener('click', () => {
     const target = button.getAttribute('data-tab');
-
-    // Always switch tab
-    tabs.forEach(tab => {
-      tab.classList.toggle('active', tab.id === target);
-    });
-
-    // Then show modal if needed
-    if (target === 'upload' && !isLoggedIn) {
-      showAuthModal();
-    }
+    tabs.forEach(tab => tab.classList.toggle('active', tab.id === target));
+    if (target === 'upload' && !isLoggedIn) showAuthModal();
   });
 });
 
-/* ---------- UPLOAD + GO LIVE BUTTONS ---------- */
-['upload-trigger', 'go-live-trigger'].forEach(id => {
-  const btn = document.getElementById(id);
-  if (btn) {
-    btn.addEventListener('click', () => {
-      if (!isLoggedIn) {
-        alert('You must be logged in first.');
-      } else {
-        alert(`${id === 'upload-trigger' ? 'Upload' : 'Go-Live'} feature coming soon.`);
-      }
-    });
-  }
-});
-
-/* ---------- SEARCH BAR ---------- */
+/* ---------- SEARCH FUNCTION ---------- */
 document.querySelectorAll('.search-bar input').forEach(input => {
   input.addEventListener('keypress', e => {
     if (e.key === 'Enter') alert(`Searching for: ${input.value}`);
@@ -48,7 +25,7 @@ document.querySelectorAll('.search-bar .icon').forEach(icon => {
   });
 });
 
-/* ---------- AUTH MODAL ---------- */
+/* ---------- AUTH ---------- */
 const authModal = document.getElementById('auth-modal');
 const authTitle = document.getElementById('auth-title');
 const authAction = document.getElementById('auth-action');
@@ -61,6 +38,7 @@ let isLogin = true;
 function showAuthModal() {
   authModal.classList.remove('hidden');
 }
+
 closeAuth.addEventListener('click', () => authModal.classList.add('hidden'));
 
 toggleAuth.addEventListener('click', () => {
@@ -80,46 +58,31 @@ document.getElementById('forgot-password').addEventListener('click', () => {
   alert(email ? `Reset link sent to ${email}` : 'Enter your email first.');
 });
 
-/* ---------- LOGIN / SIGN-UP FLOW ---------- */
+/* ---------- LOGIN ---------- */
 authAction.addEventListener('click', () => {
   const email = document.getElementById('auth-email').value.trim();
   const password = passwordInput.value.trim();
   const remember = document.getElementById('remember-me').checked;
-
-  if (!email || !password) {
-    alert('Please fill in all fields.');
-    return;
-  }
+  if (!email || !password) return alert('Please fill in all fields.');
 
   isLoggedIn = true;
   if (remember) {
-    localStorage.setItem('intakeeUserEmail', email);
     localStorage.setItem('intakeeLoggedIn', 'true');
-  } else {
-    localStorage.removeItem('intakeeUserEmail');
-    localStorage.removeItem('intakeeLoggedIn');
+    localStorage.setItem('intakeeUserEmail', email);
   }
-
   updateUI();
   authModal.classList.add('hidden');
   alert(`Welcome, ${email}`);
 });
 
-/* ---------- INITIALISE ON LOAD ---------- */
+/* ---------- INIT ---------- */
 window.addEventListener('load', () => {
-  if (localStorage.getItem('intakeeLoggedIn') === 'true') {
-    isLoggedIn = true;
-  }
-  if (localStorage.getItem('intakeeUserEmail')) {
-    document.getElementById('auth-email').value = localStorage.getItem('intakeeUserEmail');
-    document.getElementById('remember-me').checked = true;
-  }
+  if (localStorage.getItem('intakeeLoggedIn') === 'true') isLoggedIn = true;
   updateUI();
 });
 
-/* ---------- GLOBAL UI REFRESH ---------- */
+/* ---------- MAIN UI REFRESH ---------- */
 function updateUI() {
-  /* HOME HEADER LOGIN CONTROLS */
   const homeLoginBtn = document.getElementById('home-login-btn');
   const homeUserEmail = document.getElementById('home-user-email');
 
@@ -129,55 +92,92 @@ function updateUI() {
     homeUserEmail.textContent = localStorage.getItem('intakeeUserEmail') || 'User';
   }
 
-  /* PROFILE TAB ELEMENTS */
-  document.getElementById('logged-in-panel').style.display = isLoggedIn ? 'block' : 'none';
-  document.getElementById('logged-out-message').style.display = isLoggedIn ? 'none' : 'block';
+  // Profile Info
   const bio = document.querySelector('#profile textarea');
-  if (bio) {
-    bio.disabled = !isLoggedIn;
-    bio.style.opacity = isLoggedIn ? '1' : '0.7';
-  }
-
   const profilePic = document.querySelector('.profile-pic-placeholder');
-  if (isLoggedIn && profilePic && !document.getElementById('profile-img-input')) {
-    profilePic.innerHTML = \`
-      <label for="profile-img-input" style="cursor:pointer;">
-        <span style="font-size:12px;">Upload</span>
-        <input type="file" id="profile-img-input" accept="image/*" style="display:none;" />
-      </label>
-    \`;
-  } else if (!isLoggedIn && profilePic) {
-    profilePic.textContent = 'No image';
+  const loggedOutMsg = document.getElementById('logged-out-message');
+
+  if (isLoggedIn) {
+    bio.disabled = false;
+    bio.style.opacity = '1';
+    bio.value = localStorage.getItem('userBio') || '';
+
+    if (profilePic) {
+      const savedImage = localStorage.getItem('profilePic');
+      profilePic.innerHTML = `
+        <label for="profile-img-input" style="cursor:pointer;">
+          <span style="font-size:12px;">Upload</span>
+          <input type="file" id="profile-img-input" accept="image/*" style="display:none;" />
+        </label>
+        ${savedImage ? `<img src="${savedImage}" style="width:100%;border-radius:50%;" />` : ''}
+      `;
+      document.getElementById('profile-img-input').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          localStorage.setItem('profilePic', reader.result);
+          updateUI();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (loggedOutMsg) loggedOutMsg.style.display = 'none';
+  } else {
+    bio.value = '';
+    bio.disabled = true;
+    bio.style.opacity = '0.7';
+    if (profilePic) profilePic.textContent = 'No image';
+    if (loggedOutMsg) loggedOutMsg.style.display = 'block';
   }
 
-  /* ENABLE / DISABLE UPLOAD FIELDS */
+  // Save bio
+  bio?.addEventListener('input', () => {
+    if (isLoggedIn) localStorage.setItem('userBio', bio.value);
+  });
+
+  // Upload tab
   document.querySelectorAll('#upload input, #upload textarea, #upload select')
     .forEach(el => el.disabled = !isLoggedIn);
 
-  /* Upload tab note text */
   const note = document.getElementById('upload-note');
   if (note) note.textContent = isLoggedIn ? 'You can now upload content.' : 'You must be logged in to upload content.';
 }
 
-/* ---------- ACCOUNT ACTIONS (SETTINGS) ---------- */
+/* ---------- UPLOAD / GO LIVE ---------- */
+['upload-trigger', 'go-live-trigger'].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn) {
+    btn.addEventListener('click', () => {
+      if (!isLoggedIn) {
+        alert('You must be logged in.');
+      } else {
+        alert(`${id === 'upload-trigger' ? 'Upload' : 'Go-Live'} coming soon.`);
+      }
+    });
+  }
+});
+
+/* ---------- SETTINGS ---------- */
 function handleLogout() {
   isLoggedIn = false;
   localStorage.removeItem('intakeeLoggedIn');
   localStorage.removeItem('intakeeUserEmail');
   updateUI();
-  alert('You have been logged out.');
+  alert('Logged out.');
 }
 
 function handleDeleteAccount() {
-  if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
+  if (confirm('Delete your account permanently?')) {
     localStorage.clear();
     isLoggedIn = false;
     updateUI();
-    alert('Your account has been deleted.');
+    alert('Account deleted.');
   }
 }
 
-/* ---------- EXPOSE GLOBALLY ---------- */
+/* ---------- GLOBAL ---------- */
 window.showAuthModal = showAuthModal;
 window.handleLogout = handleLogout;
 window.handleDeleteAccount = handleDeleteAccount;
