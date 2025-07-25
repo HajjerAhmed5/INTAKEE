@@ -1,38 +1,10 @@
-let isLoggedIn = false;
+// INTAKEE App JavaScript Functionality
 
-/* ---------- TAB NAVIGATION ---------- */
+let isLoggedIn = false;
+let isLogin = true;
+
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabs = document.querySelectorAll('.tab');
-
-function showTab(target) {
-  tabs.forEach(tab => tab.classList.toggle('active', tab.id === target));
-}
-
-tabButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const target = button.getAttribute('data-tab');
-    if (target === 'upload' && !isLoggedIn) {
-      showAuthModal();
-    } else {
-      showTab(target);
-    }
-  });
-});
-
-/* ---------- SEARCH FUNCTION ---------- */
-document.querySelectorAll('.search-bar input').forEach(input => {
-  input.addEventListener('keypress', e => {
-    if (e.key === 'Enter') alert(`Searching for: ${input.value}`);
-  });
-});
-document.querySelectorAll('.search-bar .icon').forEach(icon => {
-  icon.addEventListener('click', () => {
-    const input = icon.parentElement.querySelector('input');
-    alert(`Searching for: ${input.value}`);
-  });
-});
-
-/* ---------- AUTH ---------- */
 const authModal = document.getElementById('auth-modal');
 const authTitle = document.getElementById('auth-title');
 const authAction = document.getElementById('auth-action');
@@ -40,11 +12,20 @@ const toggleAuth = document.getElementById('toggle-auth');
 const closeAuth = document.querySelector('.close-auth');
 const passwordInput = document.getElementById('auth-password');
 const togglePassword = document.getElementById('toggle-password');
-let isLogin = true;
 
+// Switch tabs
+tabButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const target = button.getAttribute('data-tab');
+    tabs.forEach(tab => tab.classList.toggle('active', tab.id === target));
+  });
+});
+
+// Show Auth Modal
 function showAuthModal() {
   authModal.classList.remove('hidden');
 }
+window.showAuthModal = showAuthModal;
 
 closeAuth.addEventListener('click', () => authModal.classList.add('hidden'));
 
@@ -65,7 +46,6 @@ document.getElementById('forgot-password').addEventListener('click', () => {
   alert(email ? `Reset link sent to ${email}` : 'Enter your email first.');
 });
 
-/* ---------- LOGIN ---------- */
 authAction.addEventListener('click', () => {
   const email = document.getElementById('auth-email').value.trim();
   const password = passwordInput.value.trim();
@@ -82,107 +62,116 @@ authAction.addEventListener('click', () => {
   alert(`Welcome, ${email}`);
 });
 
-/* ---------- INIT ---------- */
+function handleLogout() {
+  isLoggedIn = false;
+  localStorage.removeItem('intakeeLoggedIn');
+  localStorage.removeItem('intakeeUserEmail');
+  updateUI();
+  alert('Logged out.');
+}
+
+function handleDeleteAccount() {
+  if (confirm('Delete your account permanently?')) {
+    localStorage.clear();
+    isLoggedIn = false;
+    updateUI();
+    alert('Account deleted.');
+  }
+}
+window.handleLogout = handleLogout;
+window.handleDeleteAccount = handleDeleteAccount;
+
+function updateUI() {
+  const email = localStorage.getItem('intakeeUserEmail') || 'User';
+  const userEmailSpan = document.getElementById('display-user-email');
+  const bio = document.getElementById('user-bio');
+  const profilePic = document.getElementById('profile-pic');
+  const uploadNote = document.getElementById('upload-note');
+  const uploadInputs = document.querySelectorAll('#upload input, #upload textarea, #upload select');
+
+  if (isLoggedIn) {
+    document.getElementById('home-login-btn').style.display = 'none';
+    document.getElementById('home-user-email').style.display = 'inline-block';
+    document.getElementById('home-user-email').textContent = email;
+    userEmailSpan.textContent = email;
+    document.getElementById('logged-in-panel').style.display = 'block';
+
+    bio.disabled = false;
+    bio.value = localStorage.getItem('userBio') || '';
+    bio.addEventListener('input', () => {
+      localStorage.setItem('userBio', bio.value);
+    });
+
+    const storedPic = localStorage.getItem('profilePic');
+    profilePic.src = storedPic || '';
+    profilePic.addEventListener('click', () => {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          localStorage.setItem('profilePic', reader.result);
+          updateUI();
+        };
+        reader.readAsDataURL(file);
+      };
+      fileInput.click();
+    });
+  }
+
+  uploadInputs.forEach(el => el.disabled = !isLoggedIn);
+  uploadNote.textContent = isLoggedIn ? 'You can now upload content.' : 'You must be logged in to upload content.';
+}
+
+function createPostCard({ title, description, type, thumbnailURL }) {
+  const div = document.createElement('div');
+  div.className = 'video-card';
+  div.innerHTML = `
+    <img src="${thumbnailURL}" alt="Thumbnail" />
+    <h3>${title}</h3>
+    <p>${description}</p>
+    <span>${type}</span>
+  `;
+  return div;
+}
+
+document.getElementById('upload-trigger').addEventListener('click', () => {
+  if (!isLoggedIn) return alert('You must be logged in to upload.');
+
+  const title = document.getElementById('title').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const type = document.getElementById('upload-type').value;
+  const thumbnailInput = document.getElementById('thumbnail');
+  const file = thumbnailInput.files[0];
+
+  if (!title || !description || !file) return alert('Please fill in all fields and choose a thumbnail.');
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const post = { title, description, type, thumbnailURL: reader.result };
+
+    const feeds = {
+      'video': document.getElementById('video-feed'),
+      'clip': document.getElementById('clip-feed'),
+      'podcast-audio': document.getElementById('podcast-feed'),
+      'podcast-video': document.getElementById('podcast-feed')
+    };
+    const profileFeed = document.getElementById('profile-uploads');
+
+    const postCard = createPostCard(post);
+    feeds[type].appendChild(postCard);
+    profileFeed.appendChild(postCard.cloneNode(true));
+    alert('Upload successful!');
+  };
+  reader.readAsDataURL(file);
+});
+
 window.addEventListener('load', () => {
   if (localStorage.getItem('intakeeLoggedIn') === 'true') {
     isLoggedIn = true;
   }
   updateUI();
-  loadContent();
 });
-
-/* ---------- MAIN UI REFRESH ---------- */
-function updateUI() {
-  const homeLoginBtn = document.getElementById('home-login-btn');
-  const homeUserEmail = document.getElementById('home-user-email');
-  const displayUserEmail = document.getElementById('display-user-email');
-  const loggedInPanel = document.getElementById('logged-in-panel');
-  const loggedOutMsg = document.getElementById('logged-out-message');
-  const profilePic = document.querySelector('.profile-pic-placeholder');
-  const bio = document.querySelector('#profile textarea');
-
-  const savedEmail = localStorage.getItem('intakeeUserEmail') || 'User';
-
-  if (homeLoginBtn && homeUserEmail) {
-    homeLoginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
-    homeUserEmail.style.display = isLoggedIn ? 'block' : 'none';
-    homeUserEmail.textContent = savedEmail;
-  }
-
-  if (displayUserEmail) displayUserEmail.textContent = savedEmail;
-  if (loggedInPanel) loggedInPanel.style.display = isLoggedIn ? 'block' : 'none';
-  if (loggedOutMsg) loggedOutMsg.style.display = isLoggedIn ? 'none' : 'block';
-
-  if (bio) {
-    bio.disabled = !isLoggedIn;
-    bio.style.opacity = isLoggedIn ? '1' : '0.7';
-    if (isLoggedIn) bio.value = localStorage.getItem('userBio') || '';
-  }
-
-  if (profilePic && isLoggedIn) {
-    const savedImage = localStorage.getItem('profilePic');
-    profilePic.innerHTML = `
-      <label for="profile-img-input" style="cursor:pointer;">
-        <span style="font-size:12px;">Upload</span>
-        <input type="file" id="profile-img-input" accept="image/*" style="display:none;" />
-      </label>
-      ${savedImage ? `<img src="${savedImage}" style="width:100%;border-radius:50%;" />` : ''}
-    `;
-    document.getElementById('profile-img-input').addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        localStorage.setItem('profilePic', reader.result);
-        updateUI();
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  bio?.addEventListener('input', () => {
-    if (isLoggedIn) localStorage.setItem('userBio', bio.value);
-  });
-}
-
-/* ---------- CONTENT POSTING ---------- */
-const uploadButton = document.getElementById('upload-trigger');
-if (uploadButton) {
-  uploadButton.addEventListener('click', () => {
-    if (!isLoggedIn) return alert('You must be logged in.');
-    const type = document.getElementById('upload-type')?.value || 'video';
-    const title = document.getElementById('title')?.value.trim();
-    if (!title) return alert('Please enter a title.');
-    const post = { type, title, id: Date.now() };
-    const existing = JSON.parse(localStorage.getItem('intakeePosts') || '[]');
-    existing.push(post);
-    localStorage.setItem('intakeePosts', JSON.stringify(existing));
-    alert('Post uploaded!');
-    loadContent();
-  });
-}
-
-function loadContent() {
-  const posts = JSON.parse(localStorage.getItem('intakeePosts') || '[]');
-  const videoGrid = document.querySelector('#videos .video-grid');
-  const clipsGrid = document.querySelector('#clips .video-grid');
-  const podcastGrid = document.querySelector('#podcast .video-grid');
-
-  if (!videoGrid || !clipsGrid || !podcastGrid) return;
-
-  videoGrid.innerHTML = '';
-  clipsGrid.innerHTML = '';
-  podcastGrid.innerHTML = '';
-
-  posts.forEach(post => {
-    const div = document.createElement('div');
-    div.className = 'video-card';
-    div.textContent = post.title;
-    if (post.type === 'clip') clipsGrid.appendChild(div);
-    else if (post.type.includes('podcast')) podcastGrid.appendChild(div);
-    else videoGrid.appendChild(div);
-  });
-}
-
-/* ---------- GLOBAL ---------- */
-window.showAuthModal = showAuthModal;
