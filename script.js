@@ -181,3 +181,13 @@ function handleDeleteAccount() {
 window.showAuthModal = showAuthModal;
 window.handleLogout = handleLogout;
 window.handleDeleteAccount = handleDeleteAccount;
+// Show or hide profile section
+const loggedInPanel = document.getElementById('logged-in-panel');
+const displayUserEmail = document.getElementById('display-user-email');
+
+if (isLoggedIn) {
+  if (loggedInPanel) loggedInPanel.style.display = 'block';
+  if (displayUserEmail) displayUserEmail.textContent = localStorage.getItem('intakeeUserEmail') || 'User';
+} else {
+  if (loggedInPanel) loggedInPanel.style.display = 'none';
+}
