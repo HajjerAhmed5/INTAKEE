@@ -19,23 +19,30 @@
   </nav>
 
   <div class="tab active" id="home">
+    <div class="search-bar">
+      <input type="text" placeholder="Search home..." />
+      <span class="icon"><i class="fas fa-search"></i></span>
+    </div>
     <h1>Home Feed</h1>
     <div id="home-feed" class="video-grid"></div>
   </div>
 
   <div class="tab" id="videos">
+    <div class="search-bar">
+      <input type="text" placeholder="Search videos..." />
+      <span class="icon"><i class="fas fa-search"></i></span>
+    </div>
     <h1>Videos</h1>
     <div id="video-feed" class="video-grid"></div>
   </div>
 
   <div class="tab" id="podcast">
+    <div class="search-bar">
+      <input type="text" placeholder="Search podcasts..." />
+      <span class="icon"><i class="fas fa-search"></i></span>
+    </div>
     <h1>Podcasts</h1>
     <div id="podcast-feed" class="video-grid"></div>
-  </div>
-
-  <div class="tab" id="clips">
-    <h1>Clips</h1>
-    <div id="clip-feed" class="video-grid"></div>
   </div>
 
   <div class="tab" id="upload">
@@ -53,10 +60,19 @@
     <textarea id="description" placeholder="Add a description..."></textarea>
     <label for="thumbnail">Thumbnail:</label>
     <input type="file" id="thumbnail" accept="image/*" />
-    <label for="media">Video/Audio File:</label>
+    <label for="media">Media File (Video/Audio):</label>
     <input type="file" id="media" accept="video/*,audio/*" />
     <p id="upload-note">You must be logged in to upload content.</p>
     <button id="upload-trigger">Upload</button>
+  </div>
+
+  <div class="tab" id="clips">
+    <div class="search-bar">
+      <input type="text" placeholder="Search clips..." />
+      <span class="icon"><i class="fas fa-search"></i></span>
+    </div>
+    <h1>Clips</h1>
+    <div id="clip-feed" class="video-grid"></div>
   </div>
 
   <div class="tab" id="profile">
@@ -65,18 +81,35 @@
     <div id="logged-in-panel" style="display:none">
       <p>Welcome, <span id="display-user-email"></span>!</p>
       <div class="profile-info">
-        <img id="profile-pic" class="profile-pic" src="" alt="Upload" />
-        <textarea id="user-bio" placeholder="Bio (editable if logged in)" disabled></textarea>
+        <label for="profile-img-input" class="profile-pic-placeholder" id="profile-pic">No image</label>
+        <input type="file" id="profile-img-input" accept="image/*" style="display:none" />
+        <textarea id="user-bio" placeholder="Bio (editable if logged in)"></textarea>
       </div>
       <h3>Uploads</h3>
       <div id="profile-uploads" class="video-grid"></div>
+      <h3>Liked</h3>
+      <div id="profile-liked" class="video-grid"></div>
+      <h3>Saved</h3>
+      <div id="profile-saved" class="video-grid"></div>
+      <h3>Playlists</h3>
+      <div id="profile-playlists" class="video-grid"></div>
     </div>
   </div>
 
   <div class="tab" id="settings">
     <h1>Settings</h1>
-    <button onclick="handleLogout()">Logout</button>
-    <button onclick="handleDeleteAccount()">Delete Account</button>
+    <div class="video-card"><h3>Privacy Policy</h3><p>We respect your privacy. Data is never sold or shared.</p></div>
+    <div class="video-card"><h3>Terms of Service</h3><p>You are responsible for all uploaded content. INTAKEE is not liable for anything user-generated.</p></div>
+    <div class="video-card"><h3>Community Guidelines</h3><p>No nudity, illegal activity, or hate speech. We moderate abuse fairly and support speech freedom.</p></div>
+    <div class="video-card"><h3>Report Content</h3><p>Flag abusive or inappropriate content. Repeated violations lead to content review or action.</p></div>
+    <div class="video-card"><h3>Blocked Users</h3><p>View and manage users you’ve blocked from seeing your content.</p></div>
+    <div class="video-card"><h3>Contact Support</h3><p>Email <strong>Intakee2025@gmail.com</strong> for help or technical issues.</p></div>
+    <div class="video-card auth-settings">
+      <h3>Account Controls</h3>
+      <button onclick="handleLogout()">Logout</button>
+      <button onclick="handleDeleteAccount()">Delete Account</button>
+      <button onclick="alert('Your account is now private (simulated).')">Make Account Private</button>
+    </div>
   </div>
 
   <div id="auth-modal" class="auth-modal hidden">
@@ -98,4 +131,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
