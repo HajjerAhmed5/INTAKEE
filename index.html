@@ -69,24 +69,24 @@
     <div class="upload-wrapper">
       <h2>Upload Content</h2>
       <label>Choose Type:</label>
-      <select id="upload-type" disabled>
+      <select id="upload-type">
         <option value="video">Video</option>
         <option value="clip">Clip</option>
         <option value="podcast-audio">Podcast - Audio</option>
         <option value="podcast-video">Podcast - Video</option>
       </select>
       <label for="title">Title:</label>
-      <input type="text" id="title" placeholder="Enter title..." disabled />
+      <input type="text" id="title" placeholder="Enter title..." />
       <label for="description">Description:</label>
-      <textarea id="description" placeholder="Add a description..." disabled></textarea>
+      <textarea id="description" placeholder="Add a description..."></textarea>
       <label for="thumbnail">Thumbnail:</label>
-      <input type="file" id="thumbnail" accept="image/*" disabled />
+      <input type="file" id="thumbnail" accept="image/*" />
       <label for="hashtags">Hashtags or Category:</label>
-      <input type="text" id="hashtags" placeholder="#music #comedy..." disabled />
+      <input type="text" id="hashtags" placeholder="#music #comedy..." />
       <label for="tags">Tag Users:</label>
-      <input type="text" id="tags" placeholder="@creator1 @friend2..." disabled />
+      <input type="text" id="tags" placeholder="@creator1 @friend2..." />
       <label for="schedule">Schedule Upload:</label>
-      <input type="datetime-local" id="schedule" disabled />
+      <input type="datetime-local" id="schedule" />
       <p class="note" id="upload-note">You must be logged in to upload content.</p>
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <button id="upload-trigger">Upload</button>
@@ -117,10 +117,7 @@
     </div>
     <div class="profile-section">
       <h1 class="home-title">Your Profile</h1>
-      <div id="logged-out-message">
-        <p>You must be logged in to edit your profile or interact with content.</p>
-      </div>
-      <div id="logged-in-panel" style="display:none;">
+      <div id="logged-in-panel">
         <p style="font-size:14px; color:#fff; font-weight:bold; padding:0 10px 20px;">
           Welcome, <span id="display-user-email"></span>!
         </p>
