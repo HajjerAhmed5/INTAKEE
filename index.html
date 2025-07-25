@@ -35,7 +35,7 @@
       </div>
     </div>
     <h1 class="home-title">Welcome to INTAKEE</h1>
-    <div class="video-grid"><p>No posts yet</p></div>
+    <div class="video-grid" id="home-feed"><p>No posts yet</p></div>
   </div>
 
   <div class="tab" id="videos">
@@ -69,11 +69,11 @@
     <div class="upload-wrapper">
       <h2>Upload Content</h2>
       <label>Choose Type:</label>
-      <select disabled>
-        <option>Video</option>
-        <option>Clip</option>
-        <option>Podcast - Audio</option>
-        <option>Podcast - Video</option>
+      <select id="upload-type" disabled>
+        <option value="video">Video</option>
+        <option value="clip">Clip</option>
+        <option value="podcast-audio">Podcast - Audio</option>
+        <option value="podcast-video">Podcast - Video</option>
       </select>
       <label for="title">Title:</label>
       <input type="text" id="title" placeholder="Enter title..." disabled />
