@@ -4,11 +4,18 @@ let isLoggedIn = false;
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabs = document.querySelectorAll('.tab');
 
+function showTab(target) {
+  tabs.forEach(tab => tab.classList.toggle('active', tab.id === target));
+}
+
 tabButtons.forEach(button => {
   button.addEventListener('click', () => {
     const target = button.getAttribute('data-tab');
-    tabs.forEach(tab => tab.classList.toggle('active', tab.id === target));
-    if (target === 'upload' && !isLoggedIn) showAuthModal();
+    if (target === 'upload' && !isLoggedIn) {
+      showAuthModal();
+    } else {
+      showTab(target);
+    }
   });
 });
 
@@ -77,117 +84,103 @@ authAction.addEventListener('click', () => {
 
 /* ---------- INIT ---------- */
 window.addEventListener('load', () => {
-  if (localStorage.getItem('intakeeLoggedIn') === 'true') isLoggedIn = true;
+  if (localStorage.getItem('intakeeLoggedIn') === 'true') {
+    isLoggedIn = true;
+  }
   updateUI();
+  loadContent();
 });
 
 /* ---------- MAIN UI REFRESH ---------- */
 function updateUI() {
   const homeLoginBtn = document.getElementById('home-login-btn');
   const homeUserEmail = document.getElementById('home-user-email');
+  const displayUserEmail = document.getElementById('display-user-email');
+  const loggedInPanel = document.getElementById('logged-in-panel');
+  const loggedOutMsg = document.getElementById('logged-out-message');
+  const profilePic = document.querySelector('.profile-pic-placeholder');
+  const bio = document.querySelector('#profile textarea');
+
+  const savedEmail = localStorage.getItem('intakeeUserEmail') || 'User';
 
   if (homeLoginBtn && homeUserEmail) {
     homeLoginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
     homeUserEmail.style.display = isLoggedIn ? 'block' : 'none';
-    homeUserEmail.textContent = localStorage.getItem('intakeeUserEmail') || 'User';
+    homeUserEmail.textContent = savedEmail;
   }
 
-  // Profile Info
-  const bio = document.querySelector('#profile textarea');
-  const profilePic = document.querySelector('.profile-pic-placeholder');
-  const loggedOutMsg = document.getElementById('logged-out-message');
+  if (displayUserEmail) displayUserEmail.textContent = savedEmail;
+  if (loggedInPanel) loggedInPanel.style.display = isLoggedIn ? 'block' : 'none';
+  if (loggedOutMsg) loggedOutMsg.style.display = isLoggedIn ? 'none' : 'block';
 
-  if (isLoggedIn) {
-    bio.disabled = false;
-    bio.style.opacity = '1';
-    bio.value = localStorage.getItem('userBio') || '';
-
-    if (profilePic) {
-      const savedImage = localStorage.getItem('profilePic');
-      profilePic.innerHTML = `
-        <label for="profile-img-input" style="cursor:pointer;">
-          <span style="font-size:12px;">Upload</span>
-          <input type="file" id="profile-img-input" accept="image/*" style="display:none;" />
-        </label>
-        ${savedImage ? `<img src="${savedImage}" style="width:100%;border-radius:50%;" />` : ''}
-      `;
-      document.getElementById('profile-img-input').addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          localStorage.setItem('profilePic', reader.result);
-          updateUI();
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    if (loggedOutMsg) loggedOutMsg.style.display = 'none';
-  } else {
-    bio.value = '';
-    bio.disabled = true;
-    bio.style.opacity = '0.7';
-    if (profilePic) profilePic.textContent = 'No image';
-    if (loggedOutMsg) loggedOutMsg.style.display = 'block';
+  if (bio) {
+    bio.disabled = !isLoggedIn;
+    bio.style.opacity = isLoggedIn ? '1' : '0.7';
+    if (isLoggedIn) bio.value = localStorage.getItem('userBio') || '';
   }
 
-  // Save bio
+  if (profilePic && isLoggedIn) {
+    const savedImage = localStorage.getItem('profilePic');
+    profilePic.innerHTML = `
+      <label for="profile-img-input" style="cursor:pointer;">
+        <span style="font-size:12px;">Upload</span>
+        <input type="file" id="profile-img-input" accept="image/*" style="display:none;" />
+      </label>
+      ${savedImage ? `<img src="${savedImage}" style="width:100%;border-radius:50%;" />` : ''}
+    `;
+    document.getElementById('profile-img-input').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        localStorage.setItem('profilePic', reader.result);
+        updateUI();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   bio?.addEventListener('input', () => {
     if (isLoggedIn) localStorage.setItem('userBio', bio.value);
   });
-
-  // Upload tab
-  document.querySelectorAll('#upload input, #upload textarea, #upload select')
-    .forEach(el => el.disabled = !isLoggedIn);
-
-  const note = document.getElementById('upload-note');
-  if (note) note.textContent = isLoggedIn ? 'You can now upload content.' : 'You must be logged in to upload content.';
 }
 
-/* ---------- UPLOAD / GO LIVE ---------- */
-['upload-trigger', 'go-live-trigger'].forEach(id => {
-  const btn = document.getElementById(id);
-  if (btn) {
-    btn.addEventListener('click', () => {
-      if (!isLoggedIn) {
-        alert('You must be logged in.');
-      } else {
-        alert(`${id === 'upload-trigger' ? 'Upload' : 'Go-Live'} coming soon.`);
-      }
-    });
-  }
-});
-
-/* ---------- SETTINGS ---------- */
-function handleLogout() {
-  isLoggedIn = false;
-  localStorage.removeItem('intakeeLoggedIn');
-  localStorage.removeItem('intakeeUserEmail');
-  updateUI();
-  alert('Logged out.');
+/* ---------- CONTENT POSTING ---------- */
+const uploadButton = document.getElementById('upload-trigger');
+if (uploadButton) {
+  uploadButton.addEventListener('click', () => {
+    if (!isLoggedIn) return alert('You must be logged in.');
+    const type = document.getElementById('upload-type')?.value || 'video';
+    const title = document.getElementById('title')?.value.trim();
+    if (!title) return alert('Please enter a title.');
+    const post = { type, title, id: Date.now() };
+    const existing = JSON.parse(localStorage.getItem('intakeePosts') || '[]');
+    existing.push(post);
+    localStorage.setItem('intakeePosts', JSON.stringify(existing));
+    alert('Post uploaded!');
+    loadContent();
+  });
 }
 
-function handleDeleteAccount() {
-  if (confirm('Delete your account permanently?')) {
-    localStorage.clear();
-    isLoggedIn = false;
-    updateUI();
-    alert('Account deleted.');
-  }
+function loadContent() {
+  const posts = JSON.parse(localStorage.getItem('intakeePosts') || '[]');
+  const videoGrid = document.querySelector('#videos .video-grid');
+  const clipsGrid = document.querySelector('#clips .video-grid');
+  const podcastGrid = document.querySelector('#podcast .video-grid');
+
+  videoGrid.innerHTML = '';
+  clipsGrid.innerHTML = '';
+  podcastGrid.innerHTML = '';
+
+  posts.forEach(post => {
+    const div = document.createElement('div');
+    div.className = 'video-card';
+    div.textContent = post.title;
+    if (post.type === 'clip') clipsGrid.appendChild(div);
+    else if (post.type.includes('podcast')) podcastGrid.appendChild(div);
+    else videoGrid.appendChild(div);
+  });
 }
 
 /* ---------- GLOBAL ---------- */
 window.showAuthModal = showAuthModal;
-window.handleLogout = handleLogout;
-window.handleDeleteAccount = handleDeleteAccount;
-// Show or hide profile section
-const loggedInPanel = document.getElementById('logged-in-panel');
-const displayUserEmail = document.getElementById('display-user-email');
-
-if (isLoggedIn) {
-  if (loggedInPanel) loggedInPanel.style.display = 'block';
-  if (displayUserEmail) displayUserEmail.textContent = localStorage.getItem('intakeeUserEmail') || 'User';
-} else {
-  if (loggedInPanel) loggedInPanel.style.display = 'none';
-}
