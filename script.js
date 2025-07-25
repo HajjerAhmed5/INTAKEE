@@ -168,6 +168,8 @@ function loadContent() {
   const clipsGrid = document.querySelector('#clips .video-grid');
   const podcastGrid = document.querySelector('#podcast .video-grid');
 
+  if (!videoGrid || !clipsGrid || !podcastGrid) return;
+
   videoGrid.innerHTML = '';
   clipsGrid.innerHTML = '';
   podcastGrid.innerHTML = '';
