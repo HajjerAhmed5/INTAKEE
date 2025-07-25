@@ -126,11 +126,19 @@ function updateUI() {
   uploadNote.textContent = isLoggedIn ? 'You can now upload content.' : 'You must be logged in to upload content.';
 }
 
-function createPostCard({ title, description, type, thumbnailURL }) {
+function createPostCard({ title, description, type, thumbnailURL, mediaURL }) {
   const div = document.createElement('div');
   div.className = 'video-card';
+
+  let mediaElement = '';
+  if (type.includes('podcast') || type === 'clip') {
+    mediaElement = `<audio controls src="${mediaURL}"></audio>`;
+  } else {
+    mediaElement = `<video controls src="${mediaURL}" poster="${thumbnailURL}" style="width:100%"></video>`;
+  }
+
   div.innerHTML = `
-    <img src="${thumbnailURL}" alt="Thumbnail" />
+    ${mediaElement}
     <h3>${title}</h3>
     <p>${description}</p>
     <span>${type}</span>
@@ -145,28 +153,42 @@ document.getElementById('upload-trigger').addEventListener('click', () => {
   const description = document.getElementById('description').value.trim();
   const type = document.getElementById('upload-type').value;
   const thumbnailInput = document.getElementById('thumbnail');
-  const file = thumbnailInput.files[0];
+  const mediaInput = document.getElementById('media');
+  const thumbnailFile = thumbnailInput.files[0];
+  const mediaFile = mediaInput.files[0];
 
-  if (!title || !description || !file) return alert('Please fill in all fields and choose a thumbnail.');
+  if (!title || !description || !thumbnailFile || !mediaFile) {
+    return alert('Please fill in all fields and choose both a thumbnail and media file.');
+  }
 
   const reader = new FileReader();
   reader.onload = () => {
-    const post = { title, description, type, thumbnailURL: reader.result };
+    const mediaReader = new FileReader();
+    mediaReader.onload = () => {
+      const post = {
+        title,
+        description,
+        type,
+        thumbnailURL: reader.result,
+        mediaURL: mediaReader.result
+      };
 
-    const feeds = {
-      'video': document.getElementById('video-feed'),
-      'clip': document.getElementById('clip-feed'),
-      'podcast-audio': document.getElementById('podcast-feed'),
-      'podcast-video': document.getElementById('podcast-feed')
+      const feeds = {
+        'video': document.getElementById('video-feed'),
+        'clip': document.getElementById('clip-feed'),
+        'podcast-audio': document.getElementById('podcast-feed'),
+        'podcast-video': document.getElementById('podcast-feed')
+      };
+      const profileFeed = document.getElementById('profile-uploads');
+
+      const postCard = createPostCard(post);
+      feeds[type].appendChild(postCard);
+      profileFeed.appendChild(postCard.cloneNode(true));
+      alert('Upload successful!');
     };
-    const profileFeed = document.getElementById('profile-uploads');
-
-    const postCard = createPostCard(post);
-    feeds[type].appendChild(postCard);
-    profileFeed.appendChild(postCard.cloneNode(true));
-    alert('Upload successful!');
+    mediaReader.readAsDataURL(mediaFile);
   };
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(thumbnailFile);
 });
 
 window.addEventListener('load', () => {
