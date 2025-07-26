@@ -1,4 +1,4 @@
-// INTAKEE FINAL SCRIPT.JS - FULLY FUNCTIONAL WITH PREVIEW, DELETE, LIKE/SAVE
+// INTAKEE FINAL SCRIPT.JS - FULLY FUNCTIONAL WITH PREVIEW, DELETE, LIKE/SAVE, VIEWER, COMMENTS, RECOMMENDED
 
 let isLoggedIn = false;
 
@@ -187,14 +187,47 @@ function toggleSave(index) {
 // ---------- POST HTML ----------
 function generatePostHTML(post, index) {
   return `
-    <div class="post-card">
+    <div class="post-card" onclick="viewPost(${index})">
       <strong>${post.type}</strong>: ${post.title}<br>
-      ${post.preview ? `<video src="${post.preview}" controls width="100%"></video>` : ''}
-      <button onclick="deletePost(${index})">🗑️</button>
-      <button onclick="toggleLike(${index})">${post.liked ? '❤️' : '🤍'}</button>
-      <button onclick="toggleSave(${index})">${post.saved ? '💾' : '📁'}</button>
+      ${post.preview ? `<video src="${post.preview}" muted autoplay loop style="max-width:100%"></video>` : ''}
     </div>
   `;
+}
+
+// ---------- VIEW POST ----------
+function viewPost(index) {
+  const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
+  const post = posts[index];
+  const viewer = document.createElement('div');
+  viewer.className = 'viewer-modal';
+  viewer.innerHTML = `
+    <div class="viewer-box">
+      <button onclick="this.parentElement.parentElement.remove()">❌</button>
+      <h2>${post.title}</h2>
+      ${post.preview ? `<video src="${post.preview}" controls autoplay style="width:100%"></video>` : ''}
+      <div><strong>Type:</strong> ${post.type}</div>
+      <div><strong>Uploader:</strong> ${localStorage.getItem('intakeeUserEmail')}</div>
+      <textarea placeholder="Add a comment..."></textarea>
+      <button onclick="addComment(${index})">Post Comment</button>
+      <div id="comments-list">${(post.comments||[]).map(c => `<p>${c}</p>`).join('')}</div>
+      <h3>Other Posts</h3>
+      ${posts.filter((_,i) => i !== index).map((p, i) => generatePostHTML(p, i)).join('')}
+    </div>
+  `;
+  document.body.appendChild(viewer);
+}
+
+function addComment(index) {
+  const viewer = document.querySelector('.viewer-modal');
+  const textarea = viewer.querySelector('textarea');
+  const text = textarea.value.trim();
+  if (!text) return;
+  const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
+  posts[index].comments = posts[index].comments || [];
+  posts[index].comments.push(text);
+  localStorage.setItem('userPosts', JSON.stringify(posts));
+  textarea.value = '';
+  viewPost(index);
 }
 
 // ---------- POPULATE TABS ----------
@@ -222,7 +255,7 @@ document.getElementById('upload-trigger').addEventListener('click', () => {
   const reader = new FileReader();
   reader.onload = () => {
     const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
-    posts.push({ title, type, preview: reader.result });
+    posts.push({ title, type, preview: reader.result, liked: false, saved: false });
     localStorage.setItem('userPosts', JSON.stringify(posts));
     updateUI();
     alert(`${type} uploaded: ${title}`);
@@ -258,3 +291,4 @@ window.handleDeleteAccount = handleDeleteAccount;
 window.deletePost = deletePost;
 window.toggleLike = toggleLike;
 window.toggleSave = toggleSave;
+window.viewPost = viewPost;
