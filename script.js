@@ -1,4 +1,4 @@
- // INTAKEE FINAL SCRIPT.JS - EXTENDED VERSION
+// INTAKEE FINAL SCRIPT.JS - FULLY FUNCTIONAL
 
 let isLoggedIn = false;
 
@@ -6,11 +6,18 @@ let isLoggedIn = false;
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabs = document.querySelectorAll('.tab');
 
+function switchTab(target) {
+  tabs.forEach(tab => tab.classList.toggle('active', tab.id === target));
+}
+
 tabButtons.forEach(button => {
   button.addEventListener('click', () => {
     const target = button.getAttribute('data-tab');
-    tabs.forEach(tab => tab.classList.toggle('active', tab.id === target));
-    if (target === 'upload' && !isLoggedIn) showAuthModal();
+    if (target === 'upload' && !isLoggedIn) {
+      showAuthModal();
+      return;
+    }
+    switchTab(target);
   });
 });
 
@@ -20,6 +27,7 @@ document.querySelectorAll('.search-bar input').forEach(input => {
     if (e.key === 'Enter') alert(`Searching for: ${input.value}`);
   });
 });
+
 document.querySelectorAll('.search-bar .icon').forEach(icon => {
   icon.addEventListener('click', () => {
     const input = icon.parentElement.querySelector('input');
@@ -64,14 +72,11 @@ document.getElementById('forgot-password').addEventListener('click', () => {
 authAction.addEventListener('click', () => {
   const email = document.getElementById('auth-email').value.trim();
   const password = passwordInput.value.trim();
-  const remember = document.getElementById('remember-me').checked;
   if (!email || !password) return alert('Please fill in all fields.');
 
   isLoggedIn = true;
-  if (remember) {
-    localStorage.setItem('intakeeLoggedIn', 'true');
-    localStorage.setItem('intakeeUserEmail', email);
-  }
+  localStorage.setItem('intakeeLoggedIn', 'true');
+  localStorage.setItem('intakeeUserEmail', email);
   updateUI();
   authModal.classList.add('hidden');
   alert(`Welcome, ${email}`);
@@ -79,25 +84,27 @@ authAction.addEventListener('click', () => {
 
 // ---------- ON PAGE LOAD ----------
 window.addEventListener('load', () => {
-  if (localStorage.getItem('intakeeLoggedIn') === 'true') isLoggedIn = true;
+  isLoggedIn = localStorage.getItem('intakeeLoggedIn') === 'true';
   updateUI();
 });
 
 // ---------- UPDATE UI FUNCTION ----------
 function updateUI() {
+  const email = localStorage.getItem('intakeeUserEmail') || 'User';
+
   const homeLoginBtn = document.getElementById('home-login-btn');
   const homeUserEmail = document.getElementById('home-user-email');
   if (homeLoginBtn && homeUserEmail) {
     homeLoginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
     homeUserEmail.style.display = isLoggedIn ? 'block' : 'none';
-    homeUserEmail.textContent = localStorage.getItem('intakeeUserEmail') || 'User';
+    homeUserEmail.textContent = email;
   }
 
   const bio = document.querySelector('#profile textarea');
   const profilePic = document.querySelector('.profile-pic-placeholder');
+  const uploadsContainer = document.getElementById('profile-uploads');
   const loggedOutMsg = document.getElementById('logged-out-message');
   const loggedInPanel = document.getElementById('logged-in-panel');
-  const uploadsContainer = document.getElementById('profile-uploads');
 
   if (isLoggedIn) {
     bio.disabled = false;
@@ -109,7 +116,7 @@ function updateUI() {
       <label for="profile-img-input" style="cursor:pointer;position:relative;">
         <span style="position:absolute;top:0;right:0;background:#fff;border-radius:50%;padding:2px 6px;color:#000;font-weight:bold;font-size:12px;">+</span>
         <input type="file" id="profile-img-input" accept="image/*" style="display:none;" />
-        ${savedImage ? `<img src="${savedImage}" style="width:100%;border-radius:50%;transition:transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/>` : ''}
+        ${savedImage ? `<img src="${savedImage}" style="width:100%;border-radius:50%;transition:transform 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"/>` : ''}
       </label>
     `;
 
@@ -127,15 +134,18 @@ function updateUI() {
     const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
     uploadsContainer.innerHTML = posts.length ? posts.map(p => `<div class="post-card"><strong>${p.type}</strong>: ${p.title}</div>`).join('') : 'No uploads';
 
-    if (loggedOutMsg) loggedOutMsg.style.display = 'none';
-    if (loggedInPanel) loggedInPanel.style.display = 'block';
+    populateTabs(posts);
+
+    loggedOutMsg.style.display = 'none';
+    loggedInPanel.style.display = 'block';
   } else {
     bio.value = '';
     bio.disabled = true;
     bio.style.opacity = '0.7';
-    if (profilePic) profilePic.textContent = 'No image';
-    if (loggedOutMsg) loggedOutMsg.style.display = 'block';
-    if (loggedInPanel) loggedInPanel.style.display = 'none';
+    profilePic.textContent = 'No image';
+    uploadsContainer.innerHTML = '';
+    loggedOutMsg.style.display = 'block';
+    loggedInPanel.style.display = 'none';
   }
 
   bio?.addEventListener('input', () => {
@@ -147,6 +157,21 @@ function updateUI() {
 
   const note = document.getElementById('upload-note');
   if (note) note.textContent = isLoggedIn ? 'You can now upload content.' : 'You must be logged in to upload content.';
+}
+
+// ---------- POPULATE TABS ----------
+function populateTabs(posts) {
+  const types = ['home', 'videos', 'podcast', 'clips'];
+  types.forEach(type => {
+    const container = document.getElementById(`${type}-feed`);
+    if (!container) return;
+    const filtered = posts.filter(p =>
+      type === 'home' || p.type.toLowerCase() === type
+    );
+    container.innerHTML = filtered.length
+      ? filtered.map(p => `<div class="post-card"><strong>${p.type}</strong>: ${p.title}</div>`).join('')
+      : 'No posts yet';
+  });
 }
 
 // ---------- POST SIMULATION ----------
@@ -165,14 +190,13 @@ document.getElementById('upload-trigger').addEventListener('click', () => {
 
 document.getElementById('go-live-trigger').addEventListener('click', () => {
   if (!isLoggedIn) return alert('You must be logged in.');
-  alert('You are now live! (simulated)');
+  alert('You are now LIVE! (simulated stream)');
 });
 
 // ---------- SETTINGS ACTIONS ----------
 function handleLogout() {
   isLoggedIn = false;
-  localStorage.removeItem('intakeeLoggedIn');
-  localStorage.removeItem('intakeeUserEmail');
+  localStorage.clear();
   updateUI();
   alert('Logged out.');
 }
