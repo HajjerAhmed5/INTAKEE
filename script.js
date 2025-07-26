@@ -1,4 +1,4 @@
- // INTAKEE FINAL SCRIPT.JS (ENHANCED UPLOAD + GO LIVE + POST DISPLAY)
+ // INTAKEE FINAL SCRIPT.JS - EXTENDED VERSION
 
 let isLoggedIn = false;
 
@@ -97,32 +97,35 @@ function updateUI() {
   const profilePic = document.querySelector('.profile-pic-placeholder');
   const loggedOutMsg = document.getElementById('logged-out-message');
   const loggedInPanel = document.getElementById('logged-in-panel');
+  const uploadsContainer = document.getElementById('profile-uploads');
 
   if (isLoggedIn) {
     bio.disabled = false;
     bio.style.opacity = '1';
     bio.value = localStorage.getItem('userBio') || '';
 
-    if (profilePic) {
-      const savedImage = localStorage.getItem('profilePic');
-      profilePic.innerHTML = `
-        <label for="profile-img-input" style="cursor:pointer;">
-          <span style="font-size:12px;">Upload</span>
-          <input type="file" id="profile-img-input" accept="image/*" style="display:none;" />
-        </label>
-        ${savedImage ? `<img src="${savedImage}" style="width:100%;border-radius:50%;" />` : ''}
-      `;
-      document.getElementById('profile-img-input').addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          localStorage.setItem('profilePic', reader.result);
-          updateUI();
-        };
-        reader.readAsDataURL(file);
-      });
-    }
+    const savedImage = localStorage.getItem('profilePic');
+    profilePic.innerHTML = `
+      <label for="profile-img-input" style="cursor:pointer;position:relative;">
+        <span style="position:absolute;top:0;right:0;background:#fff;border-radius:50%;padding:2px 6px;color:#000;font-weight:bold;font-size:12px;">+</span>
+        <input type="file" id="profile-img-input" accept="image/*" style="display:none;" />
+        ${savedImage ? `<img src="${savedImage}" style="width:100%;border-radius:50%;transition:transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"/>` : ''}
+      </label>
+    `;
+
+    document.getElementById('profile-img-input').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        localStorage.setItem('profilePic', reader.result);
+        updateUI();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
+    uploadsContainer.innerHTML = posts.length ? posts.map(p => `<div class="post-card"><strong>${p.type}</strong>: ${p.title}</div>`).join('') : 'No uploads';
 
     if (loggedOutMsg) loggedOutMsg.style.display = 'none';
     if (loggedInPanel) loggedInPanel.style.display = 'block';
@@ -147,43 +150,17 @@ function updateUI() {
 }
 
 // ---------- POST SIMULATION ----------
-const contentSections = {
-  'Video': 'videos',
-  'Clip': 'clips',
-  'Podcast - Audio': 'podcast',
-  'Podcast - Video': 'podcast'
-};
-
 document.getElementById('upload-trigger').addEventListener('click', () => {
   if (!isLoggedIn) return alert('You must be logged in.');
   const title = document.getElementById('title').value;
   const type = document.querySelector('select').value;
-  const thumbInput = document.getElementById('thumbnail');
-  const thumbFile = thumbInput.files[0];
-
   if (!title || !type) return alert('Add a title and select a type.');
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    const tabId = contentSections[type];
-    const grid = document.querySelector(`#${tabId} .video-grid`);
-    const card = document.createElement('div');
-    card.className = 'video-card';
-    card.innerHTML = `
-      ${thumbFile ? `<img src="${reader.result}" />` : ''}
-      <h3>${title}</h3>
-      <p>Type: ${type}</p>
-      <div class="video-stats"><span>0 likes</span><span>0 views</span></div>
-    `;
-    if (grid) {
-      const existingMsg = grid.querySelector('p');
-      if (existingMsg) existingMsg.remove();
-      grid.appendChild(card);
-    }
-    alert(`${type} uploaded: ${title}`);
-  };
-  if (thumbFile) reader.readAsDataURL(thumbFile);
-  else reader.onload();
+  const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
+  posts.push({ title, type });
+  localStorage.setItem('userPosts', JSON.stringify(posts));
+  updateUI();
+  alert(`${type} uploaded: ${title}`);
 });
 
 document.getElementById('go-live-trigger').addEventListener('click', () => {
