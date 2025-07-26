@@ -13,7 +13,7 @@ body {
 }
 
 .home-logo {
-  height: 70px;
+  height: 90px;
   width: auto;
   margin: 10px;
 }
@@ -120,6 +120,8 @@ body {
   position: relative;
   transition: transform 0.3s ease;
   overflow: hidden;
+  border: 2px solid #0af;
+  animation: pulse 3s infinite;
 }
 
 .profile-pic-placeholder:hover {
@@ -257,4 +259,10 @@ button:hover, .tab-btn:hover {
   font-size: 13px;
   color: #aaa;
   padding-top: 5px;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
