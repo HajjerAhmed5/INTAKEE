@@ -1,10 +1,33 @@
-// INTAKEE App JavaScript Functionality
+// INTAKEE FINAL SCRIPT.JS
 
 let isLoggedIn = false;
-let isLogin = true;
 
+// ---------- TAB NAVIGATION ----------
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabs = document.querySelectorAll('.tab');
+
+tabButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const target = button.getAttribute('data-tab');
+    tabs.forEach(tab => tab.classList.toggle('active', tab.id === target));
+    if (target === 'upload' && !isLoggedIn) showAuthModal();
+  });
+});
+
+// ---------- SEARCH FUNCTION ----------
+document.querySelectorAll('.search-bar input').forEach(input => {
+  input.addEventListener('keypress', e => {
+    if (e.key === 'Enter') alert(`Searching for: ${input.value}`);
+  });
+});
+document.querySelectorAll('.search-bar .icon').forEach(icon => {
+  icon.addEventListener('click', () => {
+    const input = icon.parentElement.querySelector('input');
+    alert(`Searching for: ${input.value}`);
+  });
+});
+
+// ---------- AUTH MODAL ----------
 const authModal = document.getElementById('auth-modal');
 const authTitle = document.getElementById('auth-title');
 const authAction = document.getElementById('auth-action');
@@ -12,20 +35,11 @@ const toggleAuth = document.getElementById('toggle-auth');
 const closeAuth = document.querySelector('.close-auth');
 const passwordInput = document.getElementById('auth-password');
 const togglePassword = document.getElementById('toggle-password');
+let isLogin = true;
 
-// Switch tabs
-tabButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const target = button.getAttribute('data-tab');
-    tabs.forEach(tab => tab.classList.toggle('active', tab.id === target));
-  });
-});
-
-// Show Auth Modal
 function showAuthModal() {
   authModal.classList.remove('hidden');
 }
-window.showAuthModal = showAuthModal;
 
 closeAuth.addEventListener('click', () => authModal.classList.add('hidden'));
 
@@ -46,6 +60,7 @@ document.getElementById('forgot-password').addEventListener('click', () => {
   alert(email ? `Reset link sent to ${email}` : 'Enter your email first.');
 });
 
+// ---------- LOGIN HANDLER ----------
 authAction.addEventListener('click', () => {
   const email = document.getElementById('auth-email').value.trim();
   const password = passwordInput.value.trim();
@@ -62,6 +77,87 @@ authAction.addEventListener('click', () => {
   alert(`Welcome, ${email}`);
 });
 
+// ---------- ON PAGE LOAD ----------
+window.addEventListener('load', () => {
+  if (localStorage.getItem('intakeeLoggedIn') === 'true') isLoggedIn = true;
+  updateUI();
+});
+
+// ---------- UPDATE UI FUNCTION ----------
+function updateUI() {
+  const homeLoginBtn = document.getElementById('home-login-btn');
+  const homeUserEmail = document.getElementById('home-user-email');
+  if (homeLoginBtn && homeUserEmail) {
+    homeLoginBtn.style.display = isLoggedIn ? 'none' : 'inline-block';
+    homeUserEmail.style.display = isLoggedIn ? 'block' : 'none';
+    homeUserEmail.textContent = localStorage.getItem('intakeeUserEmail') || 'User';
+  }
+
+  const bio = document.querySelector('#profile textarea');
+  const profilePic = document.querySelector('.profile-pic-placeholder');
+  const loggedOutMsg = document.getElementById('logged-out-message');
+  const loggedInPanel = document.getElementById('logged-in-panel');
+
+  if (isLoggedIn) {
+    bio.disabled = false;
+    bio.style.opacity = '1';
+    bio.value = localStorage.getItem('userBio') || '';
+
+    if (profilePic) {
+      const savedImage = localStorage.getItem('profilePic');
+      profilePic.innerHTML = `
+        <label for="profile-img-input" style="cursor:pointer;">
+          <span style="font-size:12px;">Upload</span>
+          <input type="file" id="profile-img-input" accept="image/*" style="display:none;" />
+        </label>
+        ${savedImage ? `<img src="${savedImage}" style="width:100%;border-radius:50%;" />` : ''}
+      `;
+      document.getElementById('profile-img-input').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          localStorage.setItem('profilePic', reader.result);
+          updateUI();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (loggedOutMsg) loggedOutMsg.style.display = 'none';
+    if (loggedInPanel) loggedInPanel.style.display = 'block';
+  } else {
+    bio.value = '';
+    bio.disabled = true;
+    bio.style.opacity = '0.7';
+    if (profilePic) profilePic.textContent = 'No image';
+    if (loggedOutMsg) loggedOutMsg.style.display = 'block';
+    if (loggedInPanel) loggedInPanel.style.display = 'none';
+  }
+
+  bio?.addEventListener('input', () => {
+    if (isLoggedIn) localStorage.setItem('userBio', bio.value);
+  });
+
+  document.querySelectorAll('#upload input, #upload textarea, #upload select')
+    .forEach(el => el.disabled = !isLoggedIn);
+
+  const note = document.getElementById('upload-note');
+  if (note) note.textContent = isLoggedIn ? 'You can now upload content.' : 'You must be logged in to upload content.';
+}
+
+// ---------- POST SIMULATION ----------
+document.getElementById('upload-trigger').addEventListener('click', () => {
+  if (!isLoggedIn) return alert('You must be logged in.');
+  alert('Post submitted (simulated).');
+});
+
+document.getElementById('go-live-trigger').addEventListener('click', () => {
+  if (!isLoggedIn) return alert('You must be logged in.');
+  alert('Live streaming coming soon.');
+});
+
+// ---------- SETTINGS ACTIONS ----------
 function handleLogout() {
   isLoggedIn = false;
   localStorage.removeItem('intakeeLoggedIn');
@@ -78,122 +174,7 @@ function handleDeleteAccount() {
     alert('Account deleted.');
   }
 }
+
+window.showAuthModal = showAuthModal;
 window.handleLogout = handleLogout;
 window.handleDeleteAccount = handleDeleteAccount;
-
-function updateUI() {
-  const email = localStorage.getItem('intakeeUserEmail') || 'User';
-  const userEmailSpan = document.getElementById('display-user-email');
-  const bio = document.getElementById('user-bio');
-  const profilePic = document.getElementById('profile-pic');
-  const uploadNote = document.getElementById('upload-note');
-  const uploadInputs = document.querySelectorAll('#upload input, #upload textarea, #upload select');
-
-  if (isLoggedIn) {
-    document.getElementById('home-login-btn').style.display = 'none';
-    document.getElementById('home-user-email').style.display = 'inline-block';
-    document.getElementById('home-user-email').textContent = email;
-    userEmailSpan.textContent = email;
-    document.getElementById('logged-in-panel').style.display = 'block';
-
-    bio.disabled = false;
-    bio.value = localStorage.getItem('userBio') || '';
-    bio.addEventListener('input', () => {
-      localStorage.setItem('userBio', bio.value);
-    });
-
-    const storedPic = localStorage.getItem('profilePic');
-    profilePic.src = storedPic || '';
-    profilePic.addEventListener('click', () => {
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'image/*';
-      fileInput.onchange = e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          localStorage.setItem('profilePic', reader.result);
-          updateUI();
-        };
-        reader.readAsDataURL(file);
-      };
-      fileInput.click();
-    });
-  }
-
-  uploadInputs.forEach(el => el.disabled = !isLoggedIn);
-  uploadNote.textContent = isLoggedIn ? 'You can now upload content.' : 'You must be logged in to upload content.';
-}
-
-function createPostCard({ title, description, type, thumbnailURL, mediaURL }) {
-  const div = document.createElement('div');
-  div.className = 'video-card';
-
-  let mediaElement = '';
-  if (type.includes('podcast') || type === 'clip') {
-    mediaElement = `<audio controls src="${mediaURL}"></audio>`;
-  } else {
-    mediaElement = `<video controls src="${mediaURL}" poster="${thumbnailURL}" style="width:100%"></video>`;
-  }
-
-  div.innerHTML = `
-    ${mediaElement}
-    <h3>${title}</h3>
-    <p>${description}</p>
-    <span>${type}</span>
-  `;
-  return div;
-}
-
-document.getElementById('upload-trigger').addEventListener('click', () => {
-  if (!isLoggedIn) return alert('You must be logged in to upload.');
-
-  const title = document.getElementById('title').value.trim();
-  const description = document.getElementById('description').value.trim();
-  const type = document.getElementById('upload-type').value;
-  const thumbnailInput = document.getElementById('thumbnail');
-  const mediaInput = document.getElementById('media');
-  const thumbnailFile = thumbnailInput.files[0];
-  const mediaFile = mediaInput.files[0];
-
-  if (!title || !description || !thumbnailFile || !mediaFile) {
-    return alert('Please fill in all fields and choose both a thumbnail and media file.');
-  }
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    const mediaReader = new FileReader();
-    mediaReader.onload = () => {
-      const post = {
-        title,
-        description,
-        type,
-        thumbnailURL: reader.result,
-        mediaURL: mediaReader.result
-      };
-
-      const feeds = {
-        'video': document.getElementById('video-feed'),
-        'clip': document.getElementById('clip-feed'),
-        'podcast-audio': document.getElementById('podcast-feed'),
-        'podcast-video': document.getElementById('podcast-feed')
-      };
-      const profileFeed = document.getElementById('profile-uploads');
-
-      const postCard = createPostCard(post);
-      feeds[type].appendChild(postCard);
-      profileFeed.appendChild(postCard.cloneNode(true));
-      alert('Upload successful!');
-    };
-    mediaReader.readAsDataURL(mediaFile);
-  };
-  reader.readAsDataURL(thumbnailFile);
-});
-
-window.addEventListener('load', () => {
-  if (localStorage.getItem('intakeeLoggedIn') === 'true') {
-    isLoggedIn = true;
-  }
-  updateUI();
-});
