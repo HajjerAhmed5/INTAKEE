@@ -1,13 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+  <div class="header">
+    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 10px 20px;">
+      <img src="logo.png" class="home-logo" alt="INTAKEE Logo" style="height: 50px;">
+      <button id="home-login-btn" onclick="showAuthModal()" style="background-color: #fff; color: #000; padding: 8px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Login</button>
+    </div>
+    <span id="home-user-email" style="display:none;"></span>
+  </div>
+
   <nav class="bottom-nav">
     <button class="tab-btn" data-tab="home">Home</button>
     <button class="tab-btn" data-tab="videos">Videos</button>
@@ -18,146 +26,118 @@
     <button class="tab-btn" data-tab="settings">Settings</button>
   </nav>
 
-  <div class="tab active" id="home">
-    <div class="home-header">
-      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
-      <div class="search-bar">
-        <input type="text" placeholder="Search home..." />
-        <span class="icon"><i class="fas fa-search"></i></span>
-      </div>
+  <div id="home" class="tab active">
+    <div class="search-bar">
+      <input type="text" placeholder="Search home...">
+      <span class="icon"><i class="fas fa-search"></i></span>
     </div>
-    <h1 class="home-title">Welcome to INTAKEE</h1>
-    <div id="home-feed" class="video-grid"><p>No posts yet</p></div>
+    <h1 class="home-title">Trending Content</h1>
+    <div class="video-grid" id="home-feed">No posts yet</div>
   </div>
 
-  <div class="tab" id="videos">
-    <div class="home-header">
-      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
-      <div class="search-bar">
-        <input type="text" placeholder="Search videos..." />
-        <span class="icon"><i class="fas fa-search"></i></span>
-      </div>
+  <div id="videos" class="tab">
+    <div class="search-bar">
+      <input type="text" placeholder="Search videos...">
+      <span class="icon"><i class="fas fa-search"></i></span>
     </div>
-    <h1 class="home-title">Videos</h1>
-    <div id="video-feed" class="video-grid"><p>No posts yet</p></div>
+    <h1 class="home-title">All Videos</h1>
+    <div class="video-grid" id="videos-feed">No posts yet</div>
   </div>
 
-  <div class="tab" id="podcast">
-    <div class="home-header">
-      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
-      <div class="search-bar">
-        <input type="text" placeholder="Search podcasts..." />
-        <span class="icon"><i class="fas fa-search"></i></span>
-      </div>
+  <div id="podcast" class="tab">
+    <div class="search-bar">
+      <input type="text" placeholder="Search podcasts...">
+      <span class="icon"><i class="fas fa-search"></i></span>
     </div>
-    <h1 class="home-title">Podcasts</h1>
-    <div id="podcast-feed" class="video-grid"><p>No posts yet</p></div>
+    <h1 class="home-title">All Podcasts</h1>
+    <div class="video-grid" id="podcast-feed">No posts yet</div>
   </div>
 
-  <div class="tab" id="upload">
-    <div class="home-header">
-      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
-    </div>
+  <div id="upload" class="tab">
+    <h1 class="home-title">Upload Content</h1>
     <div class="upload-wrapper">
-      <h2>Upload Content</h2>
-      <label>Choose Type:</label>
+      <label>Select Type</label>
       <select id="upload-type">
         <option value="video">Video</option>
         <option value="clip">Clip</option>
-        <option value="podcast-audio">Podcast - Audio</option>
-        <option value="podcast-video">Podcast - Video</option>
+        <option value="podcast">Podcast (Audio)</option>
+        <option value="podcast-video">Podcast (Video)</option>
       </select>
-      <label for="title">Title:</label>
-      <input type="text" id="title" placeholder="Enter title..." />
-      <label for="description">Description:</label>
-      <textarea id="description" placeholder="Add a description..."></textarea>
-      <label for="thumbnail">Thumbnail:</label>
-      <input type="file" id="thumbnail" accept="image/*" />
-      <label for="media">Media File (Video/Audio):</label>
-      <input type="file" id="media" accept="video/*,audio/*" />
-      <p id="upload-note">You must be logged in to upload content.</p>
+      <label>Title</label>
+      <input id="title" type="text" placeholder="Enter title...">
+      <label>Description</label>
+      <textarea id="description" placeholder="Write a description..."></textarea>
+      <label>Thumbnail</label>
+      <input id="thumbnail" type="file" accept="image/*">
+      <label>Upload File</label>
+      <input id="upload-file" type="file" accept="video/*,audio/*">
+      <p class="note" id="upload-note">You must be logged in to upload content.</p>
       <button id="upload-trigger">Upload</button>
+      <button id="go-live-trigger">Go Live</button>
     </div>
   </div>
 
-  <div class="tab" id="clips">
-    <div class="home-header">
-      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
-      <div class="search-bar">
-        <input type="text" placeholder="Search clips..." />
-        <span class="icon"><i class="fas fa-search"></i></span>
-      </div>
+  <div id="clips" class="tab">
+    <div class="search-bar">
+      <input type="text" placeholder="Search clips...">
+      <span class="icon"><i class="fas fa-search"></i></span>
     </div>
-    <h1 class="home-title">Clips</h1>
-    <div id="clip-feed" class="video-grid"><p>No posts yet</p></div>
+    <h1 class="home-title">Short Clips</h1>
+    <div class="video-grid" id="clips-feed">No posts yet</div>
   </div>
 
-  <div class="tab" id="profile">
-    <div class="home-header">
-      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
-      <div class="search-bar">
-        <input type="text" placeholder="Search your content..." />
-        <span class="icon"><i class="fas fa-search"></i></span>
-      </div>
+  <div id="profile" class="tab">
+    <h1 class="home-title">Your Profile</h1>
+    <div id="logged-out-message">
+      <p>You must be logged in to edit your profile or view uploads.</p>
     </div>
-    <div class="profile-section">
-      <h1 class="home-title">Your Profile</h1>
-      <div id="logged-out-message">
-        <p>You must be logged in to edit your profile or interact with content.</p>
-      </div>
-      <div id="logged-in-panel" style="display:none;">
-        <p style="font-size:14px; color:#fff; font-weight:bold; padding:0 10px 20px;">
-          Welcome, <span id="display-user-email"></span>!
-        </p>
-        <div class="profile-info">
-          <label for="profile-img-input" class="profile-pic-placeholder" id="profile-pic">No image</label>
-          <input type="file" id="profile-img-input" accept="image/*" style="display:none;" />
-          <textarea id="user-bio" placeholder="Bio (editable if logged in)"></textarea>
+    <div id="logged-in-panel" style="display:none">
+      <div class="profile-info">
+        <div class="profile-pic-placeholder" onclick="document.getElementById('profile-pic-input').click()">
+          <i class="fas fa-plus"></i>
         </div>
-        <h3 class="home-title">Uploads</h3>
-        <div id="profile-uploads" class="video-grid"></div>
-        <h3 class="home-title">Liked</h3>
-        <div id="profile-liked" class="video-grid"></div>
-        <h3 class="home-title">Saved</h3>
-        <div id="profile-saved" class="video-grid"></div>
-        <h3 class="home-title">Playlists</h3>
-        <div id="profile-playlists" class="video-grid"></div>
+        <input type="file" id="profile-pic-input" style="display:none;">
+        <textarea placeholder="Your bio"></textarea>
       </div>
+      <h3 class="home-title">Uploads</h3>
+      <div class="video-grid" id="profile-uploads">No uploads</div>
+      <h3 class="home-title">Liked</h3>
+      <div class="video-grid" id="liked-uploads">No liked posts</div>
+      <h3 class="home-title">Saved</h3>
+      <div class="video-grid" id="saved-uploads">No saved content</div>
     </div>
   </div>
 
-  <div class="tab" id="settings">
-    <div class="home-header">
-      <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
-    </div>
+  <div id="settings" class="tab">
     <h1 class="home-title">Settings</h1>
     <div class="video-card"><h3>Privacy Policy</h3><p>We respect your privacy. Data is never sold or shared.</p></div>
     <div class="video-card"><h3>Terms of Service</h3><p>You are responsible for all uploaded content. INTAKEE is not liable for anything user-generated.</p></div>
-    <div class="video-card"><h3>Community Guidelines</h3><p>No nudity, illegal activity, or hate speech. We moderate abuse fairly and support speech freedom.</p></div>
-    <div class="video-card"><h3>Report Content</h3><p>Flag abusive or inappropriate content. Repeated violations lead to content review or action.</p></div>
-    <div class="video-card"><h3>Blocked Users</h3><p>View and manage users you’ve blocked from seeing your content.</p></div>
-    <div class="video-card"><h3>Contact Support</h3><p>Email <strong>Intakee2025@gmail.com</strong> for help or technical issues.</p></div>
+    <div class="video-card"><h3>Community Guidelines</h3><p>No nudity, illegal activity, or hate speech. All reports will be reviewed fairly.</p></div>
+    <div class="video-card"><h3>Report Content</h3><p>Flag abusive or inappropriate content for review.</p></div>
+    <div class="video-card"><h3>Blocked Users</h3><p>Manage blocked users and restrictions.</p></div>
+    <div class="video-card"><h3>Contact Support</h3><p>Email <strong>Intakee2025@gmail.com</strong> for help or issues.</p></div>
     <div class="video-card auth-settings">
       <h3>Account Controls</h3>
       <button onclick="handleLogout()">Log Out</button>
       <button onclick="handleDeleteAccount()">Delete Account</button>
-      <button onclick="alert('Your account is now private (simulated).')">Make Account Private</button>
     </div>
   </div>
 
   <div id="auth-modal" class="auth-modal hidden">
     <div class="auth-box">
       <h2 id="auth-title">Login to INTAKEE</h2>
-      <input type="email" id="auth-email" placeholder="Email" />
+      <input type="email" id="auth-email" placeholder="Email">
       <div class="password-wrapper">
-        <input type="password" id="auth-password" placeholder="Password" />
+        <input type="password" id="auth-password" placeholder="Password">
         <i class="fas fa-eye toggle-password" id="toggle-password"></i>
       </div>
-      <label><input type="checkbox" id="remember-me" /> Remember Me</label>
+      <label style="font-size: 14px; margin-top: 10px; color: #ccc;">
+        <input type="checkbox" id="remember-me"> Remember Me
+      </label>
       <button id="auth-action">Login</button>
       <p id="auth-toggle-text">Don’t have an account? <span id="toggle-auth">Sign Up</span></p>
       <p class="forgot-link"><span id="forgot-password">Forgot Password?</span></p>
-      <button class="close-auth">×</button>
+      <button class="close-auth">&times;</button>
     </div>
   </div>
 
