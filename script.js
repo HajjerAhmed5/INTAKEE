@@ -1,4 +1,4 @@
-// INTAKEE FINAL SCRIPT.JS - FULLY FUNCTIONAL
+// INTAKEE FINAL SCRIPT.JS - FULLY FUNCTIONAL WITH PREVIEW, DELETE, LIKE/SAVE
 
 let isLoggedIn = false;
 
@@ -132,7 +132,9 @@ function updateUI() {
     });
 
     const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
-    uploadsContainer.innerHTML = posts.length ? posts.map(p => `<div class="post-card"><strong>${p.type}</strong>: ${p.title}</div>`).join('') : 'No uploads';
+    uploadsContainer.innerHTML = posts.length
+      ? posts.map((p, i) => generatePostHTML(p, i)).join('')
+      : 'No uploads';
 
     populateTabs(posts);
 
@@ -159,17 +161,51 @@ function updateUI() {
   if (note) note.textContent = isLoggedIn ? 'You can now upload content.' : 'You must be logged in to upload content.';
 }
 
+// ---------- DELETE POST ----------
+function deletePost(index) {
+  const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
+  posts.splice(index, 1);
+  localStorage.setItem('userPosts', JSON.stringify(posts));
+  updateUI();
+}
+
+// ---------- LIKE/SAVE POST ----------
+function toggleLike(index) {
+  const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
+  posts[index].liked = !posts[index].liked;
+  localStorage.setItem('userPosts', JSON.stringify(posts));
+  updateUI();
+}
+
+function toggleSave(index) {
+  const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
+  posts[index].saved = !posts[index].saved;
+  localStorage.setItem('userPosts', JSON.stringify(posts));
+  updateUI();
+}
+
+// ---------- POST HTML ----------
+function generatePostHTML(post, index) {
+  return `
+    <div class="post-card">
+      <strong>${post.type}</strong>: ${post.title}<br>
+      ${post.preview ? `<video src="${post.preview}" controls width="100%"></video>` : ''}
+      <button onclick="deletePost(${index})">🗑️</button>
+      <button onclick="toggleLike(${index})">${post.liked ? '❤️' : '🤍'}</button>
+      <button onclick="toggleSave(${index})">${post.saved ? '💾' : '📁'}</button>
+    </div>
+  `;
+}
+
 // ---------- POPULATE TABS ----------
 function populateTabs(posts) {
   const types = ['home', 'videos', 'podcast', 'clips'];
   types.forEach(type => {
     const container = document.getElementById(`${type}-feed`);
     if (!container) return;
-    const filtered = posts.filter(p =>
-      type === 'home' || p.type.toLowerCase() === type
-    );
+    const filtered = posts.filter(p => type === 'home' || p.type.toLowerCase() === type);
     container.innerHTML = filtered.length
-      ? filtered.map(p => `<div class="post-card"><strong>${p.type}</strong>: ${p.title}</div>`).join('')
+      ? filtered.map((p, i) => generatePostHTML(p, i)).join('')
       : 'No posts yet';
   });
 }
@@ -179,13 +215,19 @@ document.getElementById('upload-trigger').addEventListener('click', () => {
   if (!isLoggedIn) return alert('You must be logged in.');
   const title = document.getElementById('title').value;
   const type = document.querySelector('select').value;
-  if (!title || !type) return alert('Add a title and select a type.');
+  const fileInput = document.getElementById('upload-file');
 
-  const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
-  posts.push({ title, type });
-  localStorage.setItem('userPosts', JSON.stringify(posts));
-  updateUI();
-  alert(`${type} uploaded: ${title}`);
+  if (!title || !type || !fileInput.files[0]) return alert('Complete all fields.');
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const posts = JSON.parse(localStorage.getItem('userPosts') || '[]');
+    posts.push({ title, type, preview: reader.result });
+    localStorage.setItem('userPosts', JSON.stringify(posts));
+    updateUI();
+    alert(`${type} uploaded: ${title}`);
+  };
+  reader.readAsDataURL(fileInput.files[0]);
 });
 
 document.getElementById('go-live-trigger').addEventListener('click', () => {
@@ -213,3 +255,6 @@ function handleDeleteAccount() {
 window.showAuthModal = showAuthModal;
 window.handleLogout = handleLogout;
 window.handleDeleteAccount = handleDeleteAccount;
+window.deletePost = deletePost;
+window.toggleLike = toggleLike;
+window.toggleSave = toggleSave;
