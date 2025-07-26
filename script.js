@@ -1,4 +1,4 @@
-// INTAKEE FINAL SCRIPT.JS
+ // INTAKEE FINAL SCRIPT.JS (ENHANCED UPLOAD + GO LIVE + POST DISPLAY)
 
 let isLoggedIn = false;
 
@@ -147,14 +147,48 @@ function updateUI() {
 }
 
 // ---------- POST SIMULATION ----------
+const contentSections = {
+  'Video': 'videos',
+  'Clip': 'clips',
+  'Podcast - Audio': 'podcast',
+  'Podcast - Video': 'podcast'
+};
+
 document.getElementById('upload-trigger').addEventListener('click', () => {
   if (!isLoggedIn) return alert('You must be logged in.');
-  alert('Post submitted (simulated).');
+  const title = document.getElementById('title').value;
+  const type = document.querySelector('select').value;
+  const thumbInput = document.getElementById('thumbnail');
+  const thumbFile = thumbInput.files[0];
+
+  if (!title || !type) return alert('Add a title and select a type.');
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const tabId = contentSections[type];
+    const grid = document.querySelector(`#${tabId} .video-grid`);
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.innerHTML = `
+      ${thumbFile ? `<img src="${reader.result}" />` : ''}
+      <h3>${title}</h3>
+      <p>Type: ${type}</p>
+      <div class="video-stats"><span>0 likes</span><span>0 views</span></div>
+    `;
+    if (grid) {
+      const existingMsg = grid.querySelector('p');
+      if (existingMsg) existingMsg.remove();
+      grid.appendChild(card);
+    }
+    alert(`${type} uploaded: ${title}`);
+  };
+  if (thumbFile) reader.readAsDataURL(thumbFile);
+  else reader.onload();
 });
 
 document.getElementById('go-live-trigger').addEventListener('click', () => {
   if (!isLoggedIn) return alert('You must be logged in.');
-  alert('Live streaming coming soon.');
+  alert('You are now live! (simulated)');
 });
 
 // ---------- SETTINGS ACTIONS ----------
