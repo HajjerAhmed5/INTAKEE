@@ -71,7 +71,7 @@
         <h2>Your Profile</h2>
         <div class="profile-info">
           <div class="profile-pic-wrapper">
-            <div class="profile-pic-placeholder" id="profile-pic" onclick="promptLoginIfNeeded()">+
+            <div class="profile-pic-placeholder" id="profile-pic" onclick="promptLoginIfNeeded()">
               <span class="plus-icon">+</span>
             </div>
           </div>
@@ -79,7 +79,7 @@
         </div>
         <p class="note" id="profile-warning">Login required to edit profile and view content.</p>
         <h3>Uploads</h3>
-        <div class="video-grid" id="user-uploads">No uploads</div>
+        <div class="video-grid" id="user-uploads">No uploads yet</div>
         <h3>Liked</h3>
         <div class="video-grid" id="user-liked">No liked posts</div>
         <h3>Saved</h3>
@@ -90,6 +90,18 @@
     <section class="tab" id="settings">
       <div class="settings-page">
         <h2>Settings</h2>
+        <div class="video-card">
+          <h3>Privacy Policy</h3>
+          <p>We respect your privacy. Data is never sold or shared.</p>
+        </div>
+        <div class="video-card">
+          <h3>Terms of Service</h3>
+          <p>You are responsible for all uploaded content. INTAKEE is not liable for user-generated content.</p>
+        </div>
+        <div class="video-card">
+          <h3>Community Guidelines</h3>
+          <p>No nudity, illegal activity, or hate speech. Content moderation is enforced fairly.</p>
+        </div>
         <p class="note" id="settings-warning">Login required to manage account settings.</p>
         <div class="auth-settings">
           <button onclick="handleLogoutOrPrompt()">Log Out</button>
@@ -129,22 +141,18 @@
     function promptLoginIfNeeded() {
       if (!window.isLoggedIn) showAuthModal();
     }
-
     function handleLogoutOrPrompt() {
       if (!window.isLoggedIn) return showAuthModal();
       handleLogout();
     }
-
     function handleDeleteAccountOrPrompt() {
       if (!window.isLoggedIn) return showAuthModal();
       handleDeleteAccount();
     }
-
     function handlePrivacyToggleOrPrompt() {
       if (!window.isLoggedIn) return showAuthModal();
       alert('Account made private');
     }
-
     const observer = new MutationObserver(() => {
       const activeTab = document.querySelector('.tab.active')?.id;
       const searchBar = document.getElementById('global-search');
