@@ -1,13 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+  <!-- HEADER -->
+  <header class="home-header">
+    <img src="logo.png" alt="INTAKEE Logo" class="home-logo">
+    <div class="search-bar">
+      <input type="text" placeholder="Search...">
+      <span class="icon"><i class="fas fa-search"></i></span>
+    </div>
+    <button id="home-login-btn" onclick="showAuthModal()">Login / Sign Up</button>
+  </header>
+
+  <!-- MAIN TABS -->
+  <main>
+    <section class="tab active" id="home">
+      <h2 class="home-title">Trending</h2>
+      <div class="video-grid" id="trending-feed">No trending posts</div>
+    </section>
+
+    <section class="tab" id="videos">
+      <h2 class="home-title">Videos</h2>
+      <div class="video-grid" id="video-feed">No videos yet</div>
+    </section>
+
+    <section class="tab" id="podcast">
+      <h2 class="home-title">Podcasts</h2>
+      <div class="video-grid" id="podcast-feed">No podcasts yet</div>
+    </section>
+
+    <section class="tab" id="upload">
+      <div class="upload-wrapper">
+        <h2>Upload Content</h2>
+        <label for="upload-type">Choose Type:</label>
+        <select id="upload-type">
+          <option value="video">Video</option>
+          <option value="clip">Clip</option>
+          <option value="podcast-video">Podcast (Video)</option>
+          <option value="podcast-audio">Podcast (Audio)</option>
+        </select>
+        <label for="upload-title">Title:</label>
+        <input type="text" id="upload-title">
+        <label for="upload-description">Description:</label>
+        <textarea id="upload-description"></textarea>
+        <label for="upload-thumbnail">Upload Thumbnail:</label>
+        <input type="file" id="upload-thumbnail">
+        <label for="upload-file">Upload File:</label>
+        <input type="file" id="upload-file">
+        <button onclick="handleUpload()">Upload</button>
+        <button onclick="goLive()">Go Live</button>
+      </div>
+    </section>
+
+    <section class="tab" id="clips">
+      <h2 class="home-title">Clips</h2>
+      <div class="video-grid" id="clips-feed">No clips yet</div>
+    </section>
+
+    <section class="tab" id="profile">
+      <div class="profile-section">
+        <h2>Your Profile</h2>
+        <div id="logged-out-message">You must be logged in to see your profile.</div>
+        <div id="logged-in-panel" class="hidden">
+          <p id="profile-email"></p>
+          <div class="profile-info">
+            <div class="profile-pic-placeholder" id="profile-pic">+</div>
+            <textarea id="profile-bio" placeholder="Your bio"></textarea>
+          </div>
+          <h3>Uploads</h3>
+          <div class="video-grid" id="user-uploads">No uploads</div>
+          <h3>Liked</h3>
+          <div class="video-grid" id="user-liked">No liked posts</div>
+          <h3>Saved</h3>
+          <div class="video-grid" id="user-saved">No saved content</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab" id="settings">
+      <div class="settings-page">
+        <h2>Settings</h2>
+        <div class="auth-settings">
+          <button onclick="handleLogout()">Log Out</button>
+          <button onclick="handleDeleteAccount()">Delete Account</button>
+          <button onclick="alert('Account made private')">Make Account Private</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
     <button class="tab-btn" data-tab="home">Home</button>
     <button class="tab-btn" data-tab="videos">Videos</button>
@@ -18,132 +106,19 @@
     <button class="tab-btn" data-tab="settings">Settings</button>
   </nav>
 
-  <div class="tab active" id="home">
-    <div class="home-header">
-      <img src="logo.png" class="home-logo" alt="Logo" />
-      <div class="search-bar">
-        <input type="text" placeholder="Search...">
-        <span class="icon"><i class="fas fa-search"></i></span>
-      </div>
-      <div id="home-auth-controls">
-        <button id="home-login-btn" onclick="showAuthModal()">Login / Sign Up</button>
-        <span id="home-user-email"></span>
-      </div>
-    </div>
-    <h1 class="home-title">Trending</h1>
-    <div class="video-grid"></div>
-  </div>
-
-  <div class="tab" id="videos">
-    <div class="home-header">
-      <img src="logo.png" class="home-logo" alt="Logo" />
-      <div class="search-bar">
-        <input type="text" placeholder="Search videos...">
-        <span class="icon"><i class="fas fa-search"></i></span>
-      </div>
-    </div>
-    <h1 class="home-title">Videos</h1>
-    <div class="video-grid"></div>
-  </div>
-
-  <div class="tab" id="podcast">
-    <div class="home-header">
-      <img src="logo.png" class="home-logo" alt="Logo" />
-      <div class="search-bar">
-        <input type="text" placeholder="Search podcasts...">
-        <span class="icon"><i class="fas fa-search"></i></span>
-      </div>
-    </div>
-    <h1 class="home-title">Podcasts</h1>
-    <div class="video-grid"></div>
-  </div>
-
-  <div class="tab" id="upload">
-    <div class="home-header">
-      <img src="logo.png" class="home-logo" alt="Logo" />
-    </div>
-    <div class="upload-wrapper">
-      <h2>Upload Content</h2>
-      <label>Choose Type:</label>
-      <select>
-        <option value="video">Video</option>
-        <option value="clip">Clip</option>
-        <option value="podcast">Podcast</option>
-      </select>
-      <label>Title:</label>
-      <input type="text" id="title" />
-      <label>Description:</label>
-      <textarea id="description"></textarea>
-      <label>Upload Thumbnail:</label>
-      <input type="file" id="thumbnail" accept="image/*" />
-      <div style="display:flex; gap:10px; margin-top:10px;">
-        <button id="upload-trigger">Upload</button>
-        <button id="go-live-trigger">Go Live</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="tab" id="clips">
-    <div class="home-header">
-      <img src="logo.png" class="home-logo" alt="Logo" />
-      <div class="search-bar">
-        <input type="text" placeholder="Search clips...">
-        <span class="icon"><i class="fas fa-search"></i></span>
-      </div>
-    </div>
-    <h1 class="home-title">Clips</h1>
-    <div class="video-grid"></div>
-  </div>
-
-  <div class="tab" id="profile">
-    <div class="home-header">
-      <img src="logo.png" class="home-logo" alt="Logo" />
-    </div>
-    <div class="profile-section">
-      <div id="logged-out-message">
-        <p>You must be logged in to see your profile.</p>
-      </div>
-      <div id="logged-in-panel" class="hidden">
-        <h2>Your Uploads</h2>
-        <div class="video-grid"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="tab" id="settings">
-    <div class="home-header">
-      <img src="logo.png" class="home-logo" alt="Logo" />
-    </div>
-    <div class="settings-page">
-      <h1 class="home-title">Settings</h1>
-      <div class="video-card">
-        <h3>Privacy</h3>
-        <p>Your account data is stored locally in your browser only.</p>
-      </div>
-      <div class="video-card">
-        <h3>Support</h3>
-        <p>Contact: <strong>intakee2025@gmail.com</strong></p>
-      </div>
-      <div class="video-card auth-settings">
-        <button onclick="handleLogout()">Log Out</button>
-        <button onclick="handleDeleteAccount()">Delete Account</button>
-      </div>
-    </div>
-  </div>
-
   <!-- AUTH MODAL -->
-  <div id="auth-modal" class="auth-modal hidden">
+  <div class="auth-modal hidden" id="auth-modal">
     <div class="auth-box">
+      <button class="close-auth" onclick="closeAuthModal()">&times;</button>
       <h2 id="auth-title">Login to INTAKEE</h2>
-      <input type="email" id="auth-email" placeholder="Email" />
-      <input type="password" id="auth-password" placeholder="Password" />
+      <input type="email" id="auth-email" placeholder="Email">
+      <input type="password" id="auth-password" placeholder="Password">
+      <label><input type="checkbox" id="remember-me"> Remember Me</label>
       <button id="auth-action">Login</button>
-      <p id="auth-toggle-text">Don't have an account? <span id="toggle-auth">Sign Up</span></p>
-      <button class="close-auth">&times;</button>
+      <p id="auth-toggle-text">Don’t have an account? <span id="toggle-auth">Sign Up</span></p>
     </div>
   </div>
 
-  <!-- SCRIPTS -->
   <script src="script.js"></script>
 </body>
 </html>
