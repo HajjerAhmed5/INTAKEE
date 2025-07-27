@@ -11,7 +11,7 @@
   <!-- HEADER -->
   <header class="home-header">
     <img src="logo.png" alt="INTAKEE Logo" class="home-logo">
-    <div class="search-bar">
+    <div class="search-bar" id="global-search">
       <input type="text" placeholder="Search...">
       <span class="icon"><i class="fas fa-search"></i></span>
     </div>
@@ -53,8 +53,10 @@
         <input type="file" id="upload-thumbnail">
         <label for="upload-file">Upload File:</label>
         <input type="file" id="upload-file">
-        <button onclick="handleUpload()">Upload</button>
-        <button onclick="goLive()">Go Live</button>
+        <div class="upload-buttons">
+          <button onclick="handleUpload()">Upload</button>
+          <button onclick="goLive()">Go Live</button>
+        </div>
       </div>
     </section>
 
@@ -120,5 +122,18 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    // Hide search bar on upload, settings, auth modal
+    const observer = new MutationObserver(() => {
+      const activeTab = document.querySelector('.tab.active')?.id;
+      const searchBar = document.getElementById('global-search');
+      if (["upload", "settings"].includes(activeTab)) {
+        searchBar?.classList.add("hidden");
+      } else {
+        searchBar?.classList.remove("hidden");
+      }
+    });
+    observer.observe(document.querySelector('main'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+  </script>
 </body>
 </html>
