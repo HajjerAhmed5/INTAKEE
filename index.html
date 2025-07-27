@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <!-- Header -->
+  <!-- HEADER -->
   <header class="home-header">
-    <img src="logo.png" alt="INTAKEE Logo" class="home-logo"/>
+    <img src="logo.png" alt="INTAKEE Logo" class="home-logo">
     <div class="search-bar" id="global-search">
-      <input type="text" placeholder="Search..." />
+      <input type="text" placeholder="Search...">
       <span class="icon"><i class="fas fa-search"></i></span>
     </div>
     <button id="home-login-btn" onclick="showAuthModal()">Login / Sign Up</button>
   </header>
 
-  <!-- Tabs -->
+  <!-- MAIN TABS -->
   <main>
     <section class="tab active" id="home">
       <h2 class="home-title">Trending</h2>
@@ -47,13 +47,13 @@
           <option value="podcast-audio">Podcast (Audio)</option>
         </select>
         <label for="upload-title">Title:</label>
-        <input type="text" id="upload-title"/>
+        <input type="text" id="upload-title">
         <label for="upload-description">Description:</label>
         <textarea id="upload-description"></textarea>
         <label for="upload-thumbnail">Upload Thumbnail:</label>
-        <input type="file" id="upload-thumbnail"/>
+        <input type="file" id="upload-thumbnail">
         <label for="upload-file">Upload File:</label>
-        <input type="file" id="upload-file"/>
+        <input type="file" id="upload-file">
         <div class="upload-buttons">
           <button onclick="handleUpload()">Upload</button>
           <button onclick="goLive()">Go Live</button>
@@ -71,12 +71,11 @@
         <h2 class="home-title">Your Profile</h2>
         <div class="profile-header">
           <div class="profile-pic-wrapper">
-            <div class="profile-pic-placeholder" id="profile-pic" onclick="promptLoginIfNeeded()">
-              <span class="plus-icon">+</span>
-            </div>
+            <img src="default-avatar.png" alt="Profile Picture" id="profile-pic">
+            <span class="plus-icon">+</span>
           </div>
           <div class="profile-meta">
-            <p id="user-email-display">Guest</p>
+            <h3 id="user-email-display">Guest</h3>
             <textarea id="profile-bio" placeholder="Your bio" disabled onclick="promptLoginIfNeeded()"></textarea>
           </div>
         </div>
@@ -123,7 +122,7 @@
     </section>
   </main>
 
-  <!-- Bottom Nav -->
+  <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
     <button class="tab-btn" data-tab="home">Home</button>
     <button class="tab-btn" data-tab="videos">Videos</button>
@@ -134,13 +133,13 @@
     <button class="tab-btn" data-tab="settings">Settings</button>
   </nav>
 
-  <!-- Auth Modal -->
+  <!-- AUTH MODAL -->
   <div class="auth-modal hidden" id="auth-modal">
     <div class="auth-box">
       <button class="close-auth" onclick="closeAuthModal()">&times;</button>
       <h2 id="auth-title">Login to INTAKEE</h2>
-      <input type="email" id="auth-email" placeholder="Email"/>
-      <input type="password" id="auth-password" placeholder="Password"/>
+      <input type="email" id="auth-email" placeholder="Email">
+      <input type="password" id="auth-password" placeholder="Password">
       <label><input type="checkbox" id="remember-me"> Remember Me</label>
       <button id="auth-action">Login</button>
       <p id="auth-toggle-text">Don’t have an account? <span id="toggle-auth">Sign Up</span></p>
@@ -152,22 +151,18 @@
     function promptLoginIfNeeded() {
       if (!window.isLoggedIn) showAuthModal();
     }
-
     function handleLogoutOrPrompt() {
       if (!window.isLoggedIn) return showAuthModal();
       handleLogout();
     }
-
     function handleDeleteAccountOrPrompt() {
       if (!window.isLoggedIn) return showAuthModal();
       handleDeleteAccount();
     }
-
     function handlePrivacyToggleOrPrompt() {
       if (!window.isLoggedIn) return showAuthModal();
       alert('Account made private');
     }
-
     const observer = new MutationObserver(() => {
       const activeTab = document.querySelector('.tab.active')?.id;
       const searchBar = document.getElementById('global-search');
@@ -184,4 +179,5 @@
   </script>
 </body>
 </html>
+
 
