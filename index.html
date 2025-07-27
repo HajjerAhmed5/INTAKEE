@@ -68,7 +68,7 @@
 
     <section class="tab" id="profile">
       <div class="profile-section">
-        <h2>Your Profile</h2>
+        <h2 class="home-title">Your Profile</h2>
         <div class="profile-header">
           <div class="profile-pic-wrapper">
             <div class="profile-pic-placeholder" id="profile-pic" onclick="promptLoginIfNeeded()">
@@ -82,12 +82,18 @@
         </div>
         <p class="note" id="profile-warning">Login required to edit profile and view content.</p>
         <div class="profile-content">
-          <h3>Uploads</h3>
-          <div class="video-grid" id="user-uploads">No uploads yet</div>
-          <h3>Liked</h3>
-          <div class="video-grid" id="user-liked">No liked posts</div>
-          <h3>Saved</h3>
-          <div class="video-grid" id="user-saved">No saved content</div>
+          <div class="profile-block">
+            <h3>Uploads</h3>
+            <div class="video-grid" id="user-uploads">No uploads yet</div>
+          </div>
+          <div class="profile-block">
+            <h3>Liked</h3>
+            <div class="video-grid" id="user-liked">No liked posts</div>
+          </div>
+          <div class="profile-block">
+            <h3>Saved</h3>
+            <div class="video-grid" id="user-saved">No saved content</div>
+          </div>
         </div>
       </div>
     </section>
@@ -174,3 +180,4 @@
   </script>
 </body>
 </html>
+
