@@ -1,4 +1,4 @@
-/* ---------- GLOBAL STYLES ---------- */
+ /* ---------- GLOBAL STYLES ---------- */
 * {
   margin: 0;
   padding: 0;
@@ -23,13 +23,15 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px;
+  padding: 10px 20px;
+  gap: 20px;
 }
 
 .home-logo {
-  height: 120px; /* Increased size */
+  height: 160px;
+  width: auto;
   filter: brightness(1.2) contrast(1.2);
-  margin-right: 20px; /* bring closer to login */
+  margin-right: 20px;
 }
 
 .search-bar {
@@ -144,7 +146,7 @@ img {
 
 .upload-btn {
   font-size: 20px;
-  color: white; /* Updated to match request */
+  color: white;
 }
 
 /* ---------- UPLOAD ---------- */
@@ -177,7 +179,7 @@ img {
 
 .upload-wrapper button {
   margin-top: 15px;
-  background: black; /* Changed from blue */
+  background: black;
   color: white;
   border: 1px solid white;
   padding: 10px 15px;
@@ -218,7 +220,7 @@ img {
 }
 
 .auth-box button {
-  background: black; /* Changed from blue */
+  background: black;
   color: white;
   padding: 10px 15px;
   border: 1px solid white;
