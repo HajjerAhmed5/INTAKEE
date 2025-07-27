@@ -89,7 +89,6 @@
       <div class="settings-page">
         <h2>Settings</h2>
         <div class="auth-settings">
-          <button onclick="handleLogout()">Log Out</button>
           <button onclick="handleDeleteAccount()">Delete Account</button>
           <button onclick="alert('Account made private')">Make Account Private</button>
         </div>
@@ -123,14 +122,17 @@
 
   <script src="script.js"></script>
   <script>
-    // Hide search bar on upload, settings, auth modal
+    // Hide search bar and login button on upload, settings
     const observer = new MutationObserver(() => {
       const activeTab = document.querySelector('.tab.active')?.id;
       const searchBar = document.getElementById('global-search');
+      const loginBtn = document.getElementById('home-login-btn');
       if (["upload", "settings"].includes(activeTab)) {
         searchBar?.classList.add("hidden");
+        loginBtn?.classList.add("hidden");
       } else {
         searchBar?.classList.remove("hidden");
+        loginBtn?.classList.remove("hidden");
       }
     });
     observer.observe(document.querySelector('main'), { subtree: true, attributes: true, attributeFilter: ['class'] });
