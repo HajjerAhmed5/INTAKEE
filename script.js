@@ -1,260 +1,250 @@
- /* Base Reset */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+ /* ---------- GLOBAL STATE ---------- */
+let isLoggedIn = false;
+let uploads = JSON.parse(localStorage.getItem('uploads') || '[]');
+
+/* ---------- TAB NAVIGATION ---------- */
+document.querySelectorAll('.tab-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const target = button.getAttribute('data-tab');
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.getElementById(target).classList.add('active');
+
+    if (target === 'upload' && !isLoggedIn) showAuthModal();
+    if (target === 'videos') renderUploads('video');
+    if (target === 'podcast') renderUploads('podcast');
+    if (target === 'clips') renderUploads('clip');
+    if (target === 'profile') renderProfileContent();
+    if (target === 'home') renderTrending();
+  });
+});
+
+/* ---------- AUTH LOGIC ---------- */
+function showAuthModal() {
+  document.getElementById('auth-modal').classList.remove('hidden');
+}
+document.querySelector('.close-auth').addEventListener('click', () => {
+  document.getElementById('auth-modal').classList.add('hidden');
+});
+
+document.getElementById('auth-action').addEventListener('click', () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value.trim();
+  if (!email || !password) return alert('Fill in all fields');
+
+  isLoggedIn = true;
+  localStorage.setItem('intakeeUserEmail', email);
+  localStorage.setItem('intakeeLoggedIn', 'true');
+  updateUI();
+  document.getElementById('auth-modal').classList.add('hidden');
+});
+
+document.getElementById('toggle-auth').addEventListener('click', () => {
+  const isLogin = document.getElementById('auth-action').textContent === 'Login';
+  document.getElementById('auth-title').textContent = isLogin ? 'Sign Up for INTAKEE' : 'Login to INTAKEE';
+  document.getElementById('auth-action').textContent = isLogin ? 'Sign Up' : 'Login';
+  document.getElementById('toggle-auth').textContent = isLogin ? 'Login' : 'Sign Up';
+});
+
+window.onload = () => {
+  isLoggedIn = localStorage.getItem('intakeeLoggedIn') === 'true';
+  updateUI();
+};
+
+function updateUI() {
+  const email = localStorage.getItem('intakeeUserEmail');
+  document.getElementById('home-login-btn').style.display = isLoggedIn ? 'none' : 'block';
+  document.getElementById('home-user-email').textContent = email || '';
+  document.getElementById('home-user-email').style.display = isLoggedIn ? 'block' : 'none';
+  document.getElementById('logged-in-panel')?.classList.toggle('hidden', !isLoggedIn);
+  document.getElementById('logged-out-message')?.classList.toggle('hidden', isLoggedIn);
+  document.querySelectorAll('#upload input, #upload textarea, #upload select').forEach(el => el.disabled = !isLoggedIn);
 }
 
-body {
-  background-color: #000;
-  color: #fff;
-  font-family: 'Helvetica Neue', sans-serif;
-  padding-bottom: 70px;
+/* ---------- LOGOUT ---------- */
+function handleLogout() {
+  isLoggedIn = false;
+  localStorage.removeItem('intakeeLoggedIn');
+  localStorage.removeItem('intakeeUserEmail');
+  updateUI();
 }
 
-.home-logo {
-  height: 70px;
-  width: auto;
-  margin: 10px;
+function handleDeleteAccount() {
+  if (confirm('Are you sure? This will remove all data.')) {
+    localStorage.clear();
+    isLoggedIn = false;
+    updateUI();
+    alert('Account deleted');
+  }
 }
 
-.search-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #1e1e1e;
-  padding: 12px 18px;
-  border-radius: 50px;
-  max-width: 400px;
-  margin: 10px auto;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+window.handleLogout = handleLogout;
+window.handleDeleteAccount = handleDeleteAccount;
+
+/* ---------- UPLOAD ---------- */
+document.getElementById('upload-trigger').addEventListener('click', () => {
+  if (!isLoggedIn) return alert('Login to upload');
+
+  const type = document.querySelector('#upload select').value.toLowerCase();
+  const title = document.getElementById('title').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const fileInput = document.getElementById('thumbnail');
+  const file = fileInput.files[0];
+
+  if (!title || !file) return alert('Title and thumbnail required');
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const newPost = {
+      id: Date.now(),
+      title,
+      description,
+      image: reader.result,
+      type,
+      email: localStorage.getItem('intakeeUserEmail') || 'User',
+      comments: [],
+      likes: 0,
+      saves: 0
+    };
+    uploads.push(newPost);
+    localStorage.setItem('uploads', JSON.stringify(uploads));
+    alert('Uploaded!');
+    clearUploadForm();
+    renderUploads(type);
+    renderProfileContent();
+  };
+  reader.readAsDataURL(file);
+});
+
+function clearUploadForm() {
+  ['title', 'description', 'thumbnail'].forEach(id => document.getElementById(id).value = '');
 }
 
-.search-bar input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 16px;
-  outline: none;
-  padding-left: 5px;
+function renderUploads(type) {
+  const grid = document.querySelector(`#${type}s .video-grid`);
+  grid.innerHTML = '';
+  const filtered = uploads.filter(u => u.type === type);
+  if (!filtered.length) return grid.innerHTML = '<p>No posts yet</p>';
+
+  filtered.forEach(post => {
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.innerHTML = `
+      <img src="${post.image}" alt="Thumbnail" style="width:100%; border-radius:6px; cursor:pointer" onclick='openPostModal(${JSON.stringify(post)})' />
+      <h3>${post.title}</h3>
+      <p>${post.description}</p>
+      <small>By ${post.email}</small><br/>
+      <button onclick="deletePost(${post.id})">Delete</button>
+      <button onclick="likePost(${post.id})">❤️ ${post.likes}</button>
+      <button onclick="savePost(${post.id})">💾 ${post.saves}</button>
+    `;
+    grid.appendChild(card);
+  });
 }
 
-.search-bar .icon {
-  color: #888;
-  font-size: 18px;
-  cursor: pointer;
+function renderProfileContent() {
+  const grid = document.querySelector('#profile .video-grid');
+  grid.innerHTML = '';
+  const email = localStorage.getItem('intakeeUserEmail');
+  const userPosts = uploads.filter(p => p.email === email);
+  if (!userPosts.length) return grid.innerHTML = '<p>No uploads yet</p>';
+
+  userPosts.forEach(post => {
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.innerHTML = `
+      <img src="${post.image}" alt="Preview" style="width:100%; border-radius:6px; cursor:pointer" onclick='openPostModal(${JSON.stringify(post)})'>
+      <h3 contenteditable="true" onblur="editTitle(${post.id}, this.textContent)">${post.title}</h3>
+      <p contenteditable="true" onblur="editDescription(${post.id}, this.textContent)">${post.description}</p>
+      <small>${post.type}</small>
+    `;
+    grid.appendChild(card);
+  });
 }
 
-.home-title {
-  font-size: 28px;
-  font-weight: bold;
-  text-align: center;
-  margin: 10px 0 30px;
+function deletePost(id) {
+  if (!confirm('Delete this post?')) return;
+  uploads = uploads.filter(p => p.id !== id);
+  localStorage.setItem('uploads', JSON.stringify(uploads));
+  renderUploads('video');
+  renderUploads('clip');
+  renderUploads('podcast');
+  renderTrending();
+  renderProfileContent();
 }
 
-.video-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 20px;
-  padding: 0 20px 100px;
-  justify-content: center;
+function likePost(id) {
+  uploads = uploads.map(p => p.id === id ? { ...p, likes: (p.likes || 0) + 1 } : p);
+  localStorage.setItem('uploads', JSON.stringify(uploads));
+  renderTrending();
+  renderProfileContent();
+  renderUploads('video');
+  renderUploads('clip');
+  renderUploads('podcast');
 }
 
-.video-card, .upload-wrapper, .video-card.auth-settings {
-  background-color: #111;
-  border-radius: 10px;
-  overflow: hidden;
-  padding: 15px;
-  margin: 10px;
-  transition: transform 0.3s ease;
+function savePost(id) {
+  uploads = uploads.map(p => p.id === id ? { ...p, saves: (p.saves || 0) + 1 } : p);
+  localStorage.setItem('uploads', JSON.stringify(uploads));
+  renderTrending();
+  renderProfileContent();
+  renderUploads('video');
+  renderUploads('clip');
+  renderUploads('podcast');
 }
 
-.video-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0 15px rgba(0, 170, 255, 0.3);
+function editTitle(id, newTitle) {
+  uploads = uploads.map(p => p.id === id ? { ...p, title: newTitle } : p);
+  localStorage.setItem('uploads', JSON.stringify(uploads));
 }
 
-.upload-wrapper label {
-  display: block;
-  margin-top: 10px;
-  font-size: 14px;
+function editDescription(id, newDesc) {
+  uploads = uploads.map(p => p.id === id ? { ...p, description: newDesc } : p);
+  localStorage.setItem('uploads', JSON.stringify(uploads));
 }
 
-.upload-wrapper input,
-.upload-wrapper textarea,
-.upload-wrapper select {
-  width: 100%;
-  padding: 10px;
-  background: #222;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  margin-top: 5px;
+/* ---------- POST VIEW MODAL ---------- */
+function openPostModal(post) {
+  const modal = document.createElement('div');
+  modal.className = 'post-modal';
+  modal.innerHTML = `
+    <div class="post-view">
+      <img src="${post.image}" alt="preview" style="width:100%" />
+      <h2>${post.title}</h2>
+      <p>${post.description}</p>
+      <p><strong>Posted by:</strong> ${post.email}</p>
+      <textarea placeholder="Leave a comment..."></textarea>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
 }
 
-.upload-wrapper .note {
-  font-size: 12px;
-  color: #888;
-  margin-top: 10px;
+function closeModal() {
+  document.querySelector('.post-modal')?.remove();
 }
 
-.profile-info {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 10px;
+/* ---------- TRENDING (HOME) ---------- */
+function renderTrending() {
+  const grid = document.querySelector('#home .video-grid');
+  grid.innerHTML = '';
+  const recent = uploads.slice(-6).reverse();
+  if (!recent.length) return grid.innerHTML = '<p>No trending posts</p>';
+
+  recent.forEach(post => {
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.innerHTML = `
+      <img src="${post.image}" alt="Thumbnail" style="width:100%; border-radius:6px; cursor:pointer" onclick='openPostModal(${JSON.stringify(post)})' />
+      <h3>${post.title}</h3>
+      <p>${post.description}</p>
+      <small>${post.type.toUpperCase()}</small>
+    `;
+    grid.appendChild(card);
+  });
 }
 
-.profile-pic-placeholder {
-  width: 100px;
-  height: 100px;
-  background: #333;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: #aaa;
-  cursor: pointer;
-  position: relative;
-  transition: transform 0.3s ease;
-  overflow: hidden;
-}
-
-.profile-pic-placeholder:hover {
-  transform: scale(1.05);
-}
-
-.profile-pic-placeholder::after {
-  content: '+';
-  color: white;
-  font-size: 24px;
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: #000;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.profile-info textarea {
-  flex: 1;
-  padding: 10px;
-  background: #222;
-  color: #ccc;
-  border: none;
-  border-radius: 6px;
-  resize: none;
-  height: 60px;
-  font-size: 14px;
-  opacity: 0.8;
-}
-
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #111;
-  display: flex;
-  justify-content: space-around;
-  border-top: 1px solid #333;
-  z-index: 10;
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 12px 0;
-  background: none;
-  color: #fff;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.upload-btn {
-  font-size: 20px;
-  font-weight: bold;
-  color: #0af;
-}
-
-.tab {
-  display: none;
-}
-
-.tab.active {
-  display: block;
-}
-
-.auth-modal {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 9999;
-}
-
-.auth-modal.hidden {
-  display: none;
-}
-
-.auth-box {
-  background: #111;
-  padding: 30px;
-  border-radius: 12px;
-  width: 300px;
-  box-shadow: 0 0 20px #000;
-  text-align: center;
-  position: relative;
-}
-
-.auth-box input {
-  width: 100%;
-  margin: 10px 0;
-  padding: 10px;
-  background: #222;
-  color: #fff;
-  border: 1px solid #444;
-  border-radius: 5px;
-}
-
-.auth-box button {
-  padding: 10px 20px;
-  background: #0af;
-  color: #000;
-  font-weight: bold;
-  border: none;
-  border-radius: 5px;
-  margin-top: 10px;
-  cursor: pointer;
-}
-
-.settings-page button {
-  width: 100%;
-  background-color: #222;
-  border: 1px solid #444;
-  padding: 10px;
-  color: #fff;
-  border-radius: 5px;
-  margin-top: 5px;
-  cursor: pointer;
-}
-
-.settings-page button:hover {
-  background-color: #0af;
-  color: #000;
-}
-
-button:hover, .tab-btn:hover {
-  background-color: #222;
-}
-
-.note {
-  font-size: 13px;
-  color: #aaa;
-  padding-top: 5px;
-}
+/* ---------- GO LIVE ---------- */
+document.getElementById('go-live-trigger')?.addEventListener('click', () => {
+  if (!isLoggedIn) return alert("Login to Go Live.");
+  alert("🔴 You're live! (Simulated)");
+});
