@@ -27,8 +27,9 @@ img {
 }
 
 .home-logo {
-  height: 80px;
+  height: 120px; /* Increased size */
   filter: brightness(1.2) contrast(1.2);
+  margin-right: 20px; /* bring closer to login */
 }
 
 .search-bar {
@@ -49,6 +50,17 @@ img {
 
 .search-bar .icon {
   color: #aaa;
+  cursor: pointer;
+}
+
+/* ---------- LOGIN BUTTON ---------- */
+#home-login-btn {
+  background: black;
+  color: white;
+  border: 1px solid white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
   cursor: pointer;
 }
 
@@ -132,7 +144,7 @@ img {
 
 .upload-btn {
   font-size: 20px;
-  color: #0af;
+  color: white; /* Updated to match request */
 }
 
 /* ---------- UPLOAD ---------- */
@@ -165,9 +177,9 @@ img {
 
 .upload-wrapper button {
   margin-top: 15px;
-  background: #0af;
-  color: #000;
-  border: none;
+  background: black; /* Changed from blue */
+  color: white;
+  border: 1px solid white;
   padding: 10px 15px;
   border-radius: 6px;
   font-weight: bold;
@@ -206,10 +218,10 @@ img {
 }
 
 .auth-box button {
-  background: #0af;
-  color: #000;
+  background: black; /* Changed from blue */
+  color: white;
   padding: 10px 15px;
-  border: none;
+  border: 1px solid white;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
@@ -249,15 +261,15 @@ img {
 }
 
 .auth-settings button {
-  background: #222;
+  background: black;
   color: white;
-  border: 1px solid #333;
+  border: 1px solid white;
   padding: 10px;
   border-radius: 5px;
   cursor: pointer;
 }
 
 .auth-settings button:hover {
-  background: #0af;
-  color: #000;
+  background: white;
+  color: black;
 }
