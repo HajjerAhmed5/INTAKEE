@@ -69,21 +69,26 @@
     <section class="tab" id="profile">
       <div class="profile-section">
         <h2>Your Profile</h2>
-        <div class="profile-info">
+        <div class="profile-header">
           <div class="profile-pic-wrapper">
             <div class="profile-pic-placeholder" id="profile-pic" onclick="promptLoginIfNeeded()">
               <span class="plus-icon">+</span>
             </div>
           </div>
-          <textarea id="profile-bio" placeholder="Your bio" disabled onclick="promptLoginIfNeeded()"></textarea>
+          <div class="profile-meta">
+            <p id="user-email-display">Guest</p>
+            <textarea id="profile-bio" placeholder="Your bio" disabled onclick="promptLoginIfNeeded()"></textarea>
+          </div>
         </div>
         <p class="note" id="profile-warning">Login required to edit profile and view content.</p>
-        <h3>Uploads</h3>
-        <div class="video-grid" id="user-uploads">No uploads yet</div>
-        <h3>Liked</h3>
-        <div class="video-grid" id="user-liked">No liked posts</div>
-        <h3>Saved</h3>
-        <div class="video-grid" id="user-saved">No saved content</div>
+        <div class="profile-content">
+          <h3>Uploads</h3>
+          <div class="video-grid" id="user-uploads">No uploads yet</div>
+          <h3>Liked</h3>
+          <div class="video-grid" id="user-liked">No liked posts</div>
+          <h3>Saved</h3>
+          <div class="video-grid" id="user-saved">No saved content</div>
+        </div>
       </div>
     </section>
 
