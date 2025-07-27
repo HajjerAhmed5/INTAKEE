@@ -38,6 +38,7 @@
     <section class="tab" id="upload">
       <div class="upload-wrapper">
         <h2>Upload Content</h2>
+        <p class="note" id="upload-warning">You must be logged in to upload content.</p>
         <label for="upload-type">Choose Type:</label>
         <select id="upload-type">
           <option value="video">Video</option>
@@ -68,29 +69,32 @@
     <section class="tab" id="profile">
       <div class="profile-section">
         <h2>Your Profile</h2>
-        <div id="logged-out-message">You must be logged in to see your profile.</div>
-        <div id="logged-in-panel" class="hidden">
-          <p id="profile-email"></p>
-          <div class="profile-info">
-            <div class="profile-pic-placeholder" id="profile-pic">+</div>
-            <textarea id="profile-bio" placeholder="Your bio"></textarea>
+        <div class="profile-info">
+          <div class="profile-pic-wrapper">
+            <div class="profile-pic-placeholder" id="profile-pic" onclick="promptLoginIfNeeded()">+
+              <span class="plus-icon">+</span>
+            </div>
           </div>
-          <h3>Uploads</h3>
-          <div class="video-grid" id="user-uploads">No uploads</div>
-          <h3>Liked</h3>
-          <div class="video-grid" id="user-liked">No liked posts</div>
-          <h3>Saved</h3>
-          <div class="video-grid" id="user-saved">No saved content</div>
+          <textarea id="profile-bio" placeholder="Your bio" disabled onclick="promptLoginIfNeeded()"></textarea>
         </div>
+        <p class="note" id="profile-warning">Login required to edit profile and view content.</p>
+        <h3>Uploads</h3>
+        <div class="video-grid" id="user-uploads">No uploads</div>
+        <h3>Liked</h3>
+        <div class="video-grid" id="user-liked">No liked posts</div>
+        <h3>Saved</h3>
+        <div class="video-grid" id="user-saved">No saved content</div>
       </div>
     </section>
 
     <section class="tab" id="settings">
       <div class="settings-page">
         <h2>Settings</h2>
+        <p class="note" id="settings-warning">Login required to manage account settings.</p>
         <div class="auth-settings">
-          <button onclick="handleDeleteAccount()">Delete Account</button>
-          <button onclick="alert('Account made private')">Make Account Private</button>
+          <button onclick="handleLogoutOrPrompt()">Log Out</button>
+          <button onclick="handleDeleteAccountOrPrompt()">Delete Account</button>
+          <button onclick="handlePrivacyToggleOrPrompt()">Make Account Private</button>
         </div>
       </div>
     </section>
@@ -122,7 +126,25 @@
 
   <script src="script.js"></script>
   <script>
-    // Hide search bar and login button on upload, settings
+    function promptLoginIfNeeded() {
+      if (!window.isLoggedIn) showAuthModal();
+    }
+
+    function handleLogoutOrPrompt() {
+      if (!window.isLoggedIn) return showAuthModal();
+      handleLogout();
+    }
+
+    function handleDeleteAccountOrPrompt() {
+      if (!window.isLoggedIn) return showAuthModal();
+      handleDeleteAccount();
+    }
+
+    function handlePrivacyToggleOrPrompt() {
+      if (!window.isLoggedIn) return showAuthModal();
+      alert('Account made private');
+    }
+
     const observer = new MutationObserver(() => {
       const activeTab = document.querySelector('.tab.active')?.id;
       const searchBar = document.getElementById('global-search');
