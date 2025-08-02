@@ -350,3 +350,19 @@ img {
   background: white;
   color: black;
 }
+
+/* ---------- COMMUNITY GUIDELINES LIST FIX ---------- */
+.guideline-list {
+  list-style-type: disc;
+  padding-left: 25px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-align: left;
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.guideline-list li {
+  margin-bottom: 6px;
+}
