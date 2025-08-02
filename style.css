@@ -366,3 +366,19 @@ img {
 .guideline-list li {
   margin-bottom: 6px;
 }
+.video-card h3 {
+  margin-bottom: 10px;
+}
+
+.video-card p:first-of-type {
+  margin-bottom: 8px;
+}
+
+.video-card ul {
+  margin-left: 20px;
+  padding-left: 10px;
+}
+
+.video-card p:last-of-type {
+  margin-top: 12px;
+}
