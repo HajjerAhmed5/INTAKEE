@@ -220,37 +220,3 @@
       <p id="auth-toggle-text">Don’t have an account? <span id="toggle-auth">Sign Up</span></p>
     </div>
   </div>
-
-  <!-- JS -->
-  <script>
-    function promptLoginIfNeeded() {
-      if (!window.isLoggedIn) showAuthModal();
-    }
-    function handleLogoutOrPrompt() {
-      if (!window.isLoggedIn) return showAuthModal();
-      handleLogout();
-    }
-    function handleDeleteAccountOrPrompt() {
-      if (!window.isLoggedIn) return showAuthModal();
-      handleDeleteAccount();
-    }
-    function handlePrivacyToggleOrPrompt() {
-      if (!window.isLoggedIn) return showAuthModal();
-      alert('Account made private');
-    }
-    const observer = new MutationObserver(() => {
-      const activeTab = document.querySelector('.tab.active')?.id;
-      const searchBar = document.getElementById('global-search');
-      const loginBtn = document.getElementById('home-login-btn');
-      if (["upload", "settings"].includes(activeTab)) {
-        searchBar?.classList.add("hidden");
-        loginBtn?.classList.add("hidden");
-      } else {
-        searchBar?.classList.remove("hidden");
-        loginBtn?.classList.remove("hidden");
-      }
-    });
-    observer.observe(document.querySelector('main'), { subtree: true, attributes: true, attributeFilter: ['class'] });
-  </script>
-</body>
-</html>
