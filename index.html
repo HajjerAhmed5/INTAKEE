@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <!-- HEADER -->
@@ -97,52 +97,100 @@
       </div>
     </section>
 
+    <!-- UPDATED SETTINGS GOES HERE -->
     <section class="tab" id="settings">
-      <div class="settings-page">
-        <h2>Settings</h2>
+  <div class="settings-page">
+    <h2 class="settings-title">Settings</h2>
 
-        <div class="video-card">
-          <h3>Privacy Policy</h3>
-          <p>
-            We value your privacy. INTAKEE does not sell or share your personal data with third parties.
-            We only collect data necessary to operate the platform, such as login credentials and uploads.
-            You can delete your account and all associated data anytime via Settings.
-          </p>
-        </div>
-
-        <div class="video-card">
-          <h3>Terms of Service</h3>
-          <p>
-            By using INTAKEE, you agree that you are solely responsible for any content you upload or share.
-            INTAKEE acts only as a platform provider and is not liable for user-generated content. Content that
-            violates applicable laws, contains threats, or infringes on rights may be removed, and offending
-            accounts may be suspended without notice.
-          </p>
-        </div>
-
-        <div class="video-card">
-          <h3>Community Guidelines</h3>
-          <p>While INTAKEE supports freedom of speech, we do not allow:</p>
-          <ul class="guideline-list">
-            <li>Threats, violence, or harassment</li>
-            <li>Nudity or pornographic content</li>
-            <li>Hate speech or discrimination</li>
-            <li>Promotion of illegal activities</li>
-          </ul>
-          <p>
-            Content moderation is enforced fairly. Repeated violations may result in removal.
-            If you report someone, their content will be hidden from you unless you choose to unblock them.
-          </p>
-        </div>
-
-        <p class="note" id="settings-warning">Login required to manage account settings.</p>
-        <div class="auth-settings">
-          <button onclick="handleLogoutOrPrompt()">Log Out</button>
-          <button onclick="handleDeleteAccountOrPrompt()">Delete Account</button>
-          <button onclick="handlePrivacyToggleOrPrompt()">Make Account Private</button>
-        </div>
+    <div class="settings-section" onclick="toggleSettings(this)">
+      <div class="settings-label">
+        <i class="fas fa-user"></i>
+        <span>Account</span>
       </div>
-    </section>
+      <div class="settings-content">
+        <p>Manage your INTAKEE account settings below. These options are only available when logged in.</p>
+        <button onclick="handleLogoutOrPrompt()">Log Out</button>
+        <button onclick="handleDeleteAccountOrPrompt()">Delete Account</button>
+        <button onclick="handlePrivacyToggleOrPrompt()">Make Account Private</button>
+      </div>
+    </div>
+
+    <div class="settings-section" onclick="toggleSettings(this)">
+      <div class="settings-label">
+        <i class="fas fa-bell"></i>
+        <span>Notifications</span>
+      </div>
+      <div class="settings-content">
+        <p>You’ll receive updates about new posts, interactions, and milestone alerts. INTAKEE does not send marketing emails.</p>
+      </div>
+    </div>
+
+    <div class="settings-section" onclick="toggleSettings(this)">
+      <div class="settings-label">
+        <i class="fas fa-palette"></i>
+        <span>Appearance</span>
+      </div>
+      <div class="settings-content">
+        <p>INTAKEE uses dark mode by default. Light mode and accessibility features may be added in future updates.</p>
+      </div>
+    </div>
+
+    <div class="settings-section" onclick="toggleSettings(this)">
+      <div class="settings-label">
+        <i class="fas fa-shield-alt"></i>
+        <span>Privacy & Security</span>
+      </div>
+      <div class="settings-content">
+        <p>INTAKEE does not sell or share personal data. We only collect what’s needed to operate your account and store it securely. You can delete your account and data anytime.</p>
+      </div>
+    </div>
+
+    <div class="settings-section" onclick="toggleSettings(this)">
+      <div class="settings-label">
+        <i class="fas fa-balance-scale"></i>
+        <span>Community Standards</span>
+      </div>
+      <div class="settings-content">
+        <h4>Terms of Service</h4>
+        <p>Users are responsible for their uploaded content. INTAKEE is not liable for user content. Illegal, harmful, or copyrighted content may be removed without notice.</p>
+        <h4>Community Guidelines</h4>
+        <ul>
+          <li>No threats, violence, or harassment</li>
+          <li>No nudity or pornographic content</li>
+          <li>No hate speech or discrimination</li>
+          <li>No promotion of illegal activity</li>
+        </ul>
+        <p>Moderation is enforced fairly. Repeated violations lead to account removal. Reporting someone hides their content unless unblocked.</p>
+      </div>
+    </div>
+
+    <div class="settings-section" onclick="toggleSettings(this)">
+      <div class="settings-label">
+        <i class="fas fa-headset"></i>
+        <span>Help & Support</span>
+      </div>
+      <div class="settings-content">
+        <p>If you need help with your account or encounter an issue, email us at <strong>intakee2025@gmail.com</strong>. Response time is usually within 48 hours.</p>
+      </div>
+    </div>
+
+    <div class="settings-section" onclick="toggleSettings(this)">
+      <div class="settings-label">
+        <i class="fas fa-info-circle"></i>
+        <span>About</span>
+      </div>
+      <div class="settings-content">
+        <p>INTAKEE is a creator-focused platform that protects freedom of speech, supports fair monetization, and promotes safe expression. We enforce policies to protect both users and creators.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+function toggleSettings(section) {
+  section.classList.toggle("open");
+}
+</script>
   </main>
 
   <!-- BOTTOM NAVIGATION -->
@@ -169,7 +217,7 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- JS -->
   <script>
     function promptLoginIfNeeded() {
       if (!window.isLoggedIn) showAuthModal();
@@ -202,4 +250,3 @@
   </script>
 </body>
 </html>
-
