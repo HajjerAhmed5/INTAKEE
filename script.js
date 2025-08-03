@@ -248,3 +248,6 @@ document.getElementById('go-live-trigger')?.addEventListener('click', () => {
   if (!isLoggedIn) return alert("Login to Go Live.");
   alert("🔴 You're live! (Simulated)");
 });
+function toggleSettings(section) {
+  section.classList.toggle('open');
+}
