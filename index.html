@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
+  <!-- Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
 </head>
 <body>
   <!-- HEADER -->
   <header class="home-header">
-    <img src="logo.png" alt="INTAKEE Logo" class="home-logo">
+    <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
     <div class="search-bar" id="global-search">
-      <input type="text" placeholder="Search...">
+      <input type="text" placeholder="Search..." />
       <span class="icon"><i class="fas fa-search"></i></span>
     </div>
     <button id="home-login-btn" onclick="showAuthModal()">Login / Sign Up</button>
@@ -20,25 +21,30 @@
 
   <!-- MAIN TABS -->
   <main>
+    <!-- HOME -->
     <section class="tab active" id="home">
       <h2 class="home-title">Trending</h2>
       <div class="video-grid" id="trending-feed">No trending posts</div>
     </section>
 
+    <!-- VIDEOS -->
     <section class="tab" id="videos">
       <h2 class="home-title">Videos</h2>
       <div class="video-grid" id="video-feed">No videos yet</div>
     </section>
 
+    <!-- PODCAST -->
     <section class="tab" id="podcast">
       <h2 class="home-title">Podcasts</h2>
       <div class="video-grid" id="podcast-feed">No podcasts yet</div>
     </section>
 
+    <!-- UPLOAD -->
     <section class="tab" id="upload">
       <div class="upload-wrapper">
         <h2>Upload Content</h2>
         <p class="note" id="upload-warning">You must be logged in to upload content.</p>
+
         <label for="upload-type">Choose Type:</label>
         <select id="upload-type">
           <option value="video">Video</option>
@@ -46,14 +52,19 @@
           <option value="podcast-video">Podcast (Video)</option>
           <option value="podcast-audio">Podcast (Audio)</option>
         </select>
+
         <label for="upload-title">Title:</label>
-        <input type="text" id="upload-title">
+        <input type="text" id="upload-title" placeholder="Add a title" />
+
         <label for="upload-description">Description:</label>
-        <textarea id="upload-description"></textarea>
+        <textarea id="upload-description" placeholder="Write a short description"></textarea>
+
         <label for="upload-thumbnail">Upload Thumbnail:</label>
-        <input type="file" id="upload-thumbnail">
+        <input type="file" id="upload-thumbnail" accept="image/*" />
+
         <label for="upload-file">Upload File:</label>
-        <input type="file" id="upload-file">
+        <input type="file" id="upload-file" />
+
         <div class="upload-buttons">
           <button onclick="handleUpload()">Upload</button>
           <button onclick="goLive()">Go Live</button>
@@ -61,25 +72,30 @@
       </div>
     </section>
 
+    <!-- CLIPS -->
     <section class="tab" id="clips">
       <h2 class="home-title">Clips</h2>
       <div class="video-grid" id="clips-feed">No clips yet</div>
     </section>
 
+    <!-- PROFILE -->
     <section class="tab" id="profile">
       <div class="profile-section">
         <h2 class="home-title">Your Profile</h2>
+
         <div class="profile-header">
           <div class="profile-pic-wrapper">
-            <img src="default-avatar.png" alt="Profile Picture" id="profile-pic">
-            <span class="plus-icon">+</span>
+            <img src="default-avatar.png" alt="Profile Picture" id="profile-pic" />
+            <span class="plus-icon" onclick="promptLoginIfNeeded()">+</span>
           </div>
           <div class="profile-meta">
             <h3 id="user-email-display">Guest</h3>
             <textarea id="profile-bio" placeholder="Your bio" disabled onclick="promptLoginIfNeeded()"></textarea>
           </div>
         </div>
+
         <p class="note" id="profile-warning">Login required to edit profile and view content.</p>
+
         <div class="profile-content">
           <div class="profile-block">
             <h3>Uploads</h3>
@@ -97,15 +113,14 @@
       </div>
     </section>
 
-    <!-- SETTINGS TAB -->
+    <!-- SETTINGS -->
     <section class="tab" id="settings">
       <div class="settings-page">
         <h2 class="settings-title">Settings</h2>
 
         <div class="settings-section">
           <div class="settings-label">
-            <i class="fas fa-user"></i>
-            <span>Account</span>
+            <i class="fas fa-user"></i><span>Account</span>
           </div>
           <div class="settings-content">
             <p>Manage your INTAKEE account settings below. These options are only available when logged in.</p>
@@ -117,8 +132,7 @@
 
         <div class="settings-section">
           <div class="settings-label">
-            <i class="fas fa-bell"></i>
-            <span>Notifications</span>
+            <i class="fas fa-bell"></i><span>Notifications</span>
           </div>
           <div class="settings-content">
             <p>You’ll receive updates about new posts, interactions, and milestone alerts. INTAKEE does not send marketing emails.</p>
@@ -127,8 +141,7 @@
 
         <div class="settings-section">
           <div class="settings-label">
-            <i class="fas fa-palette"></i>
-            <span>Appearance</span>
+            <i class="fas fa-palette"></i><span>Appearance</span>
           </div>
           <div class="settings-content">
             <p>INTAKEE uses dark mode by default. Light mode and accessibility features may be added in future updates.</p>
@@ -137,8 +150,7 @@
 
         <div class="settings-section">
           <div class="settings-label">
-            <i class="fas fa-shield-alt"></i>
-            <span>Privacy & Security</span>
+            <i class="fas fa-shield-alt"></i><span>Privacy & Security</span>
           </div>
           <div class="settings-content">
             <p>INTAKEE does not sell or share personal data. We only collect what’s needed to operate your account and store it securely. You can delete your account and data anytime.</p>
@@ -147,14 +159,13 @@
 
         <div class="settings-section">
           <div class="settings-label">
-            <i class="fas fa-balance-scale"></i>
-            <span>Community Standards</span>
+            <i class="fas fa-balance-scale"></i><span>Community Standards</span>
           </div>
           <div class="settings-content">
             <h4>Terms of Service</h4>
             <p>Users are responsible for their uploaded content. INTAKEE is not liable for user content. Illegal, harmful, or copyrighted content may be removed without notice.</p>
             <h4>Community Guidelines</h4>
-            <ul>
+            <ul class="guideline-list">
               <li>No threats, violence, or harassment</li>
               <li>No nudity or pornographic content</li>
               <li>No hate speech or discrimination</li>
@@ -166,8 +177,7 @@
 
         <div class="settings-section">
           <div class="settings-label">
-            <i class="fas fa-headset"></i>
-            <span>Help & Support</span>
+            <i class="fas fa-headset"></i><span>Help & Support</span>
           </div>
           <div class="settings-content">
             <p>If you need help with your account or encounter an issue, email us at <strong>intakee2025@gmail.com</strong>. Response time is usually within 48 hours.</p>
@@ -176,26 +186,13 @@
 
         <div class="settings-section">
           <div class="settings-label">
-            <i class="fas fa-info-circle"></i>
-            <span>About</span>
+            <i class="fas fa-info-circle"></i><span>About</span>
           </div>
           <div class="settings-content">
             <p>INTAKEE is a creator-focused platform that protects freedom of speech, supports fair monetization, and promotes safe expression. We enforce policies to protect both users and creators.</p>
           </div>
         </div>
       </div>
-
-      <script>
-        // Enable accordion behavior using event delegation
-        document.querySelectorAll('.settings-label').forEach(label => {
-          label.addEventListener('click', function () {
-            const section = this.closest('.settings-section');
-            if (section) {
-              section.classList.toggle('open');
-            }
-          });
-        });
-      </script>
     </section>
   </main>
 
@@ -215,44 +212,15 @@
     <div class="auth-box">
       <button class="close-auth" onclick="closeAuthModal()">&times;</button>
       <h2 id="auth-title">Login to INTAKEE</h2>
-      <input type="email" id="auth-email" placeholder="Email">
-      <input type="password" id="auth-password" placeholder="Password">
-      <label><input type="checkbox" id="remember-me"> Remember Me</label>
+      <input type="email" id="auth-email" placeholder="Email" />
+      <input type="password" id="auth-password" placeholder="Password" />
+      <label><input type="checkbox" id="remember-me" /> Remember Me</label>
       <button id="auth-action">Login</button>
-      <p id="auth-toggle-text">Don’t have an account? <span id="toggle-auth">Sign Up</span></p>
+      <p id="auth-toggle-text">Don’t have an account? <span id="toggle-auth" style="text-decoration:underline; cursor:pointer;">Sign Up</span></p>
     </div>
   </div>
 
   <!-- JS -->
-  <script>
-    function promptLoginIfNeeded() {
-      if (!window.isLoggedIn) showAuthModal();
-    }
-    function handleLogoutOrPrompt() {
-      if (!window.isLoggedIn) return showAuthModal();
-      handleLogout();
-    }
-    function handleDeleteAccountOrPrompt() {
-      if (!window.isLoggedIn) return showAuthModal();
-      handleDeleteAccount();
-    }
-    function handlePrivacyToggleOrPrompt() {
-      if (!window.isLoggedIn) return showAuthModal();
-      alert('Account made private');
-    }
-    const observer = new MutationObserver(() => {
-      const activeTab = document.querySelector('.tab.active')?.id;
-      const searchBar = document.getElementById('global-search');
-      const loginBtn = document.getElementById('home-login-btn');
-      if (["upload", "settings"].includes(activeTab)) {
-        searchBar?.classList.add("hidden");
-        loginBtn?.classList.add("hidden");
-      } else {
-        searchBar?.classList.remove("hidden");
-        loginBtn?.classList.remove("hidden");
-      }
-    });
-    observer.observe(document.querySelector('main'), { subtree: true, attributes: true, attributeFilter: ['class'] });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
