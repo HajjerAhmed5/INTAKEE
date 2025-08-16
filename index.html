@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>INTAKEE</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
 </head>
 <body>
@@ -39,7 +38,7 @@
       <div class="video-grid" id="podcast-feed">No podcasts yet</div>
     </section>
 
-    <!-- UPLOAD -->
+    <!-- UPLOAD (type-aware) -->
     <section class="tab" id="upload">
       <div class="upload-wrapper">
         <h2>Upload Content</h2>
@@ -59,11 +58,17 @@
         <label for="upload-description">Description:</label>
         <textarea id="upload-description" placeholder="Write a short description"></textarea>
 
-        <label for="upload-thumbnail">Upload Thumbnail:</label>
+        <!-- Thumbnail is always used (cover for audio podcasts) -->
+        <label for="upload-thumbnail">Thumbnail (cover image):</label>
         <input type="file" id="upload-thumbnail" accept="image/*" />
 
-        <label for="upload-file">Upload File:</label>
-        <input type="file" id="upload-file" />
+        <!-- This label + input change based on selected type -->
+        <label id="upload-file-label" for="upload-file">Video File</label>
+        <input type="file" id="upload-file" accept="video/*" />
+
+        <p class="help" id="upload-help">
+          MP4/WebM recommended. Thumbnail appears in the feed. For audio podcasts, the thumbnail is a static cover.
+        </p>
 
         <div class="upload-buttons">
           <button onclick="handleUpload()">Upload</button>
@@ -220,7 +225,7 @@
     </div>
   </div>
 
-  <!-- JS -->
-  <script src="script.js"></script>
+  <!-- JS (module so we can import Firebase from CDN) -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>
