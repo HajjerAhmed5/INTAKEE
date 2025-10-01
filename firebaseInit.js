@@ -18,3 +18,5 @@ export const app     = initializeApp(firebaseConfig);
 export const auth    = getAuth(app);
 export const db      = getFirestore(app);
 export const storage = getStorage(app);
+import { getApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+console.log("Firebase connected →", getApp().options.projectId);
