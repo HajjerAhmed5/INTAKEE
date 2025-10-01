@@ -129,7 +129,8 @@
           </div>
           <div class="settings-content">
             <p>Manage your INTAKEE account settings below. These options are only available when logged in.</p>
-            <button onclick="handleLogoutOrPrompt()">Log Out</button>
+            <!-- Added id so JS can toggle visibility -->
+            <button id="logoutBtn" class="hidden" onclick="handleLogoutOrPrompt()">Log Out</button>
             <button onclick="handleDeleteAccountOrPrompt()">Delete Account</button>
             <button onclick="handlePrivacyToggleOrPrompt()">Make Account Private</button>
           </div>
@@ -224,12 +225,11 @@
       <p id="auth-toggle-text">Don’t have an account? <span id="toggle-auth" style="text-decoration:underline; cursor:pointer;">Sign Up</span></p>
     </div>
   </div>
-<!-- Firebase Config + Init -->
-<script type="module" src="firebaseInit.js"></script>
 
-<!-- Main App Logic -->
-<script type="module" src="script.js"></script>
-</body>
-</html>
+  <!-- Firebase Config + Init -->
+  <script type="module" src="firebaseInit.js"></script>
+
+  <!-- Main App Logic -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>
