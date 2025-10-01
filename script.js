@@ -374,3 +374,27 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial feed load
   loadFeeds();
 });
+// firebaseInit.js (CDN Modular SDK)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+// 1) COPY these from Firebase Console → Project Settings → Your apps → Web app (Config)
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_ID",
+  appId: "YOUR_APPID",
+};
+
+// 2) Initialize once
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+
+// 3) Tiny sanity log (shows up in browser console on load)
+console.log("[Firebase] initialized on", location.host);
