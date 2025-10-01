@@ -1,5 +1,5 @@
-// ========= INTAKEE Frontend Logic =========
-// Use the single Firebase initialization from firebaseInit.js
+// ========= INTAKEE Frontend Logic (script.js) =========
+// Uses the single Firebase initialization from firebaseInit.js
 import { app, auth, db, storage } from "./firebaseInit.js";
 
 // --- Firebase helper imports (CDN v10.12.4) ---
@@ -41,21 +41,24 @@ function setActiveTab(tabId) {
   const tabs = $$(".tab");
   const btns = $$(".tab-btn");
   if (!$("#" + tabId)) tabId = "home";
+
   tabs.forEach((t) => t.classList.toggle("active", t.id === tabId));
   btns.forEach((b) =>
     b.classList.toggle("active", b.getAttribute("data-tab") === tabId)
   );
+
+  // Per your spec: hide search & login on Upload/Settings
   const searchBar = $("#global-search");
   const loginBtn = $("#home-login-btn");
   if (["upload", "settings"].includes(tabId)) {
-    hide(searchBar);
-    hide(loginBtn);
+    hide(searchBar); hide(loginBtn);
   } else {
-    show(searchBar);
-    show(loginBtn);
+    show(searchBar); show(loginBtn);
   }
+
   if (location.hash !== "#" + tabId) history.replaceState(null, "", "#" + tabId);
 }
+
 function initTabs() {
   $$(".tab-btn").forEach((btn) =>
     btn.addEventListener("click", (e) => {
@@ -110,18 +113,18 @@ function showAuthModal() {
       }
       closeAuthModal();
     } catch (e) {
+      console.error("Auth error:", e);
       alert(e?.message || "Authentication error");
     }
   };
 }
-function closeAuthModal() {
-  hide($("#auth-modal"));
-}
-window.showAuthModal = showAuthModal;
-window.closeAuthModal = closeAuthModal;
+function closeAuthModal() { hide($("#auth-modal")); }
 
-// Update UI when auth changes
+Object.assign(window, { showAuthModal, closeAuthModal });
+
+// ========= Auth state → UI sync =========
 onAuthStateChanged(auth, (user) => {
+  console.log("Auth state:", user);
   const nameEl = $("#user-email-display");
   const bio = $("#profile-bio");
   const upWarn = $("#upload-warning");
@@ -131,19 +134,23 @@ onAuthStateChanged(auth, (user) => {
     if (bio) bio.disabled = false;
     if (upWarn) upWarn.textContent = "You are logged in. You can upload.";
     $("#home-login-btn")?.classList.add("hidden");
+    $("#logoutBtn")?.classList.remove("hidden");
   } else {
     if (nameEl) nameEl.textContent = "Guest";
     if (bio) bio.disabled = true;
     if (upWarn) upWarn.textContent = "You must be logged in to upload content.";
     $("#home-login-btn")?.classList.remove("hidden");
+    $("#logoutBtn")?.classList.add("hidden");
   }
 });
 
+// ========= Global handlers exposed to HTML =========
 async function handleLogout() {
   try {
     await signOut(auth);
     alert("Logged out.");
   } catch (e) {
+    console.error("Sign out error:", e);
     alert(e?.message || "Error");
   }
 }
@@ -162,6 +169,7 @@ function handlePrivacyToggleOrPrompt() {
   if (!auth.currentUser) return showAuthModal();
   alert("Account made private (demo).");
 }
+
 Object.assign(window, {
   promptLoginIfNeeded,
   handleLogoutOrPrompt,
@@ -210,20 +218,14 @@ async function handleUpload() {
     return;
   }
 
-  const type = $("#upload-type")?.value || "video";
+  const type  = $("#upload-type")?.value || "video";
   const title = $("#upload-title")?.value.trim();
-  const desc = $("#upload-description")?.value.trim();
-  const file = $("#upload-file")?.files?.[0];
+  const desc  = $("#upload-description")?.value.trim();
+  const file  = $("#upload-file")?.files?.[0];
   const thumb = $("#upload-thumbnail")?.files?.[0];
 
-  if (!file) {
-    alert("Please choose a file.");
-    return;
-  }
-  if (!title) {
-    alert("Please add a title.");
-    return;
-  }
+  if (!file)  return alert("Please choose a file.");
+  if (!title) return alert("Please add a title.");
 
   try {
     const uid = auth.currentUser.uid;
@@ -231,7 +233,7 @@ async function handleUpload() {
 
     // Upload main file
     const mainPath = `uploads/${uid}/${now}_${file.name}`;
-    const mainRef = storageRef(storage, mainPath);
+    const mainRef  = storageRef(storage, mainPath);
     await uploadBytes(mainRef, file);
     const fileUrl = await getDownloadURL(mainRef);
 
@@ -239,7 +241,7 @@ async function handleUpload() {
     let thumbUrl = "";
     if (thumb) {
       const thumbPath = `thumbnails/${uid}/${now}_${thumb.name}`;
-      const thumbRef = storageRef(storage, thumbPath);
+      const thumbRef  = storageRef(storage, thumbPath);
       await uploadBytes(thumbRef, thumb);
       thumbUrl = await getDownloadURL(thumbRef);
     }
@@ -257,7 +259,7 @@ async function handleUpload() {
 
     alert("Upload complete!");
 
-    // Simple UI reset
+    // Reset form
     $("#upload-title").value = "";
     $("#upload-description").value = "";
     $("#upload-file").value = "";
@@ -266,17 +268,16 @@ async function handleUpload() {
     // Refresh feeds
     await loadFeeds();
   } catch (e) {
-    console.error(e);
+    console.error("Upload failed:", e);
     alert(e?.message || "Upload failed.");
   }
 }
+
 function goLive() {
-  if (!auth.currentUser) {
-    showAuthModal();
-    return;
-  }
+  if (!auth.currentUser) return showAuthModal();
   alert("Starting live stream (not implemented yet).");
 }
+
 Object.assign(window, { handleUpload, goLive });
 
 // ========= Feeds (basic read) =========
@@ -354,7 +355,7 @@ async function fillGrid(sel, q) {
       el.appendChild(card);
     });
   } catch (e) {
-    console.error(e);
+    console.error("Feed load error:", e);
     el.textContent = "Failed to load.";
   }
 }
@@ -373,28 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initial feed load
   loadFeeds();
+
+  // Wire logout button if present (in case you prefer addEventListener over inline onclick)
+  $("#logoutBtn")?.addEventListener("click", handleLogoutOrPrompt);
 });
-// firebaseInit.js (CDN Modular SDK)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
-// 1) COPY these from Firebase Console → Project Settings → Your apps → Web app (Config)
-const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_ID",
-  appId: "YOUR_APPID",
-};
-
-// 2) Initialize once
-export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-
-// 3) Tiny sanity log (shows up in browser console on load)
-console.log("[Firebase] initialized on", location.host);
