@@ -133,4 +133,27 @@
     });
   </script>
 </body>
+<!-- File Upload Test -->
+<div style="margin:20px;">
+  <input type="file" id="testFile" />
+  <button id="uploadTestBtn">Upload Test File</button>
+</div>
+
+<script type="module">
+  import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
+  import { app } from "./firebase-config.js"; // make sure your firebase-config exports app
+
+  const storage = getStorage(app);
+
+  document.getElementById("uploadTestBtn").onclick = async () => {
+    const file = document.getElementById("testFile").files[0];
+    if (!file) {
+      alert("Pick a file first!");
+      return;
+    }
+    const fileRef = ref(storage, "test/" + file.name);
+    await uploadBytes(fileRef, file);
+    alert("✅ File uploaded successfully!");
+  };
+</script>
 </html>
