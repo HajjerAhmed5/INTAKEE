@@ -1,235 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>INTAKEE</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
+  <style>
+    body { background:#000; color:#fff; font-family:sans-serif; margin:0; padding:16px; }
+    header { display:flex; justify-content:space-between; align-items:center; }
+    #feed div { border:1px solid #333; padding:12px; margin:12px 0; border-radius:8px; }
+    button { padding:6px 12px; margin-top:8px; cursor:pointer; }
+  </style>
 </head>
 <body>
-  <!-- HEADER -->
-  <header class="home-header">
-    <img src="logo.png" alt="INTAKEE Logo" class="home-logo" />
-    <div class="search-bar" id="global-search">
-      <input type="text" placeholder="Search..." />
-      <span class="icon"><i class="fas fa-search"></i></span>
+  <header>
+    <h1>INTAKEE</h1>
+    <div>
+      <button id="loginBtn">Login / Sign Up</button>
+      <button id="logoutBtn" style="display:none;">Logout</button>
     </div>
-    <button id="home-login-btn" onclick="showAuthModal()">Login / Sign Up</button>
   </header>
 
-  <!-- MAIN TABS -->
-  <main>
-    <!-- HOME -->
-    <section class="tab active" id="home">
-      <h2 class="home-title">Trending</h2>
-      <div class="video-grid" id="trending-feed">No trending posts</div>
-    </section>
-
-    <!-- VIDEOS -->
-    <section class="tab" id="videos">
-      <h2 class="home-title">Videos</h2>
-      <div class="video-grid" id="video-feed">No videos yet</div>
-    </section>
-
-    <!-- PODCAST -->
-    <section class="tab" id="podcast">
-      <h2 class="home-title">Podcasts</h2>
-      <div class="video-grid" id="podcast-feed">No podcasts yet</div>
-    </section>
-
-    <!-- UPLOAD (type-aware) -->
-    <section class="tab" id="upload">
-      <div class="upload-wrapper">
-        <h2>Upload Content</h2>
-        <p class="note" id="upload-warning">You must be logged in to upload content.</p>
-
-        <label for="upload-type">Choose Type:</label>
-        <select id="upload-type">
-          <option value="video">Video</option>
-          <option value="clip">Clip</option>
-          <option value="podcast-video">Podcast (Video)</option>
-          <option value="podcast-audio">Podcast (Audio)</option>
-        </select>
-
-        <label for="upload-title">Title:</label>
-        <input type="text" id="upload-title" placeholder="Add a title" />
-
-        <label for="upload-description">Description:</label>
-        <textarea id="upload-description" placeholder="Write a short description"></textarea>
-
-        <!-- Thumbnail is always used (cover for audio podcasts) -->
-        <label for="upload-thumbnail">Thumbnail (cover image):</label>
-        <input type="file" id="upload-thumbnail" accept="image/*" />
-
-        <!-- This label + input change based on selected type -->
-        <label id="upload-file-label" for="upload-file">Video File</label>
-        <input type="file" id="upload-file" accept="video/*" />
-
-        <p class="help" id="upload-help">
-          MP4/WebM recommended. Thumbnail appears in the feed. For audio podcasts, the thumbnail is a static cover.
-        </p>
-
-        <div class="upload-buttons">
-          <button onclick="handleUpload()">Upload</button>
-          <button onclick="goLive()">Go Live</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- CLIPS -->
-    <section class="tab" id="clips">
-      <h2 class="home-title">Clips</h2>
-      <div class="video-grid" id="clips-feed">No clips yet</div>
-    </section>
-
-    <!-- PROFILE -->
-    <section class="tab" id="profile">
-      <div class="profile-section">
-        <h2 class="home-title">Your Profile</h2>
-
-        <div class="profile-header">
-          <div class="profile-pic-wrapper">
-            <img src="default-avatar.png" alt="Profile Picture" id="profile-pic" />
-            <span class="plus-icon" onclick="promptLoginIfNeeded()">+</span>
-          </div>
-          <div class="profile-meta">
-            <h3 id="user-email-display">Guest</h3>
-            <textarea id="profile-bio" placeholder="Your bio" disabled onclick="promptLoginIfNeeded()"></textarea>
-          </div>
-        </div>
-
-        <p class="note" id="profile-warning">Login required to edit profile and view content.</p>
-
-        <div class="profile-content">
-          <div class="profile-block">
-            <h3>Uploads</h3>
-            <div class="video-grid" id="user-uploads">No uploads yet</div>
-          </div>
-          <div class="profile-block">
-            <h3>Liked</h3>
-            <div class="video-grid" id="user-liked">No liked posts</div>
-          </div>
-          <div class="profile-block">
-            <h3>Saved</h3>
-            <div class="video-grid" id="user-saved">No saved content</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SETTINGS -->
-    <section class="tab" id="settings">
-      <div class="settings-page">
-        <h2 class="settings-title">Settings</h2>
-
-        <div class="settings-section">
-          <div class="settings-label">
-            <i class="fas fa-user"></i><span>Account</span>
-          </div>
-          <div class="settings-content">
-            <p>Manage your INTAKEE account settings below. These options are only available when logged in.</p>
-            <!-- Added id so JS can toggle visibility -->
-            <button id="logoutBtn" class="hidden" onclick="handleLogoutOrPrompt()">Log Out</button>
-            <button onclick="handleDeleteAccountOrPrompt()">Delete Account</button>
-            <button onclick="handlePrivacyToggleOrPrompt()">Make Account Private</button>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <div class="settings-label">
-            <i class="fas fa-bell"></i><span>Notifications</span>
-          </div>
-          <div class="settings-content">
-            <p>You’ll receive updates about new posts, interactions, and milestone alerts. INTAKEE does not send marketing emails.</p>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <div class="settings-label">
-            <i class="fas fa-palette"></i><span>Appearance</span>
-          </div>
-          <div class="settings-content">
-            <p>INTAKEE uses dark mode by default. Light mode and accessibility features may be added in future updates.</p>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <div class="settings-label">
-            <i class="fas fa-shield-alt"></i><span>Privacy & Security</span>
-          </div>
-          <div class="settings-content">
-            <p>INTAKEE does not sell or share personal data. We only collect what’s needed to operate your account and store it securely. You can delete your account and data anytime.</p>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <div class="settings-label">
-            <i class="fas fa-balance-scale"></i><span>Community Standards</span>
-          </div>
-          <div class="settings-content">
-            <h4>Terms of Service</h4>
-            <p>Users are responsible for their uploaded content. INTAKEE is not liable for user content. Illegal, harmful, or copyrighted content may be removed without notice.</p>
-            <h4>Community Guidelines</h4>
-            <ul class="guideline-list">
-              <li>No threats, violence, or harassment</li>
-              <li>No nudity or pornographic content</li>
-              <li>No hate speech or discrimination</li>
-              <li>No promotion of illegal activity</li>
-            </ul>
-            <p>Moderation is enforced fairly. Repeated violations lead to account removal. Reporting someone hides their content unless unblocked.</p>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <div class="settings-label">
-            <i class="fas fa-headset"></i><span>Help & Support</span>
-          </div>
-          <div class="settings-content">
-            <p>If you need help with your account or encounter an issue, email us at <strong>intakee2025@gmail.com</strong>. Response time is usually within 48 hours.</p>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <div class="settings-label">
-            <i class="fas fa-info-circle"></i><span>About</span>
-          </div>
-          <div class="settings-content">
-            <p>INTAKEE is a creator-focused platform that protects freedom of speech, supports fair monetization, and promotes safe expression. We enforce policies to protect both users and creators.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- BOTTOM NAVIGATION -->
-  <nav class="bottom-nav">
-    <button class="tab-btn" data-tab="home">Home</button>
-    <button class="tab-btn" data-tab="videos">Videos</button>
-    <button class="tab-btn" data-tab="podcast">Podcast</button>
-    <button class="tab-btn upload-btn" data-tab="upload">+</button>
-    <button class="tab-btn" data-tab="clips">Clips</button>
-    <button class="tab-btn" data-tab="profile">Profile</button>
-    <button class="tab-btn" data-tab="settings">Settings</button>
-  </nav>
-
-  <!-- AUTH MODAL -->
-  <div class="auth-modal hidden" id="auth-modal">
-    <div class="auth-box">
-      <button class="close-auth" onclick="closeAuthModal()">&times;</button>
-      <h2 id="auth-title">Login to INTAKEE</h2>
-      <input type="email" id="auth-email" placeholder="Email" />
-      <input type="password" id="auth-password" placeholder="Password" />
-      <label><input type="checkbox" id="remember-me" /> Remember Me</label>
-      <button id="auth-action">Login</button>
-      <p id="auth-toggle-text">Don’t have an account? <span id="toggle-auth" style="text-decoration:underline; cursor:pointer;">Sign Up</span></p>
-    </div>
+  <!-- Quick Post Form -->
+  <div id="quick-post" style="margin:16px 0;">
+    <input id="postText" placeholder="Say something…" />
+    <input id="postFile" type="file" />
+    <button id="postBtn">Post</button>
   </div>
 
-  <!-- Firebase Config + Init -->
-  <script type="module" src="firebaseInit.js"></script>
+  <!-- Where posts will render -->
+  <div id="feed"></div>
 
-  <!-- Main App Logic -->
-  <script type="module" src="script.js"></script>
+  <!-- Firebase + App Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import {
+      getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import {
+      getFirestore, doc, getDoc, setDoc, addDoc, collection,
+      serverTimestamp, query, orderBy, limit, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import {
+      getStorage, ref, uploadBytes, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
+    import { firebaseConfig } from "./firebase-config.js";
+
+    // Init
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // Elements
+    const loginBtn  = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const postText  = document.getElementById("postText");
+    const postFile  = document.getElementById("postFile");
+    const postBtn   = document.getElementById("postBtn");
+    const feedEl    = document.getElementById("feed");
+
+    // Auth actions
+    loginBtn.addEventListener("click", async () => {
+      await signInWithPopup(auth, new GoogleAuthProvider());
+    });
+    logoutBtn.addEventListener("click", () => signOut(auth));
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+        const uref = doc(db, "users", user.uid);
+        const snap = await getDoc(uref);
+        if (!snap.exists()) {
+          await setDoc(uref, {
+            uid: user.uid,
+            displayName: user.displayName ?? "",
+            email: user.email ?? "",
+            photoURL: user.photoURL ?? "",
+            createdAt: serverTimestamp()
+          });
+        }
+      } else {
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+      }
+    });
+
+    // Create Post
+    async function createPost({ text, file }) {
+      const user = auth.currentUser;
+      if (!user) { alert("Please sign in first."); return; }
+
+      let mediaUrl = null;
+      if (file) {
+        const key = `uploads/${user.uid}/${Date.now()}-${file.name}`;
+        const r = ref(storage, key);
+        await uploadBytes(r, file);
+        mediaUrl = await getDownloadURL(r);
+      }
+
+      await addDoc(collection(db, "posts"), {
+        ownerId: user.uid,
+        text: text ?? "",
+        mediaUrl,
+        createdAt: serverTimestamp()
+      });
+    }
+
+    postBtn.addEventListener("click", async () => {
+      postBtn.disabled = true;
+      try {
+        await createPost({ text: postText.value, file: postFile.files[0] });
+        postText.value = ""; postFile.value = "";
+      } catch (e) { alert(e.message); }
+      postBtn.disabled = false;
+    });
+
+    // Feed
+    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(20));
+    onSnapshot(q, (snap) => {
+      feedEl.innerHTML = "";
+      snap.forEach((d) => {
+        const p = d.data();
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <div><strong>${p.text ?? ""}</strong></div>
+          ${p.mediaUrl ? `<img src="${p.mediaUrl}" style="max-width:100%;border-radius:8px;">` : ""}
+          <div style="font-size:.8em;opacity:.7">${d.id}</div>
+        `;
+        feedEl.appendChild(div);
+      });
+    });
+  </script>
 </body>
 </html>
