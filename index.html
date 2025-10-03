@@ -1,34 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>INTAKEE</title>
   <style>
-    body { background:#000; color:#fff; font-family:sans-serif; margin:0; padding:16px; }
-    header { display:flex; justify-content:space-between; align-items:center; }
-    #feed div { border:1px solid #333; padding:12px; margin:12px 0; border-radius:8px; }
-    button { padding:6px 12px; margin-top:8px; cursor:pointer; }
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { background:#000; color:#fff; font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; }
+    header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:16px; border-bottom:1px solid #111; }
+    main { max-width:900px; margin:0 auto; padding:16px; }
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    input[type="text"] { flex:1; min-width:240px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
+    input[type="file"] { color:#aaa; }
+    button { padding:9px 14px; cursor:pointer; border-radius:10px; border:1px solid #2a2a2a; background:#141414; color:#fff; }
+    button.primary { background:#0b63ff; border-color:#0b63ff; }
+    button.ghost { background:transparent; }
+    button.danger { background:#8b0000; border-color:#8b0000; }
+    button[disabled] { opacity:.6; cursor:not-allowed; }
+    .pill { padding:4px 10px; border:1px solid #2a2a2a; border-radius:999px; font-size:.8rem; opacity:.8; }
+    .card { background:#0b0b0b; border:1px solid #151515; border-radius:14px; padding:14px; margin:14px 0; }
+    .post { display:grid; grid-template-columns:48px 1fr; gap:12px; }
+    .avatar { width:48px; height:48px; border-radius:50%; background:#222; object-fit:cover; }
+    .meta { display:flex; gap:8px; align-items:center; font-size:.9rem; opacity:.9; }
+    .media { margin-top:10px; }
+    .media img, .media video { max-width:100%; border-radius:10px; display:block; }
+    .media audio { width:100%; margin-top:6px; }
+    .muted { opacity:.65; font-size:.85rem; }
+    .actions { display:flex; gap:8px; margin-top:8px; }
+    .comment-box { display:flex; gap:8px; margin-top:10px; }
+    .comment { padding:8px 10px; background:#111; border-radius:8px; margin-top:6px; }
+    #loadMore { display:block; width:100%; margin:18px 0; }
   </style>
 </head>
 <body>
   <header>
-    <h1>INTAKEE</h1>
-    <div>
+    <div class="row">
+      <span class="pill">INTAKEE</span>
+    </div>
+    <div class="row">
       <button id="loginBtn">Login / Sign Up</button>
       <button id="logoutBtn" style="display:none;">Logout</button>
     </div>
   </header>
 
-  <!-- Quick Post Form -->
-  <div id="quick-post" style="margin:16px 0;">
-    <input id="postText" placeholder="Say something…" />
-    <input id="postFile" type="file" />
-    <button id="postBtn">Post</button>
-  </div>
+  <main>
+    <!-- Create Post -->
+    <section class="card">
+      <div class="row">
+        <input id="postText" type="text" placeholder="Say something…" />
+        <input id="postFile" type="file" />
+        <button id="postBtn" class="primary">Post</button>
+      </div>
+      <div class="muted" style="margin-top:6px;">Attach an image/video/audio/any file (optional).</div>
+    </section>
 
-  <!-- Where posts will render -->
-  <div id="feed"></div>
+    <!-- Feed -->
+    <section id="feed"></section>
+    <button id="loadMore" class="ghost">Load more</button>
+  </main>
 
   <!-- Firebase + App Logic -->
   <script type="module">
@@ -38,10 +68,11 @@
     } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import {
       getFirestore, doc, getDoc, setDoc, addDoc, collection,
-      serverTimestamp, query, orderBy, limit, onSnapshot
+      serverTimestamp, query, orderBy, limit, onSnapshot, deleteDoc,
+      where, getDocs, startAfter
     } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
     import {
-      getStorage, ref, uploadBytes, getDownloadURL
+      getStorage, ref, uploadBytes, getDownloadURL, deleteObject
     } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
     import { firebaseConfig } from "./firebase-config.js";
 
@@ -58,17 +89,21 @@
     const postFile  = document.getElementById("postFile");
     const postBtn   = document.getElementById("postBtn");
     const feedEl    = document.getElementById("feed");
+    const loadMoreBtn = document.getElementById("loadMore");
 
-    // Auth actions
+    // ---- Auth ----
     loginBtn.addEventListener("click", async () => {
       await signInWithPopup(auth, new GoogleAuthProvider());
     });
     logoutBtn.addEventListener("click", () => signOut(auth));
 
     onAuthStateChanged(auth, async (user) => {
+      const loggedIn = !!user;
+      loginBtn.style.display  = loggedIn ? "none" : "inline-block";
+      logoutBtn.style.display = loggedIn ? "inline-block" : "none";
+
       if (user) {
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "inline-block";
+        // ensure user doc
         const uref = doc(db, "users", user.uid);
         const snap = await getDoc(uref);
         if (!snap.exists()) {
@@ -80,29 +115,55 @@
             createdAt: serverTimestamp()
           });
         }
-      } else {
-        loginBtn.style.display = "inline-block";
-        logoutBtn.style.display = "none";
       }
     });
 
-    // Create Post
+    // ---- Helpers ----
+    function escapeHtml(s="") {
+      return s.replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+    function detectKind(file) {
+      if (!file) return { kind: "text", mime: null };
+      const mime = file.type || "";
+      if (mime.startsWith("image/")) return { kind: "image", mime };
+      if (mime.startsWith("video/")) return { kind: "video", mime };
+      if (mime.startsWith("audio/")) return { kind: "audio", mime };
+      return { kind: "file", mime };
+    }
+
+    // ---- Create Post ----
     async function createPost({ text, file }) {
       const user = auth.currentUser;
       if (!user) { alert("Please sign in first."); return; }
 
-      let mediaUrl = null;
+      let mediaUrl = null, storagePath = null;
+      let kind = "text", mime = null;
+
       if (file) {
-        const key = `uploads/${user.uid}/${Date.now()}-${file.name}`;
-        const r = ref(storage, key);
+        const info = detectKind(file);
+        kind = info.kind; mime = info.mime;
+        const folder = kind === "image" ? "images" :
+                       kind === "video" ? "videos" :
+                       kind === "audio" ? "audio"  : "files";
+        storagePath = `uploads/${user.uid}/${folder}/${Date.now()}-${file.name}`;
+        const r = ref(storage, storagePath);
         await uploadBytes(r, file);
         mediaUrl = await getDownloadURL(r);
       }
 
       await addDoc(collection(db, "posts"), {
         ownerId: user.uid,
-        text: text ?? "",
+        user: user.displayName ?? "",
+        userPhoto: user.photoURL ?? "",
+        text: (text || "").trim(),
         mediaUrl,
+        storagePath,
+        kind,
+        mime,
+        likeCount: 0,
+        commentCount: 0,
         createdAt: serverTimestamp()
       });
     }
@@ -116,44 +177,199 @@
       postBtn.disabled = false;
     });
 
-    // Feed
-    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(20));
-    onSnapshot(q, (snap) => {
-      feedEl.innerHTML = "";
-      snap.forEach((d) => {
-        const p = d.data();
-        const div = document.createElement("div");
-        div.innerHTML = `
-          <div><strong>${p.text ?? ""}</strong></div>
-          ${p.mediaUrl ? `<img src="${p.mediaUrl}" style="max-width:100%;border-radius:8px;">` : ""}
-          <div style="font-size:.8em;opacity:.7">${d.id}</div>
-        `;
-        feedEl.appendChild(div);
+    // ---- Likes ----
+    async function toggleLike(postId, ownerId) {
+      const u = auth.currentUser;
+      if (!u) return alert("Sign in to like.");
+      const likeRef = doc(db, "posts", postId, "likes", u.uid);
+      const existing = await getDoc(likeRef);
+      if (existing.exists()) {
+        await deleteDoc(likeRef);
+      } else {
+        await setDoc(likeRef, { uid: u.uid, createdAt: serverTimestamp() });
+      }
+    }
+    async function getLikeCount(postId) {
+      const likesSnap = await getDocs(collection(db, "posts", postId, "likes"));
+      return likesSnap.size;
+    }
+    async function userHasLiked(postId) {
+      const u = auth.currentUser;
+      if (!u) return false;
+      const likeRef = doc(db, "posts", postId, "likes", u.uid);
+      const snap = await getDoc(likeRef);
+      return snap.exists();
+    }
+
+    // ---- Comments ----
+    async function addComment(postId, text) {
+      const u = auth.currentUser;
+      if (!u) return alert("Sign in to comment.");
+      if (!text.trim()) return;
+      await addDoc(collection(db, "posts", postId, "comments"), {
+        uid: u.uid,
+        user: u.displayName ?? "",
+        text: text.trim(),
+        createdAt: serverTimestamp()
       });
+    }
+    function listenComments(postId, container) {
+      const q = query(collection(db, "posts", postId, "comments"), orderBy("createdAt", "asc"), limit(50));
+      return onSnapshot(q, (snap) => {
+        container.innerHTML = "";
+        snap.forEach((d) => {
+          const c = d.data();
+          const div = document.createElement("div");
+          div.className = "comment";
+          div.innerHTML = `<strong>${escapeHtml(c.user||"Anon")}:</strong> ${escapeHtml(c.text)}`;
+          container.appendChild(div);
+        });
+      });
+    }
+
+    // ---- Delete Post (owner only) ----
+    async function deletePost(id, storagePath, ownerId) {
+      const user = auth.currentUser;
+      if (!user || user.uid !== ownerId) return alert("You can only delete your own posts.");
+      if (!confirm("Delete this post?")) return;
+      await deleteDoc(doc(db, "posts", id));
+      if (storagePath) {
+        try { await deleteObject(ref(storage, storagePath)); } catch {}
+      }
+    }
+
+    // ---- Feed: first page live; older pages by "Load more" ----
+    const PAGE_SIZE = 10;
+    let lastDoc = null;
+    let firstLoadDone = false;
+
+    function renderPostCard(d) {
+      const p = d.data();
+      const me = auth.currentUser?.uid;
+      const wrapper = document.createElement("article");
+      wrapper.className = "card post";
+
+      const avatar = document.createElement("img");
+      avatar.className = "avatar";
+      avatar.src = p.userPhoto || "";
+      avatar.alt = "";
+      avatar.onerror = () => { avatar.style.display = "none"; };
+
+      const content = document.createElement("div");
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.innerHTML = `<strong>${escapeHtml(p.user||"Anon")}</strong><span class="muted">${d.id}</span>`;
+
+      const textEl = document.createElement("div");
+      textEl.innerHTML = p.text ? escapeHtml(p.text) : "";
+
+      const mediaEl = document.createElement("div");
+      mediaEl.className = "media";
+      if (p.mediaUrl) {
+        if (p.kind === "image") {
+          mediaEl.innerHTML = `<img src="${p.mediaUrl}" alt="image">`;
+        } else if (p.kind === "video") {
+          mediaEl.innerHTML = `<video src="${p.mediaUrl}" controls playsinline></video>`;
+        } else if (p.kind === "audio") {
+          mediaEl.innerHTML = `<audio src="${p.mediaUrl}" controls></audio>`;
+        } else {
+          mediaEl.innerHTML = `<a href="${p.mediaUrl}" target="_blank" rel="noopener">Download file</a>`;
+        }
+      } else {
+        mediaEl.innerHTML = "";
+      }
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      const likeBtn = document.createElement("button");
+      likeBtn.className = "ghost";
+      likeBtn.textContent = "♥ Like";
+      likeBtn.addEventListener("click", () => toggleLike(d.id, p.ownerId));
+
+      const likeCountEl = document.createElement("span");
+      likeCountEl.className = "muted";
+      likeCountEl.textContent = "0 likes";
+
+      const commentInput = document.createElement("input");
+      commentInput.type = "text"; commentInput.placeholder = "Write a comment…"; commentInput.style.flex = "1";
+
+      const commentBtn = document.createElement("button");
+      commentBtn.textContent = "Comment";
+      commentBtn.addEventListener("click", async () => {
+        await addComment(d.id, commentInput.value);
+        commentInput.value = "";
+      });
+
+      const commentsWrap = document.createElement("div");
+
+      if (me && me === p.ownerId) {
+        const delBtn = document.createElement("button");
+        delBtn.className = "danger";
+        delBtn.textContent = "Delete";
+        delBtn.addEventListener("click", () => deletePost(d.id, p.storagePath, p.ownerId));
+        actions.appendChild(delBtn);
+      }
+
+      actions.appendChild(likeBtn);
+      actions.appendChild(likeCountEl);
+      actions.appendChild(commentInput);
+      actions.appendChild(commentBtn);
+
+      content.appendChild(meta);
+      if (p.text) content.appendChild(textEl);
+      if (p.mediaUrl) content.appendChild(mediaEl);
+      content.appendChild(actions);
+      content.appendChild(commentsWrap);
+
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(content);
+
+      // hydrate likes + state
+      (async () => {
+        likeCountEl.textContent = `${await getLikeCount(d.id)} likes`;
+        if (await userHasLiked(d.id)) {
+          likeBtn.textContent = "♥ Liked";
+        }
+      })();
+
+      // live comments for this post
+      listenComments(d.id, commentsWrap);
+
+      return wrapper;
+    }
+
+    function renderBatch(docs, append=false) {
+      if (!append) feedEl.innerHTML = "";
+      docs.forEach(d => feedEl.appendChild(renderPostCard(d)));
+    }
+
+    // First page: live (onSnapshot), so new posts appear
+    const firstPageQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(PAGE_SIZE));
+    const unsubFirst = onSnapshot(firstPageQuery, (snap) => {
+      const docs = snap.docs;
+      if (!docs.length) {
+        feedEl.innerHTML = '<div class="muted">No posts yet.</div>';
+        return;
+      }
+      renderBatch(docs, false);
+      lastDoc = docs[docs.length - 1];
+      firstLoadDone = true;
+    });
+
+    // Load more (older pages) using getDocs + startAfter
+    loadMoreBtn.addEventListener("click", async () => {
+      if (!firstLoadDone || !lastDoc) return;
+      const qMore = query(collection(db, "posts"), orderBy("createdAt", "desc"), startAfter(lastDoc), limit(PAGE_SIZE));
+      const snap = await getDocs(qMore);
+      if (!snap.docs.length) {
+        loadMoreBtn.textContent = "No more posts";
+        loadMoreBtn.disabled = true;
+        return;
+      }
+      renderBatch(snap.docs, true);
+      lastDoc = snap.docs[snap.docs.length - 1];
     });
   </script>
 </body>
-<!-- File Upload Test -->
-<div style="margin:20px;">
-  <input type="file" id="testFile" />
-  <button id="uploadTestBtn">Upload Test File</button>
-</div>
-
-<script type="module">
-  import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
-  import { app } from "./firebase-config.js"; // make sure your firebase-config exports app
-
-  const storage = getStorage(app);
-
-  document.getElementById("uploadTestBtn").onclick = async () => {
-    const file = document.getElementById("testFile").files[0];
-    if (!file) {
-      alert("Pick a file first!");
-      return;
-    }
-    const fileRef = ref(storage, "test/" + file.name);
-    await uploadBytes(fileRef, file);
-    alert("✅ File uploaded successfully!");
-  };
-</script>
 </html>
