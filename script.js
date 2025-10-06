@@ -1,3 +1,52 @@
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { auth } from "./firebase.js";
+
+const signupBtn = document.getElementById("signupBtn");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (signupBtn) {
+  signupBtn.addEventListener("click", async () => {
+    const email = document.getElementById("testEmail").value;
+    const password = document.getElementById("testPassword").value;
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      alert("✅ Signed up successfully!");
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+}
+
+if (loginBtn) {
+  loginBtn.addEventListener("click", async () => {
+    const email = document.getElementById("testEmail").value;
+    const password = document.getElementById("testPassword").value;
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("✅ Logged in!");
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+}
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    alert("✅ Logged out!");
+  });
+}
+
+onAuthStateChanged(auth, (user) => {
+  console.log(user ? `User logged in: ${user.email}` : "No user logged in");
+});
+
 // ========= INTAKEE Frontend Logic (script.js) =========
 // Uses the single Firebase initialization from firebaseInit.js
 import { app, auth, db, storage } from "./firebaseInit.js";
