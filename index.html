@@ -46,7 +46,7 @@
     /* Header */
     header { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px; padding:18px 16px; border-bottom:1px solid #111; }
     .brand { display:flex; align-items:center; gap:10px; }
-    .brand img { height:100px; width:auto; border-radius:12px; } /* 👁️ bigger logo */
+    .brand img { height:100px; width:auto; border-radius:12px; } /* Big eye logo only */
 
     .search-bar{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; max-width:520px; margin:0 auto; width:100%; }
     .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
@@ -56,14 +56,14 @@
     /* Main */
     main { max-width:900px; margin:0 auto; padding:16px; padding-bottom:88px; }
     .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    input[type="text"] { flex:1; min-width:240px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
+    input[type="text"], input[type="email"], input[type="password"] { flex:1; min-width:240px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
     input[type="file"] { color:#aaa; }
     button { padding:9px 14px; cursor:pointer; border-radius:10px; border:1px solid #2a2a2a; background:#141414; color:#fff; }
     button.primary { background:#0b63ff; border-color:#0b63ff; }
     button.ghost { background:transparent; }
     button.danger { background:#8b0000; border-color:#8b0000; }
     button[disabled] { opacity:.6; cursor:not-allowed; }
-    .card { background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; }
+    .card { background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; box-shadow: 0 4px 18px rgba(0,0,0,.35); }
     .post { display:grid; grid-template-columns:48px 1fr; gap:12px; }
     .avatar { width:48px; height:48px; border-radius:50%; background:#222; object-fit:cover; }
     .meta { display:flex; gap:8px; align-items:center; font-size:.9rem; opacity:.95; font-weight:600; }
@@ -81,13 +81,17 @@
     }
     .bottom-nav a{ color:#aaa; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.75rem; padding:6px 4px; border-radius:10px; }
     .bottom-nav a.active, .bottom-nav a:hover{ color:#fff; background:#111; }
+
+    /* Modal */
+    .modal{ position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:200; }
+    .modal-card{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:16px; width:min(420px,92vw); box-shadow:0 8px 30px rgba(0,0,0,.5); }
+    .modal-card input{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; margin:6px 0; }
   </style>
 </head>
 <body>
   <header>
     <div class="brand">
       <img src="logo.png" alt="INTAKEE">
-      <!-- removed: <strong>INTAKEE</strong> -->
     </div>
 
     <div class="search-bar">
@@ -101,38 +105,64 @@
     </div>
   </header>
 
+  <!-- Auth modal -->
+  <div id="authModal" class="modal" hidden>
+    <div class="modal-card">
+      <h3 style="margin:0 0 10px;">Sign in</h3>
+      <input id="authEmail" type="email" placeholder="Email" />
+      <input id="authPass" type="password" placeholder="Password" />
+      <div class="row" style="justify-content:space-between; flex-wrap:wrap;">
+        <button id="authSignup" class="primary">Create account</button>
+        <button id="authLogin">Log in</button>
+        <button id="authGoogle" class="ghost">Continue with Google</button>
+        <button id="authClose" class="ghost">Close</button>
+      </div>
+      <div id="authMsg" class="muted" style="margin-top:8px;"></div>
+    </div>
+  </div>
+
   <main>
     <!-- Create Post -->
-    <section class="card">
+    <section class="card" id="create-card">
       <div class="row">
         <input id="postText" type="text" placeholder="Say something…" />
         <input id="postFile" type="file" />
         <button id="postBtn" class="primary">Post</button>
       </div>
-      <div class="muted" style="margin-top:6px;">Attach an image/video/audio/any file (optional).</div>
     </section>
 
-    <!-- Feed -->
-    <section id="feed"></section>
-    <button id="loadMore" class="ghost">Load more</button>
+    <!-- Tab sections -->
+    <section id="tab-home"></section> <!-- feed renders here -->
+    <section id="tab-videos"   class="card" style="display:none;">Coming soon.</section>
+    <section id="tab-podcast"  class="card" style="display:none;">Coming soon.</section>
+    <section id="tab-upload"   class="card" style="display:none;">Coming soon.</section>
+    <section id="tab-clips"    class="card" style="display:none;">Coming soon.</section>
+    <section id="tab-profile"  class="card" style="display:none;">Coming soon.</section>
+    <section id="tab-settings" class="card" style="display:none;">Coming soon.</section>
   </main>
 
   <!-- Bottom Tab Bar -->
   <nav class="bottom-nav">
-    <a href="#" class="active"><i class="fa fa-home"></i><span>Home</span></a>
-    <a href="#"><i class="fa fa-video"></i><span>Videos</span></a>
-    <a href="#"><i class="fa fa-podcast"></i><span>Podcast</span></a>
-    <a href="#"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
-    <a href="#"><i class="fa fa-bolt"></i><span>Clips</span></a>
-    <a href="#"><i class="fa fa-user"></i><span>Profile</span></a>
-    <a href="#"><i class="fa fa-gear"></i><span>Settings</span></a>
+    <a href="#home"    data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
+    <a href="#videos"  data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
+    <a href="#podcast" data-tab="podcast"><i class="fa fa-podcast"></i><span>Podcast</span></a>
+    <a href="#upload"  data-tab="upload"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
+    <a href="#clips"   data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
+    <a href="#profile" data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
+    <a href="#settings"data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
   </nav>
 
   <!-- Firebase + App Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import {
-      getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword
     } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import {
       getFirestore, doc, getDoc, setDoc, addDoc, collection,
@@ -156,14 +186,54 @@
     const postText  = document.getElementById("postText");
     const postFile  = document.getElementById("postFile");
     const postBtn   = document.getElementById("postBtn");
-    const feedEl    = document.getElementById("feed");
-    const loadMoreBtn = document.getElementById("loadMore");
+    const feedEl    = document.getElementById("tab-home");
+    const loadMoreBtn = null; // removed button in this layout
 
-    // ---- Auth ----
-    loginBtn.addEventListener("click", async () => {
-      await signInWithPopup(auth, new GoogleAuthProvider());
-    });
+    // Modal elements
+    const authModal = document.getElementById("authModal");
+    const authEmail = document.getElementById("authEmail");
+    const authPass  = document.getElementById("authPass");
+    const authSignup= document.getElementById("authSignup");
+    const authLogin = document.getElementById("authLogin");
+    const authClose = document.getElementById("authClose");
+    const authGoogle= document.getElementById("authGoogle");
+    const authMsg   = document.getElementById("authMsg");
+
+    function openAuth(){ authModal.hidden = false; authEmail.focus(); authMsg.textContent=""; }
+    function closeAuth(){ authModal.hidden = true; authEmail.value=""; authPass.value=""; authMsg.textContent=""; }
+
+    // Auth
+    loginBtn.addEventListener("click", openAuth);
     logoutBtn.addEventListener("click", () => signOut(auth));
+    authClose.addEventListener("click", closeAuth);
+
+    authSignup.addEventListener("click", async () => {
+      authMsg.textContent = "Creating account…";
+      try {
+        await createUserWithEmailAndPassword(auth, authEmail.value.trim(), authPass.value);
+        authMsg.textContent = "Account created. Signed in.";
+        setTimeout(closeAuth, 400);
+      } catch (e) { authMsg.textContent = e.message; }
+    });
+
+    authLogin.addEventListener("click", async () => {
+      authMsg.textContent = "Signing in…";
+      try {
+        await signInWithEmailAndPassword(auth, authEmail.value.trim(), authPass.value);
+        authMsg.textContent = "Signed in.";
+        setTimeout(closeAuth, 300);
+      } catch (e) { authMsg.textContent = e.message; }
+    });
+
+    authGoogle.addEventListener("click", async () => {
+      authMsg.textContent = "Google sign-in…";
+      try {
+        await signInWithPopup(auth, new GoogleAuthProvider());
+        setTimeout(closeAuth, 300);
+      } catch (e) {
+        authMsg.textContent = e.message + " (Enable Google in Firebase & add intakee.vercel.app to Authorized Domains)";
+      }
+    });
 
     onAuthStateChanged(auth, async (user) => {
       const loggedIn = !!user;
@@ -185,7 +255,7 @@
       }
     });
 
-    // ---- Helpers ----
+    // Helpers
     function escapeHtml(s="") {
       return s.replace(/[&<>"']/g, c => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
@@ -207,7 +277,7 @@
       } catch { return ""; }
     }
 
-    // ---- Create Post ----
+    // Create Post
     async function createPost({ text, file }) {
       const user = auth.currentUser;
       if (!user) { alert("Please sign in first."); return; }
@@ -251,40 +321,31 @@
       postBtn.disabled = false;
     });
 
-    // ---- Likes ----
+    // Likes
     async function toggleLike(postId) {
       const u = auth.currentUser;
       if (!u) return alert("Sign in to like.");
       const likeRef = doc(db, "posts", postId, "likes", u.uid);
       const existing = await getDoc(likeRef);
-      if (existing.exists()) {
-        await deleteDoc(likeRef);
-      } else {
-        await setDoc(likeRef, { uid: u.uid, createdAt: serverTimestamp() });
-      }
+      if (existing.exists()) { await deleteDoc(likeRef); }
+      else { await setDoc(likeRef, { uid: u.uid, createdAt: serverTimestamp() }); }
     }
     async function getLikeCount(postId) {
       const likesSnap = await getDocs(collection(db, "posts", postId, "likes"));
       return likesSnap.size;
     }
     async function userHasLiked(postId) {
-      const u = auth.currentUser;
-      if (!u) return false;
+      const u = auth.currentUser; if (!u) return false;
       const likeRef = doc(db, "posts", postId, "likes", u.uid);
-      const snap = await getDoc(likeRef);
-      return snap.exists();
+      const snap = await getDoc(likeRef); return snap.exists();
     }
 
-    // ---- Comments ----
+    // Comments
     async function addComment(postId, text) {
-      const u = auth.currentUser;
-      if (!u) return alert("Sign in to comment.");
+      const u = auth.currentUser; if (!u) return alert("Sign in to comment.");
       if (!text.trim()) return;
       await addDoc(collection(db, "posts", postId, "comments"), {
-        uid: u.uid,
-        user: u.displayName ?? "",
-        text: text.trim(),
-        createdAt: serverTimestamp()
+        uid: u.uid, user: u.displayName ?? "", text: text.trim(), createdAt: serverTimestamp()
       });
     }
     function listenComments(postId, container) {
@@ -301,7 +362,7 @@
       });
     }
 
-    // ---- Delete Post (owner only) ----
+    // Delete Post (owner only)
     async function deletePost(id, storagePath, ownerId) {
       const user = auth.currentUser;
       if (!user || user.uid !== ownerId) return alert("You can only delete your own posts.");
@@ -310,8 +371,8 @@
       if (storagePath) { try { await deleteObject(ref(storage, storagePath)); } catch {} }
     }
 
-    // ---- Feed: first page live; older pages by "Load more" ----
-    const PAGE_SIZE = 10;
+    // Feed
+    const PAGE_SIZE = 20; // latest 20
     let lastDoc = null;
     let firstLoadDone = false;
 
@@ -330,8 +391,6 @@
       const content = document.createElement("div");
       const meta = document.createElement("div");
       meta.className = "meta";
-
-      /* timestamp next to name */
       meta.innerHTML = `<strong>${escapeHtml(p.user||"Anon")}</strong><span class="muted"> · ${fmtTime(p.createdAt)}</span>`;
 
       const textEl = document.createElement("div");
@@ -340,18 +399,11 @@
       const mediaEl = document.createElement("div");
       mediaEl.className = "media";
       if (p.mediaUrl) {
-        if (p.kind === "image") {
-          mediaEl.innerHTML = `<img src="${p.mediaUrl}" alt="image">`;
-        } else if (p.kind === "video") {
-          mediaEl.innerHTML = `<video src="${p.mediaUrl}" controls playsinline></video>`;
-        } else if (p.kind === "audio") {
-          mediaEl.innerHTML = `<audio src="${p.mediaUrl}" controls></audio>`;
-        } else {
-          mediaEl.innerHTML = `<a href="${p.mediaUrl}" target="_blank" rel="noopener">Download file</a>`;
-        }
-      } else {
-        mediaEl.innerHTML = "";
-      }
+        if (p.kind === "image") mediaEl.innerHTML = `<img src="${p.mediaUrl}" alt="image">`;
+        else if (p.kind === "video") mediaEl.innerHTML = `<video src="${p.mediaUrl}" controls playsinline></video>`;
+        else if (p.kind === "audio") mediaEl.innerHTML = `<audio src="${p.mediaUrl}" controls></audio>`;
+        else mediaEl.innerHTML = `<a href="${p.mediaUrl}" target="_blank" rel="noopener">Download file</a>`;
+      } else { mediaEl.innerHTML = ""; }
 
       const actions = document.createElement("div");
       actions.className = "actions";
@@ -419,10 +471,10 @@
     }
 
     const firstPageQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(PAGE_SIZE));
-    const unsubFirst = onSnapshot(firstPageQuery, (snap) => {
+    onSnapshot(firstPageQuery, (snap) => {
       const docs = snap.docs;
       if (!docs.length) {
-        feedEl.innerHTML = '<div class="muted">No posts yet.</div>';
+        feedEl.innerHTML = '<div class="muted card">No posts yet.</div>';
         return;
       }
       renderBatch(docs, false);
@@ -430,18 +482,24 @@
       firstLoadDone = true;
     });
 
-    loadMoreBtn.addEventListener("click", async () => {
-      if (!firstLoadDone || !lastDoc) return;
-      const qMore = query(collection(db, "posts"), orderBy("createdAt", "desc"), startAfter(lastDoc), limit(PAGE_SIZE));
-      const snap = await getDocs(qMore);
-      if (!snap.docs.length) {
-        loadMoreBtn.textContent = "No more posts";
-        loadMoreBtn.disabled = true;
-        return;
-      }
-      renderBatch(snap.docs, true);
-      lastDoc = snap.docs[snap.docs.length - 1];
-    });
+    // Tabs (SPA)
+    const links = Array.from(document.querySelectorAll('.bottom-nav a'));
+    const sections = {
+      home:    document.getElementById('tab-home'),
+      videos:  document.getElementById('tab-videos'),
+      podcast: document.getElementById('tab-podcast'),
+      upload:  document.getElementById('tab-upload'),
+      clips:   document.getElementById('tab-clips'),
+      profile: document.getElementById('tab-profile'),
+      settings:document.getElementById('tab-settings'),
+    };
+    function setTab(key){
+      Object.entries(sections).forEach(([k,el]) => { el.style.display = (k===key) ? '' : 'none'; });
+      links.forEach(a => a.classList.toggle('active', a.dataset.tab===key));
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+    links.forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); setTab(a.dataset.tab); }));
+    setTab('home');
   </script>
 </body>
 </html>
