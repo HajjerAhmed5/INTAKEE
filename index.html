@@ -82,7 +82,7 @@
     .bottom-nav a{ color:#aaa; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.75rem; padding:6px 4px; border-radius:10px; }
     .bottom-nav a.active, .bottom-nav a:hover{ color:#fff; background:#111; }
 
-    /* Modal */
+    /* Modal (kept but hard-hidden) */
     .modal{ position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:200; }
     .modal-card{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:16px; width:min(420px,92vw); box-shadow:0 8px 30px rgba(0,0,0,.5); }
     .modal-card input{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; margin:6px 0; }
@@ -100,13 +100,15 @@
     </div>
 
     <div class="auth">
-      <button id="loginBtn">Login / Sign Up</button>
+      <!-- UPDATED: hide login so modal never opens -->
+      <button id="loginBtn" style="display:none">Login / Sign Up</button>
       <button id="logoutBtn" style="display:none;">Logout</button>
     </div>
   </header>
 
-  <!-- Auth modal -->
-  <div id="authModal" class="modal" hidden>
+  <!-- Auth modal (kept but hard-hidden) -->
+  <!-- UPDATED: add inline display:none to ensure it never shows -->
+  <div id="authModal" class="modal" hidden style="display:none">
     <div class="modal-card">
       <h3 style="margin:0 0 10px;">Sign in</h3>
       <input id="authEmail" type="email" placeholder="Email" />
@@ -187,9 +189,8 @@
     const postFile  = document.getElementById("postFile");
     const postBtn   = document.getElementById("postBtn");
     const feedEl    = document.getElementById("tab-home");
-    const loadMoreBtn = null; // removed button in this layout
 
-    // Modal elements
+    // Modal elements (kept but unused)
     const authModal = document.getElementById("authModal");
     const authEmail = document.getElementById("authEmail");
     const authPass  = document.getElementById("authPass");
@@ -199,45 +200,19 @@
     const authGoogle= document.getElementById("authGoogle");
     const authMsg   = document.getElementById("authMsg");
 
-    function openAuth(){ authModal.hidden = false; authEmail.focus(); authMsg.textContent=""; }
-    function closeAuth(){ authModal.hidden = true; authEmail.value=""; authPass.value=""; authMsg.textContent=""; }
+    function openAuth(){ authModal.hidden = false; authEmail?.focus(); authMsg.textContent=""; }
+    function closeAuth(){ authModal.hidden = true; if(authEmail) authEmail.value=""; if(authPass) authPass.value=""; authMsg.textContent=""; }
 
     // Auth
-    loginBtn.addEventListener("click", openAuth);
+    // UPDATED: disable opening the modal
+    // loginBtn.addEventListener("click", openAuth);
     logoutBtn.addEventListener("click", () => signOut(auth));
-    authClose.addEventListener("click", closeAuth);
-
-    authSignup.addEventListener("click", async () => {
-      authMsg.textContent = "Creating account…";
-      try {
-        await createUserWithEmailAndPassword(auth, authEmail.value.trim(), authPass.value);
-        authMsg.textContent = "Account created. Signed in.";
-        setTimeout(closeAuth, 400);
-      } catch (e) { authMsg.textContent = e.message; }
-    });
-
-    authLogin.addEventListener("click", async () => {
-      authMsg.textContent = "Signing in…";
-      try {
-        await signInWithEmailAndPassword(auth, authEmail.value.trim(), authPass.value);
-        authMsg.textContent = "Signed in.";
-        setTimeout(closeAuth, 300);
-      } catch (e) { authMsg.textContent = e.message; }
-    });
-
-    authGoogle.addEventListener("click", async () => {
-      authMsg.textContent = "Google sign-in…";
-      try {
-        await signInWithPopup(auth, new GoogleAuthProvider());
-        setTimeout(closeAuth, 300);
-      } catch (e) {
-        authMsg.textContent = e.message + " (Enable Google in Firebase & add intakee.vercel.app to Authorized Domains)";
-      }
-    });
+    authClose?.addEventListener("click", closeAuth);
 
     onAuthStateChanged(auth, async (user) => {
       const loggedIn = !!user;
-      loginBtn.style.display  = loggedIn ? "none" : "inline-block";
+      // Keep both hidden by default to avoid flashing
+      loginBtn.style.display  = "none";   // stays hidden
       logoutBtn.style.display = loggedIn ? "inline-block" : "none";
 
       if (user) {
@@ -280,7 +255,7 @@
     // Create Post
     async function createPost({ text, file }) {
       const user = auth.currentUser;
-      if (!user) { alert("Please sign in first."); return; }
+      if (!user) { alert("Posting is locked until accounts are enabled."); return; } /* keep UI safe while auth is hidden */
 
       let mediaUrl = null, storagePath = null;
       let kind = "text", mime = null;
@@ -312,6 +287,7 @@
       });
     }
 
+    const postBtn = document.getElementById("postBtn");
     postBtn.addEventListener("click", async () => {
       postBtn.disabled = true;
       try {
@@ -372,10 +348,7 @@
     }
 
     // Feed
-    const PAGE_SIZE = 20; // latest 20
-    let lastDoc = null;
-    let firstLoadDone = false;
-
+    const PAGE_SIZE = 20;
     function renderPostCard(d) {
       const p = d.data();
       const me = auth.currentUser?.uid;
@@ -478,8 +451,6 @@
         return;
       }
       renderBatch(docs, false);
-      lastDoc = docs[docs.length - 1];
-      firstLoadDone = true;
     });
 
     // Tabs (SPA)
