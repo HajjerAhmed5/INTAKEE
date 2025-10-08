@@ -46,7 +46,8 @@
     /* Header */
     header { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px; padding:18px 16px; border-bottom:1px solid #111; }
     .brand { display:flex; align-items:center; gap:10px; }
-    .brand img { height:100px; width:auto; border-radius:12px; } /* Big eye logo only */
+    /* Bigger + subtle blend */
+    .brand img { height:120px; width:auto; border-radius:12px; opacity:.9; filter:drop-shadow(0 0 12px rgba(255,255,255,.06)); }
 
     .search-bar{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; max-width:520px; margin:0 auto; width:100%; }
     .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
@@ -100,14 +101,13 @@
     </div>
 
     <div class="auth">
-      <!-- UPDATED: hide login so modal never opens -->
+      <!-- Hidden so modal never opens for now -->
       <button id="loginBtn" style="display:none">Login / Sign Up</button>
       <button id="logoutBtn" style="display:none;">Logout</button>
     </div>
   </header>
 
   <!-- Auth modal (kept but hard-hidden) -->
-  <!-- UPDATED: add inline display:none to ensure it never shows -->
   <div id="authModal" class="modal" hidden style="display:none">
     <div class="modal-card">
       <h3 style="margin:0 0 10px;">Sign in</h3>
@@ -124,8 +124,15 @@
   </div>
 
   <main>
-    <!-- Create Post -->
-    <section class="card" id="create-card">
+    <!-- Home: feed renders here -->
+    <section id="tab-home"></section>
+
+    <!-- Videos / Podcasts / Clips placeholders -->
+    <section id="tab-videos"   class="card" style="display:none;">Coming soon.</section>
+    <section id="tab-podcast"  class="card" style="display:none;">Coming soon.</section>
+
+    <!-- Upload: composer moved here -->
+    <section id="tab-upload" class="card" style="display:none;">
       <div class="row">
         <input id="postText" type="text" placeholder="Say something…" />
         <input id="postFile" type="file" />
@@ -133,11 +140,6 @@
       </div>
     </section>
 
-    <!-- Tab sections -->
-    <section id="tab-home"></section> <!-- feed renders here -->
-    <section id="tab-videos"   class="card" style="display:none;">Coming soon.</section>
-    <section id="tab-podcast"  class="card" style="display:none;">Coming soon.</section>
-    <section id="tab-upload"   class="card" style="display:none;">Coming soon.</section>
     <section id="tab-clips"    class="card" style="display:none;">Coming soon.</section>
     <section id="tab-profile"  class="card" style="display:none;">Coming soon.</section>
     <section id="tab-settings" class="card" style="display:none;">Coming soon.</section>
@@ -158,18 +160,12 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithPopup,
-      signOut,
-      onAuthStateChanged,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword
+      getAuth, signOut, onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import {
       getFirestore, doc, getDoc, setDoc, addDoc, collection,
       serverTimestamp, query, orderBy, limit, onSnapshot, deleteDoc,
-      getDocs, startAfter
+      getDocs
     } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
     import {
       getStorage, ref, uploadBytes, getDownloadURL, deleteObject
@@ -190,31 +186,12 @@
     const postBtn   = document.getElementById("postBtn");
     const feedEl    = document.getElementById("tab-home");
 
-    // Modal elements (kept but unused)
-    const authModal = document.getElementById("authModal");
-    const authEmail = document.getElementById("authEmail");
-    const authPass  = document.getElementById("authPass");
-    const authSignup= document.getElementById("authSignup");
-    const authLogin = document.getElementById("authLogin");
-    const authClose = document.getElementById("authClose");
-    const authGoogle= document.getElementById("authGoogle");
-    const authMsg   = document.getElementById("authMsg");
-
-    function openAuth(){ authModal.hidden = false; authEmail?.focus(); authMsg.textContent=""; }
-    function closeAuth(){ authModal.hidden = true; if(authEmail) authEmail.value=""; if(authPass) authPass.value=""; authMsg.textContent=""; }
-
-    // Auth
-    // UPDATED: disable opening the modal
+    // Auth (modal disabled)
     // loginBtn.addEventListener("click", openAuth);
     logoutBtn.addEventListener("click", () => signOut(auth));
-    authClose?.addEventListener("click", closeAuth);
-
     onAuthStateChanged(auth, async (user) => {
-      const loggedIn = !!user;
-      // Keep both hidden by default to avoid flashing
-      loginBtn.style.display  = "none";   // stays hidden
-      logoutBtn.style.display = loggedIn ? "inline-block" : "none";
-
+      loginBtn.style.display  = "none";
+      logoutBtn.style.display = user ? "inline-block" : "none";
       if (user) {
         const uref = doc(db, "users", user.uid);
         const snap = await getDoc(uref);
@@ -252,10 +229,10 @@
       } catch { return ""; }
     }
 
-    // Create Post
+    // Create Post (composer now under Upload tab)
     async function createPost({ text, file }) {
       const user = auth.currentUser;
-      if (!user) { alert("Posting is locked until accounts are enabled."); return; } /* keep UI safe while auth is hidden */
+      if (!user) { alert("Posting is locked until accounts are enabled."); return; }
 
       let mediaUrl = null, storagePath = null;
       let kind = "text", mime = null;
@@ -263,9 +240,9 @@
       if (file) {
         const info = detectKind(file);
         kind = info.kind; mime = info.mime;
-        const folder = kind === "image" ? "images" :
-                       kind === "video" ? "videos" :
-                       kind === "audio" ? "audio"  : "files";
+        const folder = kind === "image" ? "images"
+                    : kind === "video" ? "videos"
+                    : kind === "audio" ? "audio"  : "files";
         storagePath = `uploads/${user.uid}/${folder}/${Date.now()}-${file.name}`;
         const r = ref(storage, storagePath);
         await uploadBytes(r, file);
@@ -287,15 +264,16 @@
       });
     }
 
-    const postBtn = document.getElementById("postBtn");
-    postBtn.addEventListener("click", async () => {
-      postBtn.disabled = true;
-      try {
-        await createPost({ text: postText.value, file: postFile.files[0] });
-        postText.value = ""; postFile.value = "";
-      } catch (e) { alert(e.message); }
-      postBtn.disabled = false;
-    });
+    if (postBtn) {
+      postBtn.addEventListener("click", async () => {
+        postBtn.disabled = true;
+        try {
+          await createPost({ text: postText.value, file: postFile.files[0] });
+          postText.value = ""; postFile.value = "";
+        } catch (e) { alert(e.message); }
+        postBtn.disabled = false;
+      });
+    }
 
     // Likes
     async function toggleLike(postId) {
@@ -453,7 +431,7 @@
       renderBatch(docs, false);
     });
 
-    // Tabs (SPA)
+    /* Tabs (hash-based) */
     const links = Array.from(document.querySelectorAll('.bottom-nav a'));
     const sections = {
       home:    document.getElementById('tab-home'),
@@ -469,8 +447,16 @@
       links.forEach(a => a.classList.toggle('active', a.dataset.tab===key));
       window.scrollTo({top:0, behavior:'smooth'});
     }
-    links.forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); setTab(a.dataset.tab); }));
-    setTab('home');
+    function applyHash(){
+      const key = (location.hash || "#home").replace("#","");
+      setTab(key);
+    }
+    links.forEach(a => a.addEventListener('click', (e) => {
+      e.preventDefault();
+      location.hash = a.getAttribute('href'); // triggers hashchange
+    }));
+    window.addEventListener('hashchange', applyHash);
+    applyHash(); // initial
   </script>
 </body>
 </html>
