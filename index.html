@@ -46,9 +46,9 @@
     /* Header */
     header { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px; padding:18px 16px; border-bottom:1px solid #111; }
     .brand { display:flex; align-items:center; gap:10px; }
-    /* Bigger + subtle blend */
     .brand img { height:120px; width:auto; border-radius:12px; opacity:.9; filter:drop-shadow(0 0 12px rgba(255,255,255,.06)); }
 
+    #searchWrap { display:flex; }
     .search-bar{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; max-width:520px; margin:0 auto; width:100%; }
     .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
 
@@ -65,15 +65,7 @@
     button.danger { background:#8b0000; border-color:#8b0000; }
     button[disabled] { opacity:.6; cursor:not-allowed; }
     .card { background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; box-shadow: 0 4px 18px rgba(0,0,0,.35); }
-    .post { display:grid; grid-template-columns:48px 1fr; gap:12px; }
-    .avatar { width:48px; height:48px; border-radius:50%; background:#222; object-fit:cover; }
-    .meta { display:flex; gap:8px; align-items:center; font-size:.9rem; opacity:.95; font-weight:600; }
-    .media { margin-top:10px; }
-    .media img, .media video { max-width:100%; border-radius:10px; display:block; }
-    .media audio { width:100%; margin-top:6px; }
-    .muted { opacity:.7; font-size:.85rem; color:#b5b5b5; }
-    .actions { display:flex; gap:8px; margin-top:8px; }
-    .comment { padding:8px 10px; background:#111; border-radius:8px; margin-top:6px; }
+    .muted { opacity:.7; font-size:.95rem; color:#b5b5b5; }
 
     /* Bottom nav */
     .bottom-nav{
@@ -87,6 +79,17 @@
     .modal{ position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:200; }
     .modal-card{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:16px; width:min(420px,92vw); box-shadow:0 8px 30px rgba(0,0,0,.5); }
     .modal-card input{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; margin:6px 0; }
+
+    /* Pills / tiles */
+    .pills { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
+    .pill { padding:6px 10px; border:1px solid #2a2a2a; border-radius:999px; font-size:.85rem; background:#0f0f0f; cursor:pointer; }
+    .pill.active { background:#151515; color:#fff; border-color:#3a3a3a; }
+
+    .tiles { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:12px; }
+    .tile { border:1px solid #1a1a1a; background:#0f0f0f; border-radius:14px; padding:16px; }
+    .tile h3 { margin:0 0 6px; font-size:1.05rem; }
+    .tile p { margin:0; color:#b7b7b7; }
+    .tile .actions { margin-top:12px; display:flex; gap:8px; }
   </style>
 </head>
 <body>
@@ -95,13 +98,12 @@
       <img src="logo.png" alt="INTAKEE">
     </div>
 
-    <div class="search-bar">
+    <div id="searchWrap" class="search-bar">
       <i class="fa fa-search" style="opacity:.6;"></i>
       <input id="globalSearch" type="text" placeholder="Search videos, clips, podcasts..." />
     </div>
 
     <div class="auth">
-      <!-- Hidden so modal never opens for now -->
       <button id="loginBtn" style="display:none">Login / Sign Up</button>
       <button id="logoutBtn" style="display:none;">Logout</button>
     </div>
@@ -124,25 +126,171 @@
   </div>
 
   <main>
-    <!-- Home: feed renders here -->
-    <section id="tab-home"></section>
+    <!-- HOME (Trending mix) -->
+    <section id="tab-home">
+      <div class="row" style="justify-content:space-between; align-items:center; margin-top:8px;">
+        <h2 style="margin:0;">Trending</h2>
+        <div class="pills">
+          <button class="pill" data-filter="all">All</button>
+          <button class="pill" data-filter="video">Videos</button>
+          <button class="pill" data-filter="podcast">Podcasts</button>
+          <button class="pill" data-filter="clip">Clips</button>
+          <button class="pill" data-filter="following">Following</button>
+          <button class="pill" data-filter="new">Newest</button>
+        </div>
+      </div>
+      <div id="home-feed"></div>
+    </section>
 
-    <!-- Videos / Podcasts / Clips placeholders -->
-    <section id="tab-videos"   class="card" style="display:none;">Coming soon.</section>
-    <section id="tab-podcast"  class="card" style="display:none;">Coming soon.</section>
+    <!-- VIDEOS -->
+    <section id="tab-videos" class="card" style="display:none;">
+      <h3 style="margin:0 0 8px;">Videos</h3>
+      <div class="muted">Search filters this list to videos only.</div>
+      <div id="videos-feed" style="margin-top:8px;"></div>
+    </section>
 
-    <!-- Upload: composer moved here -->
+    <!-- PODCASTS -->
+    <section id="tab-podcast" class="card" style="display:none;">
+      <h3 style="margin:0 0 8px;">Podcasts</h3>
+      <div class="muted">Search filters this list to podcasts only.</div>
+      <div id="podcast-feed" style="margin-top:8px;"></div>
+    </section>
+
+    <!-- UPLOAD (no search) -->
     <section id="tab-upload" class="card" style="display:none;">
-      <div class="row">
-        <input id="postText" type="text" placeholder="Say something…" />
-        <input id="postFile" type="file" />
-        <button id="postBtn" class="primary">Post</button>
+      <h3 style="margin:0 0 6px;">Upload</h3>
+      <p class="muted" style="margin:0 0 12px;">Choose what you’re posting.</p>
+
+      <div class="tiles" id="upload-choices">
+        <div class="tile">
+          <h3>Video</h3>
+          <p>Full videos up to several hours.</p>
+          <div class="actions"><button class="primary" data-kind="video">Choose file</button></div>
+        </div>
+        <div class="tile">
+          <h3>Clip</h3>
+          <p>Short-form content.</p>
+          <div class="actions"><button class="primary" data-kind="clip">Choose file</button></div>
+        </div>
+        <div class="tile">
+          <h3>Podcast</h3>
+          <p>Audio (MP3/M4A) or video podcast.</p>
+          <div class="actions">
+            <button class="primary" data-kind="podcast_audio">Audio</button>
+            <button class="ghost"   data-kind="podcast_video">Video</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Composer appears AFTER a choice -->
+      <div id="upload-composer" style="display:none; margin-top:14px;">
+        <div class="muted" id="chosen-kind" style="margin-bottom:6px;"></div>
+        <div class="row">
+          <input id="postText" type="text" placeholder="Title or caption" />
+          <input id="postFile" type="file" />
+          <button id="postBtn" class="primary">Post</button>
+        </div>
+        <div class="muted" style="margin-top:6px;">Processing will start after upload. You’ll be notified when it’s ready.</div>
       </div>
     </section>
 
-    <section id="tab-clips"    class="card" style="display:none;">Coming soon.</section>
-    <section id="tab-profile"  class="card" style="display:none;">Coming soon.</section>
-    <section id="tab-settings" class="card" style="display:none;">Coming soon.</section>
+    <!-- CLIPS -->
+    <section id="tab-clips" class="card" style="display:none;">
+      <h3 style="margin:0 0 8px;">Clips</h3>
+      <div class="muted">Search filters this list to clips only.</div>
+      <div id="clips-feed" style="margin-top:8px;"></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="tab-profile" style="display:none;">
+      <div class="card">
+        <div class="row" style="align-items:flex-start;">
+          <img id="profile-photo" src="" alt="" style="width:84px; height:84px; border-radius:50%; background:#1a1a1a; object-fit:cover;">
+          <div style="flex:1; min-width:200px;">
+            <h3 id="profile-name" style="margin:0;">Your Name</h3>
+            <div id="profile-handle" class="muted">@username</div>
+            <p id="profile-bio" style="margin:8px 0 0;">Add a short bio to introduce yourself.</p>
+            <div class="row" style="gap:16px; margin-top:10px;">
+              <div class="muted"><strong id="stat-posts">0</strong> Posts</div>
+              <div class="muted"><strong id="stat-followers">0</strong> Followers</div>
+              <div class="muted"><strong id="stat-following">0</strong> Following</div>
+            </div>
+            <div class="row" style="margin-top:10px;">
+              <button id="btn-edit-profile" class="ghost">Edit Profile</button>
+              <button id="btn-share-profile" class="ghost">Share Profile</button>
+            </div>
+          </div>
+          <div>
+            <label class="muted" style="display:flex; align-items:center; gap:8px;">
+              <input type="checkbox" id="toggle-private"> Private account
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row pills">
+          <button class="pill active" data-profiletab="all">All</button>
+          <button class="pill" data-profiletab="videos">Videos</button>
+          <button class="pill" data-profiletab="podcasts">Podcasts</button>
+          <button class="pill" data-profiletab="clips">Clips</button>
+          <button class="pill" data-profiletab="playlists">Playlists</button>
+        </div>
+        <div id="profile-grid" style="margin-top:8px;">
+          <div class="muted">No posts yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="tab-settings" class="card" style="display:none;">
+      <h3 style="margin:0 0 12px;">Settings</h3>
+
+      <div class="card" style="margin:0 0 12px;">
+        <h4 style="margin:0 0 8px;">Account</h4>
+        <div class="muted">Name, Username, Email</div>
+        <div class="muted">Change Password</div>
+        <div class="muted">Delete Account</div>
+        <div class="row" style="margin-top:10px;"><button id="settings-logout">Logout</button></div>
+      </div>
+
+      <div class="card" style="margin:0 0 12px;">
+        <h4 style="margin:0 0 8px;">Privacy & Safety</h4>
+        <label class="muted" style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+          <input type="checkbox" id="settings-private"> Private account
+        </label>
+        <div class="muted">Blocked accounts</div>
+        <div class="muted">Comments: Everyone / Followers / No one</div>
+        <div class="muted">Hide sensitive content</div>
+        <div class="muted">Report a problem</div>
+      </div>
+
+      <div class="card" style="margin:0 0 12px;">
+        <h4 style="margin:0 0 8px;">Notifications</h4>
+        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> New followers</label>
+        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Likes & dislikes</label>
+        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Comments & replies</label>
+        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Upload complete</label>
+      </div>
+
+      <div class="card" style="margin:0 0 12px;">
+        <h4 style="margin:0 0 8px;">Playback & Storage</h4>
+        <div class="muted">Video quality: Auto / HD / Data Saver</div>
+        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Autoplay on Wi-Fi only</label>
+        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Background audio (podcasts)</label>
+        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Picture-in-picture</label>
+        <button class="ghost" style="margin-top:8px;">Clear cached media</button>
+      </div>
+
+      <div class="card">
+        <h4 style="margin:0 0 8px;">About & Legal</h4>
+        <div class="muted">Community Guidelines</div>
+        <div class="muted">Terms of Service</div>
+        <div class="muted">Privacy Policy</div>
+        <div class="muted">Contact: intakee2025@gmail.com</div>
+        <div class="muted" style="margin-top:6px;">Version 1.0.0</div>
+      </div>
+    </section>
   </main>
 
   <!-- Bottom Tab Bar -->
@@ -159,35 +307,26 @@
   <!-- Firebase + App Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import {
-      getAuth, signOut, onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import {
       getFirestore, doc, getDoc, setDoc, addDoc, collection,
-      serverTimestamp, query, orderBy, limit, onSnapshot, deleteDoc,
-      getDocs
+      serverTimestamp, query, orderBy, limit, onSnapshot, deleteDoc, getDocs
     } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-    import {
-      getStorage, ref, uploadBytes, getDownloadURL, deleteObject
-    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
     import { firebaseConfig } from "./firebase-config.js";
 
-    // Init
+    /* Init */
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // Elements
+    /* Elements */
+    const searchWrap = document.getElementById("searchWrap");
     const loginBtn  = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
-    const postText  = document.getElementById("postText");
-    const postFile  = document.getElementById("postFile");
-    const postBtn   = document.getElementById("postBtn");
-    const feedEl    = document.getElementById("tab-home");
 
-    // Auth (modal disabled)
-    // loginBtn.addEventListener("click", openAuth);
+    /* Auth visibility */
     logoutBtn.addEventListener("click", () => signOut(auth));
     onAuthStateChanged(auth, async (user) => {
       loginBtn.style.display  = "none";
@@ -197,241 +336,106 @@
         const snap = await getDoc(uref);
         if (!snap.exists()) {
           await setDoc(uref, {
-            uid: user.uid,
-            displayName: user.displayName ?? "",
-            email: user.email ?? "",
-            photoURL: user.photoURL ?? "",
-            createdAt: serverTimestamp()
+            uid: user.uid, displayName: user.displayName ?? "", email: user.email ?? "",
+            photoURL: user.photoURL ?? "", createdAt: serverTimestamp()
           });
         }
+        // Profile header population (simple)
+        document.getElementById("profile-name").textContent = user.displayName || "Your Name";
+        document.getElementById("profile-handle").textContent = user.email ? "@"+user.email.split("@")[0] : "@username";
+        const p = document.getElementById("profile-photo");
+        if (user.photoURL) p.src = user.photoURL;
       }
     });
 
-    // Helpers
-    function escapeHtml(s="") {
-      return s.replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[c]));
-    }
-    function detectKind(file) {
-      if (!file) return { kind: "text", mime: null };
-      const mime = file.type || "";
-      if (mime.startsWith("image/")) return { kind: "image", mime };
-      if (mime.startsWith("video/")) return { kind: "video", mime };
-      if (mime.startsWith("audio/")) return { kind: "audio", mime };
-      return { kind: "file", mime };
-    }
-    function fmtTime(ts){
-      try {
-        const t = ts?.toDate ? ts.toDate() : (ts instanceof Date ? ts : null);
-        if(!t) return "";
-        return t.toLocaleString([], { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" });
-      } catch { return ""; }
-    }
+    /* Helpers */
+    function escapeHtml(s=""){ return s.replace(/[&<>"']/g, c =>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+    function detectKind(file){ if(!file) return {kind:"text",mime:null}; const m=file.type||""; if(m.startsWith("image/"))return{kind:"image",mime:m}; if(m.startsWith("video/"))return{kind:"video",mime:m}; if(m.startsWith("audio/"))return{kind:"audio",mime:m}; return{kind:"file",mime:m}; }
+    function fmtTime(ts){ try{const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null); if(!t)return""; return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});}catch{return"";} }
 
-    // Create Post (composer now under Upload tab)
-    async function createPost({ text, file }) {
+    /* Upload choice → reveal composer */
+    const uploadChoices = document.getElementById("upload-choices");
+    const uploadComposer = document.getElementById("upload-composer");
+    const chosenKindEl = document.getElementById("chosen-kind");
+    let chosenKind = null;
+
+    uploadChoices?.addEventListener("click", (e)=>{
+      const btn = e.target.closest("button[data-kind]");
+      if(!btn) return;
+      chosenKind = btn.dataset.kind; // "video" | "clip" | "podcast_audio" | "podcast_video"
+      chosenKindEl.textContent = `Selected: ${chosenKind.replace("_"," ")}`;
+      uploadComposer.style.display = "";
+      // Optionally focus title
+      document.getElementById("postText").focus();
+    });
+
+    /* Create Post (composer) */
+    const postBtn = document.getElementById("postBtn");
+    const postText  = document.getElementById("postText");
+    const postFile  = document.getElementById("postFile");
+    async function createPost({ text, file, kindOverride }) {
       const user = auth.currentUser;
       if (!user) { alert("Posting is locked until accounts are enabled."); return; }
-
-      let mediaUrl = null, storagePath = null;
-      let kind = "text", mime = null;
-
+      let mediaUrl=null, storagePath=null, kind="text", mime=null;
       if (file) {
-        const info = detectKind(file);
-        kind = info.kind; mime = info.mime;
-        const folder = kind === "image" ? "images"
-                    : kind === "video" ? "videos"
-                    : kind === "audio" ? "audio"  : "files";
+        const info = detectKind(file); mime = info.mime;
+        // Map chosen kind to storage folder
+        const folder = (kindOverride?.startsWith("podcast") ? (info.kind==="audio"?"audio":"videos")
+                      : info.kind==="image" ? "images" : info.kind==="video" ? "videos" : info.kind==="audio" ? "audio" : "files");
+        kind = kindOverride || info.kind;
         storagePath = `uploads/${user.uid}/${folder}/${Date.now()}-${file.name}`;
         const r = ref(storage, storagePath);
         await uploadBytes(r, file);
         mediaUrl = await getDownloadURL(r);
       }
-
       await addDoc(collection(db, "posts"), {
-        ownerId: user.uid,
-        user: user.displayName ?? "",
-        userPhoto: user.photoURL ?? "",
-        text: (text || "").trim(),
-        mediaUrl,
-        storagePath,
-        kind,
-        mime,
-        likeCount: 0,
-        commentCount: 0,
-        createdAt: serverTimestamp()
+        ownerId:user.uid, user:user.displayName??"", userPhoto:user.photoURL??"",
+        text:(text||"").trim(), mediaUrl, storagePath, kind, mime,
+        likeCount:0, commentCount:0, createdAt:serverTimestamp()
       });
+      alert("Upload complete. Processing may take a moment.");
     }
-
-    if (postBtn) {
-      postBtn.addEventListener("click", async () => {
-        postBtn.disabled = true;
-        try {
-          await createPost({ text: postText.value, file: postFile.files[0] });
-          postText.value = ""; postFile.value = "";
-        } catch (e) { alert(e.message); }
-        postBtn.disabled = false;
-      });
-    }
-
-    // Likes
-    async function toggleLike(postId) {
-      const u = auth.currentUser;
-      if (!u) return alert("Sign in to like.");
-      const likeRef = doc(db, "posts", postId, "likes", u.uid);
-      const existing = await getDoc(likeRef);
-      if (existing.exists()) { await deleteDoc(likeRef); }
-      else { await setDoc(likeRef, { uid: u.uid, createdAt: serverTimestamp() }); }
-    }
-    async function getLikeCount(postId) {
-      const likesSnap = await getDocs(collection(db, "posts", postId, "likes"));
-      return likesSnap.size;
-    }
-    async function userHasLiked(postId) {
-      const u = auth.currentUser; if (!u) return false;
-      const likeRef = doc(db, "posts", postId, "likes", u.uid);
-      const snap = await getDoc(likeRef); return snap.exists();
-    }
-
-    // Comments
-    async function addComment(postId, text) {
-      const u = auth.currentUser; if (!u) return alert("Sign in to comment.");
-      if (!text.trim()) return;
-      await addDoc(collection(db, "posts", postId, "comments"), {
-        uid: u.uid, user: u.displayName ?? "", text: text.trim(), createdAt: serverTimestamp()
-      });
-    }
-    function listenComments(postId, container) {
-      const q = query(collection(db, "posts", postId, "comments"), orderBy("createdAt", "asc"), limit(50));
-      return onSnapshot(q, (snap) => {
-        container.innerHTML = "";
-        snap.forEach((d) => {
-          const c = d.data();
-          const div = document.createElement("div");
-          div.className = "comment";
-          div.innerHTML = `<strong>${escapeHtml(c.user||"Anon")}:</strong> ${escapeHtml(c.text)}`;
-          container.appendChild(div);
-        });
-      });
-    }
-
-    // Delete Post (owner only)
-    async function deletePost(id, storagePath, ownerId) {
-      const user = auth.currentUser;
-      if (!user || user.uid !== ownerId) return alert("You can only delete your own posts.");
-      if (!confirm("Delete this post?")) return;
-      await deleteDoc(doc(db, "posts", id));
-      if (storagePath) { try { await deleteObject(ref(storage, storagePath)); } catch {} }
-    }
-
-    // Feed
-    const PAGE_SIZE = 20;
-    function renderPostCard(d) {
-      const p = d.data();
-      const me = auth.currentUser?.uid;
-      const wrapper = document.createElement("article");
-      wrapper.className = "card post";
-
-      const avatar = document.createElement("img");
-      avatar.className = "avatar";
-      avatar.src = p.userPhoto || "";
-      avatar.alt = "";
-      avatar.onerror = () => { avatar.style.display = "none"; };
-
-      const content = document.createElement("div");
-      const meta = document.createElement("div");
-      meta.className = "meta";
-      meta.innerHTML = `<strong>${escapeHtml(p.user||"Anon")}</strong><span class="muted"> · ${fmtTime(p.createdAt)}</span>`;
-
-      const textEl = document.createElement("div");
-      textEl.innerHTML = p.text ? escapeHtml(p.text) : "";
-
-      const mediaEl = document.createElement("div");
-      mediaEl.className = "media";
-      if (p.mediaUrl) {
-        if (p.kind === "image") mediaEl.innerHTML = `<img src="${p.mediaUrl}" alt="image">`;
-        else if (p.kind === "video") mediaEl.innerHTML = `<video src="${p.mediaUrl}" controls playsinline></video>`;
-        else if (p.kind === "audio") mediaEl.innerHTML = `<audio src="${p.mediaUrl}" controls></audio>`;
-        else mediaEl.innerHTML = `<a href="${p.mediaUrl}" target="_blank" rel="noopener">Download file</a>`;
-      } else { mediaEl.innerHTML = ""; }
-
-      const actions = document.createElement("div");
-      actions.className = "actions";
-
-      const likeBtn = document.createElement("button");
-      likeBtn.className = "ghost";
-      likeBtn.textContent = "♥ Like";
-      likeBtn.addEventListener("click", () => toggleLike(d.id));
-
-      const likeCountEl = document.createElement("span");
-      likeCountEl.className = "muted";
-      likeCountEl.textContent = "0 likes";
-
-      const commentInput = document.createElement("input");
-      commentInput.type = "text"; commentInput.placeholder = "Write a comment…"; commentInput.style.flex = "1";
-
-      const commentBtn = document.createElement("button");
-      commentBtn.textContent = "Comment";
-      commentBtn.addEventListener("click", async () => {
-        await addComment(d.id, commentInput.value);
-        commentInput.value = "";
-      });
-
-      const commentsWrap = document.createElement("div");
-
-      if (me && me === p.ownerId) {
-        const delBtn = document.createElement("button");
-        delBtn.className = "danger";
-        delBtn.textContent = "Delete";
-        delBtn.addEventListener("click", () => deletePost(d.id, p.storagePath, p.ownerId));
-        actions.appendChild(delBtn);
-      }
-
-      actions.appendChild(likeBtn);
-      actions.appendChild(likeCountEl);
-      actions.appendChild(commentInput);
-      actions.appendChild(commentBtn);
-
-      content.appendChild(meta);
-      if (p.text) content.appendChild(textEl);
-      if (p.mediaUrl) content.appendChild(mediaEl);
-      content.appendChild(actions);
-      content.appendChild(commentsWrap);
-
-      wrapper.appendChild(avatar);
-      wrapper.appendChild(content);
-
-      (async () => {
-        const count = await getLikeCount(d.id);
-        likeCountEl.textContent = `${count} ${count===1?"like":"likes"}`;
-        if (await userHasLiked(d.id)) {
-          likeBtn.textContent = "♥ Liked";
-          likeBtn.style.borderColor = "#ff3b3b";
-          likeBtn.style.color = "#ff3b3b";
-        }
-      })();
-
-      listenComments(d.id, commentsWrap);
-      return wrapper;
-    }
-
-    function renderBatch(docs, append=false) {
-      if (!append) feedEl.innerHTML = "";
-      docs.forEach(d => feedEl.appendChild(renderPostCard(d)));
-    }
-
-    const firstPageQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(PAGE_SIZE));
-    onSnapshot(firstPageQuery, (snap) => {
-      const docs = snap.docs;
-      if (!docs.length) {
-        feedEl.innerHTML = '<div class="muted card">No posts yet.</div>';
-        return;
-      }
-      renderBatch(docs, false);
+    postBtn?.addEventListener("click", async ()=>{
+      if(!chosenKind){ alert("Choose Video, Clip, or Podcast first."); return; }
+      const file = postFile.files[0];
+      if(!file){ alert("Choose a file."); return; }
+      postBtn.disabled = true;
+      try{
+        await createPost({ text: postText.value, file, kindOverride: chosenKind });
+        postText.value=""; postFile.value=""; uploadComposer.style.display="none";
+      } catch(e){ alert(e.message); }
+      postBtn.disabled = false;
     });
 
-    /* Tabs (hash-based) */
+    /* Feed (Home) */
+    const homeFeed = document.getElementById("home-feed");
+    const PAGE_SIZE = 20;
+    function renderPostCard(d){
+      const p=d.data();
+      const wrap=document.createElement("article"); wrap.className="card";
+      const label = (p.kind==="video"||p.kind==="podcast_video")?"VIDEO":(p.kind==="audio"||p.kind==="podcast_audio")?"PODCAST":(p.kind==="clip")?"CLIP":(p.kind==="image")?"IMAGE":"POST";
+      const header=`<div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><strong>${escapeHtml(p.user||"Anon")}</strong> <span class="muted">· ${fmtTime(p.createdAt)}</span></div>
+        <span class="muted" style="border:1px solid #2a2a2a;padding:2px 8px;border-radius:999px;font-size:.75rem;">${label}</span>
+      </div>`;
+      let media="";
+      if(p.mediaUrl){
+        if(p.kind==="video"||p.kind==="podcast_video") media=`<video src="${p.mediaUrl}" controls playsinline style="width:100%;border-radius:10px;margin-top:8px;"></video>`;
+        else if(p.kind==="audio"||p.kind==="podcast_audio") media=`<audio src="${p.mediaUrl}" controls style="width:100%;margin-top:8px;"></audio>`;
+        else if(p.kind==="image") media=`<img src="${p.mediaUrl}" alt="" style="width:100%;border-radius:10px;margin-top:8px;">`;
+        else media=`<a href="${p.mediaUrl}" target="_blank" rel="noopener">Open file</a>`;
+      }
+      wrap.innerHTML = header + (p.text?`<div style="margin-top:6px;">${escapeHtml(p.text)}</div>`:"") + media;
+      return wrap;
+    }
+    const homeQuery = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
+    onSnapshot(homeQuery, (snap)=>{
+      const docs=snap.docs;
+      if(!docs.length){ homeFeed.innerHTML='<div class="muted card">No trending yet.</div>'; return; }
+      homeFeed.innerHTML=""; docs.forEach(d=> homeFeed.appendChild(renderPostCard(d)));
+    });
+
+    /* Tabs (hash-based) with search visibility rules */
     const links = Array.from(document.querySelectorAll('.bottom-nav a'));
     const sections = {
       home:    document.getElementById('tab-home'),
@@ -445,16 +449,13 @@
     function setTab(key){
       Object.entries(sections).forEach(([k,el]) => { el.style.display = (k===key) ? '' : 'none'; });
       links.forEach(a => a.classList.toggle('active', a.dataset.tab===key));
+      // Show search only on Home, Videos, Podcast, Clips
+      const showSearch = ["home","videos","podcast","clips"].includes(key);
+      searchWrap.style.display = showSearch ? "flex" : "none";
       window.scrollTo({top:0, behavior:'smooth'});
     }
-    function applyHash(){
-      const key = (location.hash || "#home").replace("#","");
-      setTab(key);
-    }
-    links.forEach(a => a.addEventListener('click', (e) => {
-      e.preventDefault();
-      location.hash = a.getAttribute('href'); // triggers hashchange
-    }));
+    function applyHash(){ const key=(location.hash||"#home").replace("#",""); setTab(key); }
+    links.forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); location.hash = a.getAttribute('href'); }));
     window.addEventListener('hashchange', applyHash);
     applyHash(); // initial
   </script>
