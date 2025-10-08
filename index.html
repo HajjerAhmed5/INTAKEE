@@ -44,10 +44,9 @@
     body { background:#000; color:#fff; font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; }
 
     /* Header */
-    header { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid #111; }
+    header { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px; padding:18px 16px; border-bottom:1px solid #111; }
     .brand { display:flex; align-items:center; gap:10px; }
-    .brand img { height:28px; border-radius:6px; }
-    .brand strong { letter-spacing:.5px; }
+    .brand img { height:100px; width:auto; border-radius:12px; } /* 👁️ bigger logo */
 
     .search-bar{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; max-width:520px; margin:0 auto; width:100%; }
     .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
@@ -88,7 +87,7 @@
   <header>
     <div class="brand">
       <img src="logo.png" alt="INTAKEE">
-      <strong>INTAKEE</strong>
+      <!-- removed: <strong>INTAKEE</strong> -->
     </div>
 
     <div class="search-bar">
@@ -138,7 +137,7 @@
     import {
       getFirestore, doc, getDoc, setDoc, addDoc, collection,
       serverTimestamp, query, orderBy, limit, onSnapshot, deleteDoc,
-      getDocs, startAfter, setDoc as setDocFs
+      getDocs, startAfter
     } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
     import {
       getStorage, ref, uploadBytes, getDownloadURL, deleteObject
@@ -332,7 +331,7 @@
       const meta = document.createElement("div");
       meta.className = "meta";
 
-      /* ✅ show timestamp instead of Firestore doc ID */
+      /* timestamp next to name */
       meta.innerHTML = `<strong>${escapeHtml(p.user||"Anon")}</strong><span class="muted"> · ${fmtTime(p.createdAt)}</span>`;
 
       const textEl = document.createElement("div");
