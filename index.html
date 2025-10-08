@@ -3,7 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>INTAKEE</title>
+
+  <title>INTAKEE — Videos, Podcasts, and Clips</title>
+  <meta name="description" content="INTAKEE is the all-in-one platform for videos, podcasts, and clips — freedom to create, simple to share.">
+  <link rel="canonical" href="https://intakee.vercel.app/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
+  <meta property="og:description" content="All-in-one platform for videos, podcasts, and clips.">
+  <meta property="og:url" content="https://intakee.vercel.app/">
+  <meta property="og:image" content="https://intakee.vercel.app/og-image.jpg">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="INTAKEE — Videos, Podcasts, and Clips">
+  <meta name="twitter:description" content="Share videos, clips, and podcasts — your voice, your space.">
+  <meta name="twitter:image" content="https://intakee.vercel.app/og-image.jpg">
+
+  <!-- Organization JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "INTAKEE",
+    "url": "https://intakee.vercel.app/",
+    "logo": "https://intakee.vercel.app/logo.png",
+    "sameAs": []
+  }
+  </script>
+
+  <!-- Favicons (optional) -->
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
   <style>
     :root { color-scheme: dark; }
     * { box-sizing: border-box; }
@@ -39,6 +72,7 @@
       <span class="pill">INTAKEE</span>
     </div>
     <div class="row">
+      <!-- IDs used by the script below -->
       <button id="loginBtn">Login / Sign Up</button>
       <button id="logoutBtn" style="display:none;">Logout</button>
     </div>
@@ -372,12 +406,4 @@
     });
   </script>
 </body>
-  <div id="firebase-test" style="text-align:center; padding:20px;">
-  <h3>Firebase Test Login</h3>
-  <input type="email" id="testEmail" placeholder="Email" style="padding:8px;"/><br><br>
-  <input type="password" id="testPassword" placeholder="Password" style="padding:8px;"/><br><br>
-  <button id="signupBtn">Sign Up</button>
-  <button id="loginBtn">Log In</button>
-  <button id="logoutBtn">Log Out</button>
-</div>
 </html>
