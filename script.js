@@ -1,57 +1,8 @@
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-import { auth } from "./firebase.js";
-
-const signupBtn = document.getElementById("signupBtn");
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-
-if (signupBtn) {
-  signupBtn.addEventListener("click", async () => {
-    const email = document.getElementById("testEmail").value;
-    const password = document.getElementById("testPassword").value;
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      alert("✅ Signed up successfully!");
-    } catch (error) {
-      alert(error.message);
-    }
-  });
-}
-
-if (loginBtn) {
-  loginBtn.addEventListener("click", async () => {
-    const email = document.getElementById("testEmail").value;
-    const password = document.getElementById("testPassword").value;
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("✅ Logged in!");
-    } catch (error) {
-      alert(error.message);
-    }
-  });
-}
-
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", async () => {
-    await signOut(auth);
-    alert("✅ Logged out!");
-  });
-}
-
-onAuthStateChanged(auth, (user) => {
-  console.log(user ? `User logged in: ${user.email}` : "No user logged in");
-});
-
 // ========= INTAKEE Frontend Logic (script.js) =========
 // Uses the single Firebase initialization from firebaseInit.js
 import { app, auth, db, storage } from "./firebaseInit.js";
 
-// --- Firebase helper imports (CDN v10.12.4) ---
+/* ---------------- Firebase CDN helpers (v10.12.4) ---------------- */
 // Auth
 import {
   onAuthStateChanged,
@@ -76,16 +27,21 @@ import {
   query,
   orderBy,
   limit,
-  where
+  where,
+  // NEW for profile data:
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-// ========= Tiny DOM helpers =========
+/* ---------------- Tiny DOM helpers ---------------- */
 const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const show = (el) => el && el.classList.remove("hidden");
 const hide = (el) => el && el.classList.add("hidden");
 
-// ========= Tabs + Hash routing =========
+/* ---------------- Tabs + Hash routing ---------------- */
 function setActiveTab(tabId) {
   const tabs = $$(".tab");
   const btns = $$(".tab-btn");
@@ -96,7 +52,7 @@ function setActiveTab(tabId) {
     b.classList.toggle("active", b.getAttribute("data-tab") === tabId)
   );
 
-  // Per your spec: hide search & login on Upload/Settings
+  // Per spec: hide search & login on Upload/Settings
   const searchBar = $("#global-search");
   const loginBtn = $("#home-login-btn");
   if (["upload", "settings"].includes(tabId)) {
@@ -121,7 +77,7 @@ function initTabs() {
   );
 }
 
-// ========= Settings accordion =========
+/* ---------------- Settings accordion ---------------- */
 function initSettingsAccordion() {
   $$(".settings-label").forEach((label) => {
     label.addEventListener("click", () =>
@@ -130,7 +86,7 @@ function initSettingsAccordion() {
   });
 }
 
-// ========= Auth modal (email/password) =========
+/* ---------------- Auth modal (email/password) ---------------- */
 function showAuthModal() {
   show($("#auth-modal"));
   const title = $("#auth-title");
@@ -171,29 +127,110 @@ function closeAuthModal() { hide($("#auth-modal")); }
 
 Object.assign(window, { showAuthModal, closeAuthModal });
 
-// ========= Auth state → UI sync =========
-onAuthStateChanged(auth, (user) => {
+/* ---------------- Auth state → UI sync + owner-only controls ---------------- */
+const profileBanner   = $("#profileBanner");
+const bannerInput     = $("#bannerInput");
+const avatarInput     = $("#avatarInput");
+const btnChangeBanner = $("#btn-change-banner"); // + fab on banner
+const btnChangeAvatar = $("#btn-change-avatar"); // + fab on avatar
+
+const profilePhoto  = $("#profile-photo");
+const profileName   = $("#profile-name");
+const profileHandle = $("#profile-handle");
+const profileBioEl  = $("#profile-bio"); // if present in your markup
+
+onAuthStateChanged(auth, async (user) => {
   console.log("Auth state:", user);
   const nameEl = $("#user-email-display");
-  const bio = $("#profile-bio");
   const upWarn = $("#upload-warning");
 
   if (user) {
+    // Ensure user doc exists
+    const uref = doc(db, "users", user.uid);
+    const usnap = await getDoc(uref);
+    if (!usnap.exists()) {
+      await setDoc(uref, {
+        uid: user.uid,
+        email: user.email || "",
+        displayName: user.displayName || "",
+        photoURL: user.photoURL || "",
+        createdAt: serverTimestamp()
+      });
+    }
+
+    // Pull fresh user data for profile header
+    const data = (await getDoc(uref)).data() || {};
+    if (profileName)   profileName.textContent   = data.displayName || "Your Name";
+    if (profileHandle) profileHandle.textContent = data.email ? "@"+data.email.split("@")[0] : "@username";
+    if (profilePhoto && (data.photoURL || user.photoURL)) profilePhoto.src = data.photoURL || user.photoURL;
+    if (profileBanner && data.bannerURL) profileBanner.style.backgroundImage = `url('${data.bannerURL}')`;
+
     if (nameEl) nameEl.textContent = user.email || "User";
-    if (bio) bio.disabled = false;
+    if (profileBioEl) profileBioEl.disabled = false;
     if (upWarn) upWarn.textContent = "You are logged in. You can upload.";
     $("#home-login-btn")?.classList.add("hidden");
     $("#logoutBtn")?.classList.remove("hidden");
+
+    // SHOW owner-only + buttons (banner/avatar fabs)
+    $$(".owner-only").forEach(el => el.style.display = "");
   } else {
     if (nameEl) nameEl.textContent = "Guest";
-    if (bio) bio.disabled = true;
+    if (profileBioEl) profileBioEl.disabled = true;
     if (upWarn) upWarn.textContent = "You must be logged in to upload content.";
     $("#home-login-btn")?.classList.remove("hidden");
     $("#logoutBtn")?.classList.add("hidden");
+
+    // HIDE owner-only + buttons
+    $$(".owner-only").forEach(el => el.style.display = "none");
   }
 });
 
-// ========= Global handlers exposed to HTML =========
+/* ---------------- Profile image uploads (+ buttons) ---------------- */
+// Banner +
+btnChangeBanner?.addEventListener("click", () => bannerInput?.click());
+bannerInput?.addEventListener("change", async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  if (!auth.currentUser) return showAuthModal();
+
+  try {
+    const uid = auth.currentUser.uid;
+    const path = `users/${uid}/banner/${Date.now()}_${file.name}`;
+    const ref  = storageRef(storage, path);
+    await uploadBytes(ref, file);
+    const url = await getDownloadURL(ref);
+
+    await updateDoc(doc(db, "users", uid), { bannerURL: url });
+    if (profileBanner) profileBanner.style.backgroundImage = `url('${url}')`;
+  } catch (e) {
+    console.error("Banner upload failed:", e);
+    alert(e?.message || "Banner upload failed.");
+  }
+});
+
+// Avatar +
+btnChangeAvatar?.addEventListener("click", () => avatarInput?.click());
+avatarInput?.addEventListener("change", async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  if (!auth.currentUser) return showAuthModal();
+
+  try {
+    const uid = auth.currentUser.uid;
+    const path = `users/${uid}/avatar/${Date.now()}_${file.name}`;
+    const ref  = storageRef(storage, path);
+    await uploadBytes(ref, file);
+    const url = await getDownloadURL(ref);
+
+    await updateDoc(doc(db, "users", uid), { photoURL: url });
+    if (profilePhoto) profilePhoto.src = url;
+  } catch (e) {
+    console.error("Avatar upload failed:", e);
+    alert(e?.message || "Avatar upload failed.");
+  }
+});
+
+/* ---------------- Global handlers exposed to HTML ---------------- */
 async function handleLogout() {
   try {
     await signOut(auth);
@@ -226,7 +263,7 @@ Object.assign(window, {
   handlePrivacyToggleOrPrompt,
 });
 
-// ========= Upload: type-aware labels + upload =========
+/* ---------------- Upload: type-aware labels + upload ---------------- */
 function refreshUploadForm() {
   const type = $("#upload-type")?.value || "video";
   const fileInput = $("#upload-file");
@@ -329,7 +366,7 @@ function goLive() {
 
 Object.assign(window, { handleUpload, goLive });
 
-// ========= Feeds (basic read) =========
+/* ---------------- Feeds (basic read) ---------------- */
 async function loadFeeds() {
   // Trending = latest 12
   await fillGrid(
@@ -387,8 +424,8 @@ async function fillGrid(sel, q) {
       return;
     }
     el.innerHTML = "";
-    snap.forEach((doc) => {
-      const d = doc.data();
+    snap.forEach((docSnap) => {
+      const d = docSnap.data();
       const card = document.createElement("div");
       card.className = "video-card";
       const cover =
@@ -409,7 +446,7 @@ async function fillGrid(sel, q) {
   }
 }
 
-// ========= Boot =========
+/* ---------------- Boot ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
   initTabs();
   initSettingsAccordion();
@@ -424,6 +461,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial feed load
   loadFeeds();
 
-  // Wire logout button if present (in case you prefer addEventListener over inline onclick)
+  // Optional: extra logout wire via button ID
   $("#logoutBtn")?.addEventListener("click", handleLogoutOrPrompt);
 });
