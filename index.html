@@ -75,34 +75,38 @@
     height:200px; border-radius:14px; border:1px solid #1a1a1a; background:#111 center/cover no-repeat;
     position:relative; overflow:hidden; margin:12px 0;
   }
-  .profile-banner::after{ /* subtle gradient for readability */
-    content:""; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.0), rgba(0,0,0,.35));
-  }
-  .profile-header{
-    display:grid; grid-template-columns: 100px 1fr auto; gap:14px; align-items:center;
-  }
-  .profile-avatar{
-    width:100px; height:100px; border-radius:50%; background:#1a1a1a; object-fit:cover; border:1px solid #262626;
-    margin-top:-50px; /* overlap banner */
-  }
+  .profile-banner::after{ content:""; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.0), rgba(0,0,0,.35)); }
+  .profile-header{ display:grid; grid-template-columns: 100px 1fr auto; gap:14px; align-items:center; }
+  .profile-avatar{ width:100px; height:100px; border-radius:50%; background:#1a1a1a; object-fit:cover; border:1px solid #262626; margin-top:-50px; }
   .profile-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
   .stat-row{ display:flex; gap:18px; flex-wrap:wrap; margin-top:8px; }
   .stat-row .muted strong{ color:#fff; }
 
   .profile-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
-  .grid{
-    margin-top:10px;
-    display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px;
+  .grid{ margin-top:10px; display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px; }
+  .grid .tile{ background:#0f0f0f; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden; }
+  .grid .tile .thumb{ width:100%; aspect-ratio:16/9; background:#111; object-fit:cover; display:block; }
+  .grid .tile .meta{ padding:8px 10px; font-size:.9rem; }
+
+  /* --- overlay + buttons --- */
+  .profile-edit-wrap{ position:relative; }
+  .edit-fab{
+    position:absolute; right:10px; bottom:10px;
+    width:36px; height:36px; border-radius:50%;
+    border:1px solid #2a2a2a; background:#111; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:transform .15s ease; opacity:.95;
   }
-  .grid .tile{
-    background:#0f0f0f; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden;
+  .edit-fab:hover{ transform:scale(1.05); }
+  .avatar-wrap{ position:relative; display:inline-block; }
+  .avatar-fab{
+    position:absolute; right:-4px; bottom:-4px;
+    width:28px; height:28px; border-radius:50%;
+    border:1px solid #2a2a2a; background:#111; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; cursor:pointer; opacity:.95;
   }
-  .grid .tile .thumb{
-    width:100%; aspect-ratio:16/9; background:#111; object-fit:cover; display:block;
-  }
-  .grid .tile .meta{
-    padding:8px 10px; font-size:.9rem;
-  }
+  .owner-only{ display:none; } /* JS shows for owner */
 
   /* -------- SETTINGS REDESIGN -------- */
   .settings-section{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; }
@@ -229,19 +233,19 @@
 
     <!-- PROFILE (REDESIGNED) -->
     <section id="tab-profile" style="display:none;">
-      <!-- Banner -->
-      <div id="profileBanner" class="profile-banner"></div>
-      <div class="row" style="justify-content:flex-end; gap:10px; margin-top:-6px;">
-        <input id="bannerInput" type="file" accept="image/*" hidden>
-        <input id="avatarInput" type="file" accept="image/*" hidden>
-        <button id="btn-change-banner" class="ghost">Change banner</button>
-        <button id="btn-change-avatar" class="ghost">Change photo</button>
-      </div>
+      <!-- Banner with owner-only + -->
+      <div id="profileBanner" class="profile-banner profile-edit-wrap"></div>
+      <input id="bannerInput" type="file" accept="image/*" hidden>
+      <input id="avatarInput" type="file" accept="image/*" hidden>
+      <button id="btn-change-banner" class="owner-only edit-fab" title="Change banner">+</button>
 
       <!-- Header -->
       <div class="card">
         <div class="profile-header">
-          <img id="profile-photo" src="" alt="" class="profile-avatar">
+          <div class="avatar-wrap">
+            <img id="profile-photo" src="" alt="" class="profile-avatar">
+            <button id="btn-change-avatar" class="owner-only avatar-fab" title="Change photo">+</button>
+          </div>
           <div>
             <h3 id="profile-name" style="margin:0;">Your Name</h3>
             <div id="profile-handle" class="muted">@username</div>
@@ -277,9 +281,7 @@
           <button class="pill" data-profiletab="clips">Clips</button>
           <button class="pill" data-profiletab="playlists">Playlists</button>
         </div>
-        <div id="profile-grid" class="grid">
-          <!-- Filled by JS -->
-        </div>
+        <div id="profile-grid" class="grid"></div>
         <div id="profile-empty" class="muted" style="margin-top:8px; display:none;">No posts yet.</div>
       </div>
     </section>
@@ -364,7 +366,7 @@
         <div id="legalPanel" class="disclosure-panel" hidden>
           <h4 style="margin:0 0 8px;">Content Responsibility Disclaimer</h4>
           <p class="muted" style="margin:0 0 10px;">
-            INTAKEE supports freedom of speech, creativity, and open discussion. Users are fully responsible for content they upload or share, including videos, podcasts, clips, comments, and messages. INTAKEE does not endorse, verify, or assume legal responsibility for user-generated content. We reserve the right to remove content that violates laws, promotes violence or harassment, or contains explicit material.
+            INTAKEE supports freedom of speech, creativity, and open discussion. Users are fully responsible for content they upload or share, including videos, podcasts, clips, comments. INTAKEE does not endorse, verify, or assume legal responsibility for user-generated content. We reserve the right to remove content that violates laws, promotes violence or harassment, or contains explicit material.
           </p>
           <h4 style="margin:10px 0 8px;">Privacy Commitment</h4>
           <p class="muted" style="margin:0 0 10px;">
@@ -469,32 +471,35 @@
         if (fresh.bio) bioView.textContent = fresh.bio;
         if (fresh.bannerURL) profileBanner.style.backgroundImage = `url('${fresh.bannerURL}')`;
 
-        // Owner-only buttons visible if logged in (this page is "your profile")
-        btnChangeBanner.style.display = "";
-        btnChangeAvatar.style.display = "";
-        btnEditProfile.style.display  = "";
-        btnFollow.style.display       = "none"; // you don't follow yourself
+        // Owner-only overlays visible if logged in (own profile case)
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = "");
 
         // Load user's posts into profile grid
         loadMyPosts(user.uid);
       } else {
-        // Not logged in: hide owner-only buttons
-        btnChangeBanner.style.display = "none";
-        btnChangeAvatar.style.display = "none";
-        btnEditProfile.style.display  = "none";
-        btnFollow.style.display       = ""; // viewing as a visitor
+        // Not logged in: hide owner-only overlays
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = "none");
         // Clear grid
         profileGrid.innerHTML = "";
         profileEmpty.style.display = "";
       }
     });
 
-    /* -------- Existing feed helpers (unchanged) -------- */
-    function escapeHtml(s=""){ return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;","<": "&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
-    function fmtTime(ts){ try{const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null); if(!t)return""; return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});}catch{return"";} }
+    /* -------- Feed helpers -------- */
+    function escapeHtml(s=""){
+      return s.replace(/[&<>"']/g, c => (
+        {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]
+      ));
+    }
+    function fmtTime(ts){
+      try{
+        const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null);
+        if(!t) return "";
+        return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});
+      }catch{return"";}
+    }
     function match(p, term){ if(!term) return true; const t=term.toLowerCase(); return ((p.text||"").toLowerCase().includes(t)); }
 
-    /* Render helpers for main feeds */
     const homeFeed   = document.getElementById("home-feed");
     const videosFeed = document.getElementById("videos-feed");
     const podcastFeed= document.getElementById("podcast-feed");
@@ -535,6 +540,7 @@
     clipsSearch?.addEventListener('input', e=>{ clipsTerm    = e.target.value.trim(); draw(); });
 
     function draw(){
+      // HOME only shows media kinds; message disappears once posts exist
       const mediaKinds = new Set(["video","clip","podcast_audio","podcast_video","audio","image"]);
       const trending = docs.filter(d => mediaKinds.has(d.data().kind) && match(d.data(), homeTerm));
       if(!trending.length){
@@ -611,7 +617,7 @@
       alert("Following will be available later.");
     });
 
-    // Change banner
+    // Change banner (overlay +)
     btnChangeBanner?.addEventListener('click', ()=> bannerInput.click());
     bannerInput?.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0]; if(!file) return;
@@ -624,7 +630,7 @@
       profileBanner.style.backgroundImage = `url('${url}')`;
     });
 
-    // Change avatar
+    // Change avatar (overlay +)
     btnChangeAvatar?.addEventListener('click', ()=> avatarInput.click());
     avatarInput?.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0]; if(!file) return;
@@ -655,7 +661,6 @@
         profileEmpty.style.display = "none";
         docs.forEach(d=>{
           const p = d.data();
-          // Build a tile with thumbnail (image or video)
           const tile = document.createElement("div");
           tile.className = "tile";
           let media = "";
@@ -667,7 +672,6 @@
             }else if(p.kind==="clip"){
               media = `<video class="thumb" src="${p.mediaUrl}" muted playsinline loop></video>`;
             }else if(p.kind==="audio" || p.kind==="podcast_audio"){
-              // audio has no visual thumbnail; show a simple block
               media = `<div class="thumb" style="display:flex;align-items:center;justify-content:center;">AUDIO</div>`;
             }
           } else {
@@ -677,7 +681,6 @@
           tile.innerHTML = `${media}<div class="meta">${escapeHtml(title||"Untitled")}</div>`;
           profileGrid.appendChild(tile);
         });
-        // Stats (basic count)
         document.getElementById("stat-posts").textContent = String(docs.length);
       });
     }
@@ -699,8 +702,6 @@
       legalToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
       legalPanel.hidden = expanded;
     });
-
-    /* --------- Existing main feed subscription already above --------- */
   </script>
 </body>
 </html>
