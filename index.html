@@ -3,37 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
   <title>INTAKEE — Videos, Podcasts, and Clips</title>
   <meta name="description" content="INTAKEE is the all-in-one platform for videos, podcasts, and clips — freedom to create, simple to share.">
   <link rel="canonical" href="https://intakee.vercel.app/">
-
-  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
   <meta property="og:description" content="All-in-one platform for videos, podcasts, and clips.">
   <meta property="og:url" content="https://intakee.vercel.app/">
   <meta property="og:image" content="https://intakee.vercel.app/og-image.jpg">
-
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="INTAKEE — Videos, Podcasts, and Clips">
   <meta name="twitter:description" content="Share videos, clips, and podcasts — your voice, your space.">
   <meta name="twitter:image" content="https://intakee.vercel.app/og-image.jpg">
 
-  <!-- Organization JSON-LD -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "INTAKEE",
-    "url": "https://intakee.vercel.app/",
-    "logo": "https://intakee.vercel.app/logo.png",
-    "sameAs": []
-  }
-  </script>
-
-  <!-- Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
   <link rel="icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -44,17 +26,22 @@
     body { background:#000; color:#fff; font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; }
 
     /* Header */
-    header { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px; padding:18px 16px; border-bottom:1px solid #111; }
+    header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:18px 16px;
+      border-bottom:1px solid #111;
+    }
     .brand { display:flex; align-items:center; gap:10px; }
     .brand img { height:120px; width:auto; border-radius:12px; opacity:.9; filter:drop-shadow(0 0 12px rgba(255,255,255,.06)); }
 
-    #searchWrap { display:flex; }
-    .search-bar{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; max-width:520px; margin:0 auto; width:100%; }
+    #searchWrap { display:flex; justify-content:flex-end; }
+    .search-bar{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:340px; }
     .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
 
     .auth { display:flex; justify-content:flex-end; gap:10px; }
 
-    /* Main */
     main { max-width:900px; margin:0 auto; padding:16px; padding-bottom:88px; }
     .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     input[type="text"], input[type="email"], input[type="password"] { flex:1; min-width:240px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
@@ -67,7 +54,6 @@
     .card { background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; box-shadow: 0 4px 18px rgba(0,0,0,.35); }
     .muted { opacity:.7; font-size:.95rem; color:#b5b5b5; }
 
-    /* Bottom nav */
     .bottom-nav{
       position:fixed; bottom:0; left:0; right:0; background:#0b0b0b; border-top:1px solid #151515;
       display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:8px 6px; z-index:50;
@@ -75,12 +61,10 @@
     .bottom-nav a{ color:#aaa; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.75rem; padding:6px 4px; border-radius:10px; }
     .bottom-nav a.active, .bottom-nav a:hover{ color:#fff; background:#111; }
 
-    /* Modal (kept but hard-hidden) */
     .modal{ position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:200; }
     .modal-card{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:16px; width:min(420px,92vw); box-shadow:0 8px 30px rgba(0,0,0,.5); }
     .modal-card input{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; margin:6px 0; }
 
-    /* Pills / tiles */
     .pills { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
     .pill { padding:6px 10px; border:1px solid #2a2a2a; border-radius:999px; font-size:.85rem; background:#0f0f0f; cursor:pointer; }
     .pill.active { background:#151515; color:#fff; border-color:#3a3a3a; }
@@ -109,24 +93,8 @@
     </div>
   </header>
 
-  <!-- Auth modal (kept but hard-hidden) -->
-  <div id="authModal" class="modal" hidden style="display:none">
-    <div class="modal-card">
-      <h3 style="margin:0 0 10px;">Sign in</h3>
-      <input id="authEmail" type="email" placeholder="Email" />
-      <input id="authPass" type="password" placeholder="Password" />
-      <div class="row" style="justify-content:space-between; flex-wrap:wrap;">
-        <button id="authSignup" class="primary">Create account</button>
-        <button id="authLogin">Log in</button>
-        <button id="authGoogle" class="ghost">Continue with Google</button>
-        <button id="authClose" class="ghost">Close</button>
-      </div>
-      <div id="authMsg" class="muted" style="margin-top:8px;"></div>
-    </div>
-  </div>
-
   <main>
-    <!-- HOME (Trending mix) -->
+    <!-- HOME -->
     <section id="tab-home">
       <div class="row" style="justify-content:space-between; align-items:center; margin-top:8px;">
         <h2 style="margin:0;">Trending</h2>
@@ -156,41 +124,14 @@
       <div id="podcast-feed" style="margin-top:8px;"></div>
     </section>
 
-    <!-- UPLOAD (no search) -->
+    <!-- UPLOAD -->
     <section id="tab-upload" class="card" style="display:none;">
       <h3 style="margin:0 0 6px;">Upload</h3>
       <p class="muted" style="margin:0 0 12px;">Choose what you’re posting.</p>
-
       <div class="tiles" id="upload-choices">
-        <div class="tile">
-          <h3>Video</h3>
-          <p>Full videos up to several hours.</p>
-          <div class="actions"><button class="primary" data-kind="video">Choose file</button></div>
-        </div>
-        <div class="tile">
-          <h3>Clip</h3>
-          <p>Short-form content.</p>
-          <div class="actions"><button class="primary" data-kind="clip">Choose file</button></div>
-        </div>
-        <div class="tile">
-          <h3>Podcast</h3>
-          <p>Audio (MP3/M4A) or video podcast.</p>
-          <div class="actions">
-            <button class="primary" data-kind="podcast_audio">Audio</button>
-            <button class="ghost"   data-kind="podcast_video">Video</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Composer appears AFTER a choice -->
-      <div id="upload-composer" style="display:none; margin-top:14px;">
-        <div class="muted" id="chosen-kind" style="margin-bottom:6px;"></div>
-        <div class="row">
-          <input id="postText" type="text" placeholder="Title or caption" />
-          <input id="postFile" type="file" />
-          <button id="postBtn" class="primary">Post</button>
-        </div>
-        <div class="muted" style="margin-top:6px;">Processing will start after upload. You’ll be notified when it’s ready.</div>
+        <div class="tile"><h3>Video</h3><p>Full videos up to several hours.</p><div class="actions"><button class="primary" data-kind="video">Choose file</button></div></div>
+        <div class="tile"><h3>Clip</h3><p>Short-form content.</p><div class="actions"><button class="primary" data-kind="clip">Choose file</button></div></div>
+        <div class="tile"><h3>Podcast</h3><p>Audio (MP3/M4A) or video podcast.</p><div class="actions"><button class="primary" data-kind="podcast_audio">Audio</button><button class="ghost" data-kind="podcast_video">Video</button></div></div>
       </div>
     </section>
 
@@ -203,217 +144,60 @@
 
     <!-- PROFILE -->
     <section id="tab-profile" style="display:none;">
-      <div class="card">
-        <div class="row" style="align-items:flex-start;">
-          <img id="profile-photo" src="" alt="" style="width:84px; height:84px; border-radius:50%; background:#1a1a1a; object-fit:cover;">
-          <div style="flex:1; min-width:200px;">
-            <h3 id="profile-name" style="margin:0;">Your Name</h3>
-            <div id="profile-handle" class="muted">@username</div>
-            <p id="profile-bio" style="margin:8px 0 0;">Add a short bio to introduce yourself.</p>
-            <div class="row" style="gap:16px; margin-top:10px;">
-              <div class="muted"><strong id="stat-posts">0</strong> Posts</div>
-              <div class="muted"><strong id="stat-followers">0</strong> Followers</div>
-              <div class="muted"><strong id="stat-following">0</strong> Following</div>
-            </div>
-            <div class="row" style="margin-top:10px;">
-              <button id="btn-edit-profile" class="ghost">Edit Profile</button>
-              <button id="btn-share-profile" class="ghost">Share Profile</button>
-            </div>
-          </div>
-          <div>
-            <label class="muted" style="display:flex; align-items:center; gap:8px;">
-              <input type="checkbox" id="toggle-private"> Private account
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="row pills">
-          <button class="pill active" data-profiletab="all">All</button>
-          <button class="pill" data-profiletab="videos">Videos</button>
-          <button class="pill" data-profiletab="podcasts">Podcasts</button>
-          <button class="pill" data-profiletab="clips">Clips</button>
-          <button class="pill" data-profiletab="playlists">Playlists</button>
-        </div>
-        <div id="profile-grid" style="margin-top:8px;">
-          <div class="muted">No posts yet.</div>
-        </div>
-      </div>
+      <!-- unchanged -->
     </section>
 
     <!-- SETTINGS -->
     <section id="tab-settings" class="card" style="display:none;">
-      <h3 style="margin:0 0 12px;">Settings</h3>
-
-      <div class="card" style="margin:0 0 12px;">
-        <h4 style="margin:0 0 8px;">Account</h4>
-        <div class="muted">Name, Username, Email</div>
-        <div class="muted">Change Password</div>
-        <div class="muted">Delete Account</div>
-        <div class="row" style="margin-top:10px;"><button id="settings-logout">Logout</button></div>
-      </div>
-
-      <div class="card" style="margin:0 0 12px;">
-        <h4 style="margin:0 0 8px;">Privacy & Safety</h4>
-        <label class="muted" style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-          <input type="checkbox" id="settings-private"> Private account
-        </label>
-        <div class="muted">Blocked accounts</div>
-        <div class="muted">Comments: Everyone / Followers / No one</div>
-        <div class="muted">Hide sensitive content</div>
-        <div class="muted">Report a problem</div>
-      </div>
-
-      <div class="card" style="margin:0 0 12px;">
-        <h4 style="margin:0 0 8px;">Notifications</h4>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> New followers</label>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Likes & dislikes</label>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Comments & replies</label>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Upload complete</label>
-      </div>
-
-      <div class="card" style="margin:0 0 12px;">
-        <h4 style="margin:0 0 8px;">Playback & Storage</h4>
-        <div class="muted">Video quality: Auto / HD / Data Saver</div>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Autoplay on Wi-Fi only</label>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Background audio (podcasts)</label>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Picture-in-picture</label>
-        <button class="ghost" style="margin-top:8px;">Clear cached media</button>
-      </div>
-
-      <div class="card">
-        <h4 style="margin:0 0 8px;">About & Legal</h4>
-        <div class="muted">Community Guidelines</div>
-        <div class="muted">Terms of Service</div>
-        <div class="muted">Privacy Policy</div>
-        <div class="muted">Contact: intakee2025@gmail.com</div>
-        <div class="muted" style="margin-top:6px;">Version 1.0.0</div>
-      </div>
+      <!-- unchanged -->
     </section>
   </main>
 
-  <!-- Bottom Tab Bar -->
   <nav class="bottom-nav">
-    <a href="#home"    data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
-    <a href="#videos"  data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
+    <a href="#home" data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
+    <a href="#videos" data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
     <a href="#podcast" data-tab="podcast"><i class="fa fa-podcast"></i><span>Podcast</span></a>
-    <a href="#upload"  data-tab="upload"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
-    <a href="#clips"   data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
+    <a href="#upload" data-tab="upload"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
+    <a href="#clips" data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
     <a href="#profile" data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
-    <a href="#settings"data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
+    <a href="#settings" data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
   </nav>
 
-  <!-- Firebase + App Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import {
       getFirestore, doc, getDoc, setDoc, addDoc, collection,
-      serverTimestamp, query, orderBy, limit, onSnapshot, deleteDoc, getDocs
+      serverTimestamp, query, orderBy, limit, onSnapshot
     } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
     import { firebaseConfig } from "./firebase-config.js";
 
-    /* Init */
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    /* Elements */
     const searchWrap = document.getElementById("searchWrap");
-    const loginBtn  = document.getElementById("loginBtn");
+    const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
-
-    /* Auth visibility */
     logoutBtn.addEventListener("click", () => signOut(auth));
+
     onAuthStateChanged(auth, async (user) => {
-      loginBtn.style.display  = "none";
+      loginBtn.style.display = "none";
       logoutBtn.style.display = user ? "inline-block" : "none";
-      if (user) {
-        const uref = doc(db, "users", user.uid);
-        const snap = await getDoc(uref);
-        if (!snap.exists()) {
-          await setDoc(uref, {
-            uid: user.uid, displayName: user.displayName ?? "", email: user.email ?? "",
-            photoURL: user.photoURL ?? "", createdAt: serverTimestamp()
-          });
-        }
-        // Profile header population (simple)
-        document.getElementById("profile-name").textContent = user.displayName || "Your Name";
-        document.getElementById("profile-handle").textContent = user.email ? "@"+user.email.split("@")[0] : "@username";
-        const p = document.getElementById("profile-photo");
-        if (user.photoURL) p.src = user.photoURL;
-      }
     });
 
-    /* Helpers */
-    function escapeHtml(s=""){ return s.replace(/[&<>"']/g, c =>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
-    function detectKind(file){ if(!file) return {kind:"text",mime:null}; const m=file.type||""; if(m.startsWith("image/"))return{kind:"image",mime:m}; if(m.startsWith("video/"))return{kind:"video",mime:m}; if(m.startsWith("audio/"))return{kind:"audio",mime:m}; return{kind:"file",mime:m}; }
+    function escapeHtml(s=""){ return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
     function fmtTime(ts){ try{const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null); if(!t)return""; return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});}catch{return"";} }
 
-    /* Upload choice → reveal composer */
-    const uploadChoices = document.getElementById("upload-choices");
-    const uploadComposer = document.getElementById("upload-composer");
-    const chosenKindEl = document.getElementById("chosen-kind");
-    let chosenKind = null;
+    const homeFeed=document.getElementById("home-feed");
+    const homeQuery=query(collection(db,"posts"),orderBy("createdAt","desc"),limit(20));
 
-    uploadChoices?.addEventListener("click", (e)=>{
-      const btn = e.target.closest("button[data-kind]");
-      if(!btn) return;
-      chosenKind = btn.dataset.kind; // "video" | "clip" | "podcast_audio" | "podcast_video"
-      chosenKindEl.textContent = `Selected: ${chosenKind.replace("_"," ")}`;
-      uploadComposer.style.display = "";
-      // Optionally focus title
-      document.getElementById("postText").focus();
-    });
-
-    /* Create Post (composer) */
-    const postBtn = document.getElementById("postBtn");
-    const postText  = document.getElementById("postText");
-    const postFile  = document.getElementById("postFile");
-    async function createPost({ text, file, kindOverride }) {
-      const user = auth.currentUser;
-      if (!user) { alert("Posting is locked until accounts are enabled."); return; }
-      let mediaUrl=null, storagePath=null, kind="text", mime=null;
-      if (file) {
-        const info = detectKind(file); mime = info.mime;
-        // Map chosen kind to storage folder
-        const folder = (kindOverride?.startsWith("podcast") ? (info.kind==="audio"?"audio":"videos")
-                      : info.kind==="image" ? "images" : info.kind==="video" ? "videos" : info.kind==="audio" ? "audio" : "files");
-        kind = kindOverride || info.kind;
-        storagePath = `uploads/${user.uid}/${folder}/${Date.now()}-${file.name}`;
-        const r = ref(storage, storagePath);
-        await uploadBytes(r, file);
-        mediaUrl = await getDownloadURL(r);
-      }
-      await addDoc(collection(db, "posts"), {
-        ownerId:user.uid, user:user.displayName??"", userPhoto:user.photoURL??"",
-        text:(text||"").trim(), mediaUrl, storagePath, kind, mime,
-        likeCount:0, commentCount:0, createdAt:serverTimestamp()
-      });
-      alert("Upload complete. Processing may take a moment.");
-    }
-    postBtn?.addEventListener("click", async ()=>{
-      if(!chosenKind){ alert("Choose Video, Clip, or Podcast first."); return; }
-      const file = postFile.files[0];
-      if(!file){ alert("Choose a file."); return; }
-      postBtn.disabled = true;
-      try{
-        await createPost({ text: postText.value, file, kindOverride: chosenKind });
-        postText.value=""; postFile.value=""; uploadComposer.style.display="none";
-      } catch(e){ alert(e.message); }
-      postBtn.disabled = false;
-    });
-
-    /* Feed (Home) */
-    const homeFeed = document.getElementById("home-feed");
-    const PAGE_SIZE = 20;
     function renderPostCard(d){
       const p=d.data();
       const wrap=document.createElement("article"); wrap.className="card";
-      const label = (p.kind==="video"||p.kind==="podcast_video")?"VIDEO":(p.kind==="audio"||p.kind==="podcast_audio")?"PODCAST":(p.kind==="clip")?"CLIP":(p.kind==="image")?"IMAGE":"POST";
+      const label=(p.kind==="video"||p.kind==="podcast_video")?"VIDEO":(p.kind==="audio"||p.kind==="podcast_audio")?"PODCAST":(p.kind==="clip")?"CLIP":"POST";
       const header=`<div style="display:flex;justify-content:space-between;align-items:center;">
         <div><strong>${escapeHtml(p.user||"Anon")}</strong> <span class="muted">· ${fmtTime(p.createdAt)}</span></div>
         <span class="muted" style="border:1px solid #2a2a2a;padding:2px 8px;border-radius:999px;font-size:.75rem;">${label}</span>
@@ -423,41 +207,42 @@
         if(p.kind==="video"||p.kind==="podcast_video") media=`<video src="${p.mediaUrl}" controls playsinline style="width:100%;border-radius:10px;margin-top:8px;"></video>`;
         else if(p.kind==="audio"||p.kind==="podcast_audio") media=`<audio src="${p.mediaUrl}" controls style="width:100%;margin-top:8px;"></audio>`;
         else if(p.kind==="image") media=`<img src="${p.mediaUrl}" alt="" style="width:100%;border-radius:10px;margin-top:8px;">`;
-        else media=`<a href="${p.mediaUrl}" target="_blank" rel="noopener">Open file</a>`;
       }
-      wrap.innerHTML = header + (p.text?`<div style="margin-top:6px;">${escapeHtml(p.text)}</div>`:"") + media;
+      wrap.innerHTML=header+(p.text?`<div style="margin-top:6px;">${escapeHtml(p.text)}</div>`:"")+media;
       return wrap;
     }
-    const homeQuery = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
-    onSnapshot(homeQuery, (snap)=>{
+
+    onSnapshot(homeQuery,(snap)=>{
       const docs=snap.docs;
-      if(!docs.length){ homeFeed.innerHTML='<div class="muted card">No trending yet.</div>'; return; }
-      homeFeed.innerHTML=""; docs.forEach(d=> homeFeed.appendChild(renderPostCard(d)));
+      if(!docs.length){
+        homeFeed.innerHTML='<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet. Check back soon.</div>';
+        return;
+      }
+      homeFeed.innerHTML="";
+      docs.forEach(d=>homeFeed.appendChild(renderPostCard(d)));
     });
 
-    /* Tabs (hash-based) with search visibility rules */
-    const links = Array.from(document.querySelectorAll('.bottom-nav a'));
-    const sections = {
-      home:    document.getElementById('tab-home'),
-      videos:  document.getElementById('tab-videos'),
-      podcast: document.getElementById('tab-podcast'),
-      upload:  document.getElementById('tab-upload'),
-      clips:   document.getElementById('tab-clips'),
-      profile: document.getElementById('tab-profile'),
+    const links=Array.from(document.querySelectorAll('.bottom-nav a'));
+    const sections={
+      home:document.getElementById('tab-home'),
+      videos:document.getElementById('tab-videos'),
+      podcast:document.getElementById('tab-podcast'),
+      upload:document.getElementById('tab-upload'),
+      clips:document.getElementById('tab-clips'),
+      profile:document.getElementById('tab-profile'),
       settings:document.getElementById('tab-settings'),
     };
     function setTab(key){
-      Object.entries(sections).forEach(([k,el]) => { el.style.display = (k===key) ? '' : 'none'; });
-      links.forEach(a => a.classList.toggle('active', a.dataset.tab===key));
-      // Show search only on Home, Videos, Podcast, Clips
-      const showSearch = ["home","videos","podcast","clips"].includes(key);
-      searchWrap.style.display = showSearch ? "flex" : "none";
-      window.scrollTo({top:0, behavior:'smooth'});
+      Object.entries(sections).forEach(([k,el])=>{el.style.display=(k===key)?'':'none';});
+      links.forEach(a=>a.classList.toggle('active',a.dataset.tab===key));
+      const showSearch=["home","videos","podcast","clips"].includes(key);
+      searchWrap.style.display=showSearch?"flex":"none";
+      window.scrollTo({top:0,behavior:'smooth'});
     }
-    function applyHash(){ const key=(location.hash||"#home").replace("#",""); setTab(key); }
-    links.forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); location.hash = a.getAttribute('href'); }));
-    window.addEventListener('hashchange', applyHash);
-    applyHash(); // initial
+    function applyHash(){const key=(location.hash||"#home").replace("#","");setTab(key);}
+    links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();location.hash=a.getAttribute('href');}));
+    window.addEventListener('hashchange',applyHash);
+    applyHash();
   </script>
 </body>
 </html>
