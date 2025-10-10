@@ -46,7 +46,7 @@
     /* Header */
     header {
       display:flex;
-      justify-content:space-between;   /* logo left, search right */
+      justify-content:space-between;
       align-items:center;
       gap:12px;
       padding:18px 16px;
@@ -55,41 +55,45 @@
     .brand { display:flex; align-items:center; gap:10px; }
     .brand img { height:120px; width:auto; border-radius:12px; opacity:.9; filter:drop-shadow(0 0 12px rgba(255,255,255,.06)); }
 
+    /* Global (Home) search */
     #searchWrap { display:flex; }
     .search-bar{
       display:flex; align-items:center; gap:8px;
       background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px;
-      width:420px; max-width:520px;                    /* right-aligned, not centered */
+      width:420px; max-width:520px;
     }
     .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
 
     .auth { display:flex; justify-content:flex-end; gap:10px; }
 
-    /* Main */
-    main { max-width:900px; margin:0 auto; padding:16px; padding-bottom:88px; }
+    /* Main layout */
+    main { max-width:1000px; margin:0 auto; padding:16px; padding-bottom:88px; }
     .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    input[type="text"], input[type="email"], input[type="password"] { flex:1; min-width:240px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
+    input[type="text"], input[type="email"], input[type="password"] {
+      flex:1; min-width:240px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff;
+    }
     input[type="file"] { color:#aaa; }
-    button { padding:9px 14px; cursor:pointer; border-radius:10px; border:1px solid #2a2a2a; background:#141414; color:#fff; }
-    button.primary { background:#0b63ff; border-color:#0b63ff; }
+    select { padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
+    label { color:#ddd; font-size:.95rem; }
+
+    button {
+      padding:9px 14px; cursor:pointer; border-radius:10px; border:1px solid #2a2a2a; background:#141414; color:#fff;
+    }
+    /* No accent colors */
+    button.primary { background:#1a1a1a; border-color:#3a3a3a; }
     button.ghost { background:transparent; }
-    button.danger { background:#8b0000; border-color:#8b0000; }
+    button.danger { background:#222; border-color:#444; }
     button[disabled] { opacity:.6; cursor:not-allowed; }
+    button:hover { background:#191919; }
+
     .card { background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; box-shadow: 0 4px 18px rgba(0,0,0,.35); }
     .muted { opacity:.7; font-size:.95rem; color:#b5b5b5; }
 
-    /* Bottom nav */
-    .bottom-nav{
-      position:fixed; bottom:0; left:0; right:0; background:#0b0b0b; border-top:1px solid #151515;
-      display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:8px 6px; z-index:50;
-    }
-    .bottom-nav a{ color:#aaa; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.75rem; padding:6px 4px; border-radius:10px; }
-    .bottom-nav a.active, .bottom-nav a:hover{ color:#fff; background:#111; }
-
-    /* Modal (kept but hard-hidden) */
-    .modal{ position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:200; }
-    .modal-card{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:16px; width:min(420px,92vw); box-shadow:0 8px 30px rgba(0,0,0,.5); }
-    .modal-card input{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; margin:6px 0; }
+    /* Section heads with right-side search */
+    .section-head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .section-title { margin:0; }
+    .section-search{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:340px; max-width:50vw; }
+    .section-search input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
 
     /* Pills / tiles */
     .pills { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
@@ -101,17 +105,27 @@
     .tile h3 { margin:0 0 6px; font-size:1.05rem; }
     .tile p { margin:0; color:#b7b7b7; }
     .tile .actions { margin-top:12px; display:flex; gap:8px; }
+
+    /* Bottom nav */
+    .bottom-nav{
+      position:fixed; bottom:0; left:0; right:0; background:#0b0b0b; border-top:1px solid #151515;
+      display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:8px 6px; z-index:50;
+    }
+    .bottom-nav a{ color:#aaa; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.75rem; padding:6px 4px; border-radius:10px; }
+    .bottom-nav a.active, .bottom-nav a:hover{ color:#fff; background:#111; }
   </style>
 </head>
 <body>
+  <!-- Header -->
   <header>
     <div class="brand">
       <img src="logo.png" alt="INTAKEE">
     </div>
 
+    <!-- Home/global search (shown on Home only) -->
     <div id="searchWrap" class="search-bar">
       <i class="fa fa-search" style="opacity:.6;"></i>
-      <input id="globalSearch" type="text" placeholder="Search videos, clips, podcasts..." />
+      <input id="globalSearch" type="text" placeholder="Search…" />
     </div>
 
     <div class="auth">
@@ -120,27 +134,11 @@
     </div>
   </header>
 
-  <!-- Auth modal (kept but hard-hidden) -->
-  <div id="authModal" class="modal" hidden style="display:none">
-    <div class="modal-card">
-      <h3 style="margin:0 0 10px;">Sign in</h3>
-      <input id="authEmail" type="email" placeholder="Email" />
-      <input id="authPass" type="password" placeholder="Password" />
-      <div class="row" style="justify-content:space-between; flex-wrap:wrap;">
-        <button id="authSignup" class="primary">Create account</button>
-        <button id="authLogin">Log in</button>
-        <button id="authGoogle" class="ghost">Continue with Google</button>
-        <button id="authClose" class="ghost">Close</button>
-      </div>
-      <div id="authMsg" class="muted" style="margin-top:8px;"></div>
-    </div>
-  </div>
-
   <main>
-    <!-- HOME (Trending mix) -->
+    <!-- HOME -->
     <section id="tab-home">
       <div class="row" style="justify-content:space-between; align-items:center; margin-top:8px;">
-        <h2 style="margin:0;">Trending</h2>
+        <h2 class="section-title">Trending</h2>
         <div class="pills">
           <button class="pill" data-filter="all">All</button>
           <button class="pill" data-filter="video">Videos</button>
@@ -154,61 +152,79 @@
     </section>
 
     <!-- VIDEOS -->
-    <section id="tab-videos" class="card" style="display:none;">
-      <h3 style="margin:0 0 8px;">Videos</h3>
-      <div class="muted">Search filters this list to videos only.</div>
+    <section id="tab-videos" style="display:none;">
+      <div class="section-head">
+        <h3 class="section-title">Videos</h3>
+        <div class="section-search" id="videosSearchWrap">
+          <i class="fa fa-search" style="opacity:.6;"></i>
+          <input id="videosSearch" type="text" placeholder="Search videos…" />
+        </div>
+      </div>
+      <div class="muted">Search here filters only the Videos list.</div>
       <div id="videos-feed" style="margin-top:8px;"></div>
     </section>
 
     <!-- PODCASTS -->
-    <section id="tab-podcast" class="card" style="display:none;">
-      <h3 style="margin:0 0 8px;">Podcasts</h3>
-      <div class="muted">Search filters this list to podcasts only.</div>
+    <section id="tab-podcast" style="display:none;">
+      <div class="section-head">
+        <h3 class="section-title">Podcasts</h3>
+        <div class="section-search" id="podcastSearchWrap">
+          <i class="fa fa-search" style="opacity:.6;"></i>
+          <input id="podcastSearch" type="text" placeholder="Search podcasts…" />
+        </div>
+      </div>
+      <div class="muted">Search here filters only the Podcasts list.</div>
       <div id="podcast-feed" style="margin-top:8px;"></div>
     </section>
 
-    <!-- UPLOAD (no search) -->
+    <!-- UPLOAD (single clean form matching your screenshot) -->
     <section id="tab-upload" class="card" style="display:none;">
-      <h3 style="margin:0 0 6px;">Upload</h3>
-      <p class="muted" style="margin:0 0 12px;">Choose what you’re posting.</p>
-
-      <div class="tiles" id="upload-choices">
-        <div class="tile">
-          <h3>Video</h3>
-          <p>Full videos up to several hours.</p>
-          <div class="actions"><button class="primary" data-kind="video">Choose file</button></div>
+      <h3 style="margin:0 0 12px;">Upload</h3>
+      <div class="row" style="gap:12px; align-items:flex-start;">
+        <div style="flex:1; min-width:260px;">
+          <label for="uploadType">Choose type</label>
+          <select id="uploadType" style="width:100%; margin-top:6px;">
+            <option value="video">Video</option>
+            <option value="clip">Clip</option>
+            <option value="podcast_audio">Podcast (Audio)</option>
+            <option value="podcast_video">Podcast (Video)</option>
+          </select>
         </div>
-        <div class="tile">
-          <h3>Clip</h3>
-          <p>Short-form content.</p>
-          <div class="actions"><button class="primary" data-kind="clip">Choose file</button></div>
-        </div>
-        <div class="tile">
-          <h3>Podcast</h3>
-          <p>Audio (MP3/M4A) or video podcast.</p>
-          <div class="actions">
-            <button class="primary" data-kind="podcast_audio">Audio</button>
-            <button class="ghost"   data-kind="podcast_video">Video</button>
-          </div>
+        <div style="flex:2; min-width:260px;">
+          <label for="postTitle">Title</label>
+          <input id="postTitle" type="text" placeholder="Add a title" style="width:100%; margin-top:6px;">
         </div>
       </div>
 
-      <!-- Composer appears AFTER a choice -->
-      <div id="upload-composer" style="display:none; margin-top:14px;">
-        <div class="muted" id="chosen-kind" style="margin-bottom:6px;"></div>
-        <div class="row">
-          <input id="postText" type="text" placeholder="Title or caption" />
-          <input id="postFile" type="file" />
-          <button id="postBtn" class="primary">Post</button>
+      <div class="row" style="gap:12px; align-items:flex-start; margin-top:12px;">
+        <div style="flex:1; min-width:260px;">
+          <label for="thumbFile">Thumbnail (cover image)</label>
+          <input id="thumbFile" type="file" accept="image/*" style="width:100%; margin-top:6px;">
         </div>
-        <div class="muted" style="margin-top:6px;">Processing will start after upload. You’ll be notified when it’s ready.</div>
+        <div style="flex:2; min-width:260px;">
+          <label for="mediaFile">File</label>
+          <input id="mediaFile" type="file" accept="video/*,audio/*" style="width:100%; margin-top:6px;">
+        </div>
       </div>
+
+      <div class="row" style="margin-top:14px; gap:10px;">
+        <button id="uploadSubmit" class="primary">Upload</button>
+        <button id="goLiveBtn" class="ghost">Go Live</button>
+      </div>
+
+      <p class="muted" style="margin-top:8px;">Processing will start after upload. You'll be notified when it’s ready.</p>
     </section>
 
     <!-- CLIPS -->
-    <section id="tab-clips" class="card" style="display:none;">
-      <h3 style="margin:0 0 8px;">Clips</h3>
-      <div class="muted">Search filters this list to clips only.</div>
+    <section id="tab-clips" style="display:none;">
+      <div class="section-head">
+        <h3 class="section-title">Clips</h3>
+        <div class="section-search" id="clipsSearchWrap">
+          <i class="fa fa-search" style="opacity:.6;"></i>
+          <input id="clipsSearch" type="text" placeholder="Search clips…" />
+        </div>
+      </div>
+      <div class="muted">Search here filters only the Clips list.</div>
       <div id="clips-feed" style="margin-top:8px;"></div>
     </section>
 
@@ -285,15 +301,6 @@
       </div>
 
       <div class="card">
-        <h4 style="margin:0 0 8px;">Playback & Storage</h4>
-        <div class="muted">Video quality: Auto / HD / Data Saver</div>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Autoplay on Wi-Fi only</label>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Background audio (podcasts)</label>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Picture-in-picture</label>
-        <button class="ghost" style="margin-top:8px;">Clear cached media</button>
-      </div>
-
-      <div class="card">
         <h4 style="margin:0 0 8px;">About & Legal</h4>
         <div class="muted">Community Guidelines</div>
         <div class="muted">Terms of Service</div>
@@ -321,9 +328,9 @@
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import {
       getFirestore, doc, getDoc, setDoc, addDoc, collection,
-      serverTimestamp, query, orderBy, limit, onSnapshot, deleteDoc, getDocs
+      serverTimestamp, query, orderBy, limit, onSnapshot
     } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
     import { firebaseConfig } from "./firebase-config.js";
 
     /* Init */
@@ -334,10 +341,15 @@
 
     /* Elements */
     const searchWrap = document.getElementById("searchWrap");
+    const globalSearch = document.getElementById("globalSearch");
     const loginBtn  = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    /* Auth visibility */
+    const videosSearch = document.getElementById("videosSearch");
+    const podcastSearch = document.getElementById("podcastSearch");
+    const clipsSearch = document.getElementById("clipsSearch");
+
+    /* Auth UI */
     logoutBtn.addEventListener("click", () => signOut(auth));
     onAuthStateChanged(auth, async (user) => {
       loginBtn.style.display  = "none";
@@ -351,7 +363,7 @@
             photoURL: user.photoURL ?? "", createdAt: serverTimestamp()
           });
         }
-        // Profile header population (simple)
+        // Profile header population
         document.getElementById("profile-name").textContent = user.displayName || "Your Name";
         document.getElementById("profile-handle").textContent = user.email ? "@"+user.email.split("@")[0] : "@username";
         const p = document.getElementById("profile-photo");
@@ -362,69 +374,37 @@
     /* Helpers */
     function escapeHtml(s=""){ return s.replace(/[&<>"']/g, c =>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
     function detectKind(file){ if(!file) return {kind:"text",mime:null}; const m=file.type||""; if(m.startsWith("image/"))return{kind:"image",mime:m}; if(m.startsWith("video/"))return{kind:"video",mime:m}; if(m.startsWith("audio/"))return{kind:"audio",mime:m}; return{kind:"file",mime:m}; }
-    function fmtTime(ts){ try{const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null); if(!t)return""; return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});}catch{return"";} }
-
-    /* Upload choice → reveal composer */
-    const uploadChoices = document.getElementById("upload-choices");
-    const uploadComposer = document.getElementById("upload-composer");
-    const chosenKindEl = document.getElementById("chosen-kind");
-    let chosenKind = null;
-
-    uploadChoices?.addEventListener("click", (e)=>{
-      const btn = e.target.closest("button[data-kind]");
-      if(!btn) return;
-      chosenKind = btn.dataset.kind; // "video" | "clip" | "podcast_audio" | "podcast_video"
-      chosenKindEl.textContent = `Selected: ${chosenKind.replace("_"," ")}`;
-      uploadComposer.style.display = "";
-      // Optionally focus title
-      document.getElementById("postText").focus();
-    });
-
-    /* Create Post (composer) */
-    const postBtn = document.getElementById("postBtn");
-    const postText  = document.getElementById("postText");
-    const postFile  = document.getElementById("postFile");
-    async function createPost({ text, file, kindOverride }) {
-      const user = auth.currentUser;
-      if (!user) { alert("Posting is locked until accounts are enabled."); return; }
-      let mediaUrl=null, storagePath=null, kind="text", mime=null;
-      if (file) {
-        const info = detectKind(file); mime = info.mime;
-        // Map chosen kind to storage folder
-        const folder = (kindOverride?.startsWith("podcast") ? (info.kind==="audio"?"audio":"videos")
-                      : info.kind==="image" ? "images" : info.kind==="video" ? "videos" : info.kind==="audio" ? "audio" : "files");
-        kind = kindOverride || info.kind;
-        storagePath = `uploads/${user.uid}/${folder}/${Date.now()}-${file.name}`;
-        const r = ref(storage, storagePath);
-        await uploadBytes(r, file);
-        mediaUrl = await getDownloadURL(r);
-      }
-      await addDoc(collection(db, "posts"), {
-        ownerId:user.uid, user:user.displayName??"", userPhoto:user.photoURL??"",
-        text:(text||"").trim(), mediaUrl, storagePath, kind, mime,
-        likeCount:0, commentCount:0, createdAt:serverTimestamp()
-      });
-      alert("Upload complete. Processing may take a moment.");
-    }
-    postBtn?.addEventListener("click", async ()=>{
-      if(!chosenKind){ alert("Choose Video, Clip, or Podcast first."); return; }
-      const file = postFile.files[0];
-      if(!file){ alert("Choose a file."); return; }
-      postBtn.disabled = true;
+    function fmtTime(ts){
       try{
-        await createPost({ text: postText.value, file, kindOverride: chosenKind });
-        postText.value=""; postFile.value=""; uploadComposer.style.display="none";
-      } catch(e){ alert(e.message); }
-      postBtn.disabled = false;
+        const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null);
+        if(!t)return"";
+        return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});
+      }catch{return"";}
+    }
+
+    /* Upload (UI only — posting locked until accounts are enabled) */
+    const uploadTypeEl = document.getElementById('uploadType');
+    const postTitleEl = document.getElementById('postTitle');
+    const thumbFileEl = document.getElementById('thumbFile');
+    const mediaFileEl = document.getElementById('mediaFile');
+    const uploadSubmit = document.getElementById('uploadSubmit');
+    const goLiveBtn = document.getElementById('goLiveBtn');
+
+    uploadSubmit?.addEventListener('click', () => {
+      alert('Posting is locked until accounts are enabled.');
+    });
+    goLiveBtn?.addEventListener('click', () => {
+      alert('Live streaming will be enabled later.');
     });
 
-    /* Feed (Home) */
-    const homeFeed = document.getElementById("home-feed");
-    const PAGE_SIZE = 20;
+    /* Rendering */
     function renderPostCard(d){
       const p=d.data();
       const wrap=document.createElement("article"); wrap.className="card";
-      const label = (p.kind==="video"||p.kind==="podcast_video")?"VIDEO":(p.kind==="audio"||p.kind==="podcast_audio")?"PODCAST":(p.kind==="clip")?"CLIP":(p.kind==="image")?"IMAGE":"POST";
+      const label=(p.kind==="video"||p.kind==="podcast_video")?"VIDEO"
+                  :(p.kind==="audio"||p.kind==="podcast_audio")?"PODCAST"
+                  :(p.kind==="clip")?"CLIP"
+                  :(p.kind==="image")?"IMAGE":"POST";
       const header=`<div style="display:flex;justify-content:space-between;align-items:center;">
         <div><strong>${escapeHtml(p.user||"Anon")}</strong> <span class="muted">· ${fmtTime(p.createdAt)}</span></div>
         <span class="muted" style="border:1px solid #2a2a2a;padding:2px 8px;border-radius:999px;font-size:.75rem;">${label}</span>
@@ -439,17 +419,80 @@
       wrap.innerHTML = header + (p.text?`<div style="margin-top:6px;">${escapeHtml(p.text)}</div>`:"") + media;
       return wrap;
     }
+
+    const homeFeed   = document.getElementById("home-feed");
+    const videosFeed = document.getElementById("videos-feed");
+    const podcastFeed= document.getElementById("podcast-feed");
+    const clipsFeed  = document.getElementById("clips-feed");
+
+    let allDocs = [];            // latest snapshot docs
+    let homeSearchTerm = "";
+    let videosTerm = "";
+    let podcastTerm = "";
+    let clipsTerm = "";
+
+    // Simple text match (title/text)
+    function matchesTerm(p, term){
+      if(!term) return true;
+      const t = term.toLowerCase();
+      const text = (p.text||"").toLowerCase();
+      return text.includes(t);
+    }
+
+    function renderLists(){
+      // HOME — show all posts (trending placeholder only if zero)
+      const homeFiltered = allDocs
+        .filter(d => matchesTerm(d.data(), homeSearchTerm));
+      if(!homeFiltered.length){
+        homeFeed.innerHTML = '<div class="muted" style="text-align:center; margin-top:40px;">No trending content yet. Check back soon.</div>';
+      } else {
+        homeFeed.innerHTML = "";
+        homeFiltered.forEach(d => homeFeed.appendChild(renderPostCard(d)));
+      }
+
+      // VIDEOS — kind === "video"
+      const vids = allDocs.filter(d => d.data().kind === "video" && matchesTerm(d.data(), videosTerm));
+      if(!vids.length){
+        videosFeed.innerHTML = '<div class="muted card">No videos yet.</div>';
+      } else {
+        videosFeed.innerHTML = "";
+        vids.forEach(d => videosFeed.appendChild(renderPostCard(d)));
+      }
+
+      // PODCASTS — "podcast_audio" or "podcast_video" or plain "audio"
+      const pods = allDocs.filter(d => (["podcast_audio","podcast_video","audio"].includes(d.data().kind)) && matchesTerm(d.data(), podcastTerm));
+      if(!pods.length){
+        podcastFeed.innerHTML = '<div class="muted card">No podcasts yet.</div>';
+      } else {
+        podcastFeed.innerHTML = "";
+        pods.forEach(d => podcastFeed.appendChild(renderPostCard(d)));
+      }
+
+      // CLIPS — kind === "clip"
+      const clips = allDocs.filter(d => d.data().kind === "clip" && matchesTerm(d.data(), clipsTerm));
+      if(!clips.length){
+        clipsFeed.innerHTML = '<div class="muted card">No clips yet.</div>';
+      } else {
+        clipsFeed.innerHTML = "";
+        clips.forEach(d => clipsFeed.appendChild(renderPostCard(d)));
+      }
+    }
+
+    // Subscribe once, reuse docs for all tabs
+    const PAGE_SIZE = 40;
     const homeQuery = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
     onSnapshot(homeQuery, (snap)=>{
-      const docs=snap.docs;
-      if(!docs.length){
-        homeFeed.innerHTML='<div class="muted" style="text-align:center; margin-top:40px;">No trending content yet. Check back soon.</div>';
-        return;
-      }
-      homeFeed.innerHTML=""; docs.forEach(d=> homeFeed.appendChild(renderPostCard(d)));
+      allDocs = snap.docs;
+      renderLists();
     });
 
-    /* Tabs (hash-based) with search visibility rules */
+    /* Search fields */
+    globalSearch?.addEventListener('input', (e)=>{ homeSearchTerm = e.target.value.trim(); renderLists(); });
+    videosSearch?.addEventListener('input', (e)=>{ videosTerm = e.target.value.trim(); renderLists(); });
+    podcastSearch?.addEventListener('input', (e)=>{ podcastTerm = e.target.value.trim(); renderLists(); });
+    clipsSearch?.addEventListener('input', (e)=>{ clipsTerm = e.target.value.trim(); renderLists(); });
+
+    /* Tabs (hash-based) */
     const links = Array.from(document.querySelectorAll('.bottom-nav a'));
     const sections = {
       home:    document.getElementById('tab-home'),
@@ -463,15 +506,15 @@
     function setTab(key){
       Object.entries(sections).forEach(([k,el]) => { el.style.display = (k===key) ? '' : 'none'; });
       links.forEach(a => a.classList.toggle('active', a.dataset.tab===key));
-      // Show search only on Home, Videos, Podcast, Clips
-      const showSearch = ["home","videos","podcast","clips"].includes(key);
-      searchWrap.style.display = showSearch ? "flex" : "none";
+      // Show global header search ONLY on Home. Other tabs use their own right-side search bars.
+      const showGlobalSearch = (key === "home");
+      searchWrap.style.display = showGlobalSearch ? "flex" : "none";
       window.scrollTo({top:0, behavior:'smooth'});
     }
     function applyHash(){ const key=(location.hash||"#home").replace("#",""); setTab(key); }
     links.forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); location.hash = a.getAttribute('href'); }));
     window.addEventListener('hashchange', applyHash);
-    applyHash(); // initial
+    applyHash();
   </script>
 </body>
 </html>
