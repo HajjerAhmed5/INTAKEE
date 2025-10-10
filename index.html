@@ -47,6 +47,7 @@
     padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff;
   }
   input[type="file"]{ color:#aaa; }
+  textarea{ width:100%; min-height:80px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
   button{ padding:9px 14px; border-radius:10px; border:1px solid #2a2a2a; background:#141414; color:#fff; cursor:pointer; }
   button.primary{ background:#1a1a1a; border-color:#3a3a3a; }
   button.ghost{ background:transparent; }
@@ -68,6 +69,58 @@
   .bottom-nav{ position:fixed; bottom:0; left:0; right:0; background:#0b0b0b; border-top:1px solid #151515; display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:8px 6px; z-index:50; }
   .bottom-nav a{ color:#aaa; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.75rem; padding:6px 4px; border-radius:10px; }
   .bottom-nav a.active, .bottom-nav a:hover{ color:#fff; background:#111; }
+
+  /* -------- PROFILE REDESIGN -------- */
+  .profile-banner{
+    height:200px; border-radius:14px; border:1px solid #1a1a1a; background:#111 center/cover no-repeat;
+    position:relative; overflow:hidden; margin:12px 0;
+  }
+  .profile-banner::after{ /* subtle gradient for readability */
+    content:""; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.0), rgba(0,0,0,.35));
+  }
+  .profile-header{
+    display:grid; grid-template-columns: 100px 1fr auto; gap:14px; align-items:center;
+  }
+  .profile-avatar{
+    width:100px; height:100px; border-radius:50%; background:#1a1a1a; object-fit:cover; border:1px solid #262626;
+    margin-top:-50px; /* overlap banner */
+  }
+  .profile-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+  .stat-row{ display:flex; gap:18px; flex-wrap:wrap; margin-top:8px; }
+  .stat-row .muted strong{ color:#fff; }
+
+  .profile-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .grid{
+    margin-top:10px;
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px;
+  }
+  .grid .tile{
+    background:#0f0f0f; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden;
+  }
+  .grid .tile .thumb{
+    width:100%; aspect-ratio:16/9; background:#111; object-fit:cover; display:block;
+  }
+  .grid .tile .meta{
+    padding:8px 10px; font-size:.9rem;
+  }
+
+  /* -------- SETTINGS REDESIGN -------- */
+  .settings-section{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; }
+  .settings-item{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid #151515; }
+  .settings-item:first-child{ border-top:none; }
+  .settings-left{ display:flex; align-items:center; gap:10px; }
+  .settings-left i{ width:20px; text-align:center; color:#b7b7b7; }
+  .toggle{ width:42px; height:24px; border-radius:999px; border:1px solid #2a2a2a; background:#141414; position:relative; cursor:pointer; }
+  .toggle::after{ content:""; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#2b2b2b; transition:transform .15s ease; }
+  .toggle[data-on="true"]{ background:#1c1c1c; border-color:#3a3a3a; }
+  .toggle[data-on="true"]::after{ transform:translateX(18px); }
+
+  .disclosure{ width:100%; text-align:left; padding:10px 12px; border:1px solid #1a1a1a; border-radius:10px; background:#101010; }
+  .disclosure[aria-expanded="true"]{ background:#121212; }
+  .disclosure-panel{ margin-top:10px; border:1px solid #1a1a1a; border-radius:10px; padding:12px; background:#0f0f0f; }
+
+  .settings-links a{ color:#ddd; text-decoration:none; display:block; padding:6px 0; }
+  .settings-links a:hover{ text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -174,82 +227,162 @@
       <div id="clips-feed"></div>
     </section>
 
-    <!-- PROFILE -->
+    <!-- PROFILE (REDESIGNED) -->
     <section id="tab-profile" style="display:none;">
+      <!-- Banner -->
+      <div id="profileBanner" class="profile-banner"></div>
+      <div class="row" style="justify-content:flex-end; gap:10px; margin-top:-6px;">
+        <input id="bannerInput" type="file" accept="image/*" hidden>
+        <input id="avatarInput" type="file" accept="image/*" hidden>
+        <button id="btn-change-banner" class="ghost">Change banner</button>
+        <button id="btn-change-avatar" class="ghost">Change photo</button>
+      </div>
+
+      <!-- Header -->
       <div class="card">
-        <div class="row" style="align-items:flex-start;">
-          <img id="profile-photo" src="" alt="" style="width:84px;height:84px;border-radius:50%;background:#1a1a1a;object-fit:cover;">
-          <div style="flex:1;min-width:200px;">
+        <div class="profile-header">
+          <img id="profile-photo" src="" alt="" class="profile-avatar">
+          <div>
             <h3 id="profile-name" style="margin:0;">Your Name</h3>
             <div id="profile-handle" class="muted">@username</div>
-            <p id="profile-bio" style="margin:8px 0 0;">Add a short bio to introduce yourself.</p>
-            <div class="row" style="gap:16px;margin-top:10px;">
+            <div id="bio-view" class="muted" style="margin-top:8px;">Add a short bio to introduce yourself.</div>
+            <div id="bio-edit-wrap" style="display:none; margin-top:8px;">
+              <textarea id="bio-edit" placeholder="Write your bio..."></textarea>
+              <div class="row" style="margin-top:8px;">
+                <button id="bio-save" class="primary">Save</button>
+                <button id="bio-cancel" class="ghost">Cancel</button>
+              </div>
+            </div>
+            <div class="stat-row">
               <div class="muted"><strong id="stat-posts">0</strong> Posts</div>
               <div class="muted"><strong id="stat-followers">0</strong> Followers</div>
               <div class="muted"><strong id="stat-following">0</strong> Following</div>
-            </div>
-            <div class="row" style="margin-top:10px;">
-              <button id="btn-edit-profile" class="ghost">Edit Profile</button>
-              <button id="btn-share-profile" class="ghost">Share Profile</button>
+              <div class="muted"><strong id="stat-likes">0</strong> Likes</div>
             </div>
           </div>
-          <div>
-            <label class="muted" style="display:flex;align-items:center;gap:8px;">
-              <input type="checkbox" id="toggle-private"> Private account
-            </label>
+          <div class="profile-actions">
+            <button id="btn-follow" class="primary">Follow</button>
+            <button id="btn-share-profile" class="ghost">Share Profile</button>
+            <button id="btn-edit-profile" class="ghost">Edit Profile</button>
           </div>
         </div>
       </div>
 
+      <!-- Tabs + Grid -->
       <div class="card">
-        <div class="row pills">
+        <div class="profile-tabs">
           <button class="pill active" data-profiletab="all">All</button>
           <button class="pill" data-profiletab="videos">Videos</button>
           <button class="pill" data-profiletab="podcasts">Podcasts</button>
           <button class="pill" data-profiletab="clips">Clips</button>
           <button class="pill" data-profiletab="playlists">Playlists</button>
         </div>
-        <div id="profile-grid" style="margin-top:8px;">
-          <div class="muted">No posts yet.</div>
+        <div id="profile-grid" class="grid">
+          <!-- Filled by JS -->
         </div>
+        <div id="profile-empty" class="muted" style="margin-top:8px; display:none;">No posts yet.</div>
       </div>
     </section>
 
-    <!-- SETTINGS -->
+    <!-- SETTINGS (REDESIGNED) -->
     <section id="tab-settings" style="display:none;">
-      <div class="card" style="margin:0 0 12px;">
-        <h3 style="margin:0 0 12px;">Settings</h3>
-        <div class="card" style="margin:0 0 12px;">
-          <h4 style="margin:0 0 8px;">Account</h4>
-          <div class="muted">Name, Username, Email</div>
-          <div class="muted">Change Password</div>
-          <div class="muted">Delete Account</div>
-          <div class="row" style="margin-top:10px;"><button id="settings-logout">Logout</button></div>
+      <div class="settings-section">
+        <h3 style="margin:0 0 8px;">Account</h3>
+        <div class="settings-item">
+          <div class="settings-left"><i class="fa fa-user"></i><span>Name, Username, Email</span></div>
+          <button class="ghost">Edit</button>
         </div>
-        <div class="card" style="margin:0 0 12px;">
-          <h4 style="margin:0 0 8px;">Privacy & Safety</h4>
-          <label class="muted" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <input type="checkbox" id="settings-private"> Private account
-          </label>
-          <div class="muted">Blocked accounts</div>
-          <div class="muted">Comments: Everyone / Followers / No one</div>
-          <div class="muted">Hide sensitive content</div>
-          <div class="muted">Report a problem</div>
+        <div class="settings-item">
+          <div class="settings-left"><i class="fa fa-key"></i><span>Change Password</span></div>
+          <button class="ghost">Update</button>
         </div>
-        <div class="card" style="margin:0 0 12px;">
-          <h4 style="margin:0 0 8px;">Notifications</h4>
-          <label class="muted" style="display:flex;align-items:center;gap:8px;"><input type="checkbox"> New followers</label>
-          <label class="muted" style="display:flex;align-items:center;gap:8px;"><input type="checkbox"> Likes & dislikes</label>
-          <label class="muted" style="display:flex;align-items:center;gap:8px;"><input type="checkbox"> Comments & replies</label>
-          <label class="muted" style="display:flex;align-items:center;gap:8px;"><input type="checkbox"> Upload complete</label>
+        <div class="settings-item">
+          <div class="settings-left"><i class="fa fa-trash"></i><span>Delete Account</span></div>
+          <button class="ghost">Start</button>
         </div>
-        <div class="card">
-          <h4 style="margin:0 0 8px;">About & Legal</h4>
-          <div class="muted">Community Guidelines</div>
-          <div class="muted">Terms of Service</div>
-          <div class="muted">Privacy Policy</div>
-          <div class="muted">Contact: intakee2025@gmail.com</div>
-          <div class="muted" style="margin-top:6px;">Version 1.0.0</div>
+        <div class="settings-item">
+          <div class="settings-left"><i class="fa fa-right-from-bracket"></i><span>Logout</span></div>
+          <button id="settings-logout" class="ghost">Logout</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3 style="margin:0 0 8px;">Privacy & Safety</h3>
+        <div class="settings-item">
+          <div class="settings-left"><i class="fa fa-lock"></i><span>Private account</span></div>
+          <div class="toggle" id="toggle-private" data-on="false" role="switch" aria-checked="false"></div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-left"><i class="fa fa-ban"></i><span>Blocked accounts</span></div>
+          <button class="ghost">Manage</button>
+        </div>
+        <div class="settings-item">
+          <div class="settings-left"><i class="fa fa-comments"></i><span>Comments</span></div>
+          <select>
+            <option>Everyone</option>
+            <option>Followers</option>
+            <option>No one</option>
+          </select>
+        </div>
+        <div class="settings-item">
+          <div class="settings-left"><i class="fa fa-eye-slash"></i><span>Hide sensitive content</span></div>
+          <div class="toggle" id="toggle-sensitive" data-on="false" role="switch" aria-checked="false"></div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-left"><i class="fa fa-flag"></i><span>Report a problem</span></div>
+          <button class="ghost">Report</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3 style="margin:0 0 8px;">Notifications</h3>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-user-plus"></i><span>New followers</span></div><div class="toggle" data-on="true" role="switch" aria-checked="true"></div></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-thumbs-up"></i><span>Likes & dislikes</span></div><div class="toggle" data-on="true" role="switch" aria-checked="true"></div></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-comment-dots"></i><span>Comments & replies</span></div><div class="toggle" data-on="true" role="switch" aria-checked="true"></div></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-cloud-arrow-up"></i><span>Upload complete</span></div><div class="toggle" data-on="true" role="switch" aria-checked="true"></div></div>
+      </div>
+
+      <div class="settings-section">
+        <h3 style="margin:0 0 8px;">Playback & Storage</h3>
+        <div class="settings-item">
+          <div class="settings-left"><i class="fa fa-film"></i><span>Video quality</span></div>
+          <select>
+            <option>Auto</option>
+            <option>HD</option>
+            <option>Data Saver</option>
+          </select>
+        </div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-wifi"></i><span>Autoplay on Wi-Fi only</span></div><div class="toggle" data-on="false" role="switch" aria-checked="false"></div></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-podcast"></i><span>Background audio (podcasts)</span></div><div class="toggle" data-on="true" role="switch" aria-checked="true"></div></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-square"></i><span>Picture-in-picture</span></div><div class="toggle" data-on="false" role="switch" aria-checked="false"></div></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-trash-can"></i><span>Clear cached media</span></div><button class="ghost">Clear</button></div>
+      </div>
+
+      <div class="settings-section">
+        <h3 style="margin:0 0 8px;">Legal & Policy</h3>
+        <button id="legalToggle" class="disclosure" aria-expanded="false">View Legal & Policy</button>
+        <div id="legalPanel" class="disclosure-panel" hidden>
+          <h4 style="margin:0 0 8px;">Content Responsibility Disclaimer</h4>
+          <p class="muted" style="margin:0 0 10px;">
+            INTAKEE supports freedom of speech, creativity, and open discussion. Users are fully responsible for content they upload or share, including videos, podcasts, clips, comments, and messages. INTAKEE does not endorse, verify, or assume legal responsibility for user-generated content. We reserve the right to remove content that violates laws, promotes violence or harassment, or contains explicit material.
+          </p>
+          <h4 style="margin:10px 0 8px;">Privacy Commitment</h4>
+          <p class="muted" style="margin:0 0 10px;">
+            We do not sell, rent, or share personal data with advertisers or third parties. Personal information is collected only to run core features (authentication, uploads, performance, recommendations). Usage data may be analyzed internally to improve INTAKEE. We use secure, industry-standard services (e.g., Firebase/Google Cloud). Your content remains your property.
+          </p>
+          <h4 style="margin:10px 0 8px;">Community Guidelines</h4>
+          <ul class="muted" style="margin:0 0 10px; padding-left:18px;">
+            <li>Follow the law; no threats, hate speech, or harassment.</li>
+            <li>No nudity or explicit material.</li>
+            <li>No impersonation or deliberate misinformation.</li>
+            <li>Repeated or severe violations may lead to removal or suspension.</li>
+          </ul>
+          <div class="settings-links">
+            <a href="#">Community Guidelines</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="mailto:intakee2025@gmail.com">Contact: intakee2025@gmail.com</a>
+          </div>
         </div>
       </div>
     </section>
@@ -270,12 +403,17 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import {
+      getFirestore, doc, getDoc, setDoc, updateDoc, collection,
+      serverTimestamp, query, orderBy, limit, onSnapshot, where
+    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
     import { firebaseConfig } from "./firebase-config.js";
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
     /* Elements */
     const searchWrap = document.getElementById("searchWrap");
@@ -286,30 +424,77 @@
     const podcastSearch = document.getElementById("podcastSearch");
     const clipsSearch = document.getElementById("clipsSearch");
 
+    // Profile elements
+    const profileBanner = document.getElementById("profileBanner");
+    const bannerInput = document.getElementById("bannerInput");
+    const avatarInput = document.getElementById("avatarInput");
+    const btnChangeBanner = document.getElementById("btn-change-banner");
+    const btnChangeAvatar = document.getElementById("btn-change-avatar");
+    const profilePhoto = document.getElementById("profile-photo");
+    const profileName = document.getElementById("profile-name");
+    const profileHandle = document.getElementById("profile-handle");
+    const bioView = document.getElementById("bio-view");
+    const bioEditWrap = document.getElementById("bio-edit-wrap");
+    const bioEdit = document.getElementById("bio-edit");
+    const bioSave = document.getElementById("bio-save");
+    const bioCancel = document.getElementById("bio-cancel");
+    const btnEditProfile = document.getElementById("btn-edit-profile");
+    const btnShareProfile = document.getElementById("btn-share-profile");
+    const btnFollow = document.getElementById("btn-follow");
+    const profileGrid = document.getElementById("profile-grid");
+    const profileEmpty = document.getElementById("profile-empty");
+
+    // Settings elements
+    const legalToggle = document.getElementById("legalToggle");
+    const legalPanel = document.getElementById("legalPanel");
+
     /* Auth (minimal UI) */
     logoutBtn.addEventListener("click", () => signOut(auth));
     onAuthStateChanged(auth, async (user) => {
       loginBtn.style.display  = "none";
       logoutBtn.style.display = user ? "inline-block" : "none";
+
+      // If logged in, ensure user doc exists
       if (user) {
         const uref = doc(db, "users", user.uid);
         const snap = await getDoc(uref);
         if (!snap.exists()) {
           await setDoc(uref, { uid:user.uid, displayName:user.displayName??"", email:user.email??"", photoURL:user.photoURL??"", createdAt: serverTimestamp() });
         }
-        // profile header fill
-        document.getElementById("profile-name").textContent = user.displayName || "Your Name";
-        document.getElementById("profile-handle").textContent = user.email ? "@"+user.email.split("@")[0] : "@username";
-        const p = document.getElementById("profile-photo"); if (user.photoURL) p.src = user.photoURL;
+        // Fill profile header from user doc (extended with bannerURL, bio)
+        const fresh = (await getDoc(uref)).data() || {};
+        profileName.textContent = fresh.displayName || "Your Name";
+        profileHandle.textContent = fresh.email ? "@"+fresh.email.split("@")[0] : "@username";
+        if (fresh.photoURL) profilePhoto.src = fresh.photoURL;
+        if (fresh.bio) bioView.textContent = fresh.bio;
+        if (fresh.bannerURL) profileBanner.style.backgroundImage = `url('${fresh.bannerURL}')`;
+
+        // Owner-only buttons visible if logged in (this page is "your profile")
+        btnChangeBanner.style.display = "";
+        btnChangeAvatar.style.display = "";
+        btnEditProfile.style.display  = "";
+        btnFollow.style.display       = "none"; // you don't follow yourself
+
+        // Load user's posts into profile grid
+        loadMyPosts(user.uid);
+      } else {
+        // Not logged in: hide owner-only buttons
+        btnChangeBanner.style.display = "none";
+        btnChangeAvatar.style.display = "none";
+        btnEditProfile.style.display  = "none";
+        btnFollow.style.display       = ""; // viewing as a visitor
+        // Clear grid
+        profileGrid.innerHTML = "";
+        profileEmpty.style.display = "";
       }
     });
 
-    /* Helpers */
+    /* -------- Existing feed helpers (unchanged) -------- */
     function escapeHtml(s=""){ return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;","<": "&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
     function fmtTime(ts){ try{const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null); if(!t)return""; return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});}catch{return"";} }
     function match(p, term){ if(!term) return true; const t=term.toLowerCase(); return ((p.text||"").toLowerCase().includes(t)); }
 
-    /* Render helpers */
+    /* Render helpers for main feeds */
     const homeFeed   = document.getElementById("home-feed");
     const videosFeed = document.getElementById("videos-feed");
     const podcastFeed= document.getElementById("podcast-feed");
@@ -336,11 +521,11 @@
       return el;
     }
 
-    /* Live data */
+    /* Live data for main feeds */
     let docs = [];
     const PAGE_SIZE = 40;
-    const q = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
-    onSnapshot(q, (snap)=>{ docs = snap.docs; draw(); });
+    const qMain = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
+    onSnapshot(qMain, (snap)=>{ docs = snap.docs; draw(); });
 
     /* Search state */
     let homeTerm="", videosTerm="", podcastTerm="", clipsTerm="";
@@ -350,7 +535,6 @@
     clipsSearch?.addEventListener('input', e=>{ clipsTerm    = e.target.value.trim(); draw(); });
 
     function draw(){
-      // HOME: only media kinds (remove plain text "POST" rows entirely)
       const mediaKinds = new Set(["video","clip","podcast_audio","podcast_video","audio","image"]);
       const trending = docs.filter(d => mediaKinds.has(d.data().kind) && match(d.data(), homeTerm));
       if(!trending.length){
@@ -359,17 +543,14 @@
         homeFeed.innerHTML = ""; trending.forEach(d=>homeFeed.appendChild(renderCard(d)));
       }
 
-      // VIDEOS
       const vids = docs.filter(d => d.data().kind==="video" && match(d.data(), videosTerm));
       videosFeed.innerHTML = ""; (vids.length?vids:[/*empty*/]).forEach(d=>{ if(d) videosFeed.appendChild(renderCard(d)); });
       if(!vids.length) videosFeed.innerHTML = '<div class="muted card">No videos yet.</div>';
 
-      // PODCASTS
       const pods = docs.filter(d => ["podcast_audio","podcast_video","audio"].includes(d.data().kind) && match(d.data(), podcastTerm));
       podcastFeed.innerHTML = ""; (pods.length?pods:[/*empty*/]).forEach(d=>{ if(d) podcastFeed.appendChild(renderCard(d)); });
       if(!pods.length) podcastFeed.innerHTML = '<div class="muted card">No podcasts yet.</div>';
 
-      // CLIPS
       const cls = docs.filter(d => d.data().kind==="clip" && match(d.data(), clipsTerm));
       clipsFeed.innerHTML = ""; (cls.length?cls:[/*empty*/]).forEach(d=>{ if(d) clipsFeed.appendChild(renderCard(d)); });
       if(!cls.length) clipsFeed.innerHTML = '<div class="muted card">No clips yet.</div>';
@@ -397,6 +578,129 @@
     links.forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); location.hash = a.getAttribute('href'); }));
     window.addEventListener('hashchange', applyHash);
     applyHash();
+
+    /* ---------- PROFILE FEATURES ---------- */
+
+    // Owner bio edit
+    btnEditProfile?.addEventListener('click', ()=>{
+      bioEdit.value = bioView.textContent || "";
+      bioView.style.display = "none";
+      bioEditWrap.style.display = "";
+    });
+    bioCancel?.addEventListener('click', ()=>{
+      bioEditWrap.style.display = "none";
+      bioView.style.display = "";
+    });
+    bioSave?.addEventListener('click', async ()=>{
+      const user = auth.currentUser; if(!user) return alert("Sign in to edit profile.");
+      const bio = (bioEdit.value||"").trim();
+      await updateDoc(doc(db,"users",user.uid), { bio });
+      bioView.textContent = bio || "Add a short bio to introduce yourself.";
+      bioEditWrap.style.display = "none";
+      bioView.style.display = "";
+    });
+
+    // Share profile (simple copy)
+    btnShareProfile?.addEventListener('click', async ()=>{
+      const url = location.origin + location.pathname + "#profile";
+      try{ await navigator.clipboard.writeText(url); alert("Profile link copied."); }catch{ prompt("Copy profile link:", url); }
+    });
+
+    // Follow (placeholder)
+    btnFollow?.addEventListener('click', ()=>{
+      alert("Following will be available later.");
+    });
+
+    // Change banner
+    btnChangeBanner?.addEventListener('click', ()=> bannerInput.click());
+    bannerInput?.addEventListener('change', async (e)=>{
+      const file = e.target.files?.[0]; if(!file) return;
+      const user = auth.currentUser; if(!user) return alert("Sign in to change banner.");
+      const path = `users/${user.uid}/banner/${Date.now()}-${file.name}`;
+      const r = ref(storage, path);
+      await uploadBytes(r, file);
+      const url = await getDownloadURL(r);
+      await updateDoc(doc(db,"users",user.uid), { bannerURL:url });
+      profileBanner.style.backgroundImage = `url('${url}')`;
+    });
+
+    // Change avatar
+    btnChangeAvatar?.addEventListener('click', ()=> avatarInput.click());
+    avatarInput?.addEventListener('change', async (e)=>{
+      const file = e.target.files?.[0]; if(!file) return;
+      const user = auth.currentUser; if(!user) return alert("Sign in to change photo.");
+      const path = `users/${user.uid}/avatar/${Date.now()}-${file.name}`;
+      const r = ref(storage, path);
+      await uploadBytes(r, file);
+      const url = await getDownloadURL(r);
+      await updateDoc(doc(db,"users",user.uid), { photoURL:url });
+      profilePhoto.src = url;
+    });
+
+    // Load current user's posts into profile grid
+    async function loadMyPosts(uid){
+      const qMine = query(
+        collection(db,"posts"),
+        where("ownerId","==",uid),
+        orderBy("createdAt","desc"),
+        limit(60)
+      );
+      onSnapshot(qMine, (snap)=>{
+        const docs = snap.docs;
+        profileGrid.innerHTML = "";
+        if(!docs.length){
+          profileEmpty.style.display = "";
+          return;
+        }
+        profileEmpty.style.display = "none";
+        docs.forEach(d=>{
+          const p = d.data();
+          // Build a tile with thumbnail (image or video)
+          const tile = document.createElement("div");
+          tile.className = "tile";
+          let media = "";
+          if(p.mediaUrl){
+            if(p.kind==="image"){
+              media = `<img class="thumb" src="${p.mediaUrl}" alt="">`;
+            }else if(p.kind==="video" || p.kind==="podcast_video"){
+              media = `<video class="thumb" src="${p.mediaUrl}" muted playsinline></video>`;
+            }else if(p.kind==="clip"){
+              media = `<video class="thumb" src="${p.mediaUrl}" muted playsinline loop></video>`;
+            }else if(p.kind==="audio" || p.kind==="podcast_audio"){
+              // audio has no visual thumbnail; show a simple block
+              media = `<div class="thumb" style="display:flex;align-items:center;justify-content:center;">AUDIO</div>`;
+            }
+          } else {
+            media = `<div class="thumb"></div>`;
+          }
+          const title = (p.text||"").trim();
+          tile.innerHTML = `${media}<div class="meta">${escapeHtml(title||"Untitled")}</div>`;
+          profileGrid.appendChild(tile);
+        });
+        // Stats (basic count)
+        document.getElementById("stat-posts").textContent = String(docs.length);
+      });
+    }
+
+    /* ---------- SETTINGS INTERACTIONS ---------- */
+
+    // Simple toggle behavior (visual only for now)
+    document.querySelectorAll('.toggle').forEach(t=>{
+      t.addEventListener('click', ()=>{
+        const on = t.getAttribute('data-on') === 'true';
+        t.setAttribute('data-on', on ? 'false' : 'true');
+        t.setAttribute('aria-checked', on ? 'false' : 'true');
+      });
+    });
+
+    // Collapsible Legal & Policy
+    legalToggle?.addEventListener('click', ()=>{
+      const expanded = legalToggle.getAttribute('aria-expanded') === 'true';
+      legalToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      legalPanel.hidden = expanded;
+    });
+
+    /* --------- Existing main feed subscription already above --------- */
   </script>
 </body>
 </html>
