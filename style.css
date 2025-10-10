@@ -1,158 +1,85 @@
-/* ---------- GLOBAL STYLES ---------- */
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* ===== INTAKEE Profile Enhancements (append to end of style.css) ===== */
 
-body {
-  font-family: Arial, sans-serif;
-  background-color: #000;
-  color: #fff;
-  padding-bottom: 70px; /* bottom nav space */
+/* Banner container with subtle depth */
+.profile-banner {
+  height: 200px;
+  border-radius: 12px;
+  border: 1px solid #1a1a1a;
+  background: #111 center/cover no-repeat;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 14px;
 }
-
-img { max-width: 100%; height: auto; display: block; }
-.hidden { display: none !important; }
-
-/* ---------- HEADER ---------- */
-.home-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 20px; gap: 20px;
-}
-.home-logo {
-  height: 160px; width: auto; filter: brightness(1.2) contrast(1.2); margin-right: 20px;
-}
-.search-bar {
-  display: flex; background: #222; border-radius: 50px; padding: 10px 20px; gap: 10px; align-items: center;
-}
-.search-bar input { background: transparent; border: none; outline: none; color: white; }
-.search-bar .icon { color: #aaa; cursor: pointer; }
-
-/* ---------- LOGIN BUTTON ---------- */
-#home-login-btn {
-  background: black; color: white; border: 1px solid white;
-  padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;
+.profile-banner::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,.35));
 }
 
-/* ---------- TABS ---------- */
-.tab { display: none; padding: 20px; }
-.tab.active { display: block; }
-
-.home-title { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; }
-
-.video-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-}
-.video-card { background: #111; padding: 15px; border-radius: 8px; text-align: center; }
-.video-card img { border-radius: 6px; margin-bottom: 10px; }
-.video-card h3 { font-size: 16px; margin-bottom: 10px; }
-.video-card p { font-size: 14px; color: #ccc; }
-.video-card p:first-of-type { margin-bottom: 8px; }
-.video-card p:last-of-type { margin-top: 12px; }
-.video-card ul { margin-left: 20px; padding-left: 10px; }
-.video-card button {
-  margin-top: 5px; padding: 6px 10px; background: #333; color: #fff;
-  border: none; border-radius: 4px; cursor: pointer;
+/* Keep header tidy even when overlapping the banner */
+.profile-header {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: 16px;
+  align-items: center;
 }
 
-/* ---------- BOTTOM NAV ---------- */
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; width: 100%;
-  display: flex; justify-content: space-around;
-  background: #111; border-top: 1px solid #222; z-index: 10;
+/* Avatar + overlay “+” button */
+.avatar-wrap { position: relative; display: inline-block; }
+.profile-avatar {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: #1a1a1a; object-fit: cover;
+  border: 1px solid #262626;
+  margin-top: -50px; /* overlap banner */
 }
-.tab-btn {
-  flex: 1; padding: 15px; background: none; border: none; color: #fff;
-  font-weight: bold; cursor: pointer; opacity: 0.7; transition: opacity .15s, transform .15s;
-}
-.tab-btn.active { opacity: 1; transform: scale(1.02); }
-.upload-btn { font-size: 20px; color: white; }
-
-/* ---------- UPLOAD ---------- */
-.upload-wrapper {
-  background: #111; padding: 20px; border-radius: 8px;
-  max-width: 600px; margin: auto;
-}
-.upload-wrapper label, .upload-wrapper h2 { margin-top: 10px; display: block; font-weight: bold; }
-.upload-wrapper input, .upload-wrapper textarea, .upload-wrapper select {
-  width: 100%; margin-top: 5px; padding: 10px; background: #222; color: #fff;
-  border: 1px solid #444; border-radius: 4px;
-}
-.upload-wrapper textarea { min-height: 100px; }
-.upload-wrapper .upload-buttons { display: flex; gap: 10px; }
-.upload-wrapper button {
-  margin-top: 15px; background: black; color: white; border: 1px solid white;
-  padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer;
-}
-.upload-wrapper .help { margin-top: 8px; font-size: 13px; color: #bbb; }
-.upload-wrapper .note { margin-bottom: 8px; color: #ccc; }
-
-/* ---------- MODAL ---------- */
-.auth-modal {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-  display: none; justify-content: center; align-items: center;
-}
-.auth-modal .auth-box {
-  position: relative; background: #111; padding: 30px; border-radius: 12px;
-  width: 320px; text-align: center;
-}
-.auth-box input {
-  width: 100%; padding: 10px; margin: 10px 0; background: #222;
-  color: white; border: 1px solid #444; border-radius: 5px;
-}
-.auth-box button {
-  background: black; color: white; padding: 10px 15px;
-  border: 1px solid white; border-radius: 6px; font-weight: bold; cursor: pointer;
-}
-.auth-box .close-auth {
-  position: absolute; top: 15px; right: 15px; font-size: 20px;
-  color: white; background: none; border: none; cursor: pointer;
+.avatar-fab {
+  position: absolute; right: -4px; bottom: -4px;
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid #2a2a2a; background: #111; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer; opacity: .95;
 }
 
-/* ---------- PROFILE ---------- */
-.profile-section { padding: 20px; }
-.profile-section h2 { text-align: center; margin-bottom: 15px; }
-.profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
-.profile-pic-wrapper { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
-.profile-pic-wrapper img {
-  width: 100%; height: 100%; border-radius: 50%; border: 2px solid white; object-fit: cover;
+/* Banner overlay “+” button */
+.profile-edit-wrap { position: relative; }
+.edit-fab {
+  position: absolute; right: 10px; bottom: 10px;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid #2a2a2a; background: #111; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: opacity .15s ease, transform .15s ease;
+  opacity: .9;
 }
-.plus-icon {
-  position: absolute; bottom: 0; right: 0; background: white; color: black;
-  border-radius: 50%; padding: 2px 6px; font-weight: bold; font-size: 14px; cursor: pointer;
-}
-.profile-meta { flex: 1; }
-.profile-meta h3 { font-size: 20px; margin-bottom: 5px; }
-#profile-bio {
-  width: 100%; background: #222; border: 1px solid #444; color: white;
-  padding: 8px; border-radius: 6px; resize: none; min-height: 72px;
-}
-.profile-content { margin-top: 30px; }
-.profile-block { margin-bottom: 30px; }
-.profile-block h3 { font-size: 18px; margin-bottom: 10px; }
-#user-uploads, #user-liked, #user-saved {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;
-}
+.edit-fab:hover { transform: scale(1.05); }
 
-/* ---------- SETTINGS (Accordion) ---------- */
-.settings-page { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-.settings-title { font-size: 24px; text-align: center; margin-bottom: 10px; font-weight: bold; }
+/* Only show these for the account owner (JS toggles display) */
+.owner-only { display: none; }
 
-.settings-section {
-  background: #111; border-radius: 8px; padding: 12px 16px;
-  cursor: pointer; transition: background 0.3s;
-}
-.settings-section:hover { background: #1a1a1a; }
-.settings-label { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; color: #fff; }
-.settings-content { display: none; margin-top: 10px; font-size: 14px; color: #ccc; line-height: 1.6; }
-.settings-section.open .settings-content { display: block; }
-.settings-section h4 { margin-top: 10px; font-size: 16px; color: #fff; }
-.settings-section ul { padding-left: 20px; margin: 10px 0; }
-.settings-section button {
-  display: inline-block; margin: 8px 8px 0 0; padding: 8px 12px;
-  border: 1px solid #fff; border-radius: 5px; background: black; color: white; cursor: pointer;
-}
+/* Profile stats row */
+.stat-row { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 8px; }
+.stat-row .muted strong { color: #fff; }
 
-/* ---------- COMMUNITY GUIDELINES LIST FIX ---------- */
-.guideline-list {
-  list-style-type: disc; padding-left: 25px; margin-top: 10px; margin-bottom: 10px;
-  text-align: left; color: #ccc; font-size: 14px; line-height: 1.6;
+/* Profile tabs + content grid */
+.profile-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.profile-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+.profile-grid .tile {
+  background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 12px; overflow: hidden;
+}
+.profile-grid .thumb {
+  width: 100%; aspect-ratio: 16/9; background: #111; object-fit: cover; display: block;
+}
+.profile-grid .meta { padding: 8px 10px; font-size: .9rem; color: #ddd; }
+
+/* Small screens */
+@media (max-width: 600px) {
+  .profile-header {
+    grid-template-columns: 72px 1fr;
+    grid-auto-rows: auto;
+  }
+  .profile-avatar { width: 72px; height: 72px; margin-top: -36px; }
 }
