@@ -1,133 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>INTAKEE — Videos, Podcasts, and Clips</title>
+<meta name="description" content="INTAKEE is the all-in-one platform for videos, podcasts, and clips — freedom to create, simple to share.">
+<link rel="canonical" href="https://intakee.vercel.app/">
 
-  <title>INTAKEE — Videos, Podcasts, and Clips</title>
-  <meta name="description" content="INTAKEE is the all-in-one platform for videos, podcasts, and clips — freedom to create, simple to share.">
-  <link rel="canonical" href="https://intakee.vercel.app/">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
+<meta property="og:description" content="All-in-one platform for videos, podcasts, and clips.">
+<meta property="og:url" content="https://intakee.vercel.app/">
+<meta property="og:image" content="https://intakee.vercel.app/og-image.jpg">
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
-  <meta property="og:description" content="All-in-one platform for videos, podcasts, and clips.">
-  <meta property="og:url" content="https://intakee.vercel.app/">
-  <meta property="og:image" content="https://intakee.vercel.app/og-image.jpg">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="INTAKEE — Videos, Podcasts, and Clips">
+<meta name="twitter:description" content="Share videos, clips, and podcasts — your voice, your space.">
+<meta name="twitter:image" content="https://intakee.vercel.app/og-image.jpg">
 
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="INTAKEE — Videos, Podcasts, and Clips">
-  <meta name="twitter:description" content="Share videos, clips, and podcasts — your voice, your space.">
-  <meta name="twitter:image" content="https://intakee.vercel.app/og-image.jpg">
+<!-- Organization JSON-LD -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"INTAKEE","url":"https://intakee.vercel.app/","logo":"https://intakee.vercel.app/logo.png","sameAs":[]}
+</script>
 
-  <!-- Organization JSON-LD -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "INTAKEE",
-    "url": "https://intakee.vercel.app/",
-    "logo": "https://intakee.vercel.app/logo.png",
-    "sameAs": []
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
+<link rel="icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#000; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+
+  /* Header */
+  header{
+    display:flex; align-items:center; gap:12px; padding:18px 16px; border-bottom:1px solid #111;
   }
-  </script>
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand img{height:120px;width:auto;border-radius:12px;opacity:.9;filter:drop-shadow(0 0 12px rgba(255,255,255,.06));}
+  .spacer{flex:1;}
+  #searchWrap{display:flex;margin-left:auto;} /* force right side */
+  .search-bar{display:flex;align-items:center;gap:8px;background:#0c0c0c;border:1px solid #2a2a2a;padding:8px 10px;border-radius:10px;width:420px;max-width:52vw;}
+  .search-bar input{border:none;outline:none;background:transparent;color:#fff;width:100%;}
+  .auth{display:flex;gap:10px;margin-left:12px;}
 
-  <!-- Icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
-  <link rel="icon" href="/favicon.ico">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  /* Main */
+  main{max-width:1000px;margin:0 auto;padding:16px;padding-bottom:88px;}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .muted{color:#b7b7b7;opacity:.85;font-size:.95rem;}
+  .card{background:#0e0e0e;border:1px solid #1a1a1a;border-radius:14px;padding:14px;margin:12px 0;box-shadow:0 4px 18px rgba(0,0,0,.35);}
+  input[type="text"], input[type="email"], input[type="password"], select{
+    padding:10px 12px;border-radius:10px;border:1px solid #2a2a2a;background:#0c0c0c;color:#fff;
+  }
+  input[type="file"]{color:#aaa;}
+  button{padding:9px 14px;border-radius:10px;border:1px solid #2a2a2a;background:#141414;color:#fff;cursor:pointer;}
+  button.primary{background:#1a1a1a;border-color:#3a3a3a;}
+  button.ghost{background:transparent;}
+  button:hover{background:#191919;}
+  button[disabled]{opacity:.6;cursor:not-allowed;}
 
-  <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    body { background:#000; color:#fff; font-family:system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; }
+  /* Section header with right-side search */
+  .section-head{display:flex;align-items:center;gap:12px;margin:0 0 6px;}
+  .section-head .section-title{margin:0;}
+  .section-head .section-search{display:flex;align-items:center;gap:8px;background:#0c0c0c;border:1px solid #2a2a2a;padding:8px 10px;border-radius:10px;width:340px;max-width:50vw;margin-left:auto;} /* right */
+  .section-head .section-search input{border:none;outline:none;background:transparent;color:#fff;width:100%;}
 
-    /* Header */
-    header {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:18px 16px;
-      border-bottom:1px solid #111;
-    }
-    .brand { display:flex; align-items:center; gap:10px; }
-    .brand img { height:120px; width:auto; border-radius:12px; opacity:.9; filter:drop-shadow(0 0 12px rgba(255,255,255,.06)); }
+  /* Pills */
+  .pills{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 4px;}
+  .pill{padding:6px 10px;border:1px solid #2a2a2a;border-radius:999px;font-size:.85rem;background:#0f0f0f;cursor:pointer;}
+  .pill.active{background:#151515;border-color:#3a3a3a;color:#fff;}
 
-    /* Global (Home) search */
-    #searchWrap { display:flex; }
-    .search-bar{
-      display:flex; align-items:center; gap:8px;
-      background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px;
-      width:420px; max-width:520px;
-    }
-    .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
-
-    .auth { display:flex; justify-content:flex-end; gap:10px; }
-
-    /* Main layout */
-    main { max-width:1000px; margin:0 auto; padding:16px; padding-bottom:88px; }
-    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    input[type="text"], input[type="email"], input[type="password"] {
-      flex:1; min-width:240px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff;
-    }
-    input[type="file"] { color:#aaa; }
-    select { padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
-    label { color:#ddd; font-size:.95rem; }
-
-    button {
-      padding:9px 14px; cursor:pointer; border-radius:10px; border:1px solid #2a2a2a; background:#141414; color:#fff;
-    }
-    /* No accent colors */
-    button.primary { background:#1a1a1a; border-color:#3a3a3a; }
-    button.ghost { background:transparent; }
-    button.danger { background:#222; border-color:#444; }
-    button[disabled] { opacity:.6; cursor:not-allowed; }
-    button:hover { background:#191919; }
-
-    .card { background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; box-shadow: 0 4px 18px rgba(0,0,0,.35); }
-    .muted { opacity:.7; font-size:.95rem; color:#b5b5b5; }
-
-    /* Section heads with right-side search */
-    .section-head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-    .section-title { margin:0; }
-    .section-search{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:340px; max-width:50vw; }
-    .section-search input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
-
-    /* Pills / tiles */
-    .pills { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
-    .pill { padding:6px 10px; border:1px solid #2a2a2a; border-radius:999px; font-size:.85rem; background:#0f0f0f; cursor:pointer; }
-    .pill.active { background:#151515; color:#fff; border-color:#3a3a3a; }
-
-    .tiles { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:12px; }
-    .tile { border:1px solid #1a1a1a; background:#0f0f0f; border-radius:14px; padding:16px; }
-    .tile h3 { margin:0 0 6px; font-size:1.05rem; }
-    .tile p { margin:0; color:#b7b7b7; }
-    .tile .actions { margin-top:12px; display:flex; gap:8px; }
-
-    /* Bottom nav */
-    .bottom-nav{
-      position:fixed; bottom:0; left:0; right:0; background:#0b0b0b; border-top:1px solid #151515;
-      display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:8px 6px; z-index:50;
-    }
-    .bottom-nav a{ color:#aaa; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.75rem; padding:6px 4px; border-radius:10px; }
-    .bottom-nav a.active, .bottom-nav a:hover{ color:#fff; background:#111; }
-  </style>
+  /* Bottom nav */
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#0b0b0b;border-top:1px solid #151515;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:8px 6px;z-index:50;}
+  .bottom-nav a{color:#aaa;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.75rem;padding:6px 4px;border-radius:10px;}
+  .bottom-nav a.active,.bottom-nav a:hover{color:#fff;background:#111;}
+</style>
 </head>
 <body>
-  <!-- Header -->
   <header>
     <div class="brand">
       <img src="logo.png" alt="INTAKEE">
     </div>
-
-    <!-- Home/global search (shown on Home only) -->
+    <div class="spacer"></div>
+    <!-- Home/global search (Home only) -->
     <div id="searchWrap" class="search-bar">
       <i class="fa fa-search" style="opacity:.6;"></i>
       <input id="globalSearch" type="text" placeholder="Search…" />
     </div>
-
     <div class="auth">
       <button id="loginBtn" style="display:none">Login / Sign Up</button>
       <button id="logoutBtn" style="display:none;">Logout</button>
@@ -137,7 +98,7 @@
   <main>
     <!-- HOME -->
     <section id="tab-home">
-      <div class="row" style="justify-content:space-between; align-items:center; margin-top:8px;">
+      <div class="row" style="justify-content:space-between;align-items:center;margin-top:8px;">
         <h2 class="section-title">Trending</h2>
         <div class="pills">
           <button class="pill" data-filter="all">All</button>
@@ -157,11 +118,10 @@
         <h3 class="section-title">Videos</h3>
         <div class="section-search" id="videosSearchWrap">
           <i class="fa fa-search" style="opacity:.6;"></i>
-          <input id="videosSearch" type="text" placeholder="Search videos…" />
+          <input id="videosSearch" type="text" placeholder="Search videos…"/>
         </div>
       </div>
-      <div class="muted">Search here filters only the Videos list.</div>
-      <div id="videos-feed" style="margin-top:8px;"></div>
+      <div id="videos-feed"></div>
     </section>
 
     <!-- PODCASTS -->
@@ -170,48 +130,44 @@
         <h3 class="section-title">Podcasts</h3>
         <div class="section-search" id="podcastSearchWrap">
           <i class="fa fa-search" style="opacity:.6;"></i>
-          <input id="podcastSearch" type="text" placeholder="Search podcasts…" />
+          <input id="podcastSearch" type="text" placeholder="Search podcasts…"/>
         </div>
       </div>
-      <div class="muted">Search here filters only the Podcasts list.</div>
-      <div id="podcast-feed" style="margin-top:8px;"></div>
+      <div id="podcast-feed"></div>
     </section>
 
-    <!-- UPLOAD (single clean form matching your screenshot) -->
+    <!-- UPLOAD (exact, single clean form) -->
     <section id="tab-upload" class="card" style="display:none;">
       <h3 style="margin:0 0 12px;">Upload</h3>
-      <div class="row" style="gap:12px; align-items:flex-start;">
-        <div style="flex:1; min-width:260px;">
+      <div class="row" style="gap:12px;align-items:flex-start;">
+        <div style="flex:1;min-width:260px;">
           <label for="uploadType">Choose type</label>
-          <select id="uploadType" style="width:100%; margin-top:6px;">
+          <select id="uploadType" style="width:100%;margin-top:6px;">
             <option value="video">Video</option>
             <option value="clip">Clip</option>
             <option value="podcast_audio">Podcast (Audio)</option>
             <option value="podcast_video">Podcast (Video)</option>
           </select>
         </div>
-        <div style="flex:2; min-width:260px;">
+        <div style="flex:2;min-width:260px;">
           <label for="postTitle">Title</label>
-          <input id="postTitle" type="text" placeholder="Add a title" style="width:100%; margin-top:6px;">
+          <input id="postTitle" type="text" placeholder="Add a title" style="width:100%;margin-top:6px;">
         </div>
       </div>
-
-      <div class="row" style="gap:12px; align-items:flex-start; margin-top:12px;">
-        <div style="flex:1; min-width:260px;">
+      <div class="row" style="gap:12px;align-items:flex-start;margin-top:12px;">
+        <div style="flex:1;min-width:260px;">
           <label for="thumbFile">Thumbnail (cover image)</label>
-          <input id="thumbFile" type="file" accept="image/*" style="width:100%; margin-top:6px;">
+          <input id="thumbFile" type="file" accept="image/*" style="width:100%;margin-top:6px;">
         </div>
-        <div style="flex:2; min-width:260px;">
+        <div style="flex:2;min-width:260px;">
           <label for="mediaFile">File</label>
-          <input id="mediaFile" type="file" accept="video/*,audio/*" style="width:100%; margin-top:6px;">
+          <input id="mediaFile" type="file" accept="video/*,audio/*" style="width:100%;margin-top:6px;">
         </div>
       </div>
-
-      <div class="row" style="margin-top:14px; gap:10px;">
+      <div class="row" style="margin-top:14px;gap:10px;">
         <button id="uploadSubmit" class="primary">Upload</button>
         <button id="goLiveBtn" class="ghost">Go Live</button>
       </div>
-
       <p class="muted" style="margin-top:8px;">Processing will start after upload. You'll be notified when it’s ready.</p>
     </section>
 
@@ -221,23 +177,22 @@
         <h3 class="section-title">Clips</h3>
         <div class="section-search" id="clipsSearchWrap">
           <i class="fa fa-search" style="opacity:.6;"></i>
-          <input id="clipsSearch" type="text" placeholder="Search clips…" />
+          <input id="clipsSearch" type="text" placeholder="Search clips…"/>
         </div>
       </div>
-      <div class="muted">Search here filters only the Clips list.</div>
-      <div id="clips-feed" style="margin-top:8px;"></div>
+      <div id="clips-feed"></div>
     </section>
 
     <!-- PROFILE -->
     <section id="tab-profile" style="display:none;">
       <div class="card">
         <div class="row" style="align-items:flex-start;">
-          <img id="profile-photo" src="" alt="" style="width:84px; height:84px; border-radius:50%; background:#1a1a1a; object-fit:cover;">
-          <div style="flex:1; min-width:200px;">
+          <img id="profile-photo" src="" alt="" style="width:84px;height:84px;border-radius:50%;background:#1a1a1a;object-fit:cover;">
+          <div style="flex:1;min-width:200px;">
             <h3 id="profile-name" style="margin:0;">Your Name</h3>
             <div id="profile-handle" class="muted">@username</div>
             <p id="profile-bio" style="margin:8px 0 0;">Add a short bio to introduce yourself.</p>
-            <div class="row" style="gap:16px; margin-top:10px;">
+            <div class="row" style="gap:16px;margin-top:10px;">
               <div class="muted"><strong id="stat-posts">0</strong> Posts</div>
               <div class="muted"><strong id="stat-followers">0</strong> Followers</div>
               <div class="muted"><strong id="stat-following">0</strong> Following</div>
@@ -248,7 +203,7 @@
             </div>
           </div>
           <div>
-            <label class="muted" style="display:flex; align-items:center; gap:8px;">
+            <label class="muted" style="display:flex;align-items:center;gap:8px;">
               <input type="checkbox" id="toggle-private"> Private account
             </label>
           </div>
@@ -270,43 +225,41 @@
     </section>
 
     <!-- SETTINGS -->
-    <section id="tab-settings" class="card" style="display:none;">
-      <h3 style="margin:0 0 12px;">Settings</h3>
-
+    <section id="tab-settings" style="display:none;">
       <div class="card" style="margin:0 0 12px;">
-        <h4 style="margin:0 0 8px;">Account</h4>
-        <div class="muted">Name, Username, Email</div>
-        <div class="muted">Change Password</div>
-        <div class="muted">Delete Account</div>
-        <div class="row" style="margin-top:10px;"><button id="settings-logout">Logout</button></div>
-      </div>
-
-      <div class="card" style="margin:0 0 12px;">
-        <h4 style="margin:0 0 8px;">Privacy & Safety</h4>
-        <label class="muted" style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-          <input type="checkbox" id="settings-private"> Private account
-        </label>
-        <div class="muted">Blocked accounts</div>
-        <div class="muted">Comments: Everyone / Followers / No one</div>
-        <div class="muted">Hide sensitive content</div>
-        <div class="muted">Report a problem</div>
-      </div>
-
-      <div class="card" style="margin:0 0 12px;">
-        <h4 style="margin:0 0 8px;">Notifications</h4>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> New followers</label>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Likes & dislikes</label>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Comments & replies</label>
-        <label class="muted" style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Upload complete</label>
-      </div>
-
-      <div class="card">
-        <h4 style="margin:0 0 8px;">About & Legal</h4>
-        <div class="muted">Community Guidelines</div>
-        <div class="muted">Terms of Service</div>
-        <div class="muted">Privacy Policy</div>
-        <div class="muted">Contact: intakee2025@gmail.com</div>
-        <div class="muted" style="margin-top:6px;">Version 1.0.0</div>
+        <h3 style="margin:0 0 12px;">Settings</h3>
+        <div class="card" style="margin:0 0 12px;">
+          <h4 style="margin:0 0 8px;">Account</h4>
+          <div class="muted">Name, Username, Email</div>
+          <div class="muted">Change Password</div>
+          <div class="muted">Delete Account</div>
+          <div class="row" style="margin-top:10px;"><button id="settings-logout">Logout</button></div>
+        </div>
+        <div class="card" style="margin:0 0 12px;">
+          <h4 style="margin:0 0 8px;">Privacy & Safety</h4>
+          <label class="muted" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <input type="checkbox" id="settings-private"> Private account
+          </label>
+          <div class="muted">Blocked accounts</div>
+          <div class="muted">Comments: Everyone / Followers / No one</div>
+          <div class="muted">Hide sensitive content</div>
+          <div class="muted">Report a problem</div>
+        </div>
+        <div class="card" style="margin:0 0 12px;">
+          <h4 style="margin:0 0 8px;">Notifications</h4>
+          <label class="muted" style="display:flex;align-items:center;gap:8px;"><input type="checkbox"> New followers</label>
+          <label class="muted" style="display:flex;align-items:center;gap:8px;"><input type="checkbox"> Likes & dislikes</label>
+          <label class="muted" style="display:flex;align-items:center;gap:8px;"><input type="checkbox"> Comments & replies</label>
+          <label class="muted" style="display:flex;align-items:center;gap:8px;"><input type="checkbox"> Upload complete</label>
+        </div>
+        <div class="card">
+          <h4 style="margin:0 0 8px;">About & Legal</h4>
+          <div class="muted">Community Guidelines</div>
+          <div class="muted">Terms of Service</div>
+          <div class="muted">Privacy Policy</div>
+          <div class="muted">Contact: intakee2025@gmail.com</div>
+          <div class="muted" style="margin-top:6px;">Version 1.0.0</div>
+        </div>
       </div>
     </section>
   </main>
@@ -326,30 +279,25 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, setDoc, addDoc, collection,
-      serverTimestamp, query, orderBy, limit, onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
+    import { getFirestore, doc, getDoc, setDoc, addDoc, collection, serverTimestamp, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
     import { firebaseConfig } from "./firebase-config.js";
 
     /* Init */
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     /* Elements */
     const searchWrap = document.getElementById("searchWrap");
     const globalSearch = document.getElementById("globalSearch");
     const loginBtn  = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
-
     const videosSearch = document.getElementById("videosSearch");
     const podcastSearch = document.getElementById("podcastSearch");
     const clipsSearch = document.getElementById("clipsSearch");
 
-    /* Auth UI */
+    /* Auth UI (minimal) */
     logoutBtn.addEventListener("click", () => signOut(auth));
     onAuthStateChanged(auth, async (user) => {
       loginBtn.style.display  = "none";
@@ -358,53 +306,35 @@
         const uref = doc(db, "users", user.uid);
         const snap = await getDoc(uref);
         if (!snap.exists()) {
-          await setDoc(uref, {
-            uid: user.uid, displayName: user.displayName ?? "", email: user.email ?? "",
-            photoURL: user.photoURL ?? "", createdAt: serverTimestamp()
-          });
+          await setDoc(uref, { uid:user.uid, displayName:user.displayName??"", email:user.email??"", photoURL:user.photoURL??"", createdAt: serverTimestamp() });
         }
-        // Profile header population
         document.getElementById("profile-name").textContent = user.displayName || "Your Name";
         document.getElementById("profile-handle").textContent = user.email ? "@"+user.email.split("@")[0] : "@username";
-        const p = document.getElementById("profile-photo");
-        if (user.photoURL) p.src = user.photoURL;
+        const p = document.getElementById("profile-photo"); if (user.photoURL) p.src = user.photoURL;
       }
     });
 
     /* Helpers */
-    function escapeHtml(s=""){ return s.replace(/[&<>"']/g, c =>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
-    function detectKind(file){ if(!file) return {kind:"text",mime:null}; const m=file.type||""; if(m.startsWith("image/"))return{kind:"image",mime:m}; if(m.startsWith("video/"))return{kind:"video",mime:m}; if(m.startsWith("audio/"))return{kind:"audio",mime:m}; return{kind:"file",mime:m}; }
-    function fmtTime(ts){
-      try{
-        const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null);
-        if(!t)return"";
-        return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});
-      }catch{return"";}
-    }
+    function escapeHtml(s=""){ return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+    function fmtTime(ts){ try{const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null); if(!t)return""; return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});}catch{return"";} }
+    function matchesTerm(p, term){ if(!term) return true; const t=term.toLowerCase(); return ((p.text||"").toLowerCase().includes(t)); }
 
-    /* Upload (UI only — posting locked until accounts are enabled) */
-    const uploadTypeEl = document.getElementById('uploadType');
-    const postTitleEl = document.getElementById('postTitle');
-    const thumbFileEl = document.getElementById('thumbFile');
-    const mediaFileEl = document.getElementById('mediaFile');
-    const uploadSubmit = document.getElementById('uploadSubmit');
-    const goLiveBtn = document.getElementById('goLiveBtn');
+    /* Render */
+    const homeFeed   = document.getElementById("home-feed");
+    const videosFeed = document.getElementById("videos-feed");
+    const podcastFeed= document.getElementById("podcast-feed");
+    const clipsFeed  = document.getElementById("clips-feed");
 
-    uploadSubmit?.addEventListener('click', () => {
-      alert('Posting is locked until accounts are enabled.');
-    });
-    goLiveBtn?.addEventListener('click', () => {
-      alert('Live streaming will be enabled later.');
-    });
+    let allDocs = [];
+    let homeTerm="", videosTerm="", podcastTerm="", clipsTerm="";
 
-    /* Rendering */
-    function renderPostCard(d){
+    function renderCard(d){
       const p=d.data();
-      const wrap=document.createElement("article"); wrap.className="card";
+      const el=document.createElement("article"); el.className="card";
       const label=(p.kind==="video"||p.kind==="podcast_video")?"VIDEO"
-                  :(p.kind==="audio"||p.kind==="podcast_audio")?"PODCAST"
-                  :(p.kind==="clip")?"CLIP"
-                  :(p.kind==="image")?"IMAGE":"POST";
+        :(p.kind==="podcast_audio"||p.kind==="audio")?"PODCAST"
+        :(p.kind==="clip")?"CLIP"
+        :(p.kind==="image")?"IMAGE":"POST";
       const header=`<div style="display:flex;justify-content:space-between;align-items:center;">
         <div><strong>${escapeHtml(p.user||"Anon")}</strong> <span class="muted">· ${fmtTime(p.createdAt)}</span></div>
         <span class="muted" style="border:1px solid #2a2a2a;padding:2px 8px;border-radius:999px;font-size:.75rem;">${label}</span>
@@ -412,107 +342,67 @@
       let media="";
       if(p.mediaUrl){
         if(p.kind==="video"||p.kind==="podcast_video") media=`<video src="${p.mediaUrl}" controls playsinline style="width:100%;border-radius:10px;margin-top:8px;"></video>`;
-        else if(p.kind==="audio"||p.kind==="podcast_audio") media=`<audio src="${p.mediaUrl}" controls style="width:100%;margin-top:8px;"></audio>`;
+        else if(p.kind==="podcast_audio"||p.kind==="audio") media=`<audio src="${p.mediaUrl}" controls style="width:100%;margin-top:8px;"></audio>`;
         else if(p.kind==="image") media=`<img src="${p.mediaUrl}" alt="" style="width:100%;border-radius:10px;margin-top:8px;">`;
-        else media=`<a href="${p.mediaUrl}" target="_blank" rel="noopener">Open file</a>`;
       }
-      wrap.innerHTML = header + (p.text?`<div style="margin-top:6px;">${escapeHtml(p.text)}</div>`:"") + media;
-      return wrap;
+      el.innerHTML = header + (p.text?`<div style="margin-top:6px;">${escapeHtml(p.text)}</div>`:"") + media;
+      return el;
     }
 
-    const homeFeed   = document.getElementById("home-feed");
-    const videosFeed = document.getElementById("videos-feed");
-    const podcastFeed= document.getElementById("podcast-feed");
-    const clipsFeed  = document.getElementById("clips-feed");
-
-    let allDocs = [];            // latest snapshot docs
-    let homeSearchTerm = "";
-    let videosTerm = "";
-    let podcastTerm = "";
-    let clipsTerm = "";
-
-    // Simple text match (title/text)
-    function matchesTerm(p, term){
-      if(!term) return true;
-      const t = term.toLowerCase();
-      const text = (p.text||"").toLowerCase();
-      return text.includes(t);
-    }
-
-    function renderLists(){
-      // HOME — show all posts (trending placeholder only if zero)
-      const homeFiltered = allDocs
-        .filter(d => matchesTerm(d.data(), homeSearchTerm));
+    function renderAll(){
+      // TRENDING = only media kinds (no plain POST rows)
+      const trendingKinds = new Set(["video","clip","podcast_audio","podcast_video","audio","image"]);
+      const trending = allDocs.filter(d => trendingKinds.has(d.data().kind));
+      const homeFiltered = trending.filter(d => matchesTerm(d.data(), homeTerm));
       if(!homeFiltered.length){
-        homeFeed.innerHTML = '<div class="muted" style="text-align:center; margin-top:40px;">No trending content yet. Check back soon.</div>';
+        homeFeed.innerHTML = '<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet. Check back soon.</div>';
       } else {
-        homeFeed.innerHTML = "";
-        homeFiltered.forEach(d => homeFeed.appendChild(renderPostCard(d)));
+        homeFeed.innerHTML = ""; homeFiltered.forEach(d=>homeFeed.appendChild(renderCard(d)));
       }
 
-      // VIDEOS — kind === "video"
-      const vids = allDocs.filter(d => d.data().kind === "video" && matchesTerm(d.data(), videosTerm));
-      if(!vids.length){
-        videosFeed.innerHTML = '<div class="muted card">No videos yet.</div>';
-      } else {
-        videosFeed.innerHTML = "";
-        vids.forEach(d => videosFeed.appendChild(renderPostCard(d)));
-      }
+      const vids = allDocs.filter(d=> d.data().kind==="video" && matchesTerm(d.data(), videosTerm));
+      videosFeed.innerHTML = vids.length? "" : '<div class="muted card">No videos yet.</div>';
+      vids.forEach(d=>videosFeed.appendChild(renderCard(d)));
 
-      // PODCASTS — "podcast_audio" or "podcast_video" or plain "audio"
-      const pods = allDocs.filter(d => (["podcast_audio","podcast_video","audio"].includes(d.data().kind)) && matchesTerm(d.data(), podcastTerm));
-      if(!pods.length){
-        podcastFeed.innerHTML = '<div class="muted card">No podcasts yet.</div>';
-      } else {
-        podcastFeed.innerHTML = "";
-        pods.forEach(d => podcastFeed.appendChild(renderPostCard(d)));
-      }
+      const pods = allDocs.filter(d=> ["podcast_audio","podcast_video","audio"].includes(d.data().kind) && matchesTerm(d.data(), podcastTerm));
+      podcastFeed.innerHTML = pods.length? "" : '<div class="muted card">No podcasts yet.</div>';
+      pods.forEach(d=>podcastFeed.appendChild(renderCard(d)));
 
-      // CLIPS — kind === "clip"
-      const clips = allDocs.filter(d => d.data().kind === "clip" && matchesTerm(d.data(), clipsTerm));
-      if(!clips.length){
-        clipsFeed.innerHTML = '<div class="muted card">No clips yet.</div>';
-      } else {
-        clipsFeed.innerHTML = "";
-        clips.forEach(d => clipsFeed.appendChild(renderPostCard(d)));
-      }
+      const cls = allDocs.filter(d=> d.data().kind==="clip" && matchesTerm(d.data(), clipsTerm));
+      clipsFeed.innerHTML = cls.length? "" : '<div class="muted card">No clips yet.</div>';
+      cls.forEach(d=>clipsFeed.appendChild(renderCard(d)));
     }
 
-    // Subscribe once, reuse docs for all tabs
     const PAGE_SIZE = 40;
-    const homeQuery = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
-    onSnapshot(homeQuery, (snap)=>{
-      allDocs = snap.docs;
-      renderLists();
-    });
+    const q = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
+    onSnapshot(q, (snap)=>{ allDocs = snap.docs; renderAll(); });
 
     /* Search fields */
-    globalSearch?.addEventListener('input', (e)=>{ homeSearchTerm = e.target.value.trim(); renderLists(); });
-    videosSearch?.addEventListener('input', (e)=>{ videosTerm = e.target.value.trim(); renderLists(); });
-    podcastSearch?.addEventListener('input', (e)=>{ podcastTerm = e.target.value.trim(); renderLists(); });
-    clipsSearch?.addEventListener('input', (e)=>{ clipsTerm = e.target.value.trim(); renderLists(); });
+    globalSearch?.addEventListener('input', e=>{ homeTerm = e.target.value.trim(); renderAll(); });
+    videosSearch?.addEventListener('input', e=>{ videosTerm = e.target.value.trim(); renderAll(); });
+    podcastSearch?.addEventListener('input', e=>{ podcastTerm = e.target.value.trim(); renderAll(); });
+    clipsSearch?.addEventListener('input', e=>{ clipsTerm = e.target.value.trim(); renderAll(); });
 
-    /* Tabs (hash-based) */
+    /* Tabs */
     const links = Array.from(document.querySelectorAll('.bottom-nav a'));
     const sections = {
-      home:    document.getElementById('tab-home'),
-      videos:  document.getElementById('tab-videos'),
-      podcast: document.getElementById('tab-podcast'),
-      upload:  document.getElementById('tab-upload'),
-      clips:   document.getElementById('tab-clips'),
-      profile: document.getElementById('tab-profile'),
-      settings:document.getElementById('tab-settings'),
+      home:document.getElementById('tab-home'),
+      videos:document.getElementById('tab-videos'),
+      podcast:document.getElementById('tab-podcast'),
+      upload:document.getElementById('tab-upload'),
+      clips:document.getElementById('tab-clips'),
+      profile:document.getElementById('tab-profile'),
+      settings:document.getElementById('tab-settings')
     };
     function setTab(key){
-      Object.entries(sections).forEach(([k,el]) => { el.style.display = (k===key) ? '' : 'none'; });
-      links.forEach(a => a.classList.toggle('active', a.dataset.tab===key));
-      // Show global header search ONLY on Home. Other tabs use their own right-side search bars.
-      const showGlobalSearch = (key === "home");
-      searchWrap.style.display = showGlobalSearch ? "flex" : "none";
-      window.scrollTo({top:0, behavior:'smooth'});
+      Object.entries(sections).forEach(([k,el])=>{ el.style.display = (k===key)?'':'none'; });
+      links.forEach(a=>a.classList.toggle('active', a.dataset.tab===key));
+      // Header search visible only on Home
+      searchWrap.style.display = (key==="home") ? "flex" : "none";
+      window.scrollTo({top:0,behavior:'smooth'});
     }
-    function applyHash(){ const key=(location.hash||"#home").replace("#",""); setTab(key); }
-    links.forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); location.hash = a.getAttribute('href'); }));
+    function applyHash(){ const key=(location.hash||"#home").slice(1); setTab(key); }
+    links.forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); location.hash=a.getAttribute('href'); }));
     window.addEventListener('hashchange', applyHash);
     applyHash();
   </script>
