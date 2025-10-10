@@ -7,23 +7,13 @@
 <meta name="description" content="INTAKEE is the all-in-one platform for videos, podcasts, and clips — freedom to create, simple to share.">
 <link rel="canonical" href="https://intakee.vercel.app/">
 
-<!-- Open Graph -->
+<!-- Social -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
 <meta property="og:description" content="All-in-one platform for videos, podcasts, and clips.">
 <meta property="og:url" content="https://intakee.vercel.app/">
 <meta property="og:image" content="https://intakee.vercel.app/og-image.jpg">
-
-<!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="INTAKEE — Videos, Podcasts, and Clips">
-<meta name="twitter:description" content="Share videos, clips, and podcasts — your voice, your space.">
-<meta name="twitter:image" content="https://intakee.vercel.app/og-image.jpg">
-
-<!-- Organization JSON-LD -->
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Organization","name":"INTAKEE","url":"https://intakee.vercel.app/","logo":"https://intakee.vercel.app/logo.png","sameAs":[]}
-</script>
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
 <link rel="icon" href="/favicon.ico">
@@ -31,58 +21,59 @@
 
 <style>
   :root { color-scheme: dark; }
-  * { box-sizing: border-box; }
-  body { margin:0; background:#000; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:#000; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
 
-  /* Header */
+  /* Header: logo left, search right */
   header{
-    display:flex; align-items:center; gap:12px; padding:18px 16px; border-bottom:1px solid #111;
+    display:flex; align-items:center; gap:12px;
+    padding:18px 16px; border-bottom:1px solid #111;
   }
-  .brand{display:flex;align-items:center;gap:10px;}
-  .brand img{height:120px;width:auto;border-radius:12px;opacity:.9;filter:drop-shadow(0 0 12px rgba(255,255,255,.06));}
-  .spacer{flex:1;}
-  #searchWrap{display:flex;margin-left:auto;} /* force right side */
-  .search-bar{display:flex;align-items:center;gap:8px;background:#0c0c0c;border:1px solid #2a2a2a;padding:8px 10px;border-radius:10px;width:420px;max-width:52vw;}
-  .search-bar input{border:none;outline:none;background:transparent;color:#fff;width:100%;}
-  .auth{display:flex;gap:10px;margin-left:12px;}
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand img{ height:120px; width:auto; border-radius:12px; opacity:.9; filter:drop-shadow(0 0 12px rgba(255,255,255,.06)); }
+  .spacer{ flex:1; }
+  #searchWrap{ display:flex; margin-left:auto; } /* right-align */
+  .search-bar{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:420px; max-width:52vw; }
+  .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
+  .auth{ display:flex; gap:10px; margin-left:12px; }
 
   /* Main */
-  main{max-width:1000px;margin:0 auto;padding:16px;padding-bottom:88px;}
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-  .muted{color:#b7b7b7;opacity:.85;font-size:.95rem;}
-  .card{background:#0e0e0e;border:1px solid #1a1a1a;border-radius:14px;padding:14px;margin:12px 0;box-shadow:0 4px 18px rgba(0,0,0,.35);}
-  input[type="text"], input[type="email"], input[type="password"], select{
-    padding:10px 12px;border-radius:10px;border:1px solid #2a2a2a;background:#0c0c0c;color:#fff;
-  }
-  input[type="file"]{color:#aaa;}
-  button{padding:9px 14px;border-radius:10px;border:1px solid #2a2a2a;background:#141414;color:#fff;cursor:pointer;}
-  button.primary{background:#1a1a1a;border-color:#3a3a3a;}
-  button.ghost{background:transparent;}
-  button:hover{background:#191919;}
-  button[disabled]{opacity:.6;cursor:not-allowed;}
+  main{ max-width:1000px; margin:0 auto; padding:16px; padding-bottom:88px; }
+  .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .muted{ color:#b7b7b7; opacity:.85; font-size:.95rem; }
+  .card{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; box-shadow:0 4px 18px rgba(0,0,0,.35); }
 
-  /* Section header with right-side search */
-  .section-head{display:flex;align-items:center;gap:12px;margin:0 0 6px;}
-  .section-head .section-title{margin:0;}
-  .section-head .section-search{display:flex;align-items:center;gap:8px;background:#0c0c0c;border:1px solid #2a2a2a;padding:8px 10px;border-radius:10px;width:340px;max-width:50vw;margin-left:auto;} /* right */
-  .section-head .section-search input{border:none;outline:none;background:transparent;color:#fff;width:100%;}
+  input[type="text"], input[type="email"], input[type="password"], select{
+    padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff;
+  }
+  input[type="file"]{ color:#aaa; }
+  button{ padding:9px 14px; border-radius:10px; border:1px solid #2a2a2a; background:#141414; color:#fff; cursor:pointer; }
+  button.primary{ background:#1a1a1a; border-color:#3a3a3a; }
+  button.ghost{ background:transparent; }
+  button:hover{ background:#191919; }
+  button[disabled]{ opacity:.6; cursor:not-allowed; }
+
+  /* Section header + right search (Videos/Podcasts/Clips) */
+  .section-head{ display:flex; align-items:center; gap:12px; margin:0 0 6px; }
+  .section-title{ margin:0; }
+  .section-search{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:340px; max-width:50vw; margin-left:auto; }
+  .section-search input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
 
   /* Pills */
-  .pills{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 4px;}
-  .pill{padding:6px 10px;border:1px solid #2a2a2a;border-radius:999px;font-size:.85rem;background:#0f0f0f;cursor:pointer;}
-  .pill.active{background:#151515;border-color:#3a3a3a;color:#fff;}
+  .pills{ display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
+  .pill{ padding:6px 10px; border:1px solid #2a2a2a; border-radius:999px; font-size:.85rem; background:#0f0f0f; cursor:pointer; }
+  .pill.active{ background:#151515; border-color:#3a3a3a; color:#fff; }
 
   /* Bottom nav */
-  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#0b0b0b;border-top:1px solid #151515;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:8px 6px;z-index:50;}
-  .bottom-nav a{color:#aaa;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.75rem;padding:6px 4px;border-radius:10px;}
-  .bottom-nav a.active,.bottom-nav a:hover{color:#fff;background:#111;}
+  .bottom-nav{ position:fixed; bottom:0; left:0; right:0; background:#0b0b0b; border-top:1px solid #151515; display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:8px 6px; z-index:50; }
+  .bottom-nav a{ color:#aaa; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.75rem; padding:6px 4px; border-radius:10px; }
+  .bottom-nav a.active, .bottom-nav a:hover{ color:#fff; background:#111; }
 </style>
 </head>
 <body>
+  <!-- Header -->
   <header>
-    <div class="brand">
-      <img src="logo.png" alt="INTAKEE">
-    </div>
+    <div class="brand"><img src="logo.png" alt="INTAKEE"></div>
     <div class="spacer"></div>
     <!-- Home/global search (Home only) -->
     <div id="searchWrap" class="search-bar">
@@ -136,7 +127,7 @@
       <div id="podcast-feed"></div>
     </section>
 
-    <!-- UPLOAD (exact, single clean form) -->
+    <!-- UPLOAD -->
     <section id="tab-upload" class="card" style="display:none;">
       <h3 style="margin:0 0 12px;">Upload</h3>
       <div class="row" style="gap:12px;align-items:flex-start;">
@@ -264,7 +255,7 @@
     </section>
   </main>
 
-  <!-- Bottom Tab Bar -->
+  <!-- Tabs -->
   <nav class="bottom-nav">
     <a href="#home"    data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
     <a href="#videos"  data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
@@ -275,15 +266,13 @@
     <a href="#settings"data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
   </nav>
 
-  <!-- Firebase + App Logic -->
+  <!-- App -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, addDoc, collection, serverTimestamp, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-    import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
     import { firebaseConfig } from "./firebase-config.js";
 
-    /* Init */
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -297,7 +286,7 @@
     const podcastSearch = document.getElementById("podcastSearch");
     const clipsSearch = document.getElementById("clipsSearch");
 
-    /* Auth UI (minimal) */
+    /* Auth (minimal UI) */
     logoutBtn.addEventListener("click", () => signOut(auth));
     onAuthStateChanged(auth, async (user) => {
       loginBtn.style.display  = "none";
@@ -308,6 +297,7 @@
         if (!snap.exists()) {
           await setDoc(uref, { uid:user.uid, displayName:user.displayName??"", email:user.email??"", photoURL:user.photoURL??"", createdAt: serverTimestamp() });
         }
+        // profile header fill
         document.getElementById("profile-name").textContent = user.displayName || "Your Name";
         document.getElementById("profile-handle").textContent = user.email ? "@"+user.email.split("@")[0] : "@username";
         const p = document.getElementById("profile-photo"); if (user.photoURL) p.src = user.photoURL;
@@ -315,18 +305,15 @@
     });
 
     /* Helpers */
-    function escapeHtml(s=""){ return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+    function escapeHtml(s=""){ return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;","<": "&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
     function fmtTime(ts){ try{const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null); if(!t)return""; return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});}catch{return"";} }
-    function matchesTerm(p, term){ if(!term) return true; const t=term.toLowerCase(); return ((p.text||"").toLowerCase().includes(t)); }
+    function match(p, term){ if(!term) return true; const t=term.toLowerCase(); return ((p.text||"").toLowerCase().includes(t)); }
 
-    /* Render */
+    /* Render helpers */
     const homeFeed   = document.getElementById("home-feed");
     const videosFeed = document.getElementById("videos-feed");
     const podcastFeed= document.getElementById("podcast-feed");
     const clipsFeed  = document.getElementById("clips-feed");
-
-    let allDocs = [];
-    let homeTerm="", videosTerm="", podcastTerm="", clipsTerm="";
 
     function renderCard(d){
       const p=d.data();
@@ -334,10 +321,10 @@
       const label=(p.kind==="video"||p.kind==="podcast_video")?"VIDEO"
         :(p.kind==="podcast_audio"||p.kind==="audio")?"PODCAST"
         :(p.kind==="clip")?"CLIP"
-        :(p.kind==="image")?"IMAGE":"POST";
+        :(p.kind==="image")?"IMAGE":"";
       const header=`<div style="display:flex;justify-content:space-between;align-items:center;">
         <div><strong>${escapeHtml(p.user||"Anon")}</strong> <span class="muted">· ${fmtTime(p.createdAt)}</span></div>
-        <span class="muted" style="border:1px solid #2a2a2a;padding:2px 8px;border-radius:999px;font-size:.75rem;">${label}</span>
+        ${label?`<span class="muted" style="border:1px solid #2a2a2a;padding:2px 8px;border-radius:999px;font-size:.75rem;">${label}</span>`:""}
       </div>`;
       let media="";
       if(p.mediaUrl){
@@ -349,41 +336,46 @@
       return el;
     }
 
-    function renderAll(){
-      // TRENDING = only media kinds (no plain POST rows)
-      const trendingKinds = new Set(["video","clip","podcast_audio","podcast_video","audio","image"]);
-      const trending = allDocs.filter(d => trendingKinds.has(d.data().kind));
-      const homeFiltered = trending.filter(d => matchesTerm(d.data(), homeTerm));
-      if(!homeFiltered.length){
-        homeFeed.innerHTML = '<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet. Check back soon.</div>';
-      } else {
-        homeFeed.innerHTML = ""; homeFiltered.forEach(d=>homeFeed.appendChild(renderCard(d)));
-      }
-
-      const vids = allDocs.filter(d=> d.data().kind==="video" && matchesTerm(d.data(), videosTerm));
-      videosFeed.innerHTML = vids.length? "" : '<div class="muted card">No videos yet.</div>';
-      vids.forEach(d=>videosFeed.appendChild(renderCard(d)));
-
-      const pods = allDocs.filter(d=> ["podcast_audio","podcast_video","audio"].includes(d.data().kind) && matchesTerm(d.data(), podcastTerm));
-      podcastFeed.innerHTML = pods.length? "" : '<div class="muted card">No podcasts yet.</div>';
-      pods.forEach(d=>podcastFeed.appendChild(renderCard(d)));
-
-      const cls = allDocs.filter(d=> d.data().kind==="clip" && matchesTerm(d.data(), clipsTerm));
-      clipsFeed.innerHTML = cls.length? "" : '<div class="muted card">No clips yet.</div>';
-      cls.forEach(d=>clipsFeed.appendChild(renderCard(d)));
-    }
-
+    /* Live data */
+    let docs = [];
     const PAGE_SIZE = 40;
     const q = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
-    onSnapshot(q, (snap)=>{ allDocs = snap.docs; renderAll(); });
+    onSnapshot(q, (snap)=>{ docs = snap.docs; draw(); });
 
-    /* Search fields */
-    globalSearch?.addEventListener('input', e=>{ homeTerm = e.target.value.trim(); renderAll(); });
-    videosSearch?.addEventListener('input', e=>{ videosTerm = e.target.value.trim(); renderAll(); });
-    podcastSearch?.addEventListener('input', e=>{ podcastTerm = e.target.value.trim(); renderAll(); });
-    clipsSearch?.addEventListener('input', e=>{ clipsTerm = e.target.value.trim(); renderAll(); });
+    /* Search state */
+    let homeTerm="", videosTerm="", podcastTerm="", clipsTerm="";
+    globalSearch?.addEventListener('input', e=>{ homeTerm    = e.target.value.trim(); draw(); });
+    videosSearch?.addEventListener('input', e=>{ videosTerm  = e.target.value.trim(); draw(); });
+    podcastSearch?.addEventListener('input',e=>{ podcastTerm = e.target.value.trim(); draw(); });
+    clipsSearch?.addEventListener('input', e=>{ clipsTerm    = e.target.value.trim(); draw(); });
 
-    /* Tabs */
+    function draw(){
+      // HOME: only media kinds (remove plain text "POST" rows entirely)
+      const mediaKinds = new Set(["video","clip","podcast_audio","podcast_video","audio","image"]);
+      const trending = docs.filter(d => mediaKinds.has(d.data().kind) && match(d.data(), homeTerm));
+      if(!trending.length){
+        homeFeed.innerHTML = '<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet. Check back soon.</div>';
+      } else {
+        homeFeed.innerHTML = ""; trending.forEach(d=>homeFeed.appendChild(renderCard(d)));
+      }
+
+      // VIDEOS
+      const vids = docs.filter(d => d.data().kind==="video" && match(d.data(), videosTerm));
+      videosFeed.innerHTML = ""; (vids.length?vids:[/*empty*/]).forEach(d=>{ if(d) videosFeed.appendChild(renderCard(d)); });
+      if(!vids.length) videosFeed.innerHTML = '<div class="muted card">No videos yet.</div>';
+
+      // PODCASTS
+      const pods = docs.filter(d => ["podcast_audio","podcast_video","audio"].includes(d.data().kind) && match(d.data(), podcastTerm));
+      podcastFeed.innerHTML = ""; (pods.length?pods:[/*empty*/]).forEach(d=>{ if(d) podcastFeed.appendChild(renderCard(d)); });
+      if(!pods.length) podcastFeed.innerHTML = '<div class="muted card">No podcasts yet.</div>';
+
+      // CLIPS
+      const cls = docs.filter(d => d.data().kind==="clip" && match(d.data(), clipsTerm));
+      clipsFeed.innerHTML = ""; (cls.length?cls:[/*empty*/]).forEach(d=>{ if(d) clipsFeed.appendChild(renderCard(d)); });
+      if(!cls.length) clipsFeed.innerHTML = '<div class="muted card">No clips yet.</div>';
+    }
+
+    /* Tabs (hash-based) */
     const links = Array.from(document.querySelectorAll('.bottom-nav a'));
     const sections = {
       home:document.getElementById('tab-home'),
@@ -395,14 +387,14 @@
       settings:document.getElementById('tab-settings')
     };
     function setTab(key){
-      Object.entries(sections).forEach(([k,el])=>{ el.style.display = (k===key)?'':'none'; });
+      Object.entries(sections).forEach(([k,el])=> el.style.display = (k===key)?'':'none');
       links.forEach(a=>a.classList.toggle('active', a.dataset.tab===key));
-      // Header search visible only on Home
+      // Header search only on Home. Others use their own right-side search fields.
       searchWrap.style.display = (key==="home") ? "flex" : "none";
       window.scrollTo({top:0,behavior:'smooth'});
     }
     function applyHash(){ const key=(location.hash||"#home").slice(1); setTab(key); }
-    links.forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); location.hash=a.getAttribute('href'); }));
+    links.forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); location.hash = a.getAttribute('href'); }));
     window.addEventListener('hashchange', applyHash);
     applyHash();
   </script>
