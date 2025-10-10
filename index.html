@@ -226,18 +226,63 @@
       </div>
       <div id="clips-feed"></div>
     </section>
+<!-- PROFILE (replace your whole #tab-profile with this) -->
+<section id="tab-profile" class="profile-section tab" data-tabname="profile">
+  <!-- Banner with + overlay (owner only) -->
+  <div id="profileBanner" class="profile-banner profile-edit-wrap"></div>
+  <input id="bannerInput" type="file" accept="image/*" hidden>
+  <input id="avatarInput" type="file" accept="image/*" hidden>
+  <button id="btn-change-banner" class="owner-only edit-fab" title="Change banner">+</button>
 
-    <!-- PROFILE (REDESIGNED) -->
-    <section id="tab-profile" style="display:none;">
-      <!-- Banner -->
-      <div id="profileBanner" class="profile-banner"></div>
-      <div class="row" style="justify-content:flex-end; gap:10px; margin-top:-6px;">
-        <input id="bannerInput" type="file" accept="image/*" hidden>
-        <input id="avatarInput" type="file" accept="image/*" hidden>
-        <button id="btn-change-banner" class="ghost">Change banner</button>
-        <button id="btn-change-avatar" class="ghost">Change photo</button>
+  <!-- Header -->
+  <div class="profile-header">
+    <div class="avatar-wrap">
+      <img id="profile-photo" src="" alt="" class="profile-avatar" />
+      <button id="btn-change-avatar" class="owner-only avatar-fab" title="Change photo">+</button>
+    </div>
+
+    <div class="profile-meta">
+      <h3 id="profile-name">Your Name</h3>
+      <div id="profile-handle" class="muted">@username</div>
+      <div id="bio-view" class="muted" style="margin-top:8px;">Add a short bio to introduce yourself.</div>
+      <div id="bio-edit-wrap" style="display:none; margin-top:8px;">
+        <textarea id="bio-edit" placeholder="Write your bio..."></textarea>
+        <div class="row" style="margin-top:8px;">
+          <button id="bio-save" class="primary">Save</button>
+          <button id="bio-cancel" class="ghost">Cancel</button>
+        </div>
       </div>
 
+      <div class="stat-row">
+        <div class="muted"><strong id="stat-posts">0</strong> Posts</div>
+        <div class="muted"><strong id="stat-followers">0</strong> Followers</div>
+        <div class="muted"><strong id="stat-following">0</strong> Following</div>
+        <div class="muted"><strong id="stat-likes">0</strong> Likes</div>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button id="btn-follow" class="primary">Follow</button>
+      <button id="btn-share-profile" class="ghost">Share Profile</button>
+      <button id="btn-edit-profile" class="ghost">Edit Profile</button>
+    </div>
+  </div>
+
+  <!-- Tabs + Grid -->
+  <div class="card" style="margin-top:14px;">
+    <div class="profile-tabs">
+      <button class="pill active" data-profiletab="all">All</button>
+      <button class="pill" data-profiletab="videos">Videos</button>
+      <button class="pill" data-profiletab="podcasts">Podcasts</button>
+      <button class="pill" data-profiletab="clips">Clips</button>
+      <button class="pill" data-profiletab="playlists">Playlists</button>
+    </div>
+
+    <!-- Thumbnail grid -->
+    <div id="profile-grid" class="profile-grid"></div>
+    <div id="profile-empty" class="muted" style="margin-top:8px; display:none;">No posts yet.</div>
+  </div>
+</section>
       <!-- Header -->
       <div class="card">
         <div class="profile-header">
