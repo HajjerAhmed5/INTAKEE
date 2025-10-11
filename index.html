@@ -24,7 +24,7 @@
   *{ box-sizing:border-box; }
   body{ margin:0; background:#000; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
 
-  /* Header: logo left, search right */
+  /* Header */
   header{
     display:flex; align-items:center; gap:12px;
     padding:18px 16px; border-bottom:1px solid #111;
@@ -32,7 +32,7 @@
   .brand{ display:flex; align-items:center; gap:10px; }
   .brand img{ height:120px; width:auto; border-radius:12px; opacity:.9; filter:drop-shadow(0 0 12px rgba(255,255,255,.06)); }
   .spacer{ flex:1; }
-  #searchWrap{ display:flex; margin-left:auto; } /* right-align */
+  #searchWrap{ display:flex; margin-left:auto; }
   .search-bar{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:420px; max-width:52vw; }
   .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
   .auth{ display:flex; gap:10px; margin-left:12px; }
@@ -70,45 +70,44 @@
   .bottom-nav a{ color:#aaa; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.75rem; padding:6px 4px; border-radius:10px; }
   .bottom-nav a.active, .bottom-nav a:hover{ color:#fff; background:#111; }
 
-  /* -------- PROFILE REDESIGN -------- */
+  /* -------- PROFILE -------- */
   .profile-banner{
     height:200px; border-radius:14px; border:1px solid #1a1a1a; background:#111 center/cover no-repeat;
     position:relative; overflow:hidden; margin:12px 0;
   }
-  .profile-banner::after{ content:""; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.0), rgba(0,0,0,.35)); }
-  .profile-header{ display:grid; grid-template-columns: 100px 1fr auto; gap:14px; align-items:center; }
-  .profile-avatar{ width:100px; height:100px; border-radius:50%; background:#1a1a1a; object-fit:cover; border:1px solid #262626; margin-top:-50px; }
+  .profile-banner::after{
+    content:""; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.0), rgba(0,0,0,.35));
+  }
+  .avatar-wrap{ position:relative; width:100px; height:100px; }
+  .profile-avatar{
+    width:100px; height:100px; border-radius:50%; background:#1a1a1a; object-fit:cover; border:1px solid #262626;
+    margin-top:-50px;
+  }
+  .edit-chip{
+    position:absolute; right:8px; bottom:8px; width:28px; height:28px; border-radius:50%;
+    border:1px solid #333; background:#0f0f0f; color:#fff; font-weight:700; line-height:26px;
+    text-align:center; cursor:pointer; opacity:.95;
+  }
+  .profile-banner .edit-chip{ right:10px; bottom:10px; }
+  .owner-only{ display:none; }
+
+  .profile-header{
+    display:grid; grid-template-columns: 100px 1fr auto; gap:14px; align-items:center;
+  }
   .profile-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
   .stat-row{ display:flex; gap:18px; flex-wrap:wrap; margin-top:8px; }
   .stat-row .muted strong{ color:#fff; }
 
   .profile-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
-  .grid{ margin-top:10px; display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px; }
+  .grid{
+    margin-top:10px;
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px;
+  }
   .grid .tile{ background:#0f0f0f; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden; }
   .grid .tile .thumb{ width:100%; aspect-ratio:16/9; background:#111; object-fit:cover; display:block; }
   .grid .tile .meta{ padding:8px 10px; font-size:.9rem; }
 
-  /* --- overlay + buttons --- */
-  .profile-edit-wrap{ position:relative; }
-  .edit-fab{
-    position:absolute; right:10px; bottom:10px;
-    width:36px; height:36px; border-radius:50%;
-    border:1px solid #2a2a2a; background:#111; color:#fff;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; transition:transform .15s ease; opacity:.95;
-  }
-  .edit-fab:hover{ transform:scale(1.05); }
-  .avatar-wrap{ position:relative; display:inline-block; }
-  .avatar-fab{
-    position:absolute; right:-4px; bottom:-4px;
-    width:28px; height:28px; border-radius:50%;
-    border:1px solid #2a2a2a; background:#111; color:#fff;
-    display:flex; align-items:center; justify-content:center;
-    font-size:16px; cursor:pointer; opacity:.95;
-  }
-  .owner-only{ display:none; } /* JS shows for owner */
-
-  /* -------- SETTINGS REDESIGN -------- */
+  /* -------- SETTINGS -------- */
   .settings-section{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; }
   .settings-item{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid #151515; }
   .settings-item:first-child{ border-top:none; }
@@ -118,11 +117,9 @@
   .toggle::after{ content:""; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#2b2b2b; transition:transform .15s ease; }
   .toggle[data-on="true"]{ background:#1c1c1c; border-color:#3a3a3a; }
   .toggle[data-on="true"]::after{ transform:translateX(18px); }
-
   .disclosure{ width:100%; text-align:left; padding:10px 12px; border:1px solid #1a1a1a; border-radius:10px; background:#101010; }
   .disclosure[aria-expanded="true"]{ background:#121212; }
   .disclosure-panel{ margin-top:10px; border:1px solid #1a1a1a; border-radius:10px; padding:12px; background:#0f0f0f; }
-
   .settings-links a{ color:#ddd; text-decoration:none; display:block; padding:6px 0; }
   .settings-links a:hover{ text-decoration:underline; }
 </style>
@@ -132,7 +129,6 @@
   <header>
     <div class="brand"><img src="logo.png" alt="INTAKEE"></div>
     <div class="spacer"></div>
-    <!-- Home/global search (Home only) -->
     <div id="searchWrap" class="search-bar">
       <i class="fa fa-search" style="opacity:.6;"></i>
       <input id="globalSearch" type="text" placeholder="Search…" />
@@ -184,39 +180,10 @@
       <div id="podcast-feed"></div>
     </section>
 
-    <!-- UPLOAD -->
+    <!-- UPLOAD (simple shell for later) -->
     <section id="tab-upload" class="card" style="display:none;">
       <h3 style="margin:0 0 12px;">Upload</h3>
-      <div class="row" style="gap:12px;align-items:flex-start;">
-        <div style="flex:1;min-width:260px;">
-          <label for="uploadType">Choose type</label>
-          <select id="uploadType" style="width:100%;margin-top:6px;">
-            <option value="video">Video</option>
-            <option value="clip">Clip</option>
-            <option value="podcast_audio">Podcast (Audio)</option>
-            <option value="podcast_video">Podcast (Video)</option>
-          </select>
-        </div>
-        <div style="flex:2;min-width:260px;">
-          <label for="postTitle">Title</label>
-          <input id="postTitle" type="text" placeholder="Add a title" style="width:100%;margin-top:6px;">
-        </div>
-      </div>
-      <div class="row" style="gap:12px;align-items:flex-start;margin-top:12px;">
-        <div style="flex:1;min-width:260px;">
-          <label for="thumbFile">Thumbnail (cover image)</label>
-          <input id="thumbFile" type="file" accept="image/*" style="width:100%;margin-top:6px;">
-        </div>
-        <div style="flex:2;min-width:260px;">
-          <label for="mediaFile">File</label>
-          <input id="mediaFile" type="file" accept="video/*,audio/*" style="width:100%;margin-top:6px;">
-        </div>
-      </div>
-      <div class="row" style="margin-top:14px;gap:10px;">
-        <button id="uploadSubmit" class="primary">Upload</button>
-        <button id="goLiveBtn" class="ghost">Go Live</button>
-      </div>
-      <p class="muted" style="margin-top:8px;">Processing will start after upload. You'll be notified when it’s ready.</p>
+      <p class="muted">Upload will be finalized after Firebase is connected.</p>
     </section>
 
     <!-- CLIPS -->
@@ -231,20 +198,22 @@
       <div id="clips-feed"></div>
     </section>
 
-    <!-- PROFILE (REDESIGNED) -->
+    <!-- PROFILE -->
     <section id="tab-profile" style="display:none;">
-      <!-- Banner with owner-only + -->
-      <div id="profileBanner" class="profile-banner profile-edit-wrap"></div>
+      <!-- Banner with “+” chip -->
+      <div id="profileBanner" class="profile-banner">
+        <button id="chip-banner" class="edit-chip owner-only" title="Change banner">+</button>
+      </div>
+
+      <!-- Hidden inputs for images -->
       <input id="bannerInput" type="file" accept="image/*" hidden>
       <input id="avatarInput" type="file" accept="image/*" hidden>
-      <button id="btn-change-banner" class="owner-only edit-fab" title="Change banner">+</button>
 
-      <!-- Header -->
       <div class="card">
         <div class="profile-header">
           <div class="avatar-wrap">
             <img id="profile-photo" src="" alt="" class="profile-avatar">
-            <button id="btn-change-avatar" class="owner-only avatar-fab" title="Change photo">+</button>
+            <button id="chip-avatar" class="edit-chip owner-only" title="Change photo">+</button>
           </div>
           <div>
             <h3 id="profile-name" style="margin:0;">Your Name</h3>
@@ -253,8 +222,8 @@
             <div id="bio-edit-wrap" style="display:none; margin-top:8px;">
               <textarea id="bio-edit" placeholder="Write your bio..."></textarea>
               <div class="row" style="margin-top:8px;">
-                <button id="bio-save" class="primary">Save</button>
-                <button id="bio-cancel" class="ghost">Cancel</button>
+                <button id="bio-save" class="primary owner-only">Save</button>
+                <button id="bio-cancel" class="ghost owner-only">Cancel</button>
               </div>
             </div>
             <div class="stat-row">
@@ -267,12 +236,11 @@
           <div class="profile-actions">
             <button id="btn-follow" class="primary">Follow</button>
             <button id="btn-share-profile" class="ghost">Share Profile</button>
-            <button id="btn-edit-profile" class="ghost">Edit Profile</button>
+            <button id="btn-edit-profile" class="ghost owner-only">Edit Profile</button>
           </div>
         </div>
       </div>
 
-      <!-- Tabs + Grid -->
       <div class="card">
         <div class="profile-tabs">
           <button class="pill active" data-profiletab="all">All</button>
@@ -286,7 +254,7 @@
       </div>
     </section>
 
-    <!-- SETTINGS (REDESIGNED) -->
+    <!-- SETTINGS -->
     <section id="tab-settings" style="display:none;">
       <div class="settings-section">
         <h3 style="margin:0 0 8px;">Account</h3>
@@ -366,7 +334,7 @@
         <div id="legalPanel" class="disclosure-panel" hidden>
           <h4 style="margin:0 0 8px;">Content Responsibility Disclaimer</h4>
           <p class="muted" style="margin:0 0 10px;">
-            INTAKEE supports freedom of speech, creativity, and open discussion. Users are fully responsible for content they upload or share, including videos, podcasts, clips, comments. INTAKEE does not endorse, verify, or assume legal responsibility for user-generated content. We reserve the right to remove content that violates laws, promotes violence or harassment, or contains explicit material.
+            INTAKEE supports freedom of speech, creativity, and open discussion. Users are fully responsible for content they upload or share, including videos, podcasts, clips, comments, and messages. INTAKEE does not endorse, verify, or assume legal responsibility for user-generated content. We may remove content that violates laws, promotes violence or harassment, or contains explicit material.
           </p>
           <h4 style="margin:10px 0 8px;">Privacy Commitment</h4>
           <p class="muted" style="margin:0 0 10px;">
@@ -403,6 +371,14 @@
 
   <!-- App -->
   <script type="module">
+    /* =========================
+       DESIGN SWITCH
+       ========================= */
+    const DESIGN_MODE = true; // set to false after you connect Firebase auth
+
+    /* =========================
+       Firebase (safe to keep even in design mode)
+       ========================= */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import {
@@ -412,10 +388,13 @@
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
     import { firebaseConfig } from "./firebase-config.js";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+    let app, auth, db, storage;
+    try {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+      storage = getStorage(app);
+    } catch (e){ console.warn("Firebase not ready yet (design mode is fine).", e); }
 
     /* Elements */
     const searchWrap = document.getElementById("searchWrap");
@@ -430,8 +409,8 @@
     const profileBanner = document.getElementById("profileBanner");
     const bannerInput = document.getElementById("bannerInput");
     const avatarInput = document.getElementById("avatarInput");
-    const btnChangeBanner = document.getElementById("btn-change-banner");
-    const btnChangeAvatar = document.getElementById("btn-change-avatar");
+    const chipBanner = document.getElementById("chip-banner");
+    const chipAvatar = document.getElementById("chip-avatar");
     const profilePhoto = document.getElementById("profile-photo");
     const profileName = document.getElementById("profile-name");
     const profileHandle = document.getElementById("profile-handle");
@@ -446,60 +425,59 @@
     const profileGrid = document.getElementById("profile-grid");
     const profileEmpty = document.getElementById("profile-empty");
 
-    // Settings elements
     const legalToggle = document.getElementById("legalToggle");
     const legalPanel = document.getElementById("legalPanel");
 
-    /* Auth (minimal UI) */
-    logoutBtn.addEventListener("click", () => signOut(auth));
-    onAuthStateChanged(auth, async (user) => {
-      loginBtn.style.display  = "none";
-      logoutBtn.style.display = user ? "inline-block" : "none";
+    /* Owner-only visibility */
+    function showOwnerOnly(show){
+      document.querySelectorAll('.owner-only').forEach(el=>{
+        el.style.display = show ? '' : 'none';
+      });
+    }
 
-      // If logged in, ensure user doc exists
-      if (user) {
-        const uref = doc(db, "users", user.uid);
-        const snap = await getDoc(uref);
-        if (!snap.exists()) {
-          await setDoc(uref, { uid:user.uid, displayName:user.displayName??"", email:user.email??"", photoURL:user.photoURL??"", createdAt: serverTimestamp() });
+    /* Auth (minimal) */
+    if (logoutBtn) logoutBtn.addEventListener("click", () => auth && signOut(auth));
+
+    if (auth) {
+      onAuthStateChanged(auth, async (user) => {
+        // Hide login in this version
+        if (loginBtn) loginBtn.style.display  = "none";
+        if (logoutBtn) logoutBtn.style.display = (user && !DESIGN_MODE) ? "inline-block" : "none";
+
+        if (DESIGN_MODE) { showOwnerOnly(true); return; }
+
+        if (user) {
+          showOwnerOnly(true);
+          const uref = doc(db, "users", user.uid);
+          const snap = await getDoc(uref);
+          if (!snap.exists()) {
+            await setDoc(uref, { uid:user.uid, displayName:user.displayName??"", email:user.email??"", photoURL:user.photoURL??"", createdAt: serverTimestamp() });
+          }
+          const fresh = (await getDoc(uref)).data() || {};
+          profileName.textContent = fresh.displayName || "Your Name";
+          profileHandle.textContent = fresh.email ? "@"+fresh.email.split("@")[0] : "@username";
+          if (fresh.photoURL) profilePhoto.src = fresh.photoURL;
+          if (fresh.bio) bioView.textContent = fresh.bio;
+          if (fresh.bannerURL) profileBanner.style.backgroundImage = `url('${fresh.bannerURL}')`;
+          loadMyPosts(user.uid);
+        } else {
+          showOwnerOnly(false);
+          btnFollow.style.display = "";
+          profileGrid.innerHTML = "";
+          profileEmpty.style.display = "";
         }
-        // Fill profile header from user doc (extended with bannerURL, bio)
-        const fresh = (await getDoc(uref)).data() || {};
-        profileName.textContent = fresh.displayName || "Your Name";
-        profileHandle.textContent = fresh.email ? "@"+fresh.email.split("@")[0] : "@username";
-        if (fresh.photoURL) profilePhoto.src = fresh.photoURL;
-        if (fresh.bio) bioView.textContent = fresh.bio;
-        if (fresh.bannerURL) profileBanner.style.backgroundImage = `url('${fresh.bannerURL}')`;
-
-        // Owner-only overlays visible if logged in (own profile case)
-        document.querySelectorAll('.owner-only').forEach(el => el.style.display = "");
-
-        // Load user's posts into profile grid
-        loadMyPosts(user.uid);
-      } else {
-        // Not logged in: hide owner-only overlays
-        document.querySelectorAll('.owner-only').forEach(el => el.style.display = "none");
-        // Clear grid
-        profileGrid.innerHTML = "";
-        profileEmpty.style.display = "";
-      }
-    });
-
-    /* -------- Feed helpers -------- */
-    function escapeHtml(s=""){
-      return s.replace(/[&<>"']/g, c => (
-        {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]
-      ));
+      });
+    } else {
+      // No Firebase yet → design mode only
+      showOwnerOnly(true);
     }
-    function fmtTime(ts){
-      try{
-        const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null);
-        if(!t) return "";
-        return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});
-      }catch{return"";}
-    }
+
+    /* Helpers */
+    function escapeHtml(s=""){ return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+    function fmtTime(ts){ try{const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null); if(!t)return""; return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});}catch{return"";} }
     function match(p, term){ if(!term) return true; const t=term.toLowerCase(); return ((p.text||"").toLowerCase().includes(t)); }
 
+    /* Main feeds (safe even if Firebase missing) */
     const homeFeed   = document.getElementById("home-feed");
     const videosFeed = document.getElementById("videos-feed");
     const podcastFeed= document.getElementById("podcast-feed");
@@ -526,43 +504,43 @@
       return el;
     }
 
-    /* Live data for main feeds */
-    let docs = [];
-    const PAGE_SIZE = 40;
-    const qMain = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
-    onSnapshot(qMain, (snap)=>{ docs = snap.docs; draw(); });
-
-    /* Search state */
-    let homeTerm="", videosTerm="", podcastTerm="", clipsTerm="";
-    globalSearch?.addEventListener('input', e=>{ homeTerm    = e.target.value.trim(); draw(); });
-    videosSearch?.addEventListener('input', e=>{ videosTerm  = e.target.value.trim(); draw(); });
-    podcastSearch?.addEventListener('input',e=>{ podcastTerm = e.target.value.trim(); draw(); });
-    clipsSearch?.addEventListener('input', e=>{ clipsTerm    = e.target.value.trim(); draw(); });
-
-    function draw(){
-      // HOME only shows media kinds; message disappears once posts exist
-      const mediaKinds = new Set(["video","clip","podcast_audio","podcast_video","audio","image"]);
-      const trending = docs.filter(d => mediaKinds.has(d.data().kind) && match(d.data(), homeTerm));
-      if(!trending.length){
-        homeFeed.innerHTML = '<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet. Check back soon.</div>';
-      } else {
-        homeFeed.innerHTML = ""; trending.forEach(d=>homeFeed.appendChild(renderCard(d)));
-      }
-
-      const vids = docs.filter(d => d.data().kind==="video" && match(d.data(), videosTerm));
-      videosFeed.innerHTML = ""; (vids.length?vids:[/*empty*/]).forEach(d=>{ if(d) videosFeed.appendChild(renderCard(d)); });
-      if(!vids.length) videosFeed.innerHTML = '<div class="muted card">No videos yet.</div>';
-
-      const pods = docs.filter(d => ["podcast_audio","podcast_video","audio"].includes(d.data().kind) && match(d.data(), podcastTerm));
-      podcastFeed.innerHTML = ""; (pods.length?pods:[/*empty*/]).forEach(d=>{ if(d) podcastFeed.appendChild(renderCard(d)); });
-      if(!pods.length) podcastFeed.innerHTML = '<div class="muted card">No podcasts yet.</div>';
-
-      const cls = docs.filter(d => d.data().kind==="clip" && match(d.data(), clipsTerm));
-      clipsFeed.innerHTML = ""; (cls.length?cls:[/*empty*/]).forEach(d=>{ if(d) clipsFeed.appendChild(renderCard(d)); });
-      if(!cls.length) clipsFeed.innerHTML = '<div class="muted card">No clips yet.</div>';
+    if (db) {
+      const qMain = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(40));
+      onSnapshot(qMain, (snap)=>{ const docs = snap.docs; draw(docs); });
+    } else {
+      // No Firebase yet — show placeholder
+      homeFeed.innerHTML = '<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet. Connect Firebase to populate.</div>';
     }
 
-    /* Tabs (hash-based) */
+    function draw(docs){
+      let homeTerm="", videosTerm="", podcastTerm="", clipsTerm="";
+      globalSearch?.addEventListener('input', e=>{ homeTerm    = e.target.value.trim(); paint(); });
+      videosSearch?.addEventListener('input', e=>{ videosTerm  = e.target.value.trim(); paint(); });
+      podcastSearch?.addEventListener('input',e=>{ podcastTerm = e.target.value.trim(); paint(); });
+      clipsSearch?.addEventListener('input', e=>{ clipsTerm    = e.target.value.trim(); paint(); });
+
+      function paint(){
+        const mediaKinds = new Set(["video","clip","podcast_audio","podcast_video","audio","image"]);
+        const trending = docs.filter(d => mediaKinds.has(d.data().kind) && match(d.data(), homeTerm));
+        homeFeed.innerHTML = trending.length ? "" : '<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet.</div>';
+        trending.forEach(d=>homeFeed.appendChild(renderCard(d)));
+
+        const vids = docs.filter(d => d.data().kind==="video" && match(d.data(), videosTerm));
+        videosFeed.innerHTML = vids.length ? "" : '<div class="muted card">No videos yet.</div>';
+        vids.forEach(d=>videosFeed.appendChild(renderCard(d)));
+
+        const pods = docs.filter(d => ["podcast_audio","podcast_video","audio"].includes(d.data().kind) && match(d.data(), podcastTerm));
+        podcastFeed.innerHTML = pods.length ? "" : '<div class="muted card">No podcasts yet.</div>';
+        pods.forEach(d=>podcastFeed.appendChild(renderCard(d)));
+
+        const cls = docs.filter(d => d.data().kind==="clip" && match(d.data(), clipsTerm));
+        clipsFeed.innerHTML = cls.length ? "" : '<div class="muted card">No clips yet.</div>';
+        cls.forEach(d=>clipsFeed.appendChild(renderCard(d)));
+      }
+      paint();
+    }
+
+    /* Tabs */
     const links = Array.from(document.querySelectorAll('.bottom-nav a'));
     const sections = {
       home:document.getElementById('tab-home'),
@@ -576,7 +554,6 @@
     function setTab(key){
       Object.entries(sections).forEach(([k,el])=> el.style.display = (k===key)?'':'none');
       links.forEach(a=>a.classList.toggle('active', a.dataset.tab===key));
-      // Header search only on Home. Others use their own right-side search fields.
       searchWrap.style.display = (key==="home") ? "flex" : "none";
       window.scrollTo({top:0,behavior:'smooth'});
     }
@@ -587,8 +564,8 @@
 
     /* ---------- PROFILE FEATURES ---------- */
 
-    // Owner bio edit
-    btnEditProfile?.addEventListener('click', ()=>{
+    // Edit bio (design + real)
+    document.getElementById('btn-edit-profile')?.addEventListener('click', ()=>{
       bioEdit.value = bioView.textContent || "";
       bioView.style.display = "none";
       bioEditWrap.style.display = "";
@@ -598,53 +575,64 @@
       bioView.style.display = "";
     });
     bioSave?.addEventListener('click', async ()=>{
-      const user = auth.currentUser; if(!user) return alert("Sign in to edit profile.");
       const bio = (bioEdit.value||"").trim();
-      await updateDoc(doc(db,"users",user.uid), { bio });
       bioView.textContent = bio || "Add a short bio to introduce yourself.";
       bioEditWrap.style.display = "none";
       bioView.style.display = "";
+      if (!DESIGN_MODE && auth?.currentUser) {
+        await updateDoc(doc(db,"users",auth.currentUser.uid), { bio });
+      }
     });
 
-    // Share profile (simple copy)
+    // Share profile (copy)
     btnShareProfile?.addEventListener('click', async ()=>{
       const url = location.origin + location.pathname + "#profile";
       try{ await navigator.clipboard.writeText(url); alert("Profile link copied."); }catch{ prompt("Copy profile link:", url); }
     });
 
-    // Follow (placeholder)
-    btnFollow?.addEventListener('click', ()=>{
-      alert("Following will be available later.");
-    });
+    // Follow placeholder
+    btnFollow?.addEventListener('click', ()=> alert("Following will be available later."));
 
-    // Change banner (overlay +)
-    btnChangeBanner?.addEventListener('click', ()=> bannerInput.click());
+    // Image chips → choose files
+    chipBanner?.addEventListener('click', ()=> bannerInput.click());
+    chipAvatar?.addEventListener('click', ()=> avatarInput.click());
+
+    // Local preview in design mode, Firebase upload when not
     bannerInput?.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0]; if(!file) return;
-      const user = auth.currentUser; if(!user) return alert("Sign in to change banner.");
-      const path = `users/${user.uid}/banner/${Date.now()}-${file.name}`;
+      if (DESIGN_MODE) {
+        const url = URL.createObjectURL(file);
+        profileBanner.style.backgroundImage = `url('${url}')`;
+        return;
+      }
+      if (!auth?.currentUser) return alert("Sign in to change banner.");
+      const path = `users/${auth.currentUser.uid}/banner/${Date.now()}-${file.name}`;
       const r = ref(storage, path);
       await uploadBytes(r, file);
       const url = await getDownloadURL(r);
-      await updateDoc(doc(db,"users",user.uid), { bannerURL:url });
+      await updateDoc(doc(db,"users",auth.currentUser.uid), { bannerURL:url });
       profileBanner.style.backgroundImage = `url('${url}')`;
     });
 
-    // Change avatar (overlay +)
-    btnChangeAvatar?.addEventListener('click', ()=> avatarInput.click());
     avatarInput?.addEventListener('change', async (e)=>{
       const file = e.target.files?.[0]; if(!file) return;
-      const user = auth.currentUser; if(!user) return alert("Sign in to change photo.");
-      const path = `users/${user.uid}/avatar/${Date.now()}-${file.name}`;
+      if (DESIGN_MODE) {
+        const url = URL.createObjectURL(file);
+        profilePhoto.src = url;
+        return;
+      }
+      if (!auth?.currentUser) return alert("Sign in to change photo.");
+      const path = `users/${auth.currentUser.uid}/avatar/${Date.now()}-${file.name}`;
       const r = ref(storage, path);
       await uploadBytes(r, file);
       const url = await getDownloadURL(r);
-      await updateDoc(doc(db,"users",user.uid), { photoURL:url });
+      await updateDoc(doc(db,"users",auth.currentUser.uid), { photoURL:url });
       profilePhoto.src = url;
     });
 
-    // Load current user's posts into profile grid
+    // Profile grid (real data only when Firebase is on)
     async function loadMyPosts(uid){
+      if (!db) return;
       const qMine = query(
         collection(db,"posts"),
         where("ownerId","==",uid),
@@ -667,10 +655,8 @@
           if(p.mediaUrl){
             if(p.kind==="image"){
               media = `<img class="thumb" src="${p.mediaUrl}" alt="">`;
-            }else if(p.kind==="video" || p.kind==="podcast_video"){
+            }else if(p.kind==="video" || p.kind==="podcast_video" || p.kind==="clip"){
               media = `<video class="thumb" src="${p.mediaUrl}" muted playsinline></video>`;
-            }else if(p.kind==="clip"){
-              media = `<video class="thumb" src="${p.mediaUrl}" muted playsinline loop></video>`;
             }else if(p.kind==="audio" || p.kind==="podcast_audio"){
               media = `<div class="thumb" style="display:flex;align-items:center;justify-content:center;">AUDIO</div>`;
             }
@@ -685,9 +671,7 @@
       });
     }
 
-    /* ---------- SETTINGS INTERACTIONS ---------- */
-
-    // Simple toggle behavior (visual only for now)
+    /* SETTINGS: toggles + legal panel */
     document.querySelectorAll('.toggle').forEach(t=>{
       t.addEventListener('click', ()=>{
         const on = t.getAttribute('data-on') === 'true';
@@ -695,12 +679,15 @@
         t.setAttribute('aria-checked', on ? 'false' : 'true');
       });
     });
-
-    // Collapsible Legal & Policy
     legalToggle?.addEventListener('click', ()=>{
       const expanded = legalToggle.getAttribute('aria-expanded') === 'true';
       legalToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
       legalPanel.hidden = expanded;
+    });
+
+    /* Tabs init */
+    document.addEventListener('DOMContentLoaded', ()=> {
+      showOwnerOnly(DESIGN_MODE);
     });
   </script>
 </body>
