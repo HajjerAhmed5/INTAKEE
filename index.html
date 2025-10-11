@@ -12,7 +12,7 @@
 <meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
 <meta property="og:description" content="All-in-one platform for videos, podcasts, and clips.">
 <meta property="og:url" content="https://intakee.vercel.app/">
-<meta property="og:image" content="https://intakee.vercel.app/og-image.jpg">
+<meta property="og:image" content="/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
@@ -29,34 +29,31 @@
     display:flex; align-items:center; gap:12px;
     padding:18px 16px; border-bottom:1px solid #111;
   }
-  .brand{ display:flex; align-items:center; gap:10px; }
   .brand img{ height:120px; width:auto; border-radius:12px; opacity:.9; filter:drop-shadow(0 0 12px rgba(255,255,255,.06)); }
   .spacer{ flex:1; }
   #searchWrap{ display:flex; margin-left:auto; }
   .search-bar{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:420px; max-width:52vw; }
   .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
   .auth{ display:flex; gap:10px; margin-left:12px; }
-
-  /* Main */
-  main{ max-width:1000px; margin:0 auto; padding:16px; padding-bottom:88px; }
-  .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-  .muted{ color:#b7b7b7; opacity:.85; font-size:.95rem; }
-  .card{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; box-shadow:0 4px 18px rgba(0,0,0,.35); }
-
-  input[type="text"], input[type="email"], input[type="password"], select{
-    padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff;
-  }
-  input[type="file"]{ color:#aaa; }
-  textarea{ width:100%; min-height:80px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
   button{ padding:9px 14px; border-radius:10px; border:1px solid #2a2a2a; background:#141414; color:#fff; cursor:pointer; }
   button.primary{ background:#1a1a1a; border-color:#3a3a3a; }
   button.ghost{ background:transparent; }
   button:hover{ background:#191919; }
   button[disabled]{ opacity:.6; cursor:not-allowed; }
 
-  /* Section header + right search (Videos/Podcasts/Clips) */
+  /* Layout */
+  main{ max-width:1000px; margin:0 auto; padding:16px; padding-bottom:88px; }
+  .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .muted{ color:#b7b7b7; opacity:.85; font-size:.95rem; }
+  .card{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; box-shadow:0 4px 18px rgba(0,0,0,.35); }
+  input[type="text"], input[type="email"], input[type="password"], select{
+    padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff;
+  }
+  input[type="file"]{ color:#aaa; }
+  textarea{ width:100%; min-height:80px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
+
+  /* Section header + right search */
   .section-head{ display:flex; align-items:center; gap:12px; margin:0 0 6px; }
-  .section-title{ margin:0; }
   .section-search{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:340px; max-width:50vw; margin-left:auto; }
   .section-search input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
 
@@ -78,45 +75,44 @@
   .profile-banner::after{
     content:""; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.0), rgba(0,0,0,.35));
   }
-  .avatar-wrap{ position:relative; width:100px; height:100px; }
-  .profile-avatar{
-    width:100px; height:100px; border-radius:50%; background:#1a1a1a; object-fit:cover; border:1px solid #262626;
-    margin-top:-50px;
+  .profile-banner .add-btn{
+    position:absolute; right:10px; bottom:10px;
+    width:30px; height:30px; border-radius:50%;
+    background:#fff; color:#000; display:flex; align-items:center; justify-content:center;
+    font-weight:700; border:none; cursor:pointer;
   }
-  .edit-chip{
-    position:absolute; right:8px; bottom:8px; width:28px; height:28px; border-radius:50%;
-    border:1px solid #333; background:#0f0f0f; color:#fff; font-weight:700; line-height:26px;
-    text-align:center; cursor:pointer; opacity:.95;
-  }
-  .profile-banner .edit-chip{ right:10px; bottom:10px; }
-  .owner-only{ display:none; }
-
   .profile-header{
-    display:grid; grid-template-columns: 100px 1fr auto; gap:14px; align-items:center;
+    display:grid; grid-template-columns: 110px 1fr auto; gap:14px; align-items:center;
+  }
+  .avatar-wrap{ position:relative; width:110px; height:110px; margin-top:-55px; }
+  .profile-avatar{
+    width:110px; height:110px; border-radius:50%; background:#1a1a1a; object-fit:cover; border:1px solid #262626;
+  }
+  .avatar-wrap .add-btn{
+    position:absolute; right:0; bottom:0;
+    width:28px; height:28px; border-radius:50%;
+    background:#fff; color:#000; border:none; font-weight:700; cursor:pointer;
   }
   .profile-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
   .stat-row{ display:flex; gap:18px; flex-wrap:wrap; margin-top:8px; }
   .stat-row .muted strong{ color:#fff; }
 
   .profile-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
-  .grid{
-    margin-top:10px;
-    display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px;
-  }
+  .grid{ margin-top:10px; display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px; }
   .grid .tile{ background:#0f0f0f; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden; }
   .grid .tile .thumb{ width:100%; aspect-ratio:16/9; background:#111; object-fit:cover; display:block; }
   .grid .tile .meta{ padding:8px 10px; font-size:.9rem; }
 
-  /* -------- SETTINGS -------- */
+  /* -------- SETTINGS bits used here -------- */
   .settings-section{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; }
   .settings-item{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid #151515; }
   .settings-item:first-child{ border-top:none; }
   .settings-left{ display:flex; align-items:center; gap:10px; }
-  .settings-left i{ width:20px; text-align:center; color:#b7b7b7; }
   .toggle{ width:42px; height:24px; border-radius:999px; border:1px solid #2a2a2a; background:#141414; position:relative; cursor:pointer; }
   .toggle::after{ content:""; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#2b2b2b; transition:transform .15s ease; }
   .toggle[data-on="true"]{ background:#1c1c1c; border-color:#3a3a3a; }
   .toggle[data-on="true"]::after{ transform:translateX(18px); }
+
   .disclosure{ width:100%; text-align:left; padding:10px 12px; border:1px solid #1a1a1a; border-radius:10px; background:#101010; }
   .disclosure[aria-expanded="true"]{ background:#121212; }
   .disclosure-panel{ margin-top:10px; border:1px solid #1a1a1a; border-radius:10px; padding:12px; background:#0f0f0f; }
@@ -143,7 +139,7 @@
     <!-- HOME -->
     <section id="tab-home">
       <div class="row" style="justify-content:space-between;align-items:center;margin-top:8px;">
-        <h2 class="section-title">Trending</h2>
+        <h2 style="margin:0;">Trending</h2>
         <div class="pills">
           <button class="pill" data-filter="all">All</button>
           <button class="pill" data-filter="video">Videos</button>
@@ -159,7 +155,7 @@
     <!-- VIDEOS -->
     <section id="tab-videos" style="display:none;">
       <div class="section-head">
-        <h3 class="section-title">Videos</h3>
+        <h3 style="margin:0;">Videos</h3>
         <div class="section-search" id="videosSearchWrap">
           <i class="fa fa-search" style="opacity:.6;"></i>
           <input id="videosSearch" type="text" placeholder="Search videos…"/>
@@ -171,7 +167,7 @@
     <!-- PODCASTS -->
     <section id="tab-podcast" style="display:none;">
       <div class="section-head">
-        <h3 class="section-title">Podcasts</h3>
+        <h3 style="margin:0;">Podcasts</h3>
         <div class="section-search" id="podcastSearchWrap">
           <i class="fa fa-search" style="opacity:.6;"></i>
           <input id="podcastSearch" type="text" placeholder="Search podcasts…"/>
@@ -180,16 +176,50 @@
       <div id="podcast-feed"></div>
     </section>
 
-    <!-- UPLOAD (simple shell for later) -->
+    <!-- UPLOAD (fixed) -->
     <section id="tab-upload" class="card" style="display:none;">
       <h3 style="margin:0 0 12px;">Upload</h3>
-      <p class="muted">Upload will be finalized after Firebase is connected.</p>
+      <div class="row" style="gap:12px;align-items:flex-start;">
+        <div style="flex:1;min-width:220px;">
+          <label for="uploadType">Choose type</label>
+          <select id="uploadType" style="width:100%;margin-top:6px;">
+            <option value="video">Video</option>
+            <option value="clip">Clip</option>
+            <option value="podcast_audio">Podcast (Audio)</option>
+            <option value="podcast_video">Podcast (Video)</option>
+          </select>
+        </div>
+        <div style="flex:2;min-width:260px;">
+          <label for="postTitle">Title</label>
+          <input id="postTitle" type="text" placeholder="Add a title" style="width:100%;margin-top:6px;">
+        </div>
+      </div>
+
+      <div class="row" style="gap:12px;align-items:flex-start;margin-top:12px;">
+        <div style="flex:1;min-width:220px;">
+          <label for="thumbFile">Thumbnail (cover image)</label>
+          <input id="thumbFile" type="file" accept="image/*" style="width:100%;margin-top:6px;">
+        </div>
+        <div style="flex:2;min-width:260px;">
+          <label for="mediaFile">File</label>
+          <input id="mediaFile" type="file" accept="video/*,audio/*" style="width:100%;margin-top:6px;">
+        </div>
+      </div>
+
+      <label for="postDesc" style="margin-top:12px; display:block;">Description</label>
+      <textarea id="postDesc" placeholder="Write a short description…"></textarea>
+
+      <div class="row" style="margin-top:14px;gap:10px;">
+        <button id="uploadSubmit" class="primary">Upload</button>
+        <button id="goLiveBtn" class="ghost">Go Live</button>
+      </div>
+      <p class="muted" style="margin-top:8px;">Processing starts after upload. You’ll be notified when it’s ready.</p>
     </section>
 
     <!-- CLIPS -->
     <section id="tab-clips" style="display:none;">
       <div class="section-head">
-        <h3 class="section-title">Clips</h3>
+        <h3 style="margin:0;">Clips</h3>
         <div class="section-search" id="clipsSearchWrap">
           <i class="fa fa-search" style="opacity:.6;"></i>
           <input id="clipsSearch" type="text" placeholder="Search clips…"/>
@@ -200,21 +230,18 @@
 
     <!-- PROFILE -->
     <section id="tab-profile" style="display:none;">
-      <!-- Banner with “+” chip -->
+      <!-- Banner with + -->
       <div id="profileBanner" class="profile-banner">
-        <button id="chip-banner" class="edit-chip owner-only" title="Change banner">+</button>
+        <button id="btnAddBanner" class="add-btn owner-only" title="Change banner" style="display:none;">+</button>
       </div>
-
-      <!-- Hidden inputs for images -->
-      <input id="bannerInput" type="file" accept="image/*" hidden>
-      <input id="avatarInput" type="file" accept="image/*" hidden>
 
       <div class="card">
         <div class="profile-header">
           <div class="avatar-wrap">
             <img id="profile-photo" src="" alt="" class="profile-avatar">
-            <button id="chip-avatar" class="edit-chip owner-only" title="Change photo">+</button>
+            <button id="btnAddAvatar" class="add-btn owner-only" title="Change photo" style="display:none;">+</button>
           </div>
+
           <div>
             <h3 id="profile-name" style="margin:0;">Your Name</h3>
             <div id="profile-handle" class="muted">@username</div>
@@ -222,8 +249,8 @@
             <div id="bio-edit-wrap" style="display:none; margin-top:8px;">
               <textarea id="bio-edit" placeholder="Write your bio..."></textarea>
               <div class="row" style="margin-top:8px;">
-                <button id="bio-save" class="primary owner-only">Save</button>
-                <button id="bio-cancel" class="ghost owner-only">Cancel</button>
+                <button id="bio-save" class="primary">Save</button>
+                <button id="bio-cancel" class="ghost">Cancel</button>
               </div>
             </div>
             <div class="stat-row">
@@ -233,10 +260,11 @@
               <div class="muted"><strong id="stat-likes">0</strong> Likes</div>
             </div>
           </div>
+
           <div class="profile-actions">
             <button id="btn-follow" class="primary">Follow</button>
             <button id="btn-share-profile" class="ghost">Share Profile</button>
-            <button id="btn-edit-profile" class="ghost owner-only">Edit Profile</button>
+            <button id="btn-edit-profile" class="ghost owner-only" style="display:none;">Edit Profile</button>
           </div>
         </div>
       </div>
@@ -252,56 +280,31 @@
         <div id="profile-grid" class="grid"></div>
         <div id="profile-empty" class="muted" style="margin-top:8px; display:none;">No posts yet.</div>
       </div>
+
+      <!-- Hidden file inputs -->
+      <input id="bannerInput" type="file" accept="image/*" hidden>
+      <input id="avatarInput" type="file" accept="image/*" hidden>
     </section>
 
-    <!-- SETTINGS -->
+    <!-- SETTINGS (kept as before; already approved) -->
     <section id="tab-settings" style="display:none;">
       <div class="settings-section">
         <h3 style="margin:0 0 8px;">Account</h3>
-        <div class="settings-item">
-          <div class="settings-left"><i class="fa fa-user"></i><span>Name, Username, Email</span></div>
-          <button class="ghost">Edit</button>
-        </div>
-        <div class="settings-item">
-          <div class="settings-left"><i class="fa fa-key"></i><span>Change Password</span></div>
-          <button class="ghost">Update</button>
-        </div>
-        <div class="settings-item">
-          <div class="settings-left"><i class="fa fa-trash"></i><span>Delete Account</span></div>
-          <button class="ghost">Start</button>
-        </div>
-        <div class="settings-item">
-          <div class="settings-left"><i class="fa fa-right-from-bracket"></i><span>Logout</span></div>
-          <button id="settings-logout" class="ghost">Logout</button>
-        </div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-user"></i><span>Name, Username, Email</span></div><button class="ghost">Edit</button></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-key"></i><span>Change Password</span></div><button class="ghost">Update</button></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-trash"></i><span>Delete Account</span></div><button class="ghost">Start</button></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-right-from-bracket"></i><span>Logout</span></div><button id="settings-logout" class="ghost">Logout</button></div>
       </div>
 
       <div class="settings-section">
         <h3 style="margin:0 0 8px;">Privacy & Safety</h3>
-        <div class="settings-item">
-          <div class="settings-left"><i class="fa fa-lock"></i><span>Private account</span></div>
-          <div class="toggle" id="toggle-private" data-on="false" role="switch" aria-checked="false"></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-lock"></i><span>Private account</span></div><div class="toggle" id="toggle-private" data-on="false" role="switch" aria-checked="false"></div></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-ban"></i><span>Blocked accounts</span></div><button class="ghost">Manage</button></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-comments"></i><span>Comments</span></div>
+          <select><option>Everyone</option><option>Followers</option><option>No one</option></select>
         </div>
-        <div class="settings-item">
-          <div class="settings-left"><i class="fa fa-ban"></i><span>Blocked accounts</span></div>
-          <button class="ghost">Manage</button>
-        </div>
-        <div class="settings-item">
-          <div class="settings-left"><i class="fa fa-comments"></i><span>Comments</span></div>
-          <select>
-            <option>Everyone</option>
-            <option>Followers</option>
-            <option>No one</option>
-          </select>
-        </div>
-        <div class="settings-item">
-          <div class="settings-left"><i class="fa fa-eye-slash"></i><span>Hide sensitive content</span></div>
-          <div class="toggle" id="toggle-sensitive" data-on="false" role="switch" aria-checked="false"></div>
-        </div>
-        <div class="settings-item">
-          <div class="settings-left"><i class="fa fa-flag"></i><span>Report a problem</span></div>
-          <button class="ghost">Report</button>
-        </div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-eye-slash"></i><span>Hide sensitive content</span></div><div class="toggle" id="toggle-sensitive" data-on="false" role="switch" aria-checked="false"></div></div>
+        <div class="settings-item"><div class="settings-left"><i class="fa fa-flag"></i><span>Report a problem</span></div><button class="ghost">Report</button></div>
       </div>
 
       <div class="settings-section">
@@ -313,32 +316,16 @@
       </div>
 
       <div class="settings-section">
-        <h3 style="margin:0 0 8px;">Playback & Storage</h3>
-        <div class="settings-item">
-          <div class="settings-left"><i class="fa fa-film"></i><span>Video quality</span></div>
-          <select>
-            <option>Auto</option>
-            <option>HD</option>
-            <option>Data Saver</option>
-          </select>
-        </div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-wifi"></i><span>Autoplay on Wi-Fi only</span></div><div class="toggle" data-on="false" role="switch" aria-checked="false"></div></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-podcast"></i><span>Background audio (podcasts)</span></div><div class="toggle" data-on="true" role="switch" aria-checked="true"></div></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-square"></i><span>Picture-in-picture</span></div><div class="toggle" data-on="false" role="switch" aria-checked="false"></div></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-trash-can"></i><span>Clear cached media</span></div><button class="ghost">Clear</button></div>
-      </div>
-
-      <div class="settings-section">
         <h3 style="margin:0 0 8px;">Legal & Policy</h3>
         <button id="legalToggle" class="disclosure" aria-expanded="false">View Legal & Policy</button>
         <div id="legalPanel" class="disclosure-panel" hidden>
           <h4 style="margin:0 0 8px;">Content Responsibility Disclaimer</h4>
           <p class="muted" style="margin:0 0 10px;">
-            INTAKEE supports freedom of speech, creativity, and open discussion. Users are fully responsible for content they upload or share, including videos, podcasts, clips, comments, and messages. INTAKEE does not endorse, verify, or assume legal responsibility for user-generated content. We may remove content that violates laws, promotes violence or harassment, or contains explicit material.
+            INTAKEE supports freedom of speech, creativity, and open discussion. Users are fully responsible for content they upload or share. INTAKEE does not endorse, verify, or assume legal responsibility for user-generated content. Content that violates laws, promotes violence or harassment, or contains explicit material may be removed.
           </p>
           <h4 style="margin:10px 0 8px;">Privacy Commitment</h4>
           <p class="muted" style="margin:0 0 10px;">
-            We do not sell, rent, or share personal data with advertisers or third parties. Personal information is collected only to run core features (authentication, uploads, performance, recommendations). Usage data may be analyzed internally to improve INTAKEE. We use secure, industry-standard services (e.g., Firebase/Google Cloud). Your content remains your property.
+            We do not sell, rent, or share personal data with advertisers or third parties. Personal information is collected only to run core features. We use secure, industry-standard services. Your content remains your property.
           </p>
           <h4 style="margin:10px 0 8px;">Community Guidelines</h4>
           <ul class="muted" style="margin:0 0 10px; padding-left:18px;">
@@ -371,30 +358,20 @@
 
   <!-- App -->
   <script type="module">
-    /* =========================
-       DESIGN SWITCH
-       ========================= */
-    const DESIGN_MODE = true; // set to false after you connect Firebase auth
-
-    /* =========================
-       Firebase (safe to keep even in design mode)
-       ========================= */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import {
       getFirestore, doc, getDoc, setDoc, updateDoc, collection,
-      serverTimestamp, query, orderBy, limit, onSnapshot, where
+      serverTimestamp, query, orderBy, limit, onSnapshot, where, addDoc
     } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
     import { firebaseConfig } from "./firebase-config.js";
 
-    let app, auth, db, storage;
-    try {
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-      db = getFirestore(app);
-      storage = getStorage(app);
-    } catch (e){ console.warn("Firebase not ready yet (design mode is fine).", e); }
+    /* Init */
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
     /* Elements */
     const searchWrap = document.getElementById("searchWrap");
@@ -405,139 +382,129 @@
     const podcastSearch = document.getElementById("podcastSearch");
     const clipsSearch = document.getElementById("clipsSearch");
 
-    // Profile elements
+    // Upload
+    const uploadType = document.getElementById("uploadType");
+    const postTitle  = document.getElementById("postTitle");
+    const thumbFile  = document.getElementById("thumbFile");
+    const mediaFile  = document.getElementById("mediaFile");
+    const postDesc   = document.getElementById("postDesc");
+    const uploadSubmit = document.getElementById("uploadSubmit");
+    const goLiveBtn    = document.getElementById("goLiveBtn");
+
+    // Profile
     const profileBanner = document.getElementById("profileBanner");
-    const bannerInput = document.getElementById("bannerInput");
-    const avatarInput = document.getElementById("avatarInput");
-    const chipBanner = document.getElementById("chip-banner");
-    const chipAvatar = document.getElementById("chip-avatar");
-    const profilePhoto = document.getElementById("profile-photo");
-    const profileName = document.getElementById("profile-name");
+    const btnAddBanner  = document.getElementById("btnAddBanner");
+    const btnAddAvatar  = document.getElementById("btnAddAvatar");
+    const bannerInput   = document.getElementById("bannerInput");
+    const avatarInput   = document.getElementById("avatarInput");
+    const profilePhoto  = document.getElementById("profile-photo");
+    const profileName   = document.getElementById("profile-name");
     const profileHandle = document.getElementById("profile-handle");
-    const bioView = document.getElementById("bio-view");
-    const bioEditWrap = document.getElementById("bio-edit-wrap");
-    const bioEdit = document.getElementById("bio-edit");
-    const bioSave = document.getElementById("bio-save");
-    const bioCancel = document.getElementById("bio-cancel");
-    const btnEditProfile = document.getElementById("btn-edit-profile");
-    const btnShareProfile = document.getElementById("btn-share-profile");
-    const btnFollow = document.getElementById("btn-follow");
-    const profileGrid = document.getElementById("profile-grid");
-    const profileEmpty = document.getElementById("profile-empty");
+    const bioView       = document.getElementById("bio-view");
+    const bioEditWrap   = document.getElementById("bio-edit-wrap");
+    const bioEdit       = document.getElementById("bio-edit");
+    const bioSave       = document.getElementById("bio-save");
+    const bioCancel     = document.getElementById("bio-cancel");
+    const btnEditProfile= document.getElementById("btn-edit-profile");
+    const btnShareProfile= document.getElementById("btn-share-profile");
+    const btnFollow     = document.getElementById("btn-follow");
+    const profileGrid   = document.getElementById("profile-grid");
+    const profileEmpty  = document.getElementById("profile-empty");
 
-    const legalToggle = document.getElementById("legalToggle");
-    const legalPanel = document.getElementById("legalPanel");
+    /* Auth */
+    logoutBtn.addEventListener("click", () => signOut(auth));
+    onAuthStateChanged(auth, async (user) => {
+      loginBtn.style.display  = "none";
+      logoutBtn.style.display = user ? "inline-block" : "none";
 
-    /* Owner-only visibility */
-    function showOwnerOnly(show){
-      document.querySelectorAll('.owner-only').forEach(el=>{
-        el.style.display = show ? '' : 'none';
-      });
-    }
-
-    /* Auth (minimal) */
-    if (logoutBtn) logoutBtn.addEventListener("click", () => auth && signOut(auth));
-
-    if (auth) {
-      onAuthStateChanged(auth, async (user) => {
-        // Hide login in this version
-        if (loginBtn) loginBtn.style.display  = "none";
-        if (logoutBtn) logoutBtn.style.display = (user && !DESIGN_MODE) ? "inline-block" : "none";
-
-        if (DESIGN_MODE) { showOwnerOnly(true); return; }
-
-        if (user) {
-          showOwnerOnly(true);
-          const uref = doc(db, "users", user.uid);
-          const snap = await getDoc(uref);
-          if (!snap.exists()) {
-            await setDoc(uref, { uid:user.uid, displayName:user.displayName??"", email:user.email??"", photoURL:user.photoURL??"", createdAt: serverTimestamp() });
-          }
-          const fresh = (await getDoc(uref)).data() || {};
-          profileName.textContent = fresh.displayName || "Your Name";
-          profileHandle.textContent = fresh.email ? "@"+fresh.email.split("@")[0] : "@username";
-          if (fresh.photoURL) profilePhoto.src = fresh.photoURL;
-          if (fresh.bio) bioView.textContent = fresh.bio;
-          if (fresh.bannerURL) profileBanner.style.backgroundImage = `url('${fresh.bannerURL}')`;
-          loadMyPosts(user.uid);
-        } else {
-          showOwnerOnly(false);
-          btnFollow.style.display = "";
-          profileGrid.innerHTML = "";
-          profileEmpty.style.display = "";
+      if (user) {
+        const uref = doc(db, "users", user.uid);
+        const snap = await getDoc(uref);
+        if (!snap.exists()) {
+          await setDoc(uref, { uid:user.uid, displayName:user.displayName??"", email:user.email??"", photoURL:user.photoURL??"", createdAt: serverTimestamp() });
         }
-      });
-    } else {
-      // No Firebase yet → design mode only
-      showOwnerOnly(true);
-    }
+        const fresh = (await getDoc(uref)).data() || {};
+        profileName.textContent = fresh.displayName || "Your Name";
+        profileHandle.textContent = fresh.email ? "@"+fresh.email.split("@")[0] : "@username";
+        if (fresh.photoURL) profilePhoto.src = fresh.photoURL;
+        if (fresh.bio) bioView.textContent = fresh.bio;
+        if (fresh.bannerURL) profileBanner.style.backgroundImage = `url('${fresh.bannerURL}')`;
+
+        // Show owner-only controls
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = "");
+        btnFollow.style.display = "none";
+
+        loadMyPosts(user.uid);
+      } else {
+        // Hide owner-only controls when not logged in
+        document.querySelectorAll('.owner-only').forEach(el => el.style.display = "none");
+        btnFollow.style.display = "";
+        profileGrid.innerHTML = "";
+        profileEmpty.style.display = "";
+      }
+    });
 
     /* Helpers */
-    function escapeHtml(s=""){ return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+    function escapeHtml(s=""){ return s.replace(/[&<>\"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
     function fmtTime(ts){ try{const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null); if(!t)return""; return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});}catch{return"";} }
-    function match(p, term){ if(!term) return true; const t=term.toLowerCase(); return ((p.text||"").toLowerCase().includes(t)); }
+    function match(p, term){ if(!term) return true; const t=term.toLowerCase(); return ((p.text||"").toLowerCase().includes(t) || (p.title||"").toLowerCase().includes(t)); }
 
-    /* Main feeds (safe even if Firebase missing) */
+    /* Feeds */
     const homeFeed   = document.getElementById("home-feed");
     const videosFeed = document.getElementById("videos-feed");
     const podcastFeed= document.getElementById("podcast-feed");
     const clipsFeed  = document.getElementById("clips-feed");
 
-    function renderCard(d){
+    function renderCardFromDoc(d){
       const p=d.data();
       const el=document.createElement("article"); el.className="card";
-      const label=(p.kind==="video"||p.kind==="podcast_video")?"VIDEO"
-        :(p.kind==="podcast_audio"||p.kind==="audio")?"PODCAST"
-        :(p.kind==="clip")?"CLIP"
-        :(p.kind==="image")?"IMAGE":"";
+      const kind=p.kind || p.type || "";
+      const label=(kind==="video"||kind==="podcast_video")?"VIDEO"
+        :(kind==="podcast_audio"||kind==="audio")?"PODCAST"
+        :(kind==="clip")?"CLIP"
+        :(kind==="image")?"IMAGE":"";
       const header=`<div style="display:flex;justify-content:space-between;align-items:center;">
         <div><strong>${escapeHtml(p.user||"Anon")}</strong> <span class="muted">· ${fmtTime(p.createdAt)}</span></div>
         ${label?`<span class="muted" style="border:1px solid #2a2a2a;padding:2px 8px;border-radius:999px;font-size:.75rem;">${label}</span>`:""}
       </div>`;
       let media="";
-      if(p.mediaUrl){
-        if(p.kind==="video"||p.kind==="podcast_video") media=`<video src="${p.mediaUrl}" controls playsinline style="width:100%;border-radius:10px;margin-top:8px;"></video>`;
-        else if(p.kind==="podcast_audio"||p.kind==="audio") media=`<audio src="${p.mediaUrl}" controls style="width:100%;margin-top:8px;"></audio>`;
-        else if(p.kind==="image") media=`<img src="${p.mediaUrl}" alt="" style="width:100%;border-radius:10px;margin-top:8px;">`;
+      const url = p.mediaUrl || p.fileUrl || "";
+      if(url){
+        if(kind==="video"||kind==="podcast_video") media=`<video src="${url}" controls playsinline style="width:100%;border-radius:10px;margin-top:8px;"></video>`;
+        else if(kind==="podcast_audio"||kind==="audio") media=`<audio src="${url}" controls style="width:100%;margin-top:8px;"></audio>`;
+        else if(kind==="image") media=`<img src="${url}" alt="" style="width:100%;border-radius:10px;margin-top:8px;">`;
+        else media = `<a href="${url}" target="_blank" rel="noopener">Open file</a>`;
       }
-      el.innerHTML = header + (p.text?`<div style="margin-top:6px;">${escapeHtml(p.text)}</div>`:"") + media;
+      const text = p.text || p.title || "";
+      el.innerHTML = header + (text?`<div style="margin-top:6px;">${escapeHtml(text)}</div>`:"") + media;
       return el;
     }
 
-    if (db) {
-      const qMain = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(40));
-      onSnapshot(qMain, (snap)=>{ const docs = snap.docs; draw(docs); });
-    } else {
-      // No Firebase yet — show placeholder
-      homeFeed.innerHTML = '<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet. Connect Firebase to populate.</div>';
-    }
+    let docs = [];
+    const PAGE_SIZE = 40;
+    const qMain = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
+    onSnapshot(qMain, (snap)=>{ docs = snap.docs; draw(); });
 
-    function draw(docs){
-      let homeTerm="", videosTerm="", podcastTerm="", clipsTerm="";
-      globalSearch?.addEventListener('input', e=>{ homeTerm    = e.target.value.trim(); paint(); });
-      videosSearch?.addEventListener('input', e=>{ videosTerm  = e.target.value.trim(); paint(); });
-      podcastSearch?.addEventListener('input',e=>{ podcastTerm = e.target.value.trim(); paint(); });
-      clipsSearch?.addEventListener('input', e=>{ clipsTerm    = e.target.value.trim(); paint(); });
+    let homeTerm="", videosTerm="", podcastTerm="", clipsTerm="";
+    globalSearch?.addEventListener('input', e=>{ homeTerm    = e.target.value.trim(); draw(); });
+    videosSearch?.addEventListener('input', e=>{ videosTerm  = e.target.value.trim(); draw(); });
+    podcastSearch?.addEventListener('input',e=>{ podcastTerm = e.target.value.trim(); draw(); });
+    clipsSearch?.addEventListener('input', e=>{ clipsTerm    = e.target.value.trim(); draw(); });
 
-      function paint(){
-        const mediaKinds = new Set(["video","clip","podcast_audio","podcast_video","audio","image"]);
-        const trending = docs.filter(d => mediaKinds.has(d.data().kind) && match(d.data(), homeTerm));
-        homeFeed.innerHTML = trending.length ? "" : '<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet.</div>';
-        trending.forEach(d=>homeFeed.appendChild(renderCard(d)));
+    function draw(){
+      const mediaKinds = new Set(["video","clip","podcast_audio","podcast_video","audio","image"]);
+      const trending = docs.filter(d => mediaKinds.has((d.data().kind||d.data().type)) && match(d.data(), homeTerm));
+      homeFeed.innerHTML = trending.length ? "" : '<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet. Check back soon.</div>';
+      trending.forEach(d=>homeFeed.appendChild(renderCardFromDoc(d)));
 
-        const vids = docs.filter(d => d.data().kind==="video" && match(d.data(), videosTerm));
-        videosFeed.innerHTML = vids.length ? "" : '<div class="muted card">No videos yet.</div>';
-        vids.forEach(d=>videosFeed.appendChild(renderCard(d)));
+      const vids = docs.filter(d => (d.data().kind||d.data().type)==="video" && match(d.data(), videosTerm));
+      videosFeed.innerHTML = vids.length?"":'<div class="muted card">No videos yet.</div>'; vids.forEach(d=>videosFeed.appendChild(renderCardFromDoc(d)));
 
-        const pods = docs.filter(d => ["podcast_audio","podcast_video","audio"].includes(d.data().kind) && match(d.data(), podcastTerm));
-        podcastFeed.innerHTML = pods.length ? "" : '<div class="muted card">No podcasts yet.</div>';
-        pods.forEach(d=>podcastFeed.appendChild(renderCard(d)));
+      const pods = docs.filter(d => ["podcast_audio","podcast_video","audio"].includes(d.data().kind||d.data().type) && match(d.data(), podcastTerm));
+      podcastFeed.innerHTML = pods.length?"":'<div class="muted card">No podcasts yet.</div>'; pods.forEach(d=>podcastFeed.appendChild(renderCardFromDoc(d)));
 
-        const cls = docs.filter(d => d.data().kind==="clip" && match(d.data(), clipsTerm));
-        clipsFeed.innerHTML = cls.length ? "" : '<div class="muted card">No clips yet.</div>';
-        cls.forEach(d=>clipsFeed.appendChild(renderCard(d)));
-      }
-      paint();
+      const cls = docs.filter(d => (d.data().kind||d.data().type)==="clip" && match(d.data(), clipsTerm));
+      clipsFeed.innerHTML = cls.length?"":'<div class="muted card">No clips yet.</div>'; cls.forEach(d=>clipsFeed.appendChild(renderCardFromDoc(d)));
     }
 
     /* Tabs */
@@ -554,6 +521,7 @@
     function setTab(key){
       Object.entries(sections).forEach(([k,el])=> el.style.display = (k===key)?'':'none');
       links.forEach(a=>a.classList.toggle('active', a.dataset.tab===key));
+      // Header search only on Home
       searchWrap.style.display = (key==="home") ? "flex" : "none";
       window.scrollTo({top:0,behavior:'smooth'});
     }
@@ -562,10 +530,8 @@
     window.addEventListener('hashchange', applyHash);
     applyHash();
 
-    /* ---------- PROFILE FEATURES ---------- */
-
-    // Edit bio (design + real)
-    document.getElementById('btn-edit-profile')?.addEventListener('click', ()=>{
+    /* -------- Profile: bio edit -------- */
+    document.getElementById("btn-edit-profile")?.addEventListener('click', ()=>{
       bioEdit.value = bioView.textContent || "";
       bioView.style.display = "none";
       bioEditWrap.style.display = "";
@@ -575,103 +541,124 @@
       bioView.style.display = "";
     });
     bioSave?.addEventListener('click', async ()=>{
+      const user = auth.currentUser; if(!user) return alert("Sign in to edit profile.");
       const bio = (bioEdit.value||"").trim();
+      await updateDoc(doc(db,"users",user.uid), { bio });
       bioView.textContent = bio || "Add a short bio to introduce yourself.";
       bioEditWrap.style.display = "none";
       bioView.style.display = "";
-      if (!DESIGN_MODE && auth?.currentUser) {
-        await updateDoc(doc(db,"users",auth.currentUser.uid), { bio });
-      }
     });
 
-    // Share profile (copy)
+    /* -------- Profile: share/follow placeholders -------- */
     btnShareProfile?.addEventListener('click', async ()=>{
       const url = location.origin + location.pathname + "#profile";
       try{ await navigator.clipboard.writeText(url); alert("Profile link copied."); }catch{ prompt("Copy profile link:", url); }
     });
+    btnFollow?.addEventListener('click', ()=> alert("Follow feature coming later."));
 
-    // Follow placeholder
-    btnFollow?.addEventListener('click', ()=> alert("Following will be available later."));
+    /* -------- Profile: banner/avatar upload via + buttons -------- */
+    btnAddBanner?.addEventListener('click', ()=> bannerInput.click());
+    btnAddAvatar?.addEventListener('click', ()=> avatarInput.click());
 
-    // Image chips → choose files
-    chipBanner?.addEventListener('click', ()=> bannerInput.click());
-    chipAvatar?.addEventListener('click', ()=> avatarInput.click());
-
-    // Local preview in design mode, Firebase upload when not
     bannerInput?.addEventListener('change', async (e)=>{
-      const file = e.target.files?.[0]; if(!file) return;
-      if (DESIGN_MODE) {
-        const url = URL.createObjectURL(file);
-        profileBanner.style.backgroundImage = `url('${url}')`;
-        return;
-      }
-      if (!auth?.currentUser) return alert("Sign in to change banner.");
-      const path = `users/${auth.currentUser.uid}/banner/${Date.now()}-${file.name}`;
-      const r = ref(storage, path);
-      await uploadBytes(r, file);
-      const url = await getDownloadURL(r);
-      await updateDoc(doc(db,"users",auth.currentUser.uid), { bannerURL:url });
+      const file=e.target.files?.[0]; if(!file) return;
+      const user=auth.currentUser; if(!user) return alert("Sign in to change banner.");
+      const path=`users/${user.uid}/banner/${Date.now()}-${file.name}`;
+      const r=ref(storage, path); await uploadBytes(r,file); const url=await getDownloadURL(r);
+      await updateDoc(doc(db,"users",user.uid), { bannerURL:url });
       profileBanner.style.backgroundImage = `url('${url}')`;
     });
 
     avatarInput?.addEventListener('change', async (e)=>{
-      const file = e.target.files?.[0]; if(!file) return;
-      if (DESIGN_MODE) {
-        const url = URL.createObjectURL(file);
-        profilePhoto.src = url;
-        return;
-      }
-      if (!auth?.currentUser) return alert("Sign in to change photo.");
-      const path = `users/${auth.currentUser.uid}/avatar/${Date.now()}-${file.name}`;
-      const r = ref(storage, path);
-      await uploadBytes(r, file);
-      const url = await getDownloadURL(r);
-      await updateDoc(doc(db,"users",auth.currentUser.uid), { photoURL:url });
+      const file=e.target.files?.[0]; if(!file) return;
+      const user=auth.currentUser; if(!user) return alert("Sign in to change photo.");
+      const path=`users/${user.uid}/avatar/${Date.now()}-${file.name}`;
+      const r=ref(storage, path); await uploadBytes(r,file); const url=await getDownloadURL(r);
+      await updateDoc(doc(db,"users",user.uid), { photoURL:url });
       profilePhoto.src = url;
     });
 
-    // Profile grid (real data only when Firebase is on)
-    async function loadMyPosts(uid){
-      if (!db) return;
-      const qMine = query(
-        collection(db,"posts"),
-        where("ownerId","==",uid),
-        orderBy("createdAt","desc"),
-        limit(60)
-      );
+    /* -------- Profile: load user posts into grid -------- */
+    function tileForPost(p){
+      const tile=document.createElement('div'); tile.className='tile';
+      let media="";
+      const url=p.mediaUrl || p.fileUrl || "";
+      const kind=p.kind||p.type||"";
+      if(url){
+        if(kind==="image"){ media=`<img class="thumb" src="${url}" alt="">`; }
+        else if(kind==="video"||kind==="podcast_video"){ media=`<video class="thumb" src="${url}" muted playsinline></video>`; }
+        else if(kind==="clip"){ media=`<video class="thumb" src="${url}" muted playsinline loop></video>`; }
+        else if(kind==="audio"||kind==="podcast_audio"){ media=`<div class="thumb" style="display:flex;align-items:center;justify-content:center;">AUDIO</div>`; }
+        else { media=`<div class="thumb"></div>`; }
+      } else { media=`<div class="thumb"></div>`; }
+      const title=escapeHtml((p.text||p.title||"Untitled").slice(0,80));
+      tile.innerHTML=`${media}<div class="meta">${title}</div>`;
+      return tile;
+    }
+
+    function loadMyPosts(uid){
+      const qMine = query(collection(db,"posts"), where("ownerId","==",uid), orderBy("createdAt","desc"), limit(60));
       onSnapshot(qMine, (snap)=>{
-        const docs = snap.docs;
-        profileGrid.innerHTML = "";
-        if(!docs.length){
-          profileEmpty.style.display = "";
-          return;
-        }
-        profileEmpty.style.display = "none";
-        docs.forEach(d=>{
-          const p = d.data();
-          const tile = document.createElement("div");
-          tile.className = "tile";
-          let media = "";
-          if(p.mediaUrl){
-            if(p.kind==="image"){
-              media = `<img class="thumb" src="${p.mediaUrl}" alt="">`;
-            }else if(p.kind==="video" || p.kind==="podcast_video" || p.kind==="clip"){
-              media = `<video class="thumb" src="${p.mediaUrl}" muted playsinline></video>`;
-            }else if(p.kind==="audio" || p.kind==="podcast_audio"){
-              media = `<div class="thumb" style="display:flex;align-items:center;justify-content:center;">AUDIO</div>`;
-            }
-          } else {
-            media = `<div class="thumb"></div>`;
-          }
-          const title = (p.text||"").trim();
-          tile.innerHTML = `${media}<div class="meta">${escapeHtml(title||"Untitled")}</div>`;
-          profileGrid.appendChild(tile);
-        });
-        document.getElementById("stat-posts").textContent = String(docs.length);
+        const list=snap.docs.map(d=>d.data());
+        profileGrid.innerHTML="";
+        if(!list.length){ profileEmpty.style.display=""; document.getElementById("stat-posts").textContent="0"; return; }
+        profileEmpty.style.display="none";
+        list.forEach(p=> profileGrid.appendChild(tileForPost(p)));
+        document.getElementById("stat-posts").textContent=String(list.length);
       });
     }
 
-    /* SETTINGS: toggles + legal panel */
+    /* -------- Upload: save to Storage + Firestore -------- */
+    uploadSubmit?.addEventListener('click', async ()=>{
+      const user=auth.currentUser; if(!user){ alert("Sign in to upload."); return; }
+      const type = uploadType.value;
+      const title = (postTitle.value||"").trim();
+      const desc  = (postDesc.value||"").trim();
+      const media = mediaFile.files?.[0];
+      const thumb = thumbFile.files?.[0];
+      if(!media){ alert("Choose a file to upload."); return; }
+      if(!title){ alert("Add a title."); return; }
+
+      uploadSubmit.disabled=true;
+
+      try{
+        const ts = Date.now();
+        // media
+        const mediaPath = `uploads/${user.uid}/${ts}_${media.name}`;
+        const mRef = ref(storage, mediaPath);
+        await uploadBytes(mRef, media);
+        const mediaUrl = await getDownloadURL(mRef);
+
+        // thumbnail (optional)
+        let thumbUrl = "";
+        if(thumb){
+          const tPath = `thumbnails/${user.uid}/${ts}_${thumb.name}`;
+          const tRef = ref(storage, tPath);
+          await uploadBytes(tRef, thumb);
+          thumbUrl = await getDownloadURL(tRef);
+        }
+
+        await addDoc(collection(db,"posts"), {
+          ownerId: user.uid,
+          user: user.displayName || (user.email? user.email.split("@")[0] : "User"),
+          kind: type, type, title, text:title, description: desc,
+          mediaUrl, thumbUrl,
+          likeCount: 0, commentCount: 0,
+          createdAt: serverTimestamp()
+        });
+
+        alert("Upload complete.");
+        postTitle.value=""; postDesc.value=""; mediaFile.value=""; thumbFile.value="";
+      }catch(err){
+        console.error(err); alert(err?.message || "Upload failed.");
+      }finally{
+        uploadSubmit.disabled=false;
+      }
+    });
+
+    goLiveBtn?.addEventListener('click', ()=> alert("Go Live will be added later."));
+
+    /* Settings toggles (visual only) */
     document.querySelectorAll('.toggle').forEach(t=>{
       t.addEventListener('click', ()=>{
         const on = t.getAttribute('data-on') === 'true';
@@ -679,15 +666,13 @@
         t.setAttribute('aria-checked', on ? 'false' : 'true');
       });
     });
+
+    const legalToggle = document.getElementById("legalToggle");
+    const legalPanel  = document.getElementById("legalPanel");
     legalToggle?.addEventListener('click', ()=>{
       const expanded = legalToggle.getAttribute('aria-expanded') === 'true';
       legalToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
       legalPanel.hidden = expanded;
-    });
-
-    /* Tabs init */
-    document.addEventListener('DOMContentLoaded', ()=> {
-      showOwnerOnly(DESIGN_MODE);
     });
   </script>
 </body>
