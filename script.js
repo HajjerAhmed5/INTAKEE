@@ -3,12 +3,10 @@
 import { auth, db, storage } from "./js/firebase-init.js";
 
 /* ---------------- Firebase CDN helpers (v10.12.4) ---------------- */
-// Auth
+// Auth (only what we use here)
 import {
   onAuthStateChanged,
   signOut,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 // Storage
@@ -264,8 +262,23 @@ function refreshUploadForm() {
 }
 
 async function handleUpload() {
-  // ✅ real guard: use Firebase auth state
-  if (!auth.currentUser) {
+  // ✅ Wait until Firebase confirms user is signed in
+  let user = auth.currentUser;
+  if (!user) {
+    await new Promise((resolve) => {
+      const unsub = onAuthStateChanged(auth, (u) => {
+        if (u) {
+          user = u;
+          unsub();
+          resolve();
+        }
+      });
+      // fallback so we don't hang forever
+      setTimeout(() => resolve(), 1500);
+    });
+  }
+
+  if (!user) {
     showAuthModal();
     return;
   }
@@ -280,7 +293,7 @@ async function handleUpload() {
   if (!title) return alert("Please add a title.");
 
   try {
-    const uid = auth.currentUser.uid;
+    const uid = user.uid;
     const now = Date.now();
 
     // Upload main file
