@@ -103,7 +103,7 @@
   .grid .tile .thumb{ width:100%; aspect-ratio:16/9; background:#111; object-fit:cover; display:block; }
   .grid .tile .meta{ padding:8px 10px; font-size:.9rem; }
 
-  /* -------- SETTINGS bits used here -------- */
+  /* -------- SETTINGS bits -------- */
   .settings-section{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; }
   .settings-item{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid #151515; }
   .settings-item:first-child{ border-top:none; }
@@ -127,17 +127,18 @@
     <div class="spacer"></div>
     <div id="searchWrap" class="search-bar">
       <i class="fa fa-search" style="opacity:.6;"></i>
-      <input id="globalSearch" type="text" placeholder="Search…" />
+      <input id="global-search" type="text" placeholder="Search…" />
     </div>
     <div class="auth">
-      <button id="loginBtn" style="display:none">Login / Sign Up</button>
+      <!-- this id is used by script.js to toggle visibility -->
+      <button id="home-login-btn" onclick="document.getElementById('auth-modal').showModal()">Login / Sign Up</button>
       <button id="logoutBtn" style="display:none;">Logout</button>
     </div>
   </header>
 
   <main>
     <!-- HOME -->
-    <section id="tab-home">
+    <section id="home" class="tab">
       <div class="row" style="justify-content:space-between;align-items:center;margin-top:8px;">
         <h2 style="margin:0;">Trending</h2>
         <div class="pills">
@@ -149,11 +150,11 @@
           <button class="pill" data-filter="new">Newest</button>
         </div>
       </div>
-      <div id="home-feed"></div>
+      <div id="trending-feed"></div>
     </section>
 
     <!-- VIDEOS -->
-    <section id="tab-videos" style="display:none;">
+    <section id="videos" class="tab" style="display:none;">
       <div class="section-head">
         <h3 style="margin:0;">Videos</h3>
         <div class="section-search" id="videosSearchWrap">
@@ -161,11 +162,11 @@
           <input id="videosSearch" type="text" placeholder="Search videos…"/>
         </div>
       </div>
-      <div id="videos-feed"></div>
+      <div id="video-feed"></div>
     </section>
 
     <!-- PODCASTS -->
-    <section id="tab-podcast" style="display:none;">
+    <section id="podcast" class="tab" style="display:none;">
       <div class="section-head">
         <h3 style="margin:0;">Podcasts</h3>
         <div class="section-search" id="podcastSearchWrap">
@@ -176,48 +177,51 @@
       <div id="podcast-feed"></div>
     </section>
 
-    <!-- UPLOAD (fixed) -->
-    <section id="tab-upload" class="card" style="display:none;">
+    <!-- UPLOAD -->
+    <section id="upload" class="tab card" style="display:none;">
       <h3 style="margin:0 0 12px;">Upload</h3>
+
+      <p id="upload-warning" class="muted" style="margin:6px 0 12px;">You must be logged in to upload content.</p>
+
       <div class="row" style="gap:12px;align-items:flex-start;">
         <div style="flex:1;min-width:220px;">
-          <label for="uploadType">Choose type</label>
-          <select id="uploadType" style="width:100%;margin-top:6px;">
+          <label for="upload-type">Choose type</label>
+          <select id="upload-type" style="width:100%;margin-top:6px;">
             <option value="video">Video</option>
             <option value="clip">Clip</option>
-            <option value="podcast_audio">Podcast (Audio)</option>
-            <option value="podcast_video">Podcast (Video)</option>
+            <option value="podcast-audio">Podcast (Audio)</option>
+            <option value="podcast-video">Podcast (Video)</option>
           </select>
         </div>
         <div style="flex:2;min-width:260px;">
-          <label for="postTitle">Title</label>
-          <input id="postTitle" type="text" placeholder="Add a title" style="width:100%;margin-top:6px;">
+          <label for="upload-title">Title</label>
+          <input id="upload-title" type="text" placeholder="Add a title" style="width:100%;margin-top:6px;">
         </div>
       </div>
 
       <div class="row" style="gap:12px;align-items:flex-start;margin-top:12px;">
         <div style="flex:1;min-width:220px;">
-          <label for="thumbFile">Thumbnail (cover image)</label>
-          <input id="thumbFile" type="file" accept="image/*" style="width:100%;margin-top:6px;">
+          <label for="upload-thumbnail" id="upload-file-label">Thumbnail (cover image)</label>
+          <input id="upload-thumbnail" type="file" accept="image/*" style="width:100%;margin-top:6px;">
         </div>
         <div style="flex:2;min-width:260px;">
-          <label for="mediaFile">File</label>
-          <input id="mediaFile" type="file" accept="video/*,audio/*" style="width:100%;margin-top:6px;">
+          <label for="upload-file">File</label>
+          <input id="upload-file" type="file" accept="video/*,audio/*" style="width:100%;margin-top:6px;">
         </div>
       </div>
 
-      <label for="postDesc" style="margin-top:12px; display:block;">Description</label>
-      <textarea id="postDesc" placeholder="Write a short description…"></textarea>
+      <label for="upload-description" style="margin-top:12px; display:block;">Description</label>
+      <textarea id="upload-description" placeholder="Write a short description…"></textarea>
 
       <div class="row" style="margin-top:14px;gap:10px;">
-        <button id="uploadSubmit" class="primary">Upload</button>
-        <button id="goLiveBtn" class="ghost">Go Live</button>
+        <button id="upload-btn" class="primary" data-require-auth onclick="handleUpload()">Upload</button>
+        <button class="ghost" data-require-auth onclick="goLive()">Go Live</button>
       </div>
-      <p class="muted" style="margin-top:8px;">Processing starts after upload. You’ll be notified when it’s ready.</p>
+      <p id="upload-help" class="muted" style="margin-top:8px;">Processing starts after upload. You’ll be notified when it’s ready.</p>
     </section>
 
     <!-- CLIPS -->
-    <section id="tab-clips" style="display:none;">
+    <section id="clips" class="tab" style="display:none;">
       <div class="section-head">
         <h3 style="margin:0;">Clips</h3>
         <div class="section-search" id="clipsSearchWrap">
@@ -229,30 +233,23 @@
     </section>
 
     <!-- PROFILE -->
-    <section id="tab-profile" style="display:none;">
+    <section id="profile" class="tab" style="display:none;">
       <!-- Banner with + -->
       <div id="profileBanner" class="profile-banner">
-        <button id="btnAddBanner" class="add-btn owner-only" title="Change banner" style="display:none;">+</button>
+        <button id="btn-change-banner" class="add-btn owner-only" title="Change banner" style="display:none;">+</button>
       </div>
 
       <div class="card">
         <div class="profile-header">
           <div class="avatar-wrap">
             <img id="profile-photo" src="" alt="" class="profile-avatar">
-            <button id="btnAddAvatar" class="add-btn owner-only" title="Change photo" style="display:none;">+</button>
+            <button id="btn-change-avatar" class="add-btn owner-only" title="Change photo" style="display:none;">+</button>
           </div>
 
           <div>
             <h3 id="profile-name" style="margin:0;">Your Name</h3>
             <div id="profile-handle" class="muted">@username</div>
-            <div id="bio-view" class="muted" style="margin-top:8px;">Add a short bio to introduce yourself.</div>
-            <div id="bio-edit-wrap" style="display:none; margin-top:8px;">
-              <textarea id="bio-edit" placeholder="Write your bio..."></textarea>
-              <div class="row" style="margin-top:8px;">
-                <button id="bio-save" class="primary">Save</button>
-                <button id="bio-cancel" class="ghost">Cancel</button>
-              </div>
-            </div>
+            <div id="profile-bio" class="muted" style="margin-top:8px;" disabled>Add a short bio to introduce yourself.</div>
             <div class="stat-row">
               <div class="muted"><strong id="stat-posts">0</strong> Posts</div>
               <div class="muted"><strong id="stat-followers">0</strong> Followers</div>
@@ -262,23 +259,11 @@
           </div>
 
           <div class="profile-actions">
-            <button id="btn-follow" class="primary">Follow</button>
-            <button id="btn-share-profile" class="ghost">Share Profile</button>
-            <button id="btn-edit-profile" class="ghost owner-only" style="display:none;">Edit Profile</button>
+            <button class="primary">Follow</button>
+            <button class="ghost">Share Profile</button>
+            <button class="ghost owner-only" style="display:none;">Edit Profile</button>
           </div>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="profile-tabs">
-          <button class="pill active" data-profiletab="all">All</button>
-          <button class="pill" data-profiletab="videos">Videos</button>
-          <button class="pill" data-profiletab="podcasts">Podcasts</button>
-          <button class="pill" data-profiletab="clips">Clips</button>
-          <button class="pill" data-profiletab="playlists">Playlists</button>
-        </div>
-        <div id="profile-grid" class="grid"></div>
-        <div id="profile-empty" class="muted" style="margin-top:8px; display:none;">No posts yet.</div>
       </div>
 
       <!-- Hidden file inputs -->
@@ -286,8 +271,8 @@
       <input id="avatarInput" type="file" accept="image/*" hidden>
     </section>
 
-    <!-- SETTINGS (kept as before; already approved) -->
-    <section id="tab-settings" style="display:none;">
+    <!-- SETTINGS -->
+    <section id="settings" class="tab" style="display:none;">
       <div class="settings-section">
         <h3 style="margin:0 0 8px;">Account</h3>
         <div class="settings-item"><div class="settings-left"><i class="fa fa-user"></i><span>Name, Username, Email</span></div><button class="ghost">Edit</button></div>
@@ -305,14 +290,6 @@
         </div>
         <div class="settings-item"><div class="settings-left"><i class="fa fa-eye-slash"></i><span>Hide sensitive content</span></div><div class="toggle" id="toggle-sensitive" data-on="false" role="switch" aria-checked="false"></div></div>
         <div class="settings-item"><div class="settings-left"><i class="fa fa-flag"></i><span>Report a problem</span></div><button class="ghost">Report</button></div>
-      </div>
-
-      <div class="settings-section">
-        <h3 style="margin:0 0 8px;">Notifications</h3>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-user-plus"></i><span>New followers</span></div><div class="toggle" data-on="true" role="switch" aria-checked="true"></div></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-thumbs-up"></i><span>Likes & dislikes</span></div><div class="toggle" data-on="true" role="switch" aria-checked="true"></div></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-comment-dots"></i><span>Comments & replies</span></div><div class="toggle" data-on="true" role="switch" aria-checked="true"></div></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-cloud-arrow-up"></i><span>Upload complete</span></div><div class="toggle" data-on="true" role="switch" aria-checked="true"></div></div>
       </div>
 
       <div class="settings-section">
@@ -347,371 +324,52 @@
 
   <!-- Tabs -->
   <nav class="bottom-nav">
-    <a href="#home"    data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
-    <a href="#videos"  data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
-    <a href="#podcast" data-tab="podcast"><i class="fa fa-podcast"></i><span>Podcast</span></a>
-    <a href="#upload"  data-tab="upload"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
-    <a href="#clips"   data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
-    <a href="#profile" data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
-    <a href="#settings"data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
+    <a href="#home"    data-tab="home" class="tab-btn active"><i class="fa fa-home"></i><span>Home</span></a>
+    <a href="#videos"  data-tab="videos" class="tab-btn"><i class="fa fa-video"></i><span>Videos</span></a>
+    <a href="#podcast" data-tab="podcast" class="tab-btn"><i class="fa fa-podcast"></i><span>Podcast</span></a>
+    <a href="#upload"  data-tab="upload" class="tab-btn"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
+    <a href="#clips"   data-tab="clips" class="tab-btn"><i class="fa fa-bolt"></i><span>Clips</span></a>
+    <a href="#profile" data-tab="profile" class="tab-btn"><i class="fa fa-user"></i><span>Profile</span></a>
+    <a href="#settings"data-tab="settings" class="tab-btn"><i class="fa fa-gear"></i><span>Settings</span></a>
   </nav>
 
-  <!-- App -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, setDoc, updateDoc, collection,
-      serverTimestamp, query, orderBy, limit, onSnapshot, where, addDoc
-    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
-    import { firebaseConfig } from "./firebase-config.js";
+  <!-- 🔹 AUTH CONTROLS (for auth.js UI toggles) -->
+  <div data-anon-only>
+    <button onclick="document.getElementById('auth-modal').showModal()">Sign in / Create Account</button>
+  </div>
 
-    /* Init */
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+  <div data-authed-only style="display:none;">
+    Signed in as <strong data-user-name></strong>
+    <button id="logout-btn">Log out</button>
+  </div>
 
-    /* Elements */
-    const searchWrap = document.getElementById("searchWrap");
-    const globalSearch = document.getElementById("globalSearch");
-    const loginBtn  = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const videosSearch = document.getElementById("videosSearch");
-    const podcastSearch = document.getElementById("podcastSearch");
-    const clipsSearch = document.getElementById("clipsSearch");
+  <!-- 🔹 AUTH MODAL -->
+  <dialog id="auth-modal">
+    <form method="dialog" style="text-align:right">
+      <button>✕</button>
+    </form>
 
-    // Upload
-    const uploadType = document.getElementById("uploadType");
-    const postTitle  = document.getElementById("postTitle");
-    const thumbFile  = document.getElementById("thumbFile");
-    const mediaFile  = document.getElementById("mediaFile");
-    const postDesc   = document.getElementById("postDesc");
-    const uploadSubmit = document.getElementById("uploadSubmit");
-    const goLiveBtn    = document.getElementById("goLiveBtn");
+    <h3>Create account</h3>
+    <form id="signup-form">
+      <input name="displayName" type="text" placeholder="Display name (optional)" />
+      <input name="email" type="email" placeholder="Email" required />
+      <input name="password" type="password" placeholder="Password (min 6)" required />
+      <button type="submit">Sign up</button>
+    </form>
 
-    // Profile
-    const profileBanner = document.getElementById("profileBanner");
-    const btnAddBanner  = document.getElementById("btnAddBanner");
-    const btnAddAvatar  = document.getElementById("btnAddAvatar");
-    const bannerInput   = document.getElementById("bannerInput");
-    const avatarInput   = document.getElementById("avatarInput");
-    const profilePhoto  = document.getElementById("profile-photo");
-    const profileName   = document.getElementById("profile-name");
-    const profileHandle = document.getElementById("profile-handle");
-    const bioView       = document.getElementById("bio-view");
-    const bioEditWrap   = document.getElementById("bio-edit-wrap");
-    const bioEdit       = document.getElementById("bio-edit");
-    const bioSave       = document.getElementById("bio-save");
-    const bioCancel     = document.getElementById("bio-cancel");
-    const btnEditProfile= document.getElementById("btn-edit-profile");
-    const btnShareProfile= document.getElementById("btn-share-profile");
-    const btnFollow     = document.getElementById("btn-follow");
-    const profileGrid   = document.getElementById("profile-grid");
-    const profileEmpty  = document.getElementById("profile-empty");
+    <hr />
 
-    /* Auth */
-    logoutBtn.addEventListener("click", () => signOut(auth));
-    onAuthStateChanged(auth, async (user) => {
-      loginBtn.style.display  = "none";
-      logoutBtn.style.display = user ? "inline-block" : "none";
+    <h3>Sign in</h3>
+    <form id="login-form">
+      <input name="email" type="email" placeholder="Email" required />
+      <input name="password" type="password" placeholder="Password" required />
+      <button type="submit">Sign in</button>
+    </form>
+  </dialog>
 
-      if (user) {
-        const uref = doc(db, "users", user.uid);
-        const snap = await getDoc(uref);
-        if (!snap.exists()) {
-          await setDoc(uref, { uid:user.uid, displayName:user.displayName??"", email:user.email??"", photoURL:user.photoURL??"", createdAt: serverTimestamp() });
-        }
-        const fresh = (await getDoc(uref)).data() || {};
-        profileName.textContent = fresh.displayName || "Your Name";
-        profileHandle.textContent = fresh.email ? "@"+fresh.email.split("@")[0] : "@username";
-        if (fresh.photoURL) profilePhoto.src = fresh.photoURL;
-        if (fresh.bio) bioView.textContent = fresh.bio;
-        if (fresh.bannerURL) profileBanner.style.backgroundImage = `url('${fresh.bannerURL}')`;
-
-        // Show owner-only controls
-        document.querySelectorAll('.owner-only').forEach(el => el.style.display = "");
-        btnFollow.style.display = "none";
-
-        loadMyPosts(user.uid);
-      } else {
-        // Hide owner-only controls when not logged in
-        document.querySelectorAll('.owner-only').forEach(el => el.style.display = "none");
-        btnFollow.style.display = "";
-        profileGrid.innerHTML = "";
-        profileEmpty.style.display = "";
-      }
-    });
-
-    /* Helpers */
-    function escapeHtml(s=""){ return s.replace(/[&<>\"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
-    function fmtTime(ts){ try{const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null); if(!t)return""; return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});}catch{return"";} }
-    function match(p, term){ if(!term) return true; const t=term.toLowerCase(); return ((p.text||"").toLowerCase().includes(t) || (p.title||"").toLowerCase().includes(t)); }
-
-    /* Feeds */
-    const homeFeed   = document.getElementById("home-feed");
-    const videosFeed = document.getElementById("videos-feed");
-    const podcastFeed= document.getElementById("podcast-feed");
-    const clipsFeed  = document.getElementById("clips-feed");
-
-    function renderCardFromDoc(d){
-      const p=d.data();
-      const el=document.createElement("article"); el.className="card";
-      const kind=p.kind || p.type || "";
-      const label=(kind==="video"||kind==="podcast_video")?"VIDEO"
-        :(kind==="podcast_audio"||kind==="audio")?"PODCAST"
-        :(kind==="clip")?"CLIP"
-        :(kind==="image")?"IMAGE":"";
-      const header=`<div style="display:flex;justify-content:space-between;align-items:center;">
-        <div><strong>${escapeHtml(p.user||"Anon")}</strong> <span class="muted">· ${fmtTime(p.createdAt)}</span></div>
-        ${label?`<span class="muted" style="border:1px solid #2a2a2a;padding:2px 8px;border-radius:999px;font-size:.75rem;">${label}</span>`:""}
-      </div>`;
-      let media="";
-      const url = p.mediaUrl || p.fileUrl || "";
-      if(url){
-        if(kind==="video"||kind==="podcast_video") media=`<video src="${url}" controls playsinline style="width:100%;border-radius:10px;margin-top:8px;"></video>`;
-        else if(kind==="podcast_audio"||kind==="audio") media=`<audio src="${url}" controls style="width:100%;margin-top:8px;"></audio>`;
-        else if(kind==="image") media=`<img src="${url}" alt="" style="width:100%;border-radius:10px;margin-top:8px;">`;
-        else media = `<a href="${url}" target="_blank" rel="noopener">Open file</a>`;
-      }
-      const text = p.text || p.title || "";
-      el.innerHTML = header + (text?`<div style="margin-top:6px;">${escapeHtml(text)}</div>`:"") + media;
-      return el;
-    }
-
-    let docs = [];
-    const PAGE_SIZE = 40;
-    const qMain = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
-    onSnapshot(qMain, (snap)=>{ docs = snap.docs; draw(); });
-
-    let homeTerm="", videosTerm="", podcastTerm="", clipsTerm="";
-    globalSearch?.addEventListener('input', e=>{ homeTerm    = e.target.value.trim(); draw(); });
-    videosSearch?.addEventListener('input', e=>{ videosTerm  = e.target.value.trim(); draw(); });
-    podcastSearch?.addEventListener('input',e=>{ podcastTerm = e.target.value.trim(); draw(); });
-    clipsSearch?.addEventListener('input', e=>{ clipsTerm    = e.target.value.trim(); draw(); });
-
-    function draw(){
-      const mediaKinds = new Set(["video","clip","podcast_audio","podcast_video","audio","image"]);
-      const trending = docs.filter(d => mediaKinds.has((d.data().kind||d.data().type)) && match(d.data(), homeTerm));
-      homeFeed.innerHTML = trending.length ? "" : '<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet. Check back soon.</div>';
-      trending.forEach(d=>homeFeed.appendChild(renderCardFromDoc(d)));
-
-      const vids = docs.filter(d => (d.data().kind||d.data().type)==="video" && match(d.data(), videosTerm));
-      videosFeed.innerHTML = vids.length?"":'<div class="muted card">No videos yet.</div>'; vids.forEach(d=>videosFeed.appendChild(renderCardFromDoc(d)));
-
-      const pods = docs.filter(d => ["podcast_audio","podcast_video","audio"].includes(d.data().kind||d.data().type) && match(d.data(), podcastTerm));
-      podcastFeed.innerHTML = pods.length?"":'<div class="muted card">No podcasts yet.</div>'; pods.forEach(d=>podcastFeed.appendChild(renderCardFromDoc(d)));
-
-      const cls = docs.filter(d => (d.data().kind||d.data().type)==="clip" && match(d.data(), clipsTerm));
-      clipsFeed.innerHTML = cls.length?"":'<div class="muted card">No clips yet.</div>'; cls.forEach(d=>clipsFeed.appendChild(renderCardFromDoc(d)));
-    }
-
-    /* Tabs */
-    const links = Array.from(document.querySelectorAll('.bottom-nav a'));
-    const sections = {
-      home:document.getElementById('tab-home'),
-      videos:document.getElementById('tab-videos'),
-      podcast:document.getElementById('tab-podcast'),
-      upload:document.getElementById('tab-upload'),
-      clips:document.getElementById('tab-clips'),
-      profile:document.getElementById('tab-profile'),
-      settings:document.getElementById('tab-settings')
-    };
-    function setTab(key){
-      Object.entries(sections).forEach(([k,el])=> el.style.display = (k===key)?'':'none');
-      links.forEach(a=>a.classList.toggle('active', a.dataset.tab===key));
-      // Header search only on Home
-      searchWrap.style.display = (key==="home") ? "flex" : "none";
-      window.scrollTo({top:0,behavior:'smooth'});
-    }
-    function applyHash(){ const key=(location.hash||"#home").slice(1); setTab(key); }
-    links.forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); location.hash = a.getAttribute('href'); }));
-    window.addEventListener('hashchange', applyHash);
-    applyHash();
-
-    /* -------- Profile: bio edit -------- */
-    document.getElementById("btn-edit-profile")?.addEventListener('click', ()=>{
-      bioEdit.value = bioView.textContent || "";
-      bioView.style.display = "none";
-      bioEditWrap.style.display = "";
-    });
-    bioCancel?.addEventListener('click', ()=>{
-      bioEditWrap.style.display = "none";
-      bioView.style.display = "";
-    });
-    bioSave?.addEventListener('click', async ()=>{
-      const user = auth.currentUser; if(!user) return alert("Sign in to edit profile.");
-      const bio = (bioEdit.value||"").trim();
-      await updateDoc(doc(db,"users",user.uid), { bio });
-      bioView.textContent = bio || "Add a short bio to introduce yourself.";
-      bioEditWrap.style.display = "none";
-      bioView.style.display = "";
-    });
-
-    /* -------- Profile: share/follow placeholders -------- */
-    btnShareProfile?.addEventListener('click', async ()=>{
-      const url = location.origin + location.pathname + "#profile";
-      try{ await navigator.clipboard.writeText(url); alert("Profile link copied."); }catch{ prompt("Copy profile link:", url); }
-    });
-    btnFollow?.addEventListener('click', ()=> alert("Follow feature coming later."));
-
-    /* -------- Profile: banner/avatar upload via + buttons -------- */
-    btnAddBanner?.addEventListener('click', ()=> bannerInput.click());
-    btnAddAvatar?.addEventListener('click', ()=> avatarInput.click());
-
-    bannerInput?.addEventListener('change', async (e)=>{
-      const file=e.target.files?.[0]; if(!file) return;
-      const user=auth.currentUser; if(!user) return alert("Sign in to change banner.");
-      const path=`users/${user.uid}/banner/${Date.now()}-${file.name}`;
-      const r=ref(storage, path); await uploadBytes(r,file); const url=await getDownloadURL(r);
-      await updateDoc(doc(db,"users",user.uid), { bannerURL:url });
-      profileBanner.style.backgroundImage = `url('${url}')`;
-    });
-
-    avatarInput?.addEventListener('change', async (e)=>{
-      const file=e.target.files?.[0]; if(!file) return;
-      const user=auth.currentUser; if(!user) return alert("Sign in to change photo.");
-      const path=`users/${user.uid}/avatar/${Date.now()}-${file.name}`;
-      const r=ref(storage, path); await uploadBytes(r,file); const url=await getDownloadURL(r);
-      await updateDoc(doc(db,"users",user.uid), { photoURL:url });
-      profilePhoto.src = url;
-    });
-
-    /* -------- Profile: load user posts into grid -------- */
-    function tileForPost(p){
-      const tile=document.createElement('div'); tile.className='tile';
-      let media="";
-      const url=p.mediaUrl || p.fileUrl || "";
-      const kind=p.kind||p.type||"";
-      if(url){
-        if(kind==="image"){ media=`<img class="thumb" src="${url}" alt="">`; }
-        else if(kind==="video"||kind==="podcast_video"){ media=`<video class="thumb" src="${url}" muted playsinline></video>`; }
-        else if(kind==="clip"){ media=`<video class="thumb" src="${url}" muted playsinline loop></video>`; }
-        else if(kind==="audio"||kind==="podcast_audio"){ media=`<div class="thumb" style="display:flex;align-items:center;justify-content:center;">AUDIO</div>`; }
-        else { media=`<div class="thumb"></div>`; }
-      } else { media=`<div class="thumb"></div>`; }
-      const title=escapeHtml((p.text||p.title||"Untitled").slice(0,80));
-      tile.innerHTML=`${media}<div class="meta">${title}</div>`;
-      return tile;
-    }
-
-    function loadMyPosts(uid){
-      const qMine = query(collection(db,"posts"), where("ownerId","==",uid), orderBy("createdAt","desc"), limit(60));
-      onSnapshot(qMine, (snap)=>{
-        const list=snap.docs.map(d=>d.data());
-        profileGrid.innerHTML="";
-        if(!list.length){ profileEmpty.style.display=""; document.getElementById("stat-posts").textContent="0"; return; }
-        profileEmpty.style.display="none";
-        list.forEach(p=> profileGrid.appendChild(tileForPost(p)));
-        document.getElementById("stat-posts").textContent=String(list.length);
-      });
-    }
-
-    /* -------- Upload: save to Storage + Firestore -------- */
-    uploadSubmit?.addEventListener('click', async ()=>{
-      const user=auth.currentUser; if(!user){ alert("Sign in to upload."); return; }
-      const type = uploadType.value;
-      const title = (postTitle.value||"").trim();
-      const desc  = (postDesc.value||"").trim();
-      const media = mediaFile.files?.[0];
-      const thumb = thumbFile.files?.[0];
-      if(!media){ alert("Choose a file to upload."); return; }
-      if(!title){ alert("Add a title."); return; }
-
-      uploadSubmit.disabled=true;
-
-      try{
-        const ts = Date.now();
-        // media
-        const mediaPath = `uploads/${user.uid}/${ts}_${media.name}`;
-        const mRef = ref(storage, mediaPath);
-        await uploadBytes(mRef, media);
-        const mediaUrl = await getDownloadURL(mRef);
-
-        // thumbnail (optional)
-        let thumbUrl = "";
-        if(thumb){
-          const tPath = `thumbnails/${user.uid}/${ts}_${thumb.name}`;
-          const tRef = ref(storage, tPath);
-          await uploadBytes(tRef, thumb);
-          thumbUrl = await getDownloadURL(tRef);
-        }
-
-        await addDoc(collection(db,"posts"), {
-          ownerId: user.uid,
-          user: user.displayName || (user.email? user.email.split("@")[0] : "User"),
-          kind: type, type, title, text:title, description: desc,
-          mediaUrl, thumbUrl,
-          likeCount: 0, commentCount: 0,
-          createdAt: serverTimestamp()
-        });
-
-        alert("Upload complete.");
-        postTitle.value=""; postDesc.value=""; mediaFile.value=""; thumbFile.value="";
-      }catch(err){
-        console.error(err); alert(err?.message || "Upload failed.");
-      }finally{
-        uploadSubmit.disabled=false;
-      }
-    });
-
-    goLiveBtn?.addEventListener('click', ()=> alert("Go Live will be added later."));
-
-    /* Settings toggles (visual only) */
-    document.querySelectorAll('.toggle').forEach(t=>{
-      t.addEventListener('click', ()=>{
-        const on = t.getAttribute('data-on') === 'true';
-        t.setAttribute('data-on', on ? 'false' : 'true');
-        t.setAttribute('aria-checked', on ? 'false' : 'true');
-      });
-    });
-
-    const legalToggle = document.getElementById("legalToggle");
-    const legalPanel  = document.getElementById("legalPanel");
-    legalToggle?.addEventListener('click', ()=>{
-      const expanded = legalToggle.getAttribute('aria-expanded') === 'true';
-      legalToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-      legalPanel.hidden = expanded;
-    });
-  </script>
+  <!-- 🔹 JS LINKS (order matters) -->
+  <script type="module" src="./js/firebase-init.js"></script>
+  <script type="module" src="./js/auth.js"></script>
+  <script type="module" src="./script.js"></script>
 </body>
-<!-- 🔹 AUTH CONTROLS -->
-<div data-anon-only>
-  <button onclick="document.getElementById('auth-modal').showModal()">Sign in / Create Account</button>
-</div>
-
-<div data-authed-only style="display:none;">
-  Signed in as <strong data-user-name></strong>
-  <button id="logout-btn">Log out</button>
-</div>
-
-<!-- 🔹 AUTH MODAL -->
-<dialog id="auth-modal">
-  <form method="dialog" style="text-align:right">
-    <button>✕</button>
-  </form>
-
-  <h3>Create account</h3>
-  <form id="signup-form">
-    <input name="displayName" type="text" placeholder="Display name (optional)" />
-    <input name="email" type="email" placeholder="Email" required />
-    <input name="password" type="password" placeholder="Password (min 6)" required />
-    <button type="submit">Sign up</button>
-  </form>
-
-  <hr />
-
-  <h3>Sign in</h3>
-  <form id="login-form">
-    <input name="email" type="email" placeholder="Email" required />
-    <input name="password" type="password" placeholder="Password" required />
-    <button type="submit">Sign in</button>
-  </form>
-</dialog>
-
-<!-- 🔹 JS LINKS -->
-<script type="module" src="./js/firebase-init.js"></script>
-<script type="module" src="./js/auth.js"></script>
-<script src="./script.js"></script> <!-- main app logic, including upload
 </html>
