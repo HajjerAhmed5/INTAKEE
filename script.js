@@ -1,6 +1,6 @@
 // ========= INTAKEE Frontend Logic (script.js) =========
-// Uses the single Firebase initialization from firebaseInit.js
-import { app, auth, db, storage } from "./firebaseInit.js";
+// Load from our actual init file (CDN modular SDK)
+import { auth, db, storage } from "./js/firebase-init.js";
 
 /* ---------------- Firebase CDN helpers (v10.12.4) ---------------- */
 // Auth
@@ -28,7 +28,6 @@ import {
   orderBy,
   limit,
   where,
-  // NEW for profile data:
   doc,
   getDoc,
   setDoc,
@@ -52,7 +51,6 @@ function setActiveTab(tabId) {
     b.classList.toggle("active", b.getAttribute("data-tab") === tabId)
   );
 
-  // Per spec: hide search & login on Upload/Settings
   const searchBar = $("#global-search");
   const loginBtn = $("#home-login-btn");
   if (["upload", "settings"].includes(tabId)) {
@@ -86,61 +84,34 @@ function initSettingsAccordion() {
   });
 }
 
-/* ---------------- Auth modal (email/password) ---------------- */
-function showAuthModal() {
-  show($("#auth-modal"));
-  const title = $("#auth-title");
-  const actionBtn = $("#auth-action");
-  const toggle = $("#toggle-auth");
-  title.textContent = "Login to INTAKEE";
-  actionBtn.textContent = "Login";
-
-  toggle.onclick = () => {
-    const isLogin = title.textContent.includes("Login");
-    title.textContent = isLogin
-      ? "Create your INTAKEE account"
-      : "Login to INTAKEE";
-    actionBtn.textContent = isLogin ? "Sign Up" : "Login";
-  };
-
-  actionBtn.onclick = async () => {
-    const email = $("#auth-email")?.value.trim();
-    const pwd = $("#auth-password")?.value.trim();
-    if (!email || !pwd) {
-      alert("Please enter email and password.");
-      return;
-    }
-    try {
-      if (actionBtn.textContent.includes("Sign Up")) {
-        await createUserWithEmailAndPassword(auth, email, pwd);
-      } else {
-        await signInWithEmailAndPassword(auth, email, pwd);
-      }
-      closeAuthModal();
-    } catch (e) {
-      console.error("Auth error:", e);
-      alert(e?.message || "Authentication error");
-    }
-  };
-}
+/* ---------------- Auth modal helpers ---------------- */
+function showAuthModal() { show($("#auth-modal")); }
 function closeAuthModal() { hide($("#auth-modal")); }
-
 Object.assign(window, { showAuthModal, closeAuthModal });
 
 /* ---------------- Auth state → UI sync + owner-only controls ---------------- */
 const profileBanner   = $("#profileBanner");
 const bannerInput     = $("#bannerInput");
 const avatarInput     = $("#avatarInput");
-const btnChangeBanner = $("#btn-change-banner"); // + fab on banner
-const btnChangeAvatar = $("#btn-change-avatar"); // + fab on avatar
+const btnChangeBanner = $("#btn-change-banner");
+const btnChangeAvatar = $("#btn-change-avatar");
 
 const profilePhoto  = $("#profile-photo");
 const profileName   = $("#profile-name");
 const profileHandle = $("#profile-handle");
-const profileBioEl  = $("#profile-bio"); // if present in your markup
+const profileBioEl  = $("#profile-bio");
 
 onAuthStateChanged(auth, async (user) => {
   console.log("Auth state:", user);
+
+  // make user available to any other script just in case
+  window.currentUser = user;
+
+  // auto-disable any buttons that require auth
+  document.querySelectorAll("[data-require-auth]").forEach(btn => {
+    btn.disabled = !user;
+  });
+
   const nameEl = $("#user-email-display");
   const upWarn = $("#upload-warning");
 
@@ -170,8 +141,6 @@ onAuthStateChanged(auth, async (user) => {
     if (upWarn) upWarn.textContent = "You are logged in. You can upload.";
     $("#home-login-btn")?.classList.add("hidden");
     $("#logoutBtn")?.classList.remove("hidden");
-
-    // SHOW owner-only + buttons (banner/avatar fabs)
     $$(".owner-only").forEach(el => el.style.display = "");
   } else {
     if (nameEl) nameEl.textContent = "Guest";
@@ -179,14 +148,11 @@ onAuthStateChanged(auth, async (user) => {
     if (upWarn) upWarn.textContent = "You must be logged in to upload content.";
     $("#home-login-btn")?.classList.remove("hidden");
     $("#logoutBtn")?.classList.add("hidden");
-
-    // HIDE owner-only + buttons
     $$(".owner-only").forEach(el => el.style.display = "none");
   }
 });
 
-/* ---------------- Profile image uploads (+ buttons) ---------------- */
-// Banner +
+/* ---------------- Profile image uploads ---------------- */
 btnChangeBanner?.addEventListener("click", () => bannerInput?.click());
 bannerInput?.addEventListener("change", async (e) => {
   const file = e.target.files?.[0];
@@ -208,7 +174,6 @@ bannerInput?.addEventListener("change", async (e) => {
   }
 });
 
-// Avatar +
 btnChangeAvatar?.addEventListener("click", () => avatarInput?.click());
 avatarInput?.addEventListener("change", async (e) => {
   const file = e.target.files?.[0];
@@ -299,6 +264,7 @@ function refreshUploadForm() {
 }
 
 async function handleUpload() {
+  // ✅ real guard: use Firebase auth state
   if (!auth.currentUser) {
     showAuthModal();
     return;
@@ -385,7 +351,7 @@ async function loadFeeds() {
     )
   );
 
-  // Podcasts: both audio and video
+  // Podcasts
   await fillGrid(
     "#podcast-feed",
     query(
@@ -463,4 +429,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Optional: extra logout wire via button ID
   $("#logoutBtn")?.addEventListener("click", handleLogoutOrPrompt);
+
+  // Upload button gate by live auth state (extra defense)
+  const uploadBtn = $("#upload-btn");
+  uploadBtn?.addEventListener("click", (e) => {
+    if (!auth.currentUser) {
+      e.preventDefault?.();
+      showAuthModal();
+    }
+  });
 });
