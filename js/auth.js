@@ -11,15 +11,30 @@ import {
 // helper to toggle UI
 function setAuthedUI(user) {
   const authed = !!user;
+
+  // toggle visibility for logged-in / logged-out UI elements
   document.querySelectorAll("[data-authed-only]").forEach(el => el.style.display = authed ? "" : "none");
   document.querySelectorAll("[data-anon-only]").forEach(el => el.style.display = authed ? "none" : "");
   document.querySelectorAll("[data-user-name]").forEach(el => el.textContent = authed ? (user.displayName || user.email) : "");
+
+  // globally expose the Firebase user
+  window.currentUser = user;
+
+  // auto-disable any buttons that require auth
+  document.querySelectorAll("[data-require-auth]").forEach(btn => {
+    btn.disabled = !authed;
+  });
 }
-onAuthStateChanged(auth, setAuthedUI);
-// SIGN UP (safe)
+
+// listen for user state changes
+onAuthStateChanged(auth, (user) => {
+  setAuthedUI(user);
+});
+
+// --------------------------- SIGN UP ---------------------------
 document.getElementById("signup-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const form = e.currentTarget;                 // capture the form safely
+  const form = e.currentTarget;
   const fd = new FormData(form);
   const name = (fd.get("displayName") || "").toString().trim();
   const email = (fd.get("email") || "").toString().trim();
@@ -31,7 +46,6 @@ document.getElementById("signup-form")?.addEventListener("submit", async (e) => 
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     if (name) await updateProfile(cred.user, { displayName: name });
 
-    // form may be detached; guard it
     form?.reset?.();
     document.getElementById("auth-modal")?.close?.();
     alert("Account created! You’re signed in.");
@@ -41,7 +55,8 @@ document.getElementById("signup-form")?.addEventListener("submit", async (e) => 
     if (btn) btn.disabled = false;
   }
 });
-// LOGIN (safe)
+
+// --------------------------- LOGIN ---------------------------
 document.getElementById("login-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.currentTarget;
@@ -63,7 +78,13 @@ document.getElementById("login-form")?.addEventListener("submit", async (e) => {
     if (btn) btn.disabled = false;
   }
 });
-// LOGOUT
+
+// --------------------------- LOGOUT ---------------------------
 document.getElementById("logout-btn")?.addEventListener("click", async () => {
-  try { await signOut(auth); } catch (err) { alert(err.message); }
+  try {
+    await signOut(auth);
+    alert("You’ve been signed out.");
+  } catch (err) {
+    alert(err.message);
+  }
 });
