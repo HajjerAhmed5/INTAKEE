@@ -16,49 +16,53 @@ function setAuthedUI(user) {
   document.querySelectorAll("[data-user-name]").forEach(el => el.textContent = authed ? (user.displayName || user.email) : "");
 }
 onAuthStateChanged(auth, setAuthedUI);
-
-// SIGN UP
+// SIGN UP (safe)
 document.getElementById("signup-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const fd = new FormData(e.currentTarget);
+  const form = e.currentTarget;                 // capture the form safely
+  const fd = new FormData(form);
   const name = (fd.get("displayName") || "").toString().trim();
   const email = (fd.get("email") || "").toString().trim();
   const password = (fd.get("password") || "").toString();
-  const btn = e.currentTarget.querySelector("button[type=submit]");
+  const btn = form.querySelector("button[type=submit]");
+
   try {
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     if (name) await updateProfile(cred.user, { displayName: name });
-    e.currentTarget.reset();
+
+    // form may be detached; guard it
+    form?.reset?.();
     document.getElementById("auth-modal")?.close?.();
-    alert("Account created. You’re signed in.");
+    alert("Account created! You’re signed in.");
   } catch (err) {
     alert(err.message);
   } finally {
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
   }
 });
-
-// LOGIN
+// LOGIN (safe)
 document.getElementById("login-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const fd = new FormData(e.currentTarget);
+  const form = e.currentTarget;
+  const fd = new FormData(form);
   const email = (fd.get("email") || "").toString().trim();
   const password = (fd.get("password") || "").toString();
-  const btn = e.currentTarget.querySelector("button[type=submit]");
+  const btn = form.querySelector("button[type=submit]");
+
   try {
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
     await signInWithEmailAndPassword(auth, email, password);
-    e.currentTarget.reset();
+
+    form?.reset?.();
     document.getElementById("auth-modal")?.close?.();
     alert("Welcome back!");
   } catch (err) {
     alert(err.message);
   } finally {
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
   }
 });
-
 // LOGOUT
 document.getElementById("logout-btn")?.addEventListener("click", async () => {
   try { await signOut(auth); } catch (err) { alert(err.message); }
