@@ -1,454 +1,226 @@
 // ========= INTAKEE Frontend Logic (script.js) =========
-// Load from our actual init file (CDN modular SDK)
+// Use the ONE Firebase app from ./js/firebase-init.js
 import { auth, db, storage } from "./js/firebase-init.js";
 
 /* ---------------- Firebase CDN helpers (v10.12.4) ---------------- */
-// Auth (only what we use here)
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import {
-  onAuthStateChanged,
-  signOut,
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-
-// Storage
-import {
-  ref as storageRef,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
-
-// Firestore
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  getDocs,
-  query,
-  orderBy,
-  limit,
-  where,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc
+  collection, addDoc, serverTimestamp, getDocs, query, orderBy, limit, where,
+  doc, getDoc, setDoc, updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
 /* ---------------- Tiny DOM helpers ---------------- */
 const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-const show = (el) => el && el.classList.remove("hidden");
-const hide = (el) => el && el.classList.add("hidden");
+const show = (el) => el && (el.style.display = "");
+const hide = (el) => el && (el.style.display = "none");
 
-/* ---------------- Tabs + Hash routing ---------------- */
-function setActiveTab(tabId) {
-  const tabs = $$(".tab");
-  const btns = $$(".tab-btn");
-  if (!$("#" + tabId)) tabId = "home";
+/* ---------------- Elements that exist in your HTML ---------------- */
+// Header
+const searchWrap = $("#searchWrap");
+const loginBtn   = $("#loginBtn");
+const logoutBtn  = $("#logoutBtn");
 
-  tabs.forEach((t) => t.classList.toggle("active", t.id === tabId));
-  btns.forEach((b) =>
-    b.classList.toggle("active", b.getAttribute("data-tab") === tabId)
-  );
+// Upload section (IDs from your HTML)
+const uploadType   = $("#uploadType");
+const postTitle    = $("#postTitle");
+const postDesc     = $("#postDesc");
+const mediaFile    = $("#mediaFile");
+const thumbFile    = $("#thumbFile");
+const uploadSubmit = $("#uploadSubmit");
+const goLiveBtn    = $("#goLiveBtn");
 
-  const searchBar = $("#global-search");
-  const loginBtn = $("#home-login-btn");
-  if (["upload", "settings"].includes(tabId)) {
-    hide(searchBar); hide(loginBtn);
-  } else {
-    show(searchBar); show(loginBtn);
-  }
+// Feeds search inputs (optional in your markup)
+const videosSearch  = $("#videosSearch");
+const podcastSearch = $("#podcastSearch");
+const clipsSearch   = $("#clipsSearch");
 
-  if (location.hash !== "#" + tabId) history.replaceState(null, "", "#" + tabId);
-}
-
-function initTabs() {
-  $$(".tab-btn").forEach((btn) =>
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      setActiveTab(btn.getAttribute("data-tab"));
-    })
-  );
-  setActiveTab((location.hash || "#home").slice(1));
-  window.addEventListener("hashchange", () =>
-    setActiveTab((location.hash || "#home").slice(1))
-  );
-}
-
-/* ---------------- Settings accordion ---------------- */
-function initSettingsAccordion() {
-  $$(".settings-label").forEach((label) => {
-    label.addEventListener("click", () =>
-      label.closest(".settings-section")?.classList.toggle("open")
-    );
-  });
-}
-
-/* ---------------- Auth modal helpers ---------------- */
-function showAuthModal() { show($("#auth-modal")); }
-function closeAuthModal() { hide($("#auth-modal")); }
-Object.assign(window, { showAuthModal, closeAuthModal });
-
-/* ---------------- Auth state → UI sync + owner-only controls ---------------- */
-const profileBanner   = $("#profileBanner");
-const bannerInput     = $("#bannerInput");
-const avatarInput     = $("#avatarInput");
-const btnChangeBanner = $("#btn-change-banner");
-const btnChangeAvatar = $("#btn-change-avatar");
-
+// Profile bits
+const profileBanner = $("#profileBanner");
+const btnAddBanner  = $("#btnAddBanner");
+const btnAddAvatar  = $("#btnAddAvatar");
+const bannerInput   = $("#bannerInput");
+const avatarInput   = $("#avatarInput");
 const profilePhoto  = $("#profile-photo");
 const profileName   = $("#profile-name");
 const profileHandle = $("#profile-handle");
-const profileBioEl  = $("#profile-bio");
+
+/* ---------------- Auth state → UI sync ---------------- */
+logoutBtn?.addEventListener("click", () => signOut(auth));
 
 onAuthStateChanged(auth, async (user) => {
-  console.log("Auth state:", user);
-
-  // make user available to any other script just in case
-  window.currentUser = user;
-
-  // auto-disable any buttons that require auth
-  document.querySelectorAll("[data-require-auth]").forEach(btn => {
-    btn.disabled = !user;
-  });
-
-  const nameEl = $("#user-email-display");
-  const upWarn = $("#upload-warning");
+  // header buttons
+  loginBtn && (loginBtn.style.display  = "none");
+  logoutBtn && (logoutBtn.style.display = user ? "inline-block" : "none");
 
   if (user) {
-    // Ensure user doc exists
+    // ensure user doc
     const uref = doc(db, "users", user.uid);
-    const usnap = await getDoc(uref);
-    if (!usnap.exists()) {
+    const snap = await getDoc(uref);
+    if (!snap.exists()) {
       await setDoc(uref, {
         uid: user.uid,
-        email: user.email || "",
-        displayName: user.displayName || "",
-        photoURL: user.photoURL || "",
-        createdAt: serverTimestamp()
+        displayName: user.displayName ?? "",
+        email: user.email ?? "",
+        photoURL: user.photoURL ?? "",
+        createdAt: serverTimestamp(),
       });
     }
-
-    // Pull fresh user data for profile header
-    const data = (await getDoc(uref)).data() || {};
-    if (profileName)   profileName.textContent   = data.displayName || "Your Name";
-    if (profileHandle) profileHandle.textContent = data.email ? "@"+data.email.split("@")[0] : "@username";
-    if (profilePhoto && (data.photoURL || user.photoURL)) profilePhoto.src = data.photoURL || user.photoURL;
-    if (profileBanner && data.bannerURL) profileBanner.style.backgroundImage = `url('${data.bannerURL}')`;
-
-    if (nameEl) nameEl.textContent = user.email || "User";
-    if (profileBioEl) profileBioEl.disabled = false;
-    if (upWarn) upWarn.textContent = "You are logged in. You can upload.";
-    $("#home-login-btn")?.classList.add("hidden");
-    $("#logoutBtn")?.classList.remove("hidden");
-    $$(".owner-only").forEach(el => el.style.display = "");
-  } else {
-    if (nameEl) nameEl.textContent = "Guest";
-    if (profileBioEl) profileBioEl.disabled = true;
-    if (upWarn) upWarn.textContent = "You must be logged in to upload content.";
-    $("#home-login-btn")?.classList.remove("hidden");
-    $("#logoutBtn")?.classList.add("hidden");
-    $$(".owner-only").forEach(el => el.style.display = "none");
+    const fresh = (await getDoc(uref)).data() || {};
+    if (fresh.displayName) profileName.textContent = fresh.displayName;
+    if (fresh.email)       profileHandle.textContent = "@" + fresh.email.split("@")[0];
+    if (fresh.photoURL)    profilePhoto.src = fresh.photoURL;
+    if (fresh.bannerURL)   profileBanner.style.backgroundImage = `url('${fresh.bannerURL}')`;
   }
 });
 
 /* ---------------- Profile image uploads ---------------- */
-btnChangeBanner?.addEventListener("click", () => bannerInput?.click());
+btnAddBanner?.addEventListener("click", () => bannerInput?.click());
 bannerInput?.addEventListener("change", async (e) => {
   const file = e.target.files?.[0];
   if (!file) return;
-  if (!auth.currentUser) return showAuthModal();
+  if (!auth.currentUser) return alert("Sign in to change banner.");
 
-  try {
-    const uid = auth.currentUser.uid;
-    const path = `users/${uid}/banner/${Date.now()}_${file.name}`;
-    const ref  = storageRef(storage, path);
-    await uploadBytes(ref, file);
-    const url = await getDownloadURL(ref);
-
-    await updateDoc(doc(db, "users", uid), { bannerURL: url });
-    if (profileBanner) profileBanner.style.backgroundImage = `url('${url}')`;
-  } catch (e) {
-    console.error("Banner upload failed:", e);
-    alert(e?.message || "Banner upload failed.");
-  }
+  const uid = auth.currentUser.uid;
+  const path = `users/${uid}/banner/${Date.now()}_${file.name}`;
+  const ref  = storageRef(storage, path);
+  await uploadBytes(ref, file);
+  const url = await getDownloadURL(ref);
+  await updateDoc(doc(db, "users", uid), { bannerURL: url });
+  profileBanner.style.backgroundImage = `url('${url}')`;
 });
 
-btnChangeAvatar?.addEventListener("click", () => avatarInput?.click());
+btnAddAvatar?.addEventListener("click", () => avatarInput?.click());
 avatarInput?.addEventListener("change", async (e) => {
   const file = e.target.files?.[0];
   if (!file) return;
-  if (!auth.currentUser) return showAuthModal();
+  if (!auth.currentUser) return alert("Sign in to change photo.");
 
-  try {
-    const uid = auth.currentUser.uid;
-    const path = `users/${uid}/avatar/${Date.now()}_${file.name}`;
-    const ref  = storageRef(storage, path);
-    await uploadBytes(ref, file);
-    const url = await getDownloadURL(ref);
-
-    await updateDoc(doc(db, "users", uid), { photoURL: url });
-    if (profilePhoto) profilePhoto.src = url;
-  } catch (e) {
-    console.error("Avatar upload failed:", e);
-    alert(e?.message || "Avatar upload failed.");
-  }
+  const uid = auth.currentUser.uid;
+  const path = `users/${uid}/avatar/${Date.now()}_${file.name}`;
+  const ref  = storageRef(storage, path);
+  await uploadBytes(ref, file);
+  const url = await getDownloadURL(ref);
+  await updateDoc(doc(db, "users", uid), { photoURL: url });
+  profilePhoto.src = url;
 });
 
-/* ---------------- Global handlers exposed to HTML ---------------- */
-async function handleLogout() {
-  try {
-    await signOut(auth);
-    alert("Logged out.");
-  } catch (e) {
-    console.error("Sign out error:", e);
-    alert(e?.message || "Error");
-  }
-}
-function promptLoginIfNeeded() {
-  if (!auth.currentUser) showAuthModal();
-}
-function handleLogoutOrPrompt() {
-  if (!auth.currentUser) return showAuthModal();
-  handleLogout();
-}
-function handleDeleteAccountOrPrompt() {
-  if (!auth.currentUser) return showAuthModal();
-  alert("Account deletion flow not implemented yet.");
-}
-function handlePrivacyToggleOrPrompt() {
-  if (!auth.currentUser) return showAuthModal();
-  alert("Account made private (demo).");
-}
-
-Object.assign(window, {
-  promptLoginIfNeeded,
-  handleLogoutOrPrompt,
-  handleDeleteAccountOrPrompt,
-  handlePrivacyToggleOrPrompt,
-});
-
-/* ---------------- Upload: type-aware labels + upload ---------------- */
-function refreshUploadForm() {
-  const type = $("#upload-type")?.value || "video";
-  const fileInput = $("#upload-file");
-  const fileLabel = $("#upload-file-label");
-  const help = $("#upload-help");
-  if (!fileInput || !fileLabel || !help) return;
-
-  switch (type) {
-    case "video":
-      fileLabel.textContent = "Video File";
-      fileInput.accept = "video/*";
-      help.textContent =
-        "Upload a standard video (MP4/WebM). Thumbnail shows in feed.";
-      break;
-    case "clip":
-      fileLabel.textContent = "Clip File";
-      fileInput.accept = "video/*";
-      help.textContent =
-        "Upload a short vertical clip (MP4/WebM). Recommended under 60s.";
-      break;
-    case "podcast-video":
-      fileLabel.textContent = "Podcast Video File";
-      fileInput.accept = "video/*";
-      help.textContent = "Upload a video podcast. Thumbnail shows in the feed.";
-      break;
-    case "podcast-audio":
-      fileLabel.textContent = "Podcast Audio File";
-      fileInput.accept = "audio/*";
-      help.textContent =
-        "Upload an audio podcast (MP3/M4A/WAV). Thumbnail is a static cover.";
-      break;
-  }
-}
-
+/* ---------------- Upload handler ---------------- */
 async function handleUpload() {
-  // ✅ Wait until Firebase confirms user is signed in
+  // wait for a confirmed auth user (prevents “Sign in to upload” race)
   let user = auth.currentUser;
   if (!user) {
     await new Promise((resolve) => {
       const unsub = onAuthStateChanged(auth, (u) => {
-        if (u) {
-          user = u;
-          unsub();
-          resolve();
-        }
+        if (u) { user = u; unsub(); resolve(); }
       });
-      // fallback so we don't hang forever
-      setTimeout(() => resolve(), 1500);
+      setTimeout(resolve, 1500); // fallback so we don’t hang
     });
   }
+  if (!user) return alert("Sign in to upload.");
 
-  if (!user) {
-    showAuthModal();
-    return;
-  }
+  const type  = uploadType?.value || "video";
+  const title = (postTitle?.value || "").trim();
+  const desc  = (postDesc?.value || "").trim();
+  const media = mediaFile?.files?.[0];
+  const thumb = thumbFile?.files?.[0];
 
-  const type  = $("#upload-type")?.value || "video";
-  const title = $("#upload-title")?.value.trim();
-  const desc  = $("#upload-description")?.value.trim();
-  const file  = $("#upload-file")?.files?.[0];
-  const thumb = $("#upload-thumbnail")?.files?.[0];
+  if (!media) return alert("Choose a file to upload.");
+  if (!title) return alert("Add a title.");
 
-  if (!file)  return alert("Please choose a file.");
-  if (!title) return alert("Please add a title.");
-
+  uploadSubmit && (uploadSubmit.disabled = true);
   try {
-    const uid = user.uid;
-    const now = Date.now();
+    const ts = Date.now();
 
-    // Upload main file
-    const mainPath = `uploads/${uid}/${now}_${file.name}`;
-    const mainRef  = storageRef(storage, mainPath);
-    await uploadBytes(mainRef, file);
-    const fileUrl = await getDownloadURL(mainRef);
+    // main file
+    const mediaPath = `uploads/${user.uid}/${ts}_${media.name}`;
+    const mRef = storageRef(storage, mediaPath);
+    await uploadBytes(mRef, media);
+    const mediaUrl = await getDownloadURL(mRef);
 
-    // Upload thumbnail if present
+    // thumbnail (optional)
     let thumbUrl = "";
     if (thumb) {
-      const thumbPath = `thumbnails/${uid}/${now}_${thumb.name}`;
-      const thumbRef  = storageRef(storage, thumbPath);
-      await uploadBytes(thumbRef, thumb);
-      thumbUrl = await getDownloadURL(thumbRef);
+      const tPath = `thumbnails/${user.uid}/${ts}_${thumb.name}`;
+      const tRef = storageRef(storage, tPath);
+      await uploadBytes(tRef, thumb);
+      thumbUrl = await getDownloadURL(tRef);
     }
 
-    // Save metadata to Firestore
+    // Firestore metadata
     await addDoc(collection(db, "posts"), {
-      uid,
-      type,
-      title,
-      description: desc || "",
-      fileUrl,
-      thumbUrl,
+      ownerId: user.uid,
+      user: user.displayName || (user.email ? user.email.split("@")[0] : "User"),
+      kind: type, type, title, text: title, description: desc,
+      mediaUrl, thumbUrl,
+      likeCount: 0, commentCount: 0,
       createdAt: serverTimestamp(),
     });
 
-    alert("Upload complete!");
-
-    // Reset form
-    $("#upload-title").value = "";
-    $("#upload-description").value = "";
-    $("#upload-file").value = "";
-    $("#upload-thumbnail").value = "";
-
-    // Refresh feeds
-    await loadFeeds();
-  } catch (e) {
-    console.error("Upload failed:", e);
-    alert(e?.message || "Upload failed.");
+    alert("Upload complete.");
+    if (postTitle) postTitle.value = "";
+    if (postDesc)  postDesc.value  = "";
+    if (mediaFile) mediaFile.value = "";
+    if (thumbFile) thumbFile.value = "";
+  } catch (err) {
+    console.error(err);
+    alert(err?.message || "Upload failed.");
+  } finally {
+    uploadSubmit && (uploadSubmit.disabled = false);
   }
 }
 
-function goLive() {
-  if (!auth.currentUser) return showAuthModal();
-  alert("Starting live stream (not implemented yet).");
-}
+uploadSubmit?.addEventListener("click", handleUpload);
+goLiveBtn?.addEventListener("click", () => alert("Go Live will be added later."));
 
-Object.assign(window, { handleUpload, goLive });
+/* ---------------- Optional: Feeds (basic render stubs) ---------------- */
+// These match your IDs; safe if sections are empty.
+const homeFeed    = $("#home-feed");
+const videosFeed  = $("#videos-feed");
+const podcastFeed = $("#podcast-feed");
+const clipsFeed   = $("#clips-feed");
 
-/* ---------------- Feeds (basic read) ---------------- */
-async function loadFeeds() {
-  // Trending = latest 12
-  await fillGrid(
-    "#trending-feed",
-    query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(12))
-  );
+function escapeHtml(s=""){ return s.replace(/[&<>\"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+function fmtTime(ts){ try{const t=ts?.toDate?ts.toDate():(ts instanceof Date?ts:null); if(!t)return""; return t.toLocaleString([], {month:"short", day:"numeric", hour:"2-digit", minute:"2-digit"});}catch{return"";} }
+function match(p, term){ if(!term) return true; const t=term.toLowerCase(); return ((p.text||"").toLowerCase().includes(t) || (p.title||"").toLowerCase().includes(t)); }
 
-  // Videos
-  await fillGrid(
-    "#video-feed",
-    query(
-      collection(db, "posts"),
-      where("type", "in", ["video"]),
-      orderBy("createdAt", "desc"),
-      limit(12)
-    )
-  );
-
-  // Podcasts
-  await fillGrid(
-    "#podcast-feed",
-    query(
-      collection(db, "posts"),
-      where("type", "in", ["podcast-audio", "podcast-video"]),
-      orderBy("createdAt", "desc"),
-      limit(12)
-    )
-  );
-
-  // Clips
-  await fillGrid(
-    "#clips-feed",
-    query(
-      collection(db, "posts"),
-      where("type", "in", ["clip"]),
-      orderBy("createdAt", "desc"),
-      limit(12)
-    )
-  );
-}
-
-async function fillGrid(sel, q) {
-  const el = $(sel);
-  if (!el) return;
-  try {
-    const snap = await getDocs(q);
-    if (snap.empty) {
-      el.textContent = el.id.includes("video")
-        ? "No videos yet"
-        : el.id.includes("podcast")
-        ? "No podcasts yet"
-        : el.id.includes("clips")
-        ? "No clips yet"
-        : "No trending posts";
-      return;
-    }
-    el.innerHTML = "";
-    snap.forEach((docSnap) => {
-      const d = docSnap.data();
-      const card = document.createElement("div");
-      card.className = "video-card";
-      const cover =
-        d.thumbUrl || (d.type === "podcast-audio" ? "default-audio-cover.png" : "");
-      const media = cover ? `<img src="${cover}" alt="${d.title} cover">` : "";
-      card.innerHTML = `
-        ${media}
-        <h3>${d.title || "Untitled"}</h3>
-        <p>${d.type.replace("-", " ")}</p>
-        <p>${(d.description || "").slice(0, 120)}</p>
-        <a class="button" href="${d.fileUrl}" target="_blank" rel="noopener">Open</a>
-      `;
-      el.appendChild(card);
-    });
-  } catch (e) {
-    console.error("Feed load error:", e);
-    el.textContent = "Failed to load.";
+function cardFromDoc(d){
+  const p = d.data();
+  const el = document.createElement("article"); el.className = "card";
+  const kind = p.kind || p.type || "";
+  const label = (kind==="video"||kind==="podcast_video") ? "VIDEO"
+             : (kind==="podcast_audio"||kind==="audio") ? "PODCAST"
+             : (kind==="clip") ? "CLIP" : "";
+  const url = p.mediaUrl || p.fileUrl || "";
+  let media = "";
+  if (url) {
+    if (kind==="video"||kind==="podcast_video") media = `<video src="${url}" controls playsinline style="width:100%;border-radius:10px;margin-top:8px;"></video>`;
+    else if (kind==="podcast_audio"||kind==="audio") media = `<audio src="${url}" controls style="width:100%;margin-top:8px;"></audio>`;
+    else if (kind==="image") media = `<img src="${url}" alt="" style="width:100%;border-radius:10px;margin-top:8px;">`;
+    else media = `<a href="${url}" target="_blank" rel="noopener">Open file</a>`;
   }
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div><strong>${escapeHtml(p.user||"Anon")}</strong> <span class="muted">· ${fmtTime(p.createdAt)}</span></div>
+      ${label?`<span class="muted" style="border:1px solid #2a2a2a;padding:2px 8px;border-radius:999px;font-size:.75rem;">${label}</span>`:""}
+    </div>
+    ${p.title ? `<div style="margin-top:6px;">${escapeHtml(p.title)}</div>` : ""}
+    ${media}
+  `;
+  return el;
 }
 
-/* ---------------- Boot ---------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  initTabs();
-  initSettingsAccordion();
-
-  // Upload form type → accept/labels
-  const typeSel = $("#upload-type");
-  if (typeSel) {
-    refreshUploadForm();
-    typeSel.addEventListener("change", refreshUploadForm);
-  }
-
-  // Initial feed load
-  loadFeeds();
-
-  // Optional: extra logout wire via button ID
-  $("#logoutBtn")?.addEventListener("click", handleLogoutOrPrompt);
-
-  // Upload button gate by live auth state (extra defense)
-  const uploadBtn = $("#upload-btn");
-  uploadBtn?.addEventListener("click", (e) => {
-    if (!auth.currentUser) {
-      e.preventDefault?.();
-      showAuthModal();
-    }
+// basic live trending feed
+try {
+  const PAGE_SIZE = 40;
+  const qMain = query(collection(db,"posts"), orderBy("createdAt","desc"), limit(PAGE_SIZE));
+  const unsub = (await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js")).onSnapshot;
+  // dynamic import to get onSnapshot (keeps top import list shorter)
+  unsub(qMain, (snap)=>{
+    if (!homeFeed) return;
+    const docs = snap.docs;
+    homeFeed.innerHTML = docs.length ? "" : '<div class="muted" style="text-align:center;margin-top:40px;">No trending content yet.</div>';
+    docs.forEach(d=> homeFeed.appendChild(cardFromDoc(d)));
   });
-});
+} catch { /* feeds are optional; ignore errors */ }
