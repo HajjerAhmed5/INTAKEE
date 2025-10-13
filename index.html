@@ -676,4 +676,41 @@
     });
   </script>
 </body>
+<!-- 🔹 AUTH CONTROLS -->
+<div data-anon-only>
+  <button onclick="document.getElementById('auth-modal').showModal()">Sign in / Create Account</button>
+</div>
+
+<div data-authed-only style="display:none;">
+  Signed in as <strong data-user-name></strong>
+  <button id="logout-btn">Log out</button>
+</div>
+
+<!-- 🔹 AUTH MODAL -->
+<dialog id="auth-modal">
+  <form method="dialog" style="text-align:right">
+    <button>✕</button>
+  </form>
+
+  <h3>Create account</h3>
+  <form id="signup-form">
+    <input name="displayName" type="text" placeholder="Display name (optional)" />
+    <input name="email" type="email" placeholder="Email" required />
+    <input name="password" type="password" placeholder="Password (min 6)" required />
+    <button type="submit">Sign up</button>
+  </form>
+
+  <hr />
+
+  <h3>Sign in</h3>
+  <form id="login-form">
+    <input name="email" type="email" placeholder="Email" required />
+    <input name="password" type="password" placeholder="Password" required />
+    <button type="submit">Sign in</button>
+  </form>
+</dialog>
+
+<!-- 🔹 JS LINKS -->
+<script type="module" src="./js/firebase-init.js"></script>
+<script type="module" src="./js/auth.js"></script>
 </html>
