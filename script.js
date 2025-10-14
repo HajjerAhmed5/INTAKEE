@@ -1,6 +1,6 @@
 /* 
 INTAKEE — Fully Connected JS (Accounts + Profiles + Uploads)
-Replace your script.js file with this one.
+Single client-side file. No HTML inside this file.
 */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -17,7 +17,6 @@ import {
   doc,
   getDoc,
   setDoc,
-  updateDoc,
   serverTimestamp,
   collection,
   addDoc,
@@ -38,7 +37,7 @@ const FIREBASE_CONFIG = {
   apiKey: "AIzaSyD0_tL8pXuVG7JpCBj3tuL7s3KipL5E6g",
   authDomain: "intakee-5785e.firebaseapp.com",
   projectId: "intakee-5785e",
-  storageBucket: "intakee-5785e.firebasestorage.app",
+  storageBucket: "intakee-5785e.appspot.com", // ✅ correct domain
   messagingSenderId: "406062380272",
   appId: "1:406062380272:web:49dd5e7db91c6a38b56c5d",
   measurementId: "G-3C2YDVGTEG"
@@ -54,16 +53,13 @@ const storage = getStorage(app);
 const $ = (sel) => document.querySelector(sel);
 const $id = (id) => document.getElementById(id);
 const on = (el, ev, fn) => el && el.addEventListener(ev, fn);
-function toast(msg) {
-  console.log("[INTAKEE]", msg);
-}
+function toast(msg) { console.log("[INTAKEE]", msg); }
+
 async function uploadFileToStorage(file, path) {
   if (!file) return null;
   const storageRef = sRef(storage, path);
   const task = uploadBytesResumable(storageRef, file);
-  await new Promise((res, rej) => {
-    task.on("state_changed", () => {}, rej, res);
-  });
+  await new Promise((res, rej) => { task.on("state_changed", () => {}, rej, res); });
   return await getDownloadURL(task.snapshot.ref);
 }
 function dispatch(name, detail = {}) {
@@ -87,44 +83,34 @@ on($id("authSignUpForm"), "submit", async (e) => {
       bannerURL: "",
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      likes: 0,
-      followers: 0,
-      following: 0
+      likes: 0, followers: 0, following: 0
     });
     toast("Account created. You are signed in.");
-  } catch (err) {
-    toast(err.message);
-  }
+  } catch (err) { toast(err.message); }
 });
 
 on($id("authSignInForm"), "submit", async (e) => {
   e.preventDefault();
   const email = $id("signInEmail")?.value?.trim();
   const password = $id("signInPassword")?.value;
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    toast("Signed in.");
-  } catch (err) {
-    toast(err.message);
-  }
+  try { await signInWithEmailAndPassword(auth, email, password); toast("Signed in."); }
+  catch (err) { toast(err.message); }
 });
 
 on($id("btnSignOut"), "click", async () => {
-  try {
-    await signOut(auth);
-    toast("Signed out.");
-  } catch (err) {
-    toast(err.message);
-  }
+  try { await signOut(auth); toast("Signed out."); }
+  catch (err) { toast(err.message); }
 });
 
 onAuthStateChanged(auth, async (user) => {
   const body = document.body;
   if (user) {
     body.classList.add("is-logged-in");
-    const snap = await getDoc(doc(db, "users", user.uid));
+    // ensure profile doc exists
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
     if (!snap.exists()) {
-      await setDoc(doc(db, "users", user.uid), {
+      await setDoc(ref, {
         uid: user.uid,
         displayName: user.displayName || "Creator",
         bio: "",
@@ -141,71 +127,63 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-/* ---------- PROFILE ---------- */
+/* ---------- PROFILE (name, bio, photo, banner) ---------- */
 on($id("btnSaveProfile"), "click", async () => {
   const user = auth.currentUser;
   if (!user) return toast("Please sign in first.");
+
   try {
-    const displayName =
-      $id("profileNameInput")?.value?.trim() || user.displayName || "Creator";
+    const displayName = $id("profileNameInput")?.value?.trim() || user.displayName || "Creator";
     const bio = $id("profileBioInput")?.value?.trim() || "";
     const photoFile = $id("profilePhotoInput")?.files?.[0] || null;
     const bannerFile = $id("profileBannerInput")?.files?.[0] || null;
 
-    let photoURL = null,
-      bannerURL = null;
+    let photoURL = null, bannerURL = null;
+
     if (photoFile) {
-      photoURL = await uploadFileToStorage(
-        photoFile,
-        `users/${user.uid}/profile/photo_${Date.now()}`
-      );
+      photoURL = await uploadFileToStorage(photoFile, `users/${user.uid}/profile/photo_${Date.now()}`);
       await updateProfile(user, { displayName, photoURL });
     } else {
       await updateProfile(user, { displayName });
     }
     if (bannerFile) {
-      bannerURL = await uploadFileToStorage(
-        bannerFile,
-        `users/${user.uid}/profile/banner_${Date.now()}`
-      );
+      bannerURL = await uploadFileToStorage(bannerFile, `users/${user.uid}/profile/banner_${Date.now()}`);
     }
 
-    const userRef = doc(db, "users", user.uid);
-    await setDoc(
-      userRef,
-      {
-        uid: user.uid,
-        displayName,
-        bio,
-        photoURL: photoURL ?? auth.currentUser.photoURL ?? "",
-        bannerURL:
-          bannerURL ?? (await getDoc(userRef)).data()?.bannerURL ?? "",
-        updatedAt: serverTimestamp()
-      },
-      { merge: true }
-    );
+    const ref = doc(db, "users", user.uid);
+    const old = (await getDoc(ref)).data() || {};
+    await setDoc(ref, {
+      uid: user.uid,
+      displayName,
+      bio,
+      photoURL: photoURL ?? auth.currentUser.photoURL ?? old.photoURL ?? "",
+      bannerURL: bannerURL ?? old.bannerURL ?? "",
+      updatedAt: serverTimestamp()
+    }, { merge: true });
 
     toast("Profile saved.");
     dispatch("intakee:profileSaved", { uid: user.uid });
-  } catch (err) {
-    toast(err.message);
-  }
+  } catch (err) { toast(err.message); }
 });
 
-/* ---------- UPLOAD ---------- */
+/* ---------- UPLOAD (video/clip/podcast) ---------- */
 on($id("btnUpload"), "click", async () => {
   const user = auth.currentUser;
   if (!user) return toast("Please sign in to upload.");
+
   const type = $id("uploadTypeSelect")?.value || "video";
   const title = $id("uploadTitleInput")?.value?.trim();
   const mediaFile = $id("uploadFileInput")?.files?.[0];
   const thumbFile = $id("uploadThumbInput")?.files?.[0] || null;
+
   if (!title || !mediaFile) return toast("Title and media file are required.");
 
   try {
+    // media
     const mediaPath = `posts/${user.uid}/${Date.now()}_${mediaFile.name}`;
     const mediaURL = await uploadFileToStorage(mediaFile, mediaPath);
 
+    // optional thumb
     let thumbURL = "";
     if (thumbFile) {
       const thumbPath = `posts/${user.uid}/thumb_${Date.now()}_${thumbFile.name}`;
@@ -215,7 +193,7 @@ on($id("btnUpload"), "click", async () => {
     const postRef = await addDoc(collection(db, "posts"), {
       ownerUid: user.uid,
       ownerName: auth.currentUser.displayName || "Creator",
-      type,
+      type, // 'video' | 'clip' | 'podcast-audio' | 'podcast-video'
       title,
       mediaURL,
       thumbURL,
@@ -227,55 +205,12 @@ on($id("btnUpload"), "click", async () => {
 
     toast("Upload complete.");
     dispatch("intakee:uploadComplete", { postId: postRef.id });
-  } catch (err) {
-    toast(err.message);
-  }
+  } catch (err) { toast(err.message); }
 });
 
-/* ---------- LOAD FEED (OPTIONAL) ---------- */
+/* ---------- FEED HELPER (optional for your lists) ---------- */
 export async function loadRecentPosts(limitCount = 12) {
-  const q = query(
-    collection(db, "posts"),
-    orderBy("createdAt", "desc"),
-    limit(limitCount)
-  );
+  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(limitCount));
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
-<script>
-  // --- Bottom tab router (hash-based) ---
-  const links = Array.from(document.querySelectorAll('.bottom-nav a'));
-  const sections = {
-    home:     document.getElementById('tab-home'),
-    videos:   document.getElementById('tab-videos'),
-    podcast:  document.getElementById('tab-podcast'),
-    upload:   document.getElementById('tab-upload'),
-    clips:    document.getElementById('tab-clips'),
-    profile:  document.getElementById('tab-profile'),
-    settings: document.getElementById('tab-settings')
-  };
-  const searchWrap = document.getElementById('searchWrap');
-
-  function setTab(key){
-    Object.entries(sections).forEach(([k,el]) => el.style.display = (k === key) ? '' : 'none');
-    links.forEach(a => a.classList.toggle('active', a.dataset.tab === key));
-    // Only show the big header search on Home (your design)
-    if (searchWrap) searchWrap.style.display = (key === 'home') ? 'flex' : 'none';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-  function applyHash(){
-    const key = (location.hash || '#home').slice(1);
-    setTab(sections[key] ? key : 'home');
-  }
-  links.forEach(a => a.addEventListener('click', (e) => {
-    e.preventDefault();
-    location.hash = a.getAttribute('href');
-  }));
-  window.addEventListener('hashchange', applyHash);
-  applyHash();
-
-  // --- Open the auth dialog when “Login / Sign Up” is clicked ---
-  document.getElementById('openAuth')?.addEventListener('click', () => {
-    document.getElementById('authDialog')?.showModal();
-  });
-</script>
