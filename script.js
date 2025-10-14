@@ -44,6 +44,7 @@ const FIREBASE_CONFIG = {
 
 /* ---------- INIT ---------- */
 const app = initializeApp(FIREBASE_CONFIG);
+console.log("INTAKEE runtime Firebase config:", app.options);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
