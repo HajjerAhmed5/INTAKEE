@@ -37,8 +37,8 @@ const FIREBASE_CONFIG = {
   authDomain: "intakee-5785e.firebaseapp.com",
   projectId: "intakee-5785e",
   storageBucket: "intakee-5785e.appspot.com",   // ← important
-  messagingSenderId: "406062380272",
-  appId: "1:406062380272:web:49dd5e7db91c6a38b56c5d",
+  messagingSenderId: "406662380272",            // ← FIXED
+  appId: "1:406662380272:web:49dd5e7db91c8a38b56c5d", // ← FIXED
   measurementId: "G-3C2YDVGTEG"
 };
 
