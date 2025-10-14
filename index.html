@@ -6,6 +6,7 @@
 <title>INTAKEE — Videos, Podcasts, and Clips</title>
 <meta name="description" content="INTAKEE is the all-in-one platform for videos, podcasts, and clips — freedom to create, simple to share.">
 <link rel="canonical" href="https://intakee.vercel.app/">
+
 <!-- Social -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
@@ -17,10 +18,12 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
 <link rel="icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
 <style>
   :root { color-scheme: dark; }
   *{ box-sizing:border-box; }
   body{ margin:0; background:#000; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+
   /* Header */
   header{
     display:flex; align-items:center; gap:12px;
@@ -31,12 +34,13 @@
   #searchWrap{ display:flex; margin-left:auto; }
   .search-bar{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:420px; max-width:52vw; }
   .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
-  .auth{ display:flex; gap:10px; margin-left:12px; }
+  .auth{ display:flex; gap:10px; margin-left:12px; align-items:center; }
   button{ padding:9px 14px; border-radius:10px; border:1px solid #2a2a2a; background:#141414; color:#fff; cursor:pointer; }
   button.primary{ background:#1a1a1a; border-color:#3a3a3a; }
   button.ghost{ background:transparent; }
   button:hover{ background:#191919; }
   button[disabled]{ opacity:.6; cursor:not-allowed; }
+
   /* Layout */
   main{ max-width:1000px; margin:0 auto; padding:16px; padding-bottom:88px; }
   .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
@@ -47,18 +51,22 @@
   }
   input[type="file"]{ color:#aaa; }
   textarea{ width:100%; min-height:80px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
+
   /* Section header + right search */
   .section-head{ display:flex; align-items:center; gap:12px; margin:0 0 6px; }
   .section-search{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:340px; max-width:50vw; margin-left:auto; }
   .section-search input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
+
   /* Pills */
   .pills{ display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
   .pill{ padding:6px 10px; border:1px solid #2a2a2a; border-radius:999px; font-size:.85rem; background:#0f0f0f; cursor:pointer; }
   .pill.active{ background:#151515; border-color:#3a3a3a; color:#fff; }
+
   /* Bottom nav */
   .bottom-nav{ position:fixed; bottom:0; left:0; right:0; background:#0b0b0b; border-top:1px solid #151515; display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:8px 6px; z-index:50; }
   .bottom-nav a{ color:#aaa; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.75rem; padding:6px 4px; border-radius:10px; }
   .bottom-nav a.active, .bottom-nav a:hover{ color:#fff; background:#111; }
+
   /* -------- PROFILE -------- */
   .profile-banner{
     height:200px; border-radius:14px; border:1px solid #1a1a1a; background:#111 center/cover no-repeat;
@@ -94,7 +102,8 @@
   .grid .tile{ background:#0f0f0f; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden; }
   .grid .tile .thumb{ width:100%; aspect-ratio:16/9; background:#111; object-fit:cover; display:block; }
   .grid .tile .meta{ padding:8px 10px; font-size:.9rem; }
-  /* Settings */
+
+  /* -------- SETTINGS bits -------- */
   .settings-section{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; }
   .settings-item{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid #151515; }
   .settings-item:first-child{ border-top:none; }
@@ -103,11 +112,13 @@
   .toggle::after{ content:""; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#2b2b2b; transition:transform .15s ease; }
   .toggle[data-on="true"]{ background:#1c1c1c; border-color:#3a3a3a; }
   .toggle[data-on="true"]::after{ transform:translateX(18px); }
+
   .disclosure{ width:100%; text-align:left; padding:10px 12px; border:1px solid #1a1a1a; border-radius:10px; background:#101010; }
   .disclosure[aria-expanded="true"]{ background:#121212; }
   .disclosure-panel{ margin-top:10px; border:1px solid #1a1a1a; border-radius:10px; padding:12px; background:#0f0f0f; }
   .settings-links a{ color:#ddd; text-decoration:none; display:block; padding:6px 0; }
   .settings-links a:hover{ text-decoration:underline; }
+
   /* Auth modal */
   dialog{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; color:#fff; }
   dialog form[method="dialog"]{ text-align:right; }
@@ -118,15 +129,20 @@
   <header>
     <div class="brand"><img src="logo.png" alt="INTAKEE"></div>
     <div class="spacer"></div>
+
     <div id="searchWrap" class="search-bar">
       <i class="fa fa-search" style="opacity:.6;"></i>
       <input id="globalSearch" type="text" placeholder="Search…" />
     </div>
+
     <div class="auth">
       <button id="openAuth">Login / Sign Up</button>
       <button id="btnSignOut" style="display:none;">Logout</button>
+      <!-- shows who is signed in -->
+      <span id="whoami" class="muted" style="margin-left:8px;"></span>
     </div>
   </header>
+
   <main>
     <!-- HOME -->
     <section id="tab-home">
@@ -143,6 +159,7 @@
       </div>
       <div id="home-feed"></div>
     </section>
+
     <!-- VIDEOS -->
     <section id="tab-videos" style="display:none;">
       <div class="section-head">
@@ -154,6 +171,7 @@
       </div>
       <div id="videos-feed"></div>
     </section>
+
     <!-- PODCASTS -->
     <section id="tab-podcast" style="display:none;">
       <div class="section-head">
@@ -165,7 +183,8 @@
       </div>
       <div id="podcast-feed"></div>
     </section>
-    <!-- UPLOAD (IDs matched to script.js) -->
+
+    <!-- UPLOAD -->
     <section id="tab-upload" class="card" style="display:none;">
       <h3 style="margin:0 0 12px;">Upload</h3>
       <div class="row" style="gap:12px;align-items:flex-start;">
@@ -183,6 +202,7 @@
           <input id="uploadTitleInput" type="text" placeholder="Add a title" style="width:100%;margin-top:6px;">
         </div>
       </div>
+
       <div class="row" style="gap:12px;align-items:flex-start;margin-top:12px;">
         <div style="flex:1;min-width:220px;">
           <label for="uploadThumbInput">Thumbnail (cover image)</label>
@@ -193,12 +213,15 @@
           <input id="uploadFileInput" type="file" accept="video/*,audio/*" style="width:100%;margin-top:6px;">
         </div>
       </div>
+
       <p class="muted" style="margin-top:8px;">Processing starts after upload. You’ll be notified when it’s ready.</p>
+
       <div class="row" style="margin-top:14px;gap:10px;">
         <button id="btnUpload" class="primary">Upload</button>
         <button id="goLiveBtn" class="ghost">Go Live</button>
       </div>
     </section>
+
     <!-- CLIPS -->
     <section id="tab-clips" style="display:none;">
       <div class="section-head">
@@ -210,24 +233,26 @@
       </div>
       <div id="clips-feed"></div>
     </section>
+
     <!-- PROFILE -->
     <section id="tab-profile" style="display:none;">
-      <!-- Banner with + -->
       <div id="profileBanner" class="profile-banner">
         <button id="btnAddBanner" class="add-btn owner-only" title="Change banner" style="display:none;">+</button>
       </div>
+
       <div class="card">
         <div class="profile-header">
           <div class="avatar-wrap">
             <img id="profile-photo" src="" alt="" class="profile-avatar">
             <button id="btnAddAvatar" class="add-btn owner-only" title="Change photo" style="display:none;">+</button>
           </div>
+
           <div>
             <h3 id="profile-name" style="margin:0;">Your Name</h3>
             <div id="profile-handle" class="muted">@username</div>
-            <!-- Bio view -->
+
             <div id="bio-view" class="muted" style="margin-top:8px;">Add a short bio to introduce yourself.</div>
-            <!-- Profile edit inputs for script.js -->
+
             <div id="bio-edit-wrap" style="display:none; margin-top:8px;">
               <input id="profileNameInput" type="text" placeholder="Your name" style="width:100%;margin-bottom:6px;">
               <textarea id="profileBioInput" placeholder="Write your bio..."></textarea>
@@ -238,6 +263,7 @@
                 <button id="bio-cancel" class="ghost">Cancel</button>
               </div>
             </div>
+
             <div class="stat-row">
               <div class="muted"><strong id="stat-posts">0</strong> Posts</div>
               <div class="muted"><strong id="stat-followers">0</strong> Followers</div>
@@ -245,6 +271,7 @@
               <div class="muted"><strong id="stat-likes">0</strong> Likes</div>
             </div>
           </div>
+
           <div class="profile-actions">
             <button id="btn-follow" class="primary">Follow</button>
             <button id="btn-share-profile" class="ghost">Share Profile</button>
@@ -252,6 +279,7 @@
           </div>
         </div>
       </div>
+
       <div class="card">
         <div class="profile-tabs">
           <button class="pill active" data-profiletab="all">All</button>
@@ -263,10 +291,11 @@
         <div id="profile-grid" class="grid"></div>
         <div id="profile-empty" class="muted" style="margin-top:8px; display:none;">No posts yet.</div>
       </div>
-      <!-- Hidden file inputs (for + buttons if you re-enable them later) -->
+
       <input id="bannerInput" type="file" accept="image/*" hidden>
       <input id="avatarInput" type="file" accept="image/*" hidden>
     </section>
+
     <!-- SETTINGS -->
     <section id="tab-settings" style="display:none;">
       <div class="settings-section">
@@ -276,6 +305,7 @@
         <div class="settings-item"><div class="settings-left"><i class="fa fa-trash"></i><span>Delete Account</span></div><button class="ghost">Start</button></div>
         <div class="settings-item"><div class="settings-left"><i class="fa fa-right-from-bracket"></i><span>Logout</span></div><button id="settings-logout" class="ghost">Logout</button></div>
       </div>
+
       <div class="settings-section">
         <h3 style="margin:0 0 8px;">Privacy & Safety</h3>
         <div class="settings-item"><div class="settings-left"><i class="fa fa-lock"></i><span>Private account</span></div><div class="toggle" id="toggle-private" data-on="false" role="switch" aria-checked="false"></div></div>
@@ -286,6 +316,7 @@
         <div class="settings-item"><div class="settings-left"><i class="fa fa-eye-slash"></i><span>Hide sensitive content</span></div><div class="toggle" id="toggle-sensitive" data-on="false" role="switch" aria-checked="false"></div></div>
         <div class="settings-item"><div class="settings-left"><i class="fa fa-flag"></i><span>Report a problem</span></div><button class="ghost">Report</button></div>
       </div>
+
       <div class="settings-section">
         <h3 style="margin:0 0 8px;">Legal & Policy</h3>
         <button id="legalToggle" class="disclosure" aria-expanded="false">View Legal & Policy</button>
@@ -315,6 +346,7 @@
       </div>
     </section>
   </main>
+
   <!-- Tabs -->
   <nav class="bottom-nav">
     <a href="#home"    data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
@@ -325,11 +357,13 @@
     <a href="#profile" data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
     <a href="#settings"data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
   </nav>
+
   <!-- 🔹 AUTH MODAL -->
   <dialog id="authDialog">
     <form method="dialog" style="text-align:right; margin:0 0 8px;">
       <button>✕</button>
     </form>
+
     <h3 style="margin:0 0 8px;">Create account</h3>
     <form id="authSignUpForm" style="display:grid; gap:8px;">
       <input id="signUpName" type="text" placeholder="Display name (optional)" />
@@ -337,7 +371,9 @@
       <input id="signUpPassword" type="password" placeholder="Password (min 6)" required />
       <button type="submit" class="primary">Sign up</button>
     </form>
+
     <hr style="border-color:#1a1a1a; margin:12px 0;" />
+
     <h3 style="margin:0 0 8px;">Sign in</h3>
     <form id="authSignInForm" style="display:grid; gap:8px;">
       <input id="signInEmail" type="email" placeholder="Email" required />
@@ -345,20 +381,41 @@
       <button type="submit">Sign in</button>
     </form>
   </dialog>
-  <!-- Helper scripts -->
+
+  <!-- Helper scripts for header + legal -->
   <script>
     // Open auth dialog
     document.getElementById('openAuth')?.addEventListener('click', () => {
       document.getElementById('authDialog')?.showModal();
     });
-    // Toggle header buttons based on login state (script.js adds/removes .is-logged-in)
-    const headerObserver = new MutationObserver(() => {
-      const loggedIn = document.body.classList.contains('is-logged-in');
-      document.getElementById('openAuth').style.display = loggedIn ? 'none' : '';
-      document.getElementById('btnSignOut').style.display = loggedIn ? '' : 'none';
+
+    // Update header buttons and "whoami" when script.js reports auth state
+    function applyHeaderAuth(user) {
+      const openBtn = document.getElementById('openAuth');
+      const outBtn  = document.getElementById('btnSignOut');
+      const whoami  = document.getElementById('whoami');
+
+      const loggedIn = !!user;
+      if (openBtn) openBtn.style.display = loggedIn ? 'none' : '';
+      if (outBtn)  outBtn.style.display  = loggedIn ? '' : 'none';
+
+      if (whoami) {
+        if (loggedIn) {
+          const email = user.email || '';
+          const name  = user.displayName || '';
+          whoami.textContent = name ? `${name} (${email})` : email;
+        } else {
+          whoami.textContent = '';
+        }
+      }
+    }
+
+    // Listen for custom event from script.js: dispatch("intakee:auth", { user })
+    document.addEventListener('intakee:auth', (e) => {
+      applyHeaderAuth(e.detail?.user ?? null);
     });
-    headerObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-    // Legal disclosure
+
+    // Legal disclosure toggle
     const legalToggle = document.getElementById("legalToggle");
     const legalPanel  = document.getElementById("legalPanel");
     legalToggle?.addEventListener('click', ()=>{
@@ -367,6 +424,7 @@
       legalPanel.hidden = expanded;
     });
   </script>
+
   <!-- Bottom tab router (hash-based) -->
   <script>
     const links = Array.from(document.querySelectorAll('.bottom-nav a'));
@@ -380,6 +438,7 @@
       settings: document.getElementById('tab-settings')
     };
     const searchWrap = document.getElementById('searchWrap');
+
     function setTab(key){
       Object.entries(sections).forEach(([k,el]) => el.style.display = (k === key) ? '' : 'none');
       links.forEach(a => a.classList.toggle('active', a.dataset.tab === key));
@@ -397,7 +456,8 @@
     window.addEventListener('hashchange', applyHash);
     applyHash();
   </script>
+
   <!-- App JS (single entry) -->
-<script type="module" src="script.js?v=10"></script>
+  <script type="module" src="script.js?v=10"></script>
 </body>
 </html>
