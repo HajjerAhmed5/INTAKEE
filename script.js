@@ -1,17 +1,16 @@
-/* 
-INTAKEE — Fully Connected JS (Accounts + Profiles + Uploads)
-Single client-side file. No HTML inside this file.
-*/
+/* INTAKEE — Accounts + Profiles + Uploads (final) */
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
 import {
   getAuth,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  updateProfile
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  updateProfile,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import {
   getFirestore,
   doc,
@@ -24,20 +23,20 @@ import {
   orderBy,
   limit,
   getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 import {
   getStorage,
   ref as sRef,
   uploadBytesResumable,
   getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
 
 /* ---------- FIREBASE CONFIG ---------- */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyD0_tL8pXuVG7JpCBj3tuL7s3KipL5E6g",
   authDomain: "intakee-5785e.firebaseapp.com",
   projectId: "intakee-5785e",
-  storageBucket: "intakee-5785e.appspot.com", // ✅ correct domain
+  storageBucket: "intakee-5785e.appspot.com",   // ← important
   messagingSenderId: "406062380272",
   appId: "1:406062380272:web:49dd5e7db91c6a38b56c5d",
   measurementId: "G-3C2YDVGTEG"
@@ -48,13 +47,26 @@ const app = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+// keep users logged in
+await setPersistence(auth, browserLocalPersistence);
 
 /* ---------- HELPERS ---------- */
 const $ = (sel) => document.querySelector(sel);
 const $id = (id) => document.getElementById(id);
 const on = (el, ev, fn) => el && el.addEventListener(ev, fn);
-function toast(msg) { console.log("[INTAKEE]", msg); }
+const authDialog = $id("authDialog");
+const authError = document.createElement("div");
+authError.id = "authError";
+authError.style.cssText = "color:#ff7676;margin-top:6px;font-size:.9rem;";
+$id("authSignUpForm")?.appendChild(authError); // shows errors under signup
+$id("authSignInForm")?.appendChild(authError); // same element reused
 
+function showError(msg) { if (authError) authError.textContent = msg || ""; }
+function clearError() { showError(""); }
+function toast(msg){ console.log("[INTAKEE]", msg); }
+function closeAuth(){ try{ authDialog?.close?.(); }catch{} }
+
+/* Upload to Storage */
 async function uploadFileToStorage(file, path) {
   if (!file) return null;
   const storageRef = sRef(storage, path);
@@ -67,14 +79,16 @@ function dispatch(name, detail = {}) {
 }
 
 /* ---------- AUTH ---------- */
+// signup
 on($id("authSignUpForm"), "submit", async (e) => {
-  e.preventDefault();
+  e.preventDefault(); clearError();
   const email = $id("signUpEmail")?.value?.trim();
   const password = $id("signUpPassword")?.value;
   const displayName = $id("signUpName")?.value?.trim() || "";
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     if (displayName) await updateProfile(cred.user, { displayName });
+    // ensure profile doc
     await setDoc(doc(db, "users", cred.user.uid), {
       uid: cred.user.uid,
       displayName: cred.user.displayName || displayName || "Creator",
@@ -84,33 +98,51 @@ on($id("authSignUpForm"), "submit", async (e) => {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       likes: 0, followers: 0, following: 0
-    });
-    toast("Account created. You are signed in.");
-  } catch (err) { toast(err.message); }
+    }, { merge: true });
+
+    toast("Account created.");
+    closeAuth();
+  } catch (err) {
+    showError(err?.message || "Sign up failed.");
+  }
 });
 
+// signin
 on($id("authSignInForm"), "submit", async (e) => {
-  e.preventDefault();
+  e.preventDefault(); clearError();
   const email = $id("signInEmail")?.value?.trim();
   const password = $id("signInPassword")?.value;
-  try { await signInWithEmailAndPassword(auth, email, password); toast("Signed in."); }
-  catch (err) { toast(err.message); }
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    toast("Signed in.");
+    closeAuth();
+  } catch (err) {
+    showError(err?.message || "Sign in failed.");
+  }
 });
 
+// logout (header)
 on($id("btnSignOut"), "click", async () => {
   try { await signOut(auth); toast("Signed out."); }
-  catch (err) { toast(err.message); }
+  catch (err) { alert(err?.message || "Logout failed."); }
+});
+// logout (settings page)
+on($id("settings-logout"), "click", async () => {
+  try { await signOut(auth); toast("Signed out."); }
+  catch (err) { alert(err?.message || "Logout failed."); }
 });
 
+// reflect auth state in UI
 onAuthStateChanged(auth, async (user) => {
   const body = document.body;
   if (user) {
     body.classList.add("is-logged-in");
-    // ensure profile doc exists
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
+
+    // create user doc if missing
+    const uref = doc(db, "users", user.uid);
+    const snap = await getDoc(uref);
     if (!snap.exists()) {
-      await setDoc(ref, {
+      await setDoc(uref, {
         uid: user.uid,
         displayName: user.displayName || "Creator",
         bio: "",
@@ -120,6 +152,7 @@ onAuthStateChanged(auth, async (user) => {
         updatedAt: serverTimestamp()
       });
     }
+
     dispatch("intakee:auth", { user });
   } else {
     body.classList.remove("is-logged-in");
@@ -130,7 +163,7 @@ onAuthStateChanged(auth, async (user) => {
 /* ---------- PROFILE (name, bio, photo, banner) ---------- */
 on($id("btnSaveProfile"), "click", async () => {
   const user = auth.currentUser;
-  if (!user) return toast("Please sign in first.");
+  if (!user) return alert("Sign in to edit your profile.");
 
   try {
     const displayName = $id("profileNameInput")?.value?.trim() || user.displayName || "Creator";
@@ -139,7 +172,6 @@ on($id("btnSaveProfile"), "click", async () => {
     const bannerFile = $id("profileBannerInput")?.files?.[0] || null;
 
     let photoURL = null, bannerURL = null;
-
     if (photoFile) {
       photoURL = await uploadFileToStorage(photoFile, `users/${user.uid}/profile/photo_${Date.now()}`);
       await updateProfile(user, { displayName, photoURL });
@@ -161,39 +193,43 @@ on($id("btnSaveProfile"), "click", async () => {
       updatedAt: serverTimestamp()
     }, { merge: true });
 
-    toast("Profile saved.");
+    alert("Profile saved.");
     dispatch("intakee:profileSaved", { uid: user.uid });
-  } catch (err) { toast(err.message); }
+  } catch (err) {
+    alert(err?.message || "Failed to save profile.");
+  }
 });
 
 /* ---------- UPLOAD (video/clip/podcast) ---------- */
 on($id("btnUpload"), "click", async () => {
   const user = auth.currentUser;
-  if (!user) return toast("Please sign in to upload.");
+  if (!user) return alert("Sign in to upload.");
 
   const type = $id("uploadTypeSelect")?.value || "video";
   const title = $id("uploadTitleInput")?.value?.trim();
   const mediaFile = $id("uploadFileInput")?.files?.[0];
   const thumbFile = $id("uploadThumbInput")?.files?.[0] || null;
 
-  if (!title || !mediaFile) return toast("Title and media file are required.");
+  if (!title || !mediaFile) return alert("Title and media file are required.");
 
   try {
-    // media
-    const mediaPath = `posts/${user.uid}/${Date.now()}_${mediaFile.name}`;
+    const ts = Date.now();
+
+    // upload media
+    const mediaPath = `posts/${user.uid}/${ts}_${mediaFile.name}`;
     const mediaURL = await uploadFileToStorage(mediaFile, mediaPath);
 
-    // optional thumb
+    // optional thumbnail
     let thumbURL = "";
     if (thumbFile) {
-      const thumbPath = `posts/${user.uid}/thumb_${Date.now()}_${thumbFile.name}`;
+      const thumbPath = `posts/${user.uid}/thumb_${ts}_${thumbFile.name}`;
       thumbURL = await uploadFileToStorage(thumbFile, thumbPath);
     }
 
     const postRef = await addDoc(collection(db, "posts"), {
       ownerUid: user.uid,
       ownerName: auth.currentUser.displayName || "Creator",
-      type, // 'video' | 'clip' | 'podcast-audio' | 'podcast-video'
+      type,                     // 'video' | 'clip' | 'podcast-audio' | 'podcast-video'
       title,
       mediaURL,
       thumbURL,
@@ -203,12 +239,19 @@ on($id("btnUpload"), "click", async () => {
       visibility: "public"
     });
 
-    toast("Upload complete.");
+    alert("Upload complete.");
     dispatch("intakee:uploadComplete", { postId: postRef.id });
-  } catch (err) { toast(err.message); }
+
+    // reset inputs
+    $id("uploadTitleInput").value = "";
+    $id("uploadFileInput").value = "";
+    $id("uploadThumbInput").value = "";
+  } catch (err) {
+    alert(err?.message || "Upload failed.");
+  }
 });
 
-/* ---------- FEED HELPER (optional for your lists) ---------- */
+/* ---------- FEED HELPER (optional) ---------- */
 export async function loadRecentPosts(limitCount = 12) {
   const q = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(limitCount));
   const snap = await getDocs(q);
