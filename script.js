@@ -33,7 +33,7 @@ import {
 
 /* ---------- FIREBASE CONFIG ---------- */
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyD0_tL8pXuVG7JpCBj3tuL7s3KipL5E6g",
+  apiKey:apiKey: "AIzaSyCl_Gytnf5dpOE_AEKmRl7Dm1vlJVJLRlc",
   authDomain: "intakee-5785e.firebaseapp.com",
   projectId: "intakee-5785e",
   storageBucket: "intakee-5785e.appspot.com",   // ← important
