@@ -242,3 +242,40 @@ export async function loadRecentPosts(limitCount = 12) {
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
+<script>
+  // --- Bottom tab router (hash-based) ---
+  const links = Array.from(document.querySelectorAll('.bottom-nav a'));
+  const sections = {
+    home:     document.getElementById('tab-home'),
+    videos:   document.getElementById('tab-videos'),
+    podcast:  document.getElementById('tab-podcast'),
+    upload:   document.getElementById('tab-upload'),
+    clips:    document.getElementById('tab-clips'),
+    profile:  document.getElementById('tab-profile'),
+    settings: document.getElementById('tab-settings')
+  };
+  const searchWrap = document.getElementById('searchWrap');
+
+  function setTab(key){
+    Object.entries(sections).forEach(([k,el]) => el.style.display = (k === key) ? '' : 'none');
+    links.forEach(a => a.classList.toggle('active', a.dataset.tab === key));
+    // Only show the big header search on Home (your design)
+    if (searchWrap) searchWrap.style.display = (key === 'home') ? 'flex' : 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function applyHash(){
+    const key = (location.hash || '#home').slice(1);
+    setTab(sections[key] ? key : 'home');
+  }
+  links.forEach(a => a.addEventListener('click', (e) => {
+    e.preventDefault();
+    location.hash = a.getAttribute('href');
+  }));
+  window.addEventListener('hashchange', applyHash);
+  applyHash();
+
+  // --- Open the auth dialog when “Login / Sign Up” is clicked ---
+  document.getElementById('openAuth')?.addEventListener('click', () => {
+    document.getElementById('authDialog')?.showModal();
+  });
+</script>
