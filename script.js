@@ -16,16 +16,16 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 // -----------------------------------------------------------------------------
-// 1) Firebase Config (intakee-5785e)  — make sure these match Project Settings
+// 1) Firebase Config (intakee-5785e) — UPDATED to correct project
 // -----------------------------------------------------------------------------
 const firebaseConfig = {
-  apiKey: "AIzaSyCl_Gytnf5dpOE_AEKmRl7Dm1vlJVJLRlc",
+  apiKey: "AIzaSyD0_tL8PxUvGT7JqCBj3tuL7s3Kipl5E6g",
   authDomain: "intakee-5785e.firebaseapp.com",
   projectId: "intakee-5785e",
-  storageBucket: "intakee-5785e.appspot.com",
-  messagingSenderId: "406662380272",
-  appId: "1:406662380272:web:49dd5e7db91c8a38b56c5d",
-  measurementId: "G-3C2YDVGTEG"
+  storageBucket: "intakee-5785e.firebasestorage.app",
+  messagingSenderId: "40666230072",
+  appId: "1:40666230072:web:49dd5e7db91c8a38b565cd",
+  measurementId: "G-3C2YDV6T0G"
 };
 
 // Init
@@ -69,7 +69,6 @@ const profileEmpty    = $("#profile-empty");
 // 2) Auth: Sign Up / Sign In / Sign Out + auth state -> notify header
 // -----------------------------------------------------------------------------
 onAuthStateChanged(auth, (user) => {
-  // send to header (your HTML listens and updates buttons/whoami)
   dispatchAuthEvent(user || null);
 });
 
@@ -80,12 +79,9 @@ if (signUpForm) {
     const pass  = $("#signUpPassword")?.value;
     const name  = $("#signUpName")?.value.trim();
     if (!email || !pass) return;
-
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, pass);
-      if (name) {
-        await updateProfile(cred.user, { displayName: name });
-      }
+      if (name) await updateProfile(cred.user, { displayName: name });
       dispatchAuthEvent(cred.user);
       authDialog?.close();
     } catch (err) {
@@ -124,8 +120,6 @@ if (btnSignOut) {
 // -----------------------------------------------------------------------------
 // 3) Uploads: Videos / Clips / Podcasts + Thumbnail → Storage + Firestore
 // -----------------------------------------------------------------------------
-
-// Map selected type to storage folder + normalized 'type'/'subtype'
 function resolveUploadPath(type) {
   switch (type) {
     case "video":          return { folder: "videos",   type: "video",   subtype: null };
@@ -157,10 +151,7 @@ async function uploadFileWithProgress(file, destRef, progressCb) {
 
 async function handleUpload() {
   const user = auth.currentUser;
-  if (!user) {
-    alert("Please sign in to upload.");
-    return;
-  }
+  if (!user) { alert("Please sign in to upload."); return; }
 
   const chosen = uploadTypeSel?.value || "video";
   const title  = (uploadTitleIn?.value || "").trim();
@@ -172,7 +163,6 @@ async function handleUpload() {
 
   const { folder, type, subtype } = resolveUploadPath(chosen);
 
-  // Paths
   const safeName = `${Date.now()}_${file.name.replace(/\s+/g, "_")}`;
   const fileRef  = ref(storage, `uploads/${folder}/${user.uid}/${safeName}`);
 
@@ -180,22 +170,18 @@ async function handleUpload() {
   if (thumb) {
     const thumbName = `${Date.now()}_${thumb.name.replace(/\s+/g, "_")}`;
     const thumbRef  = ref(storage, `uploads/thumbnails/${user.uid}/${thumbName}`);
-    thumbURL        = await uploadFileWithProgress(thumb, thumbRef, (p)=>{
-      // Could show thumbnail progress if desired
-    });
+    thumbURL        = await uploadFileWithProgress(thumb, thumbRef, () => {});
   }
 
-  // Upload media
   const mediaURL = await uploadFileWithProgress(file, fileRef, (pct)=>{
     btnUpload.textContent = `Uploading… ${pct}%`;
     btnUpload.disabled = true;
   });
 
-  // Save to Firestore
   const docRef = await addDoc(collection(db, "posts"), {
     title,
-    type,                   // "video" | "clip" | "podcast"
-    subtype: subtype || "", // for podcasts: "audio" | "video"
+    type,
+    subtype: subtype || "",
     mediaURL,
     thumbnailURL: thumbURL || "",
     createdAt: serverTimestamp(),
@@ -203,14 +189,12 @@ async function handleUpload() {
     userEmail: user.email || ""
   });
 
-  // Reset UI
   btnUpload.textContent = "Upload";
   btnUpload.disabled = false;
   if (uploadFileIn) uploadFileIn.value = "";
   if (uploadThumbIn) uploadThumbIn.value = "";
   if (uploadTitleIn) uploadTitleIn.value = "";
 
-  // Optimistically add to profile grid
   appendToProfileGrid({
     id: docRef.id,
     title, type, subtype,
@@ -219,7 +203,6 @@ async function handleUpload() {
 
   alert("Upload complete! Your post will appear in the feed shortly.");
 }
-
 if (btnUpload) btnUpload.addEventListener("click", handleUpload);
 
 // -----------------------------------------------------------------------------
@@ -257,7 +240,6 @@ function escapeHtml(s = "") {
 function mountFeedStream() {
   const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
   onSnapshot(q, (snap) => {
-    // Clear feeds
     if (homeFeed)   homeFeed.innerHTML   = "";
     if (videosFeed) videosFeed.innerHTML = "";
     if (podcastFeed)podcastFeed.innerHTML= "";
@@ -274,7 +256,6 @@ function mountFeedStream() {
     });
   });
 }
-
 mountFeedStream();
 
 // -----------------------------------------------------------------------------
@@ -301,7 +282,6 @@ function appendToProfileGrid(item) {
 
 // -----------------------------------------------------------------------------
 // 6) Simple filter pills on Home (All, Videos, Podcasts, Clips, Following, Newest)
-//     - 'Following' is placeholder until follow graph is coded.
 // -----------------------------------------------------------------------------
 const homePills = Array.from(document.querySelectorAll('#tab-home .pill'));
 homePills.forEach(p => p.addEventListener('click', () => {
@@ -319,8 +299,8 @@ homePills.forEach(p => p.addEventListener('click', () => {
     if (filter === 'video')   show = isVideo;
     if (filter === 'clip')    show = isClip;
     if (filter === 'podcast') show = isPodcast;
-    if (filter === 'following') show = true;    // TODO: wire follow graph
-    if (filter === 'new')       show = true;    // already newest by stream
+    if (filter === 'following') show = true; // TODO: wire follow graph
+    if (filter === 'new')       show = true; // already newest by stream
 
     card.style.display = show ? "" : "none";
   });
