@@ -1,260 +1,333 @@
-/* INTAKEE — Accounts + Profiles + Uploads (final) */
+// script.js — INTAKEE Firebase Auth + Uploads + Feed
+// -----------------------------------------------------------------------------
+// Dependencies: modular Firebase SDK via CDN (no bundler required)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signOut, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, serverTimestamp,
+  query, orderBy, onSnapshot, doc, getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getStorage, ref, uploadBytesResumable, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile,
-  setPersistence,
-  browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  serverTimestamp,
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  limit,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-import {
-  getStorage,
-  ref as sRef,
-  uploadBytesResumable,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
-
-/* ---------- FIREBASE CONFIG ---------- */
-const FIREBASE_CONFIG = {
-  apiKey:apiKey: "AIzaSyCl_Gytnf5dpOE_AEKmRl7Dm1vlJVJLRlc",
+// -----------------------------------------------------------------------------
+// 1) Firebase Config (intakee-5785e)  — make sure these match Project Settings
+// -----------------------------------------------------------------------------
+const firebaseConfig = {
+  apiKey: "AIzaSyCl_Gytnf5dpOE_AEKmRl7Dm1vlJVJLRlc",
   authDomain: "intakee-5785e.firebaseapp.com",
   projectId: "intakee-5785e",
-  storageBucket: "intakee-5785e.appspot.com",   // ← important
-  messagingSenderId: "406662380272",            // ← FIXED
-  appId: "1:406662380272:web:49dd5e7db91c8a38b56c5d", // ← FIXED
+  storageBucket: "intakee-5785e.appspot.com",
+  messagingSenderId: "406662380272",
+  appId: "1:406662380272:web:49dd5e7db91c8a38b56c5d",
   measurementId: "G-3C2YDVGTEG"
 };
 
-/* ---------- INIT ---------- */
-const app = initializeApp(FIREBASE_CONFIG);
-console.log("INTAKEE runtime Firebase config:", app.options);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Init
+const app     = initializeApp(firebaseConfig);
+const auth    = getAuth(app);
+const db      = getFirestore(app);
 const storage = getStorage(app);
-// keep users logged in
-await setPersistence(auth, browserLocalPersistence);
 
-/* ---------- HELPERS ---------- */
+// Utility: dispatch custom event so header reacts
+function dispatchAuthEvent(user) {
+  document.dispatchEvent(new CustomEvent("intakee:auth", { detail: { user } }));
+}
+
+// Utility: simple el()
 const $ = (sel) => document.querySelector(sel);
-const $id = (id) => document.getElementById(id);
-const on = (el, ev, fn) => el && el.addEventListener(ev, fn);
-const authDialog = $id("authDialog");
-const authError = document.createElement("div");
-authError.id = "authError";
-authError.style.cssText = "color:#ff7676;margin-top:6px;font-size:.9rem;";
-$id("authSignUpForm")?.appendChild(authError); // shows errors under signup
-$id("authSignInForm")?.appendChild(authError); // same element reused
 
-function showError(msg) { if (authError) authError.textContent = msg || ""; }
-function clearError() { showError(""); }
-function toast(msg){ console.log("[INTAKEE]", msg); }
-function closeAuth(){ try{ authDialog?.close?.(); }catch{} }
+// DOM refs (Auth)
+const authDialog      = $("#authDialog");
+const signUpForm      = $("#authSignUpForm");
+const signInForm      = $("#authSignInForm");
+const btnSignOut      = $("#btnSignOut");
 
-/* Upload to Storage */
-async function uploadFileToStorage(file, path) {
-  if (!file) return null;
-  const storageRef = sRef(storage, path);
-  const task = uploadBytesResumable(storageRef, file);
-  await new Promise((res, rej) => { task.on("state_changed", () => {}, rej, res); });
-  return await getDownloadURL(task.snapshot.ref);
+// DOM refs (Upload)
+const uploadTypeSel   = $("#uploadTypeSelect");
+const uploadTitleIn   = $("#uploadTitleInput");
+const uploadThumbIn   = $("#uploadThumbInput");
+const uploadFileIn    = $("#uploadFileInput");
+const btnUpload       = $("#btnUpload");
+
+// DOM refs (Feeds)
+const homeFeed        = $("#home-feed");
+const videosFeed      = $("#videos-feed");
+const podcastFeed     = $("#podcast-feed");
+const clipsFeed       = $("#clips-feed");
+
+// DOM refs (Profile)
+const profileGrid     = $("#profile-grid");
+const profileEmpty    = $("#profile-empty");
+
+// -----------------------------------------------------------------------------
+// 2) Auth: Sign Up / Sign In / Sign Out + auth state -> notify header
+// -----------------------------------------------------------------------------
+onAuthStateChanged(auth, (user) => {
+  // send to header (your HTML listens and updates buttons/whoami)
+  dispatchAuthEvent(user || null);
+});
+
+if (signUpForm) {
+  signUpForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = $("#signUpEmail")?.value.trim();
+    const pass  = $("#signUpPassword")?.value;
+    const name  = $("#signUpName")?.value.trim();
+    if (!email || !pass) return;
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      if (name) {
+        await updateProfile(cred.user, { displayName: name });
+      }
+      dispatchAuthEvent(cred.user);
+      authDialog?.close();
+    } catch (err) {
+      alert(err?.message || "Sign up failed");
+    }
+  });
 }
-function dispatch(name, detail = {}) {
-  document.dispatchEvent(new CustomEvent(name, { detail }));
+
+if (signInForm) {
+  signInForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = $("#signInEmail")?.value.trim();
+    const pass  = $("#signInPassword")?.value;
+    if (!email || !pass) return;
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, pass);
+      dispatchAuthEvent(cred.user);
+      authDialog?.close();
+    } catch (err) {
+      alert(err?.message || "Sign in failed");
+    }
+  });
 }
 
-/* ---------- AUTH ---------- */
-// signup
-on($id("authSignUpForm"), "submit", async (e) => {
-  e.preventDefault(); clearError();
-  const email = $id("signUpEmail")?.value?.trim();
-  const password = $id("signUpPassword")?.value;
-  const displayName = $id("signUpName")?.value?.trim() || "";
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    if (displayName) await updateProfile(cred.user, { displayName });
-    // ensure profile doc
-    await setDoc(doc(db, "users", cred.user.uid), {
-      uid: cred.user.uid,
-      displayName: cred.user.displayName || displayName || "Creator",
-      bio: "",
-      photoURL: cred.user.photoURL || "",
-      bannerURL: "",
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      likes: 0, followers: 0, following: 0
-    }, { merge: true });
-
-    toast("Account created.");
-    closeAuth();
-  } catch (err) {
-    showError(err?.message || "Sign up failed.");
-  }
-});
-
-// signin
-on($id("authSignInForm"), "submit", async (e) => {
-  e.preventDefault(); clearError();
-  const email = $id("signInEmail")?.value?.trim();
-  const password = $id("signInPassword")?.value;
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    toast("Signed in.");
-    closeAuth();
-  } catch (err) {
-    showError(err?.message || "Sign in failed.");
-  }
-});
-
-// logout (header)
-on($id("btnSignOut"), "click", async () => {
-  try { await signOut(auth); toast("Signed out."); }
-  catch (err) { alert(err?.message || "Logout failed."); }
-});
-// logout (settings page)
-on($id("settings-logout"), "click", async () => {
-  try { await signOut(auth); toast("Signed out."); }
-  catch (err) { alert(err?.message || "Logout failed."); }
-});
-
-// reflect auth state in UI
-onAuthStateChanged(auth, async (user) => {
-  const body = document.body;
-  if (user) {
-    body.classList.add("is-logged-in");
-
-    // create user doc if missing
-    const uref = doc(db, "users", user.uid);
-    const snap = await getDoc(uref);
-    if (!snap.exists()) {
-      await setDoc(uref, {
-        uid: user.uid,
-        displayName: user.displayName || "Creator",
-        bio: "",
-        photoURL: user.photoURL || "",
-        bannerURL: "",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
+if (btnSignOut) {
+  btnSignOut.addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+      dispatchAuthEvent(null);
+    } catch (err) {
+      alert(err?.message || "Sign out failed");
     }
+  });
+}
 
-    dispatch("intakee:auth", { user });
-  } else {
-    body.classList.remove("is-logged-in");
-    dispatch("intakee:auth", { user: null });
+// -----------------------------------------------------------------------------
+// 3) Uploads: Videos / Clips / Podcasts + Thumbnail → Storage + Firestore
+// -----------------------------------------------------------------------------
+
+// Map selected type to storage folder + normalized 'type'/'subtype'
+function resolveUploadPath(type) {
+  switch (type) {
+    case "video":          return { folder: "videos",   type: "video",   subtype: null };
+    case "clip":           return { folder: "clips",    type: "clip",    subtype: null };
+    case "podcast-audio":  return { folder: "podcasts", type: "podcast", subtype: "audio" };
+    case "podcast-video":  return { folder: "podcasts", type: "podcast", subtype: "video" };
+    default:               return { folder: "videos",   type: "video",   subtype: null };
   }
-});
+}
 
-/* ---------- PROFILE (name, bio, photo, banner) ---------- */
-on($id("btnSaveProfile"), "click", async () => {
+async function uploadFileWithProgress(file, destRef, progressCb) {
+  return new Promise((resolve, reject) => {
+    const task = uploadBytesResumable(destRef, file);
+    task.on("state_changed",
+      (snap) => {
+        const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+        if (progressCb) progressCb(pct);
+      },
+      (err) => reject(err),
+      async () => {
+        try {
+          const url = await getDownloadURL(task.snapshot.ref);
+          resolve(url);
+        } catch (e) { reject(e); }
+      }
+    );
+  });
+}
+
+async function handleUpload() {
   const user = auth.currentUser;
-  if (!user) return alert("Sign in to edit your profile.");
-
-  try {
-    const displayName = $id("profileNameInput")?.value?.trim() || user.displayName || "Creator";
-    const bio = $id("profileBioInput")?.value?.trim() || "";
-    const photoFile = $id("profilePhotoInput")?.files?.[0] || null;
-    const bannerFile = $id("profileBannerInput")?.files?.[0] || null;
-
-    let photoURL = null, bannerURL = null;
-    if (photoFile) {
-      photoURL = await uploadFileToStorage(photoFile, `users/${user.uid}/profile/photo_${Date.now()}`);
-      await updateProfile(user, { displayName, photoURL });
-    } else {
-      await updateProfile(user, { displayName });
-    }
-    if (bannerFile) {
-      bannerURL = await uploadFileToStorage(bannerFile, `users/${user.uid}/profile/banner_${Date.now()}`);
-    }
-
-    const ref = doc(db, "users", user.uid);
-    const old = (await getDoc(ref)).data() || {};
-    await setDoc(ref, {
-      uid: user.uid,
-      displayName,
-      bio,
-      photoURL: photoURL ?? auth.currentUser.photoURL ?? old.photoURL ?? "",
-      bannerURL: bannerURL ?? old.bannerURL ?? "",
-      updatedAt: serverTimestamp()
-    }, { merge: true });
-
-    alert("Profile saved.");
-    dispatch("intakee:profileSaved", { uid: user.uid });
-  } catch (err) {
-    alert(err?.message || "Failed to save profile.");
+  if (!user) {
+    alert("Please sign in to upload.");
+    return;
   }
-});
 
-/* ---------- UPLOAD (video/clip/podcast) ---------- */
-on($id("btnUpload"), "click", async () => {
-  const user = auth.currentUser;
-  if (!user) return alert("Sign in to upload.");
+  const chosen = uploadTypeSel?.value || "video";
+  const title  = (uploadTitleIn?.value || "").trim();
+  const file   = uploadFileIn?.files?.[0] || null;
+  const thumb  = uploadThumbIn?.files?.[0] || null;
 
-  const type = $id("uploadTypeSelect")?.value || "video";
-  const title = $id("uploadTitleInput")?.value?.trim();
-  const mediaFile = $id("uploadFileInput")?.files?.[0];
-  const thumbFile = $id("uploadThumbInput")?.files?.[0] || null;
+  if (!file)  { alert("Please choose a file."); return; }
+  if (!title) { alert("Please add a title.");   return; }
 
-  if (!title || !mediaFile) return alert("Title and media file are required.");
+  const { folder, type, subtype } = resolveUploadPath(chosen);
 
-  try {
-    const ts = Date.now();
+  // Paths
+  const safeName = `${Date.now()}_${file.name.replace(/\s+/g, "_")}`;
+  const fileRef  = ref(storage, `uploads/${folder}/${user.uid}/${safeName}`);
 
-    // upload media
-    const mediaPath = `posts/${user.uid}/${ts}_${mediaFile.name}`;
-    const mediaURL = await uploadFileToStorage(mediaFile, mediaPath);
-
-    // optional thumbnail
-    let thumbURL = "";
-    if (thumbFile) {
-      const thumbPath = `posts/${user.uid}/thumb_${ts}_${thumbFile.name}`;
-      thumbURL = await uploadFileToStorage(thumbFile, thumbPath);
-    }
-
-    const postRef = await addDoc(collection(db, "posts"), {
-      ownerUid: user.uid,
-      ownerName: auth.currentUser.displayName || "Creator",
-      type,                     // 'video' | 'clip' | 'podcast-audio' | 'podcast-video'
-      title,
-      mediaURL,
-      thumbURL,
-      likes: 0,
-      commentsCount: 0,
-      createdAt: serverTimestamp(),
-      visibility: "public"
+  let thumbURL = "";
+  if (thumb) {
+    const thumbName = `${Date.now()}_${thumb.name.replace(/\s+/g, "_")}`;
+    const thumbRef  = ref(storage, `uploads/thumbnails/${user.uid}/${thumbName}`);
+    thumbURL        = await uploadFileWithProgress(thumb, thumbRef, (p)=>{
+      // Could show thumbnail progress if desired
     });
-
-    alert("Upload complete.");
-    dispatch("intakee:uploadComplete", { postId: postRef.id });
-
-    // reset inputs
-    $id("uploadTitleInput").value = "";
-    $id("uploadFileInput").value = "";
-    $id("uploadThumbInput").value = "";
-  } catch (err) {
-    alert(err?.message || "Upload failed.");
   }
-});
 
-/* ---------- FEED HELPER (optional) ---------- */
-export async function loadRecentPosts(limitCount = 12) {
-  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(limitCount));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  // Upload media
+  const mediaURL = await uploadFileWithProgress(file, fileRef, (pct)=>{
+    btnUpload.textContent = `Uploading… ${pct}%`;
+    btnUpload.disabled = true;
+  });
+
+  // Save to Firestore
+  const docRef = await addDoc(collection(db, "posts"), {
+    title,
+    type,                   // "video" | "clip" | "podcast"
+    subtype: subtype || "", // for podcasts: "audio" | "video"
+    mediaURL,
+    thumbnailURL: thumbURL || "",
+    createdAt: serverTimestamp(),
+    userId: user.uid,
+    userEmail: user.email || ""
+  });
+
+  // Reset UI
+  btnUpload.textContent = "Upload";
+  btnUpload.disabled = false;
+  if (uploadFileIn) uploadFileIn.value = "";
+  if (uploadThumbIn) uploadThumbIn.value = "";
+  if (uploadTitleIn) uploadTitleIn.value = "";
+
+  // Optimistically add to profile grid
+  appendToProfileGrid({
+    id: docRef.id,
+    title, type, subtype,
+    mediaURL, thumbnailURL: thumbURL
+  });
+
+  alert("Upload complete! Your post will appear in the feed shortly.");
 }
+
+if (btnUpload) btnUpload.addEventListener("click", handleUpload);
+
+// -----------------------------------------------------------------------------
+// 4) Live Feeds: stream 'posts' ordered by createdAt desc
+// -----------------------------------------------------------------------------
+function createCard(item) {
+  const thumb = item.thumbnailURL || "";
+  const isPodcast = item.type === "podcast";
+  const mediaTag = isPodcast
+    ? `<audio controls preload="metadata" style="width:100%; margin-top:8px;">
+         <source src="${item.mediaURL}">
+       </audio>`
+    : `<video controls preload="metadata" style="width:100%; border-radius:10px; margin-top:8px; max-height:420px;">
+         <source src="${item.mediaURL}">
+       </video>`;
+
+  return `
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center;">
+        <h4 style="margin:0;">${escapeHtml(item.title || "Untitled")}</h4>
+        <span class="pill">${item.type}${item.subtype ? " · " + item.subtype : ""}</span>
+      </div>
+      ${thumb ? `<img src="${thumb}" alt="" style="width:100%; border-radius:10px; margin-top:8px;"/>` : ""}
+      ${item.mediaURL ? mediaTag : ""}
+    </div>
+  `;
+}
+
+function escapeHtml(s = "") {
+  return s.replace(/[&<>"']/g, m => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[m]));
+}
+
+function mountFeedStream() {
+  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+  onSnapshot(q, (snap) => {
+    // Clear feeds
+    if (homeFeed)   homeFeed.innerHTML   = "";
+    if (videosFeed) videosFeed.innerHTML = "";
+    if (podcastFeed)podcastFeed.innerHTML= "";
+    if (clipsFeed)  clipsFeed.innerHTML  = "";
+
+    snap.forEach((docSnap) => {
+      const d = { id: docSnap.id, ...docSnap.data() };
+      const cardHtml = createCard(d);
+
+      if (homeFeed) homeFeed.insertAdjacentHTML("beforeend", cardHtml);
+      if (d.type === "video" && videosFeed)   videosFeed.insertAdjacentHTML("beforeend", cardHtml);
+      if (d.type === "clip" && clipsFeed)     clipsFeed.insertAdjacentHTML("beforeend", cardHtml);
+      if (d.type === "podcast" && podcastFeed)podcastFeed.insertAdjacentHTML("beforeend", cardHtml);
+    });
+  });
+}
+
+mountFeedStream();
+
+// -----------------------------------------------------------------------------
+// 5) Profile grid: append the uploaded item (simple visual confirmation)
+// -----------------------------------------------------------------------------
+function appendToProfileGrid(item) {
+  if (!profileGrid) return;
+  const thumb = item.thumbnailURL || "";
+  const tile = `
+    <div class="tile">
+      ${thumb
+        ? `<img class="thumb" src="${thumb}" alt="">`
+        : `<div class="thumb" style="display:flex;align-items:center;justify-content:center;color:#aaa;">No thumbnail</div>`}
+      <div class="meta">
+        <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+          ${escapeHtml(item.title || "Untitled")}
+        </div>
+        <div class="muted">${item.type}${item.subtype ? " · " + item.subtype : ""}</div>
+      </div>
+    </div>`;
+  profileGrid.insertAdjacentHTML("afterbegin", tile);
+  if (profileEmpty) profileEmpty.style.display = "none";
+}
+
+// -----------------------------------------------------------------------------
+// 6) Simple filter pills on Home (All, Videos, Podcasts, Clips, Following, Newest)
+//     - 'Following' is placeholder until follow graph is coded.
+// -----------------------------------------------------------------------------
+const homePills = Array.from(document.querySelectorAll('#tab-home .pill'));
+homePills.forEach(p => p.addEventListener('click', () => {
+  homePills.forEach(x => x.classList.toggle('active', x === p));
+  const filter = p.dataset.filter;
+
+  const cards = Array.from(homeFeed?.querySelectorAll('.card') || []);
+  cards.forEach(card => {
+    const label = card.querySelector('.pill')?.textContent || "";
+    const isVideo   = label.startsWith('video');
+    const isClip    = label.startsWith('clip');
+    const isPodcast = label.startsWith('podcast');
+
+    let show = true;
+    if (filter === 'video')   show = isVideo;
+    if (filter === 'clip')    show = isClip;
+    if (filter === 'podcast') show = isPodcast;
+    if (filter === 'following') show = true;    // TODO: wire follow graph
+    if (filter === 'new')       show = true;    // already newest by stream
+
+    card.style.display = show ? "" : "none";
+  });
+}));
+
+// -----------------------------------------------------------------------------
+// 7) Optional: expose for debugging (remove in production)
+// -----------------------------------------------------------------------------
+window.__INTAKEE__ = { app, auth, db, storage };
+// -----------------------------------------------------------------------------
