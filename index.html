@@ -1,155 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>INTAKEE — Videos, Podcasts, and Clips</title>
-<meta name="description" content="INTAKEE is the all-in-one platform for videos, podcasts, and clips — freedom to create, simple to share.">
-<link rel="canonical" href="https://intakee.vercel.app/">
-
-<!-- Social -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
-<meta property="og:description" content="All-in-one platform for videos, podcasts, and clips.">
-<meta property="og:url" content="https://intakee.vercel.app/">
-<meta property="og:image" content="/og-image.jpg">
-<meta name="twitter:card" content="summary_large_image">
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
-<link rel="icon" href="/favicon.ico">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
-<style>
-  :root { color-scheme: dark; }
-  *{ box-sizing:border-box; }
-  body{ margin:0; background:#000; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
-
-  /* Header */
-  header{
-    display:flex; align-items:center; gap:12px;
-    padding:18px 16px; border-bottom:1px solid #111;
-  }
-  .brand img{ height:120px; width:auto; border-radius:12px; opacity:.9; filter:drop-shadow(0 0 12px rgba(255,255,255,.06)); }
-  .spacer{ flex:1; }
-  #searchWrap{ display:flex; margin-left:auto; }
-  .search-bar{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:420px; max-width:52vw; }
-  .search-bar input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
-  .auth{ display:flex; gap:10px; margin-left:12px; align-items:center; }
-  button{ padding:9px 14px; border-radius:10px; border:1px solid #2a2a2a; background:#141414; color:#fff; cursor:pointer; }
-  button.primary{ background:#1a1a1a; border-color:#3a3a3a; }
-  button.ghost{ background:transparent; }
-  button:hover{ background:#191919; }
-  button[disabled]{ opacity:.6; cursor:not-allowed; }
-
-  /* Layout */
-  main{ max-width:1000px; margin:0 auto; padding:16px; padding-bottom:88px; }
-  .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-  .muted{ color:#b7b7b7; opacity:.85; font-size:.95rem; }
-  .card{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; box-shadow:0 4px 18px rgba(0,0,0,.35); }
-  input[type="text"], input[type="email"], input[type="password"], select{
-    padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff;
-  }
-  input[type="file"]{ color:#aaa; }
-  textarea{ width:100%; min-height:80px; padding:10px 12px; border-radius:10px; border:1px solid #2a2a2a; background:#0c0c0c; color:#fff; }
-
-  /* Section header + right search */
-  .section-head{ display:flex; align-items:center; gap:12px; margin:0 0 6px; }
-  .section-search{ display:flex; align-items:center; gap:8px; background:#0c0c0c; border:1px solid #2a2a2a; padding:8px 10px; border-radius:10px; width:340px; max-width:50vw; margin-left:auto; }
-  .section-search input{ border:none; outline:none; background:transparent; color:#fff; width:100%; }
-
-  /* Pills */
-  .pills{ display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
-  .pill{ padding:6px 10px; border:1px solid #2a2a2a; border-radius:999px; font-size:.85rem; background:#0f0f0f; cursor:pointer; }
-  .pill.active{ background:#151515; border-color:#3a3a3a; color:#fff; }
-
-  /* Bottom nav */
-  .bottom-nav{ position:fixed; bottom:0; left:0; right:0; background:#0b0b0b; border-top:1px solid #151515; display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:8px 6px; z-index:50; }
-  .bottom-nav a{ color:#aaa; text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.75rem; padding:6px 4px; border-radius:10px; }
-  .bottom-nav a.active, .bottom-nav a:hover{ color:#fff; background:#111; }
-
-  /* -------- PROFILE -------- */
-  .profile-banner{
-    height:200px; border-radius:14px; border:1px solid #1a1a1a; background:#111 center/cover no-repeat;
-    position:relative; overflow:hidden; margin:12px 0;
-  }
-  .profile-banner::after{
-    content:""; position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.0), rgba(0,0,0,.35));
-  }
-  .profile-banner .add-btn{
-    position:absolute; right:10px; bottom:10px;
-    width:30px; height:30px; border-radius:50%;
-    background:#fff; color:#000; display:flex; align-items:center; justify-content:center;
-    font-weight:700; border:none; cursor:pointer;
-  }
-  .profile-header{
-    display:grid; grid-template-columns: 110px 1fr auto; gap:14px; align-items:center;
-  }
-  .avatar-wrap{ position:relative; width:110px; height:110px; margin-top:-55px; }
-  .profile-avatar{
-    width:110px; height:110px; border-radius:50%; background:#1a1a1a; object-fit:cover; border:1px solid #262626;
-  }
-  .avatar-wrap .add-btn{
-    position:absolute; right:0; bottom:0;
-    width:28px; height:28px; border-radius:50%;
-    background:#fff; color:#000; border:none; font-weight:700; cursor:pointer;
-  }
-  .profile-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
-  .stat-row{ display:flex; gap:18px; flex-wrap:wrap; margin-top:8px; }
-  .stat-row .muted strong{ color:#fff; }
-
-  .profile-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
-  .grid{ margin-top:10px; display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px; }
-  .grid .tile{ background:#0f0f0f; border:1px solid #1a1a1a; border-radius:12px; overflow:hidden; }
-  .grid .tile .thumb{ width:100%; aspect-ratio:16/9; background:#111; object-fit:cover; display:block; }
-  .grid .tile .meta{ padding:8px 10px; font-size:.9rem; }
-
-  /* -------- SETTINGS bits -------- */
-  .settings-section{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; padding:14px; margin:12px 0; }
-  .settings-item{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid #151515; }
-  .settings-item:first-child{ border-top:none; }
-  .settings-left{ display:flex; align-items:center; gap:10px; }
-  .toggle{ width:42px; height:24px; border-radius:999px; border:1px solid #2a2a2a; background:#141414; position:relative; cursor:pointer; }
-  .toggle::after{ content:""; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#2b2b2b; transition:transform .15s ease; }
-  .toggle[data-on="true"]{ background:#1c1c1c; border-color:#3a3a3a; }
-  .toggle[data-on="true"]::after{ transform:translateX(18px); }
-
-  .disclosure{ width:100%; text-align:left; padding:10px 12px; border:1px solid #1a1a1a; border-radius:10px; background:#101010; }
-  .disclosure[aria-expanded="true"]{ background:#121212; }
-  .disclosure-panel{ margin-top:10px; border:1px solid #1a1a1a; border-radius:10px; padding:12px; background:#0f0f0f; }
-  .settings-links a{ color:#ddd; text-decoration:none; display:block; padding:6px 0; }
-  .settings-links a:hover{ text-decoration:underline; }
-
-  /* Auth modal */
-  dialog{ background:#0e0e0e; border:1px solid #1a1a1a; border-radius:14px; color:#fff; }
-  dialog form[method="dialog"]{ text-align:right; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>INTAKEE — Videos, Podcasts, and Clips</title>
+  <meta name="description" content="INTAKEE is the all-in-one platform for videos, podcasts, and clips — freedom to create, simple to share.">
+  <link rel="canonical" href="https://intakee.vercel.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
+  <meta property="og:description" content="All-in-one platform for videos, podcasts, and clips.">
+  <meta property="og:url" content="https://intakee.vercel.app/">
+  <meta property="og:image" content="/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <!-- Header -->
+  <!-- ===== HEADER ===== -->
   <header>
     <div class="brand"><img src="logo.png" alt="INTAKEE"></div>
     <div class="spacer"></div>
-
     <div id="searchWrap" class="search-bar">
       <i class="fa fa-search" style="opacity:.6;"></i>
       <input id="globalSearch" type="text" placeholder="Search…" />
     </div>
-
     <div class="auth">
       <button id="openAuth">Login / Sign Up</button>
       <button id="btnSignOut" style="display:none;">Logout</button>
-      <!-- shows who is signed in -->
       <span id="whoami" class="muted" style="margin-left:8px;"></span>
     </div>
   </header>
 
+  <!-- ===== MAIN CONTENT ===== -->
   <main>
-    <!-- HOME -->
+
+    <!-- HOME (Trending feed like YouTube) -->
     <section id="tab-home">
-      <div class="row" style="justify-content:space-between;align-items:center;margin-top:8px;">
-        <h2 style="margin:0;">Trending</h2>
+      <div class="row space-between">
+        <h2>Trending</h2>
         <div class="pills">
-          <button class="pill" data-filter="all">All</button>
+          <button class="pill active" data-filter="all">All</button>
           <button class="pill" data-filter="video">Videos</button>
           <button class="pill" data-filter="podcast">Podcasts</button>
           <button class="pill" data-filter="clip">Clips</button>
@@ -157,84 +50,77 @@
           <button class="pill" data-filter="new">Newest</button>
         </div>
       </div>
-      <div id="home-feed"></div>
+      <div id="home-feed" class="feed-grid"><!-- TODO: populate trending feed here --></div>
     </section>
 
-    <!-- VIDEOS -->
+    <!-- VIDEOS (YouTube-style stacked feed) -->
     <section id="tab-videos" style="display:none;">
       <div class="section-head">
-        <h3 style="margin:0;">Videos</h3>
-        <div class="section-search" id="videosSearchWrap">
-          <i class="fa fa-search" style="opacity:.6;"></i>
-          <input id="videosSearch" type="text" placeholder="Search videos…"/>
+        <h3>Videos</h3>
+        <div class="section-search">
+          <i class="fa fa-search"></i>
+          <input id="videosSearch" type="text" placeholder="Search videos…">
         </div>
       </div>
-      <div id="videos-feed"></div>
+      <div id="videos-feed" class="feed-grid"><!-- TODO: render video cards here --></div>
     </section>
 
-    <!-- PODCASTS -->
+    <!-- PODCASTS (Apple-Music style list + mini-player support) -->
     <section id="tab-podcast" style="display:none;">
       <div class="section-head">
-        <h3 style="margin:0;">Podcasts</h3>
-        <div class="section-search" id="podcastSearchWrap">
-          <i class="fa fa-search" style="opacity:.6;"></i>
-          <input id="podcastSearch" type="text" placeholder="Search podcasts…"/>
+        <h3>Podcasts</h3>
+        <div class="section-search">
+          <i class="fa fa-search"></i>
+          <input id="podcastSearch" type="text" placeholder="Search podcasts…">
         </div>
       </div>
-      <div id="podcast-feed"></div>
+      <div id="podcast-feed" class="podcast-list"><!-- TODO: render podcast rows here --></div>
     </section>
 
-    <!-- UPLOAD -->
+    <!-- UPLOAD (Creators can post unlimited content) -->
     <section id="tab-upload" class="card" style="display:none;">
-      <h3 style="margin:0 0 12px;">Upload</h3>
-      <div class="row" style="gap:12px;align-items:flex-start;">
-        <div style="flex:1;min-width:220px;">
-          <label for="uploadTypeSelect">Choose type</label>
-          <select id="uploadTypeSelect" style="width:100%;margin-top:6px;">
-            <option value="video">Video</option>
-            <option value="clip">Clip</option>
-            <option value="podcast-audio">Podcast (Audio)</option>
-            <option value="podcast-video">Podcast (Video)</option>
-          </select>
-        </div>
-        <div style="flex:2;min-width:260px;">
-          <label for="uploadTitleInput">Title</label>
-          <input id="uploadTitleInput" type="text" placeholder="Add a title" style="width:100%;margin-top:6px;">
+      <h3>Upload</h3>
+      <div class="upload-form">
+        <label>Choose type</label>
+        <select id="uploadTypeSelect">
+          <option value="video">Video</option>
+          <option value="clip">Clip</option>
+          <option value="podcast-audio">Podcast (Audio)</option>
+          <option value="podcast-video">Podcast (Video)</option>
+        </select>
+
+        <label>Title</label>
+        <input id="uploadTitleInput" type="text" placeholder="Add a title">
+
+        <label>Thumbnail (cover image)</label>
+        <input id="uploadThumbInput" type="file" accept="image/*">
+
+        <label>File</label>
+        <input id="uploadFileInput" type="file" accept="video/*,audio/*">
+
+        <p class="muted small">Processing starts after upload. You’ll be notified when it’s ready.</p>
+
+        <div class="row">
+          <button id="btnUpload" class="primary">Upload</button>
+          <button id="goLiveBtn" class="ghost">Go Live</button>
         </div>
       </div>
-
-      <div class="row" style="gap:12px;align-items:flex-start;margin-top:12px;">
-        <div style="flex:1;min-width:220px;">
-          <label for="uploadThumbInput">Thumbnail (cover image)</label>
-          <input id="uploadThumbInput" type="file" accept="image/*" style="width:100%;margin-top:6px;">
-        </div>
-        <div style="flex:2;min-width:260px;">
-          <label for="uploadFileInput">File</label>
-          <input id="uploadFileInput" type="file" accept="video/*,audio/*" style="width:100%;margin-top:6px;">
-        </div>
-      </div>
-
-      <p class="muted" style="margin-top:8px;">Processing starts after upload. You’ll be notified when it’s ready.</p>
-
-      <div class="row" style="margin-top:14px;gap:10px;">
-        <button id="btnUpload" class="primary">Upload</button>
-        <button id="goLiveBtn" class="ghost">Go Live</button>
-      </div>
+      <!-- TODO: Wire Firebase upload logic -->
     </section>
 
-    <!-- CLIPS -->
+    <!-- CLIPS (TikTok-style vertical feed) -->
     <section id="tab-clips" style="display:none;">
       <div class="section-head">
-        <h3 style="margin:0;">Clips</h3>
-        <div class="section-search" id="clipsSearchWrap">
-          <i class="fa fa-search" style="opacity:.6;"></i>
-          <input id="clipsSearch" type="text" placeholder="Search clips…"/>
+        <h3>Clips</h3>
+        <div class="section-search">
+          <i class="fa fa-search"></i>
+          <input id="clipsSearch" type="text" placeholder="Search clips…">
         </div>
       </div>
-      <div id="clips-feed"></div>
+      <div id="clips-feed" class="clip-feed"><!-- TODO: render full-screen clip cards --></div>
     </section>
 
-    <!-- PROFILE -->
+    <!-- PROFILE (Clean banner + avatar + grid) -->
     <section id="tab-profile" style="display:none;">
       <div id="profileBanner" class="profile-banner">
         <button id="btnAddBanner" class="add-btn owner-only" title="Change banner" style="display:none;">+</button>
@@ -248,15 +134,14 @@
           </div>
 
           <div>
-            <h3 id="profile-name" style="margin:0;">Your Name</h3>
+            <h3 id="profile-name">Your Name</h3>
             <div id="profile-handle" class="muted">@username</div>
+            <p id="bio-view" class="muted">Add a short bio to introduce yourself.</p>
 
-            <div id="bio-view" class="muted" style="margin-top:8px;">Add a short bio to introduce yourself.</div>
-
-            <div id="bio-edit-wrap" style="display:none; margin-top:8px;">
-              <input id="profileNameInput" type="text" placeholder="Your name" style="width:100%;margin-bottom:6px;">
+            <div id="bio-edit-wrap" style="display:none;">
+              <input id="profileNameInput" type="text" placeholder="Your name">
               <textarea id="profileBioInput" placeholder="Write your bio..."></textarea>
-              <div class="row" style="margin-top:8px;">
+              <div class="row">
                 <label class="ghost">Profile Photo <input id="profilePhotoInput" type="file" accept="image/*"></label>
                 <label class="ghost">Banner <input id="profileBannerInput" type="file" accept="image/*"></label>
                 <button id="btnSaveProfile" class="primary">Save Profile</button>
@@ -265,16 +150,16 @@
             </div>
 
             <div class="stat-row">
-              <div class="muted"><strong id="stat-posts">0</strong> Posts</div>
-              <div class="muted"><strong id="stat-followers">0</strong> Followers</div>
-              <div class="muted"><strong id="stat-following">0</strong> Following</div>
-              <div class="muted"><strong id="stat-likes">0</strong> Likes</div>
+              <span><strong id="stat-posts">0</strong> Posts</span>
+              <span><strong id="stat-followers">0</strong> Followers</span>
+              <span><strong id="stat-following">0</strong> Following</span>
+              <span><strong id="stat-likes">0</strong> Likes</span>
             </div>
           </div>
 
           <div class="profile-actions">
             <button id="btn-follow" class="primary">Follow</button>
-            <button id="btn-share-profile" class="ghost">Share Profile</button>
+            <button id="btn-share-profile" class="ghost">Share</button>
             <button id="btn-edit-profile" class="ghost owner-only" style="display:none;">Edit Profile</button>
           </div>
         </div>
@@ -289,65 +174,67 @@
           <button class="pill" data-profiletab="playlists">Playlists</button>
         </div>
         <div id="profile-grid" class="grid"></div>
-        <div id="profile-empty" class="muted" style="margin-top:8px; display:none;">No posts yet.</div>
+        <div id="profile-empty" class="muted" style="display:none;">No posts yet.</div>
       </div>
 
       <input id="bannerInput" type="file" accept="image/*" hidden>
       <input id="avatarInput" type="file" accept="image/*" hidden>
     </section>
 
-    <!-- SETTINGS -->
+    <!-- SETTINGS (Privacy & policy) -->
     <section id="tab-settings" style="display:none;">
       <div class="settings-section">
-        <h3 style="margin:0 0 8px;">Account</h3>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-user"></i><span>Name, Username, Email</span></div><button class="ghost">Edit</button></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-key"></i><span>Change Password</span></div><button class="ghost">Update</button></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-trash"></i><span>Delete Account</span></div><button class="ghost">Start</button></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-right-from-bracket"></i><span>Logout</span></div><button id="settings-logout" class="ghost">Logout</button></div>
+        <h3>Account</h3>
+        <div class="settings-item"><div><i class="fa fa-user"></i> Name / Email</div><button class="ghost">Edit</button></div>
+        <div class="settings-item"><div><i class="fa fa-key"></i> Change Password</div><button class="ghost">Update</button></div>
+        <div class="settings-item"><div><i class="fa fa-trash"></i> Delete Account</div><button class="ghost">Start</button></div>
       </div>
 
       <div class="settings-section">
-        <h3 style="margin:0 0 8px;">Privacy & Safety</h3>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-lock"></i><span>Private account</span></div><div class="toggle" id="toggle-private" data-on="false" role="switch" aria-checked="false"></div></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-ban"></i><span>Blocked accounts</span></div><button class="ghost">Manage</button></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-comments"></i><span>Comments</span></div>
-          <select><option>Everyone</option><option>Followers</option><option>No one</option></select>
-        </div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-eye-slash"></i><span>Hide sensitive content</span></div><div class="toggle" id="toggle-sensitive" data-on="false" role="switch" aria-checked="false"></div></div>
-        <div class="settings-item"><div class="settings-left"><i class="fa fa-flag"></i><span>Report a problem</span></div><button class="ghost">Report</button></div>
+        <h3>Privacy & Safety</h3>
+        <div class="settings-item"><span>Private account</span><div class="toggle" id="toggle-private" data-on="false"></div></div>
+        <div class="settings-item"><span>Uploads</span><div class="toggle" id="toggle-uploads" data-on="true"></div></div>
+        <div class="settings-item"><span>Likes</span><div class="toggle" id="toggle-likes" data-on="true"></div></div>
+        <div class="settings-item"><span>Saved</span><div class="toggle" id="toggle-saved" data-on="true"></div></div>
+        <div class="settings-item"><span>Playlists</span><div class="toggle" id="toggle-playlists" data-on="true"></div></div>
       </div>
 
       <div class="settings-section">
-        <h3 style="margin:0 0 8px;">Legal & Policy</h3>
-        <button id="legalToggle" class="disclosure" aria-expanded="false">View Legal & Policy</button>
-        <div id="legalPanel" class="disclosure-panel" hidden>
-          <h4 style="margin:0 0 8px;">Content Responsibility Disclaimer</h4>
-          <p class="muted" style="margin:0 0 10px;">
-            INTAKEE supports freedom of speech, creativity, and open discussion. Users are fully responsible for content they upload or share. INTAKEE does not endorse, verify, or assume legal responsibility for user-generated content. Content that violates laws, promotes violence or harassment, or contains explicit material may be removed.
-          </p>
-          <h4 style="margin:10px 0 8px;">Privacy Commitment</h4>
-          <p class="muted" style="margin:0 0 10px;">
-            We do not sell, rent, or share personal data with advertisers or third parties. Personal information is collected only to run core features. We use secure, industry-standard services. Your content remains your property.
-          </p>
-          <h4 style="margin:10px 0 8px;">Community Guidelines</h4>
-          <ul class="muted" style="margin:0 0 10px; padding-left:18px;">
-            <li>Follow the law; no threats, hate speech, or harassment.</li>
-            <li>No nudity or explicit material.</li>
-            <li>No impersonation or deliberate misinformation.</li>
-            <li>Repeated or severe violations may lead to removal or suspension.</li>
-          </ul>
-          <div class="settings-links">
-            <a href="#">Community Guidelines</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Privacy Policy</a>
-            <a href="mailto:intakee2025@gmail.com">Contact: intakee2025@gmail.com</a>
-          </div>
-        </div>
+        <h3>Legal & Policy</h3>
+        <p class="muted small">
+          INTAKEE supports freedom of speech and creative expression. Users are responsible for their own content.
+        </p>
+        <a href="#" class="muted">Community Guidelines</a><br>
+        <a href="#" class="muted">Terms of Service</a><br>
+        <a href="#" class="muted">Privacy Policy</a><br>
+        <a href="mailto:intakee2025@gmail.com" class="muted">Contact: intakee2025@gmail.com</a>
       </div>
     </section>
   </main>
 
-  <!-- Tabs -->
+  <!-- ===== MINI PLAYER (Apple Music–style) ===== -->
+  <div id="mini-player" class="mini-player" hidden>
+    <div class="mp-left">
+      <div class="mp-art" id="mp-art"></div>
+      <div class="mp-meta">
+        <div id="mp-title" class="mp-title">—</div>
+        <div id="mp-sub" class="mp-sub muted small">—</div>
+      </div>
+    </div>
+    <div class="mp-controls">
+      <button id="mp-prev" class="icon-btn" title="Previous"><i class="fa fa-backward-step"></i></button>
+      <button id="mp-play" class="icon-btn" title="Play/Pause"><i class="fa fa-play"></i></button>
+      <button id="mp-next" class="icon-btn" title="Next"><i class="fa fa-forward-step"></i></button>
+    </div>
+    <div class="mp-right">
+      <div class="mp-time muted small"><span id="mp-cur">0:00</span> / <span id="mp-dur">0:00</span></div>
+      <button id="mp-close" class="icon-btn" title="Close"><i class="fa fa-xmark"></i></button>
+    </div>
+    <!-- Hidden native audio element -->
+    <audio id="mp-audio" preload="metadata"></audio>
+  </div>
+
+  <!-- ===== BOTTOM NAV ===== -->
   <nav class="bottom-nav">
     <a href="#home"    data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
     <a href="#videos"  data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
@@ -358,10 +245,10 @@
     <a href="#settings"data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
   </nav>
 
-  <!-- 🔹 AUTH MODAL -->
+  <!-- ===== AUTH MODAL ===== -->
   <dialog id="authDialog">
     <form method="dialog" style="text-align:right; margin:0 0 8px;">
-      <button>✕</button>
+      <button aria-label="Close">✕</button>
     </form>
 
     <h3 style="margin:0 0 8px;">Create account</h3>
@@ -382,82 +269,189 @@
     </form>
   </dialog>
 
-  <!-- Helper scripts for header + legal -->
+  <!-- ===== CORE SHELL SCRIPTS (placeholders you’ll wire to Firebase) ===== -->
   <script>
-    // Open auth dialog
-    document.getElementById('openAuth')?.addEventListener('click', () => {
-      document.getElementById('authDialog')?.showModal();
-    });
+    // ---------- Tab Router (hash-based) ----------
+    (function initRouter(){
+      const links = Array.from(document.querySelectorAll('.bottom-nav a'));
+      const sections = {
+        home:     document.getElementById('tab-home'),
+        videos:   document.getElementById('tab-videos'),
+        podcast:  document.getElementById('tab-podcast'),
+        upload:   document.getElementById('tab-upload'),
+        clips:    document.getElementById('tab-clips'),
+        profile:  document.getElementById('tab-profile'),
+        settings: document.getElementById('tab-settings')
+      };
+      const searchWrap = document.getElementById('searchWrap');
 
-    // Update header buttons and "whoami" when script.js reports auth state
+      function setTab(key){
+        Object.entries(sections).forEach(([k,el]) => el.style.display = (k === key) ? '' : 'none');
+        links.forEach(a => a.classList.toggle('active', a.dataset.tab === key));
+        if (searchWrap) searchWrap.style.display = (key === 'home') ? 'flex' : 'none';
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+      function applyHash(){
+        const key = (location.hash || '#home').slice(1);
+        setTab(sections[key] ? key : 'home');
+      }
+      links.forEach(a => a.addEventListener('click', (e) => {
+        e.preventDefault(); location.hash = a.getAttribute('href');
+      }));
+      window.addEventListener('hashchange', applyHash);
+      applyHash();
+    })();
+
+    // ---------- Auth header updater (listen for your script.js events) ----------
     function applyHeaderAuth(user) {
       const openBtn = document.getElementById('openAuth');
       const outBtn  = document.getElementById('btnSignOut');
       const whoami  = document.getElementById('whoami');
-
       const loggedIn = !!user;
       if (openBtn) openBtn.style.display = loggedIn ? 'none' : '';
       if (outBtn)  outBtn.style.display  = loggedIn ? '' : 'none';
+      whoami && (whoami.textContent = loggedIn
+        ? (user.displayName ? `${user.displayName} (${user.email||''})` : (user.email||''))
+        : '');
+    }
+    document.addEventListener('intakee:auth', (e) => applyHeaderAuth(e.detail?.user ?? null));
+    document.getElementById('openAuth')?.addEventListener('click', () => {
+      document.getElementById('authDialog')?.showModal();
+    });
 
-      if (whoami) {
-        if (loggedIn) {
-          const email = user.email || '';
-          const name  = user.displayName || '';
-          whoami.textContent = name ? `${name} (${email})` : email;
-        } else {
-          whoami.textContent = '';
-        }
+    // ---------- MINI-PLAYER (Podcast audio across tabs) ----------
+    // TODO: In your Firebase code, call window.playPodcast({url, title, subtitle, cover})
+    (function initMiniPlayer(){
+      const wrap = document.getElementById('mini-player');
+      const art  = document.getElementById('mp-art');
+      const tEl  = document.getElementById('mp-title');
+      const sEl  = document.getElementById('mp-sub');
+      const cur  = document.getElementById('mp-cur');
+      const dur  = document.getElementById('mp-dur');
+      const audio= document.getElementById('mp-audio');
+      const btnP = document.getElementById('mp-play');
+      const btnX = document.getElementById('mp-close');
+      const btnPrev = document.getElementById('mp-prev');
+      const btnNext = document.getElementById('mp-next');
+
+      let ticking = null;
+      function fmt(sec){ if(!isFinite(sec)) return '0:00';
+        const m=Math.floor(sec/60), s=Math.floor(sec%60).toString().padStart(2,'0'); return `${m}:${s}`; }
+
+      function syncTime(){
+        cur.textContent = fmt(audio.currentTime);
+        dur.textContent = fmt(audio.duration || 0);
+        if (!audio.paused) ticking = requestAnimationFrame(syncTime);
       }
-    }
 
-    // Listen for custom event from script.js: dispatch("intakee:auth", { user })
-    document.addEventListener('intakee:auth', (e) => {
-      applyHeaderAuth(e.detail?.user ?? null);
-    });
+      btnP.addEventListener('click', ()=> audio.paused ? audio.play() : audio.pause());
+      btnX.addEventListener('click', ()=> { audio.pause(); wrap.hidden = true; });
+      btnPrev.addEventListener('click', ()=>{/* optional: queue support */});
+      btnNext.addEventListener('click', ()=>{/* optional: queue support */});
+      audio.addEventListener('play', ()=>{
+        btnP.innerHTML = '<i class="fa fa-pause"></i>';
+        cancelAnimationFrame(ticking); ticking = requestAnimationFrame(syncTime);
+      });
+      audio.addEventListener('pause', ()=> { btnP.innerHTML = '<i class="fa fa-play"></i>'; cancelAnimationFrame(ticking); });
+      audio.addEventListener('loadedmetadata', ()=> { dur.textContent = fmt(audio.duration||0); });
 
-    // Legal disclosure toggle
-    const legalToggle = document.getElementById("legalToggle");
-    const legalPanel  = document.getElementById("legalPanel");
-    legalToggle?.addEventListener('click', ()=>{
-      const expanded = legalToggle.getAttribute('aria-expanded') === 'true';
-      legalToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-      legalPanel.hidden = expanded;
-    });
-  </script>
+      // Expose starter API for your Firebase renderers
+      window.playPodcast = ({ url, title, subtitle, cover })=>{
+        // Auto-pause any video/clip currently playing — your video code should listen too.
+        document.querySelectorAll('video').forEach(v=>{ try{ v.pause(); }catch{} });
 
-  <!-- Bottom tab router (hash-based) -->
-  <script>
-    const links = Array.from(document.querySelectorAll('.bottom-nav a'));
-    const sections = {
-      home:     document.getElementById('tab-home'),
-      videos:   document.getElementById('tab-videos'),
-      podcast:  document.getElementById('tab-podcast'),
-      upload:   document.getElementById('tab-upload'),
-      clips:    document.getElementById('tab-clips'),
-      profile:  document.getElementById('tab-profile'),
-      settings: document.getElementById('tab-settings')
+        wrap.hidden = false;
+        tEl.textContent = title || 'Untitled';
+        sEl.textContent = subtitle || '';
+        art.style.backgroundImage = cover ? `url(${cover})` : 'none';
+        audio.src = url; audio.play().catch(()=>{ /* autoplay blocked until user gesture */ });
+      };
+    })();
+
+    // ---------- FEED RENDERING PLACEHOLDERS ----------
+    // TODO: Replace these with real Firebase-powered renderers in script.js
+
+    // Videos (YouTube-style cards)
+    window.renderVideoCard = function(post){
+      const card = document.createElement('article');
+      card.className = 'video-card card';
+      card.innerHTML = `
+        <div class="thumb-16x9">
+          <img src="${post.thumbnailUrl || ''}" alt="">
+          <video src="${post.mediaUrl || ''}" preload="metadata" muted playsinline></video>
+        </div>
+        <div class="meta">
+          <h4 class="title">${post.title || 'Untitled'}</h4>
+          <div class="sub muted small">${post.creatorName || 'Unknown'} • ${post.views || 0} views</div>
+        </div>`;
+      // TODO: Hover preview logic & click → watch view
+      return card;
     };
-    const searchWrap = document.getElementById('searchWrap');
 
-    function setTab(key){
-      Object.entries(sections).forEach(([k,el]) => el.style.display = (k === key) ? '' : 'none');
-      links.forEach(a => a.classList.toggle('active', a.dataset.tab === key));
-      if (searchWrap) searchWrap.style.display = (key === 'home') ? 'flex' : 'none';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    function applyHash(){
-      const key = (location.hash || '#home').slice(1);
-      setTab(sections[key] ? key : 'home');
-    }
-    links.forEach(a => a.addEventListener('click', (e) => {
-      e.preventDefault();
-      location.hash = a.getAttribute('href');
-    }));
-    window.addEventListener('hashchange', applyHash);
-    applyHash();
+    // Podcasts (Apple-Music rows; click → mini-player)
+    window.renderPodcastRow = function(post){
+      const row = document.createElement('div');
+      row.className = 'podcast-row card';
+      row.innerHTML = `
+        <div class="pod-art"><img src="${post.coverUrl || post.thumbnailUrl || ''}" alt=""></div>
+        <div class="pod-main">
+          <div class="pod-title">${post.title || 'Episode'}</div>
+          <div class="muted small">${post.showName || ''}</div>
+        </div>
+        <div class="pod-cta">
+          <button class="primary play">Play</button>
+        </div>`;
+      row.querySelector('.play').addEventListener('click', ()=>{
+        window.playPodcast({
+          url: post.mediaUrl,
+          title: post.title,
+          subtitle: post.showName || (post.creatorName||''),
+          cover: post.coverUrl || post.thumbnailUrl || ''
+        });
+      });
+      return row;
+    };
+
+    // Clips (TikTok-style full screen items)
+    window.renderClipFullScreen = function(post){
+      const wrap = document.createElement('div');
+      wrap.className = 'clip-card';
+      wrap.innerHTML = `
+        <video class="clip-video" src="${post.mediaUrl||''}" playsinline loop></video>
+        <div class="clip-rail">
+          <button class="icon-btn"><i class="fa fa-heart"></i><span>${post.likeCount||0}</span></button>
+          <button class="icon-btn"><i class="fa fa-comment"></i><span>${post.commentCount||0}</span></button>
+          <button class="icon-btn"><i class="fa fa-bookmark"></i></button>
+          <button class="icon-btn"><i class="fa fa-share"></i></button>
+        </div>
+        <div class="clip-caption">
+          <div class="muted small">@${post.creatorHandle || 'user'}</div>
+          <div class="text">${post.title || ''}</div>
+        </div>`;
+      // Auto-play when visible; pause when not
+      const vid = wrap.querySelector('.clip-video');
+      const io = new IntersectionObserver((ents)=>{
+        ents.forEach(e=>{
+          if (e.isIntersecting && e.intersectionRatio > 0.6) {
+            // pause all others
+            document.querySelectorAll('.clip-video').forEach(v=>{ if(v!==vid) try{v.pause()}catch{} });
+            vid.play().catch(()=>{});
+          } else {
+            try{ vid.pause(); }catch{}
+          }
+        });
+      }, { threshold:[0,0.6,1]});
+      io.observe(wrap);
+      return wrap;
+    };
+
+    // ---------- SIMPLE HELPERS ----------
+    window.qs  = (s,sc)=> (sc||document).querySelector(s);
+    window.qsa = (s,sc)=> Array.from((sc||document).querySelectorAll(s));
   </script>
 
-  <!-- App JS (single entry) -->
-  <script type="module" src="script.js?v=10"></script>
+  <!-- Your main app logic (keep using your existing file) -->
+  <!-- TODO: In script.js, you will fetch Firestore docs and append nodes returned by the render* functions above -->
+  <script type="module" src="script.js?v=11"></script>
 </body>
 </html>
