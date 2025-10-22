@@ -1,20 +1,55 @@
+// --- Firebase (modular CDN) ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signOut,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getStorage
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+// TODO: replace with your real keys (the same ones you used before)
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+const st   = getStorage(app);
+
+// (optional) expose for quick debugging
+window.__fb = { auth, db, st };
 /* ===============================
    INTAKEE — Core JS Scaffold
    (Placeholders first; wire Firebase later)
    =============================== */
 
 // ---------- 0) Auth event (placeholder) ----------
-(function initAuthHeader() {
-  // TODO: Replace with real Firebase onAuthStateChanged
-  const fakeUser = { email: "guest@intakee.app", displayName: "Guest" };
-  document.dispatchEvent(new CustomEvent("intakee:auth", { detail: { user: fakeUser } }));
+// --- Real Auth header wiring ---
+onAuthStateChanged(auth, (user) => {
+  // Tell the UI when user logs in or out
+  document.dispatchEvent(new CustomEvent("intakee:auth", { detail: { user } }));
+  console.log(user ? `Signed in as ${user.email}` : "Signed out");
+});
 
-  // Logout button (placeholder)
-  document.getElementById("btnSignOut")?.addEventListener("click", () => {
-    alert("TODO: Wire Firebase signOut()");
-    // document.dispatchEvent(new CustomEvent("intakee:auth", { detail: { user: null } }));
-  });
-})();
+// --- Logout button ---
+document.getElementById("btnSignOut")?.addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+    console.log("User signed out");
+  } catch (err) {
+    console.error("Logout error:", err);
+  }
+});
 
 // ---------- 1) Tiny helpers ----------
 const qs  = (s, sc) => (sc || document).querySelector(s);
