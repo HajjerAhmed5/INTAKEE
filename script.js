@@ -1,313 +1,245 @@
-// script.js — INTAKEE Firebase Auth + Uploads + Feed
-// -----------------------------------------------------------------------------
-// Dependencies: modular Firebase SDK via CDN (no bundler required)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth, onAuthStateChanged,
-  createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  signOut, updateProfile
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  getFirestore, collection, addDoc, serverTimestamp,
-  query, orderBy, onSnapshot, doc, getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import {
-  getStorage, ref, uploadBytesResumable, getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+/* ===============================
+   INTAKEE — Core JS Scaffold
+   (Placeholders first; wire Firebase later)
+   =============================== */
 
-// -----------------------------------------------------------------------------
-// 1) Firebase Config (intakee-5785e) — UPDATED to correct project
-// -----------------------------------------------------------------------------
-const firebaseConfig = {
-  apiKey: "AIzaSyD0_tL8PxUvGT7JqCBj3tuL7s3Kipl5E6g",
-  authDomain: "intakee-5785e.firebaseapp.com",
-  projectId: "intakee-5785e",
-  storageBucket: "intakee-5785e.firebasestorage.app",
-  messagingSenderId: "40666230072",
-  appId: "1:40666230072:web:49dd5e7db91c8a38b565cd",
-  measurementId: "G-3C2YDV6T0G"
+// ---------- 0) Auth event (placeholder) ----------
+(function initAuthHeader() {
+  // TODO: Replace with real Firebase onAuthStateChanged
+  const fakeUser = { email: "guest@intakee.app", displayName: "Guest" };
+  document.dispatchEvent(new CustomEvent("intakee:auth", { detail: { user: fakeUser } }));
+
+  // Logout button (placeholder)
+  document.getElementById("btnSignOut")?.addEventListener("click", () => {
+    alert("TODO: Wire Firebase signOut()");
+    // document.dispatchEvent(new CustomEvent("intakee:auth", { detail: { user: null } }));
+  });
+})();
+
+// ---------- 1) Tiny helpers ----------
+const qs  = (s, sc) => (sc || document).querySelector(s);
+const qsa = (s, sc) => Array.from((sc || document).querySelectorAll(s));
+
+// Convenience wrappers to append children
+function append(el, ...kids) { kids.forEach(k => k && el.appendChild(k)); return el; }
+
+// ---------- 2) Demo content so you can see the UI NOW ----------
+const demo = {
+  videos: [
+    {
+      id: "v1",
+      type: "video",
+      title: "How to color-grade in 3 minutes",
+      thumbnailUrl: "https://images.unsplash.com/photo-1517602302552-471fe67acf66?q=80&w=1280&auto=format&fit=crop",
+      mediaUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+      creatorName: "INTAKEE Studio",
+      views: 12800,
+      createdAt: Date.now()
+    },
+    {
+      id: "v2",
+      type: "video",
+      title: "Studio tour: lighting on a budget",
+      thumbnailUrl: "https://images.unsplash.com/photo-1484704849700-f032a568e944?q=80&w=1280&auto=format&fit=crop",
+      mediaUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+      creatorName: "Hajer",
+      views: 6400,
+      createdAt: Date.now()
+    }
+  ],
+  podcasts: [
+    {
+      id: "p1",
+      type: "podcast-audio",
+      title: "The Creator Mindset — Episode 01",
+      showName: "INTAKEE Talks",
+      coverUrl: "https://images.unsplash.com/photo-1620228885840-8a9b1bb3b0ef?q=80&w=1200&auto=format&fit=crop",
+      mediaUrl: "https://www.w3schools.com/html/horse.mp3",
+      createdAt: Date.now()
+    },
+    {
+      id: "p2",
+      type: "podcast-audio",
+      title: "Growing an audience from zero",
+      showName: "INTAKEE Talks",
+      coverUrl: "https://images.unsplash.com/photo-1520975922322-53b6038dc2da?q=80&w=1200&auto=format&fit=crop",
+      mediaUrl: "https://www.w3schools.com/html/horse.mp3",
+      createdAt: Date.now()
+    }
+  ],
+  clips: [
+    {
+      id: "c1",
+      type: "clip",
+      title: "Day 1 in the studio",
+      creatorHandle: "intakee",
+      mediaUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",
+      likeCount: 231, commentCount: 12, createdAt: Date.now()
+    },
+    {
+      id: "c2",
+      type: "clip",
+      title: "Behind the scenes",
+      creatorHandle: "hajer",
+      mediaUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      likeCount: 91, commentCount: 4, createdAt: Date.now()
+    }
+  ]
 };
 
-// Init
-const app     = initializeApp(firebaseConfig);
-const auth    = getAuth(app);
-const db      = getFirestore(app);
-const storage = getStorage(app);
-
-// Utility: dispatch custom event so header reacts
-function dispatchAuthEvent(user) {
-  document.dispatchEvent(new CustomEvent("intakee:auth", { detail: { user } }));
+// ---------- 3) Renderers (use the functions defined in index.html) ----------
+function mountVideos(targetId, items) {
+  const root = qs(`#${targetId}`);
+  root.innerHTML = "";
+  items.forEach(p => append(root, window.renderVideoCard(p)));
 }
 
-// Utility: simple el()
-const $ = (sel) => document.querySelector(sel);
+function mountPodcasts(targetId, items) {
+  const root = qs(`#${targetId}`);
+  root.innerHTML = "";
+  items.forEach(p => append(root, window.renderPodcastRow(p)));
+}
 
-// DOM refs (Auth)
-const authDialog      = $("#authDialog");
-const signUpForm      = $("#authSignUpForm");
-const signInForm      = $("#authSignInForm");
-const btnSignOut      = $("#btnSignOut");
+function mountClips(targetId, items) {
+  const root = qs(`#${targetId}`);
+  root.innerHTML = "";
+  items.forEach(p => append(root, window.renderClipFullScreen(p)));
+}
 
-// DOM refs (Upload)
-const uploadTypeSel   = $("#uploadTypeSelect");
-const uploadTitleIn   = $("#uploadTitleInput");
-const uploadThumbIn   = $("#uploadThumbInput");
-const uploadFileIn    = $("#uploadFileInput");
-const btnUpload       = $("#btnUpload");
+function mountProfileGrid(items) {
+  const grid = qs("#profile-grid");
+  const empty = qs("#profile-empty");
+  grid.innerHTML = "";
+  items.forEach(p => {
+    // Reuse the same video-card/clip layout for consistency
+    let card;
+    if (p.type === "clip") {
+      card = document.createElement("article");
+      card.className = "card ratio-9x16";
+      card.innerHTML = `<video src="${p.mediaUrl}" muted playsinline loop style="width:100%;height:100%;object-fit:cover;border-radius:12px;"></video>`;
+    } else if (p.type?.startsWith("podcast")) {
+      card = document.createElement("article");
+      card.className = "card ratio-1x1";
+      card.innerHTML = `<img src="${p.coverUrl || p.thumbnailUrl || ""}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`;
+    } else {
+      card = document.createElement("article");
+      card.className = "card ratio-16x9";
+      card.innerHTML = `<img src="${p.thumbnailUrl || ""}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`;
+    }
+    grid.appendChild(card);
+  });
+  empty.style.display = items.length ? "none" : "";
+}
 
-// DOM refs (Feeds)
-const homeFeed        = $("#home-feed");
-const videosFeed      = $("#videos-feed");
-const podcastFeed     = $("#podcast-feed");
-const clipsFeed       = $("#clips-feed");
+// ---------- 4) Initial demo mount ----------
+function mountAllDemo() {
+  // HOME feed: mix (videos + podcasts + clips) — you can customize order later
+  const homeMix = [...demo.videos, ...demo.podcasts, ...demo.clips];
+  const homeRoot = qs("#home-feed");
+  homeRoot.innerHTML = "";
+  homeMix.forEach(p => {
+    const node =
+      p.type === "video" || p.type === "podcast-video"
+        ? window.renderVideoCard(p)
+        : p.type === "podcast-audio"
+        ? window.renderPodcastRow(p)
+        : window.renderClipFullScreen(p);
+    homeRoot.appendChild(node);
+  });
 
-// DOM refs (Profile)
-const profileGrid     = $("#profile-grid");
-const profileEmpty    = $("#profile-empty");
+  // Tabs
+  mountVideos("videos-feed", demo.videos);
+  mountPodcasts("podcast-feed", demo.podcasts);
+  mountClips("clips-feed", demo.clips);
 
-// -----------------------------------------------------------------------------
-// 2) Auth: Sign Up / Sign In / Sign Out + auth state -> notify header
-// -----------------------------------------------------------------------------
-onAuthStateChanged(auth, (user) => {
-  dispatchAuthEvent(user || null);
+  // Profile header placeholders
+  qs("#profile-name").textContent = "INTAKEE Creator";
+  qs("#profile-handle").textContent = "@intakee";
+  qs("#bio-view").textContent = "Freedom to create. Simple to share.";
+  qs("#profile-photo").src = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop";
+  qs("#profileBanner").style.backgroundImage =
+    "url('https://images.unsplash.com/photo-1495567720989-cebdbdd97913?q=80&w=1600&auto=format&fit=crop')";
+
+  // Profile grid: show your uploads (use videos + clips for variety)
+  mountProfileGrid([...demo.videos, ...demo.clips]);
+}
+mountAllDemo();
+
+// ---------- 5) Filters/search (placeholders) ----------
+qsa(".pills .pill").forEach(btn => {
+  btn.addEventListener("click", () => {
+    qsa(".pills .pill").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    // TODO: Filter home feed by btn.dataset.filter
+    // For now, just no-op visual.
+  });
 });
 
-if (signUpForm) {
-  signUpForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = $("#signUpEmail")?.value.trim();
-    const pass  = $("#signUpPassword")?.value;
-    const name  = $("#signUpName")?.value.trim();
-    if (!email || !pass) return;
-    try {
-      const cred = await createUserWithEmailAndPassword(auth, email, pass);
-      if (name) await updateProfile(cred.user, { displayName: name });
-      dispatchAuthEvent(cred.user);
-      authDialog?.close();
-    } catch (err) {
-      alert(err?.message || "Sign up failed");
-    }
+qs("#videosSearch")?.addEventListener("input", (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  // TODO: replace with Firestore query; for now, simple filter
+  const filtered = demo.videos.filter(v => v.title.toLowerCase().includes(q));
+  mountVideos("videos-feed", filtered);
+});
+
+qs("#podcastSearch")?.addEventListener("input", (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  const filtered = demo.podcasts.filter(p => p.title.toLowerCase().includes(q) || (p.showName||"").toLowerCase().includes(q));
+  mountPodcasts("podcast-feed", filtered);
+});
+
+qs("#clipsSearch")?.addEventListener("input", (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  const filtered = demo.clips.filter(c => c.title.toLowerCase().includes(q) || (c.creatorHandle||"").toLowerCase().includes(q));
+  mountClips("clips-feed", filtered);
+});
+
+// ---------- 6) Upload button (placeholder) ----------
+qs("#btnUpload")?.addEventListener("click", () => {
+  alert("TODO: Wire Firebase upload logic here.\n\nUse addDoc(posts) + unique Storage path per file + store thumbnailPath.\nI’ll plug this in next.");
+});
+
+// ---------- 7) Profile edit (placeholder) ----------
+qs("#btn-edit-profile")?.addEventListener("click", () => {
+  qs("#bio-view").style.display = "none";
+  qs("#bio-edit-wrap").style.display = "";
+  qs("#profileNameInput").value = qs("#profile-name").textContent || "";
+  qs("#profileBioInput").value  = "Freedom to create. Simple to share.";
+});
+qs("#bio-cancel")?.addEventListener("click", () => {
+  qs("#bio-view").style.display = "";
+  qs("#bio-edit-wrap").style.display = "none";
+});
+qs("#btnSaveProfile")?.addEventListener("click", () => {
+  // TODO: Persist to Firestore users/{uid}
+  const name = qs("#profileNameInput").value.trim();
+  const bio  = qs("#profileBioInput").value.trim();
+  if (name) qs("#profile-name").textContent = name;
+  qs("#bio-view").textContent = bio || " ";
+  qs("#bio-view").style.display = "";
+  qs("#bio-edit-wrap").style.display = "none";
+  alert("Saved (placeholder).");
+});
+
+// ---------- 8) Settings toggles (placeholder persistence) ----------
+["private","uploads","likes","saved","playlists"].forEach(key => {
+  const el = qs(`#toggle-${key}`);
+  if (!el) return;
+  // Default values
+  const saved = localStorage.getItem(`privacy:${key}`);
+  if (saved) el.setAttribute("data-on", saved === "true");
+  el.addEventListener("click", () => {
+    const on = el.getAttribute("data-on") !== "true";
+    el.setAttribute("data-on", on ? "true" : "false");
+    localStorage.setItem(`privacy:${key}`, String(on));
+    // TODO: Persist under users/{uid}.privacy
   });
-}
+});
 
-if (signInForm) {
-  signInForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = $("#signInEmail")?.value.trim();
-    const pass  = $("#signInPassword")?.value;
-    if (!email || !pass) return;
-    try {
-      const cred = await signInWithEmailAndPassword(auth, email, pass);
-      dispatchAuthEvent(cred.user);
-      authDialog?.close();
-    } catch (err) {
-      alert(err?.message || "Sign in failed");
-    }
-  });
-}
+// ---------- 9) Expose a tiny dev hook ----------
+window.__INTAKEE__ = {
+  reloadDemo: mountAllDemo,
+  demo
+};
 
-if (btnSignOut) {
-  btnSignOut.addEventListener("click", async () => {
-    try {
-      await signOut(auth);
-      dispatchAuthEvent(null);
-    } catch (err) {
-      alert(err?.message || "Sign out failed");
-    }
-  });
-}
-
-// -----------------------------------------------------------------------------
-// 3) Uploads: Videos / Clips / Podcasts + Thumbnail → Storage + Firestore
-// -----------------------------------------------------------------------------
-function resolveUploadPath(type) {
-  switch (type) {
-    case "video":          return { folder: "videos",   type: "video",   subtype: null };
-    case "clip":           return { folder: "clips",    type: "clip",    subtype: null };
-    case "podcast-audio":  return { folder: "podcasts", type: "podcast", subtype: "audio" };
-    case "podcast-video":  return { folder: "podcasts", type: "podcast", subtype: "video" };
-    default:               return { folder: "videos",   type: "video",   subtype: null };
-  }
-}
-
-async function uploadFileWithProgress(file, destRef, progressCb) {
-  return new Promise((resolve, reject) => {
-    const task = uploadBytesResumable(destRef, file);
-    task.on("state_changed",
-      (snap) => {
-        const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
-        if (progressCb) progressCb(pct);
-      },
-      (err) => reject(err),
-      async () => {
-        try {
-          const url = await getDownloadURL(task.snapshot.ref);
-          resolve(url);
-        } catch (e) { reject(e); }
-      }
-    );
-  });
-}
-
-async function handleUpload() {
-  const user = auth.currentUser;
-  if (!user) { alert("Please sign in to upload."); return; }
-
-  const chosen = uploadTypeSel?.value || "video";
-  const title  = (uploadTitleIn?.value || "").trim();
-  const file   = uploadFileIn?.files?.[0] || null;
-  const thumb  = uploadThumbIn?.files?.[0] || null;
-
-  if (!file)  { alert("Please choose a file."); return; }
-  if (!title) { alert("Please add a title.");   return; }
-
-  const { folder, type, subtype } = resolveUploadPath(chosen);
-
-  const safeName = `${Date.now()}_${file.name.replace(/\s+/g, "_")}`;
-  const fileRef  = ref(storage, `uploads/${folder}/${user.uid}/${safeName}`);
-
-  let thumbURL = "";
-  if (thumb) {
-    const thumbName = `${Date.now()}_${thumb.name.replace(/\s+/g, "_")}`;
-    const thumbRef  = ref(storage, `uploads/thumbnails/${user.uid}/${thumbName}`);
-    thumbURL        = await uploadFileWithProgress(thumb, thumbRef, () => {});
-  }
-
-  const mediaURL = await uploadFileWithProgress(file, fileRef, (pct)=>{
-    btnUpload.textContent = `Uploading… ${pct}%`;
-    btnUpload.disabled = true;
-  });
-
-  const docRef = await addDoc(collection(db, "posts"), {
-    title,
-    type,
-    subtype: subtype || "",
-    mediaURL,
-    thumbnailURL: thumbURL || "",
-    createdAt: serverTimestamp(),
-    userId: user.uid,
-    userEmail: user.email || ""
-  });
-
-  btnUpload.textContent = "Upload";
-  btnUpload.disabled = false;
-  if (uploadFileIn) uploadFileIn.value = "";
-  if (uploadThumbIn) uploadThumbIn.value = "";
-  if (uploadTitleIn) uploadTitleIn.value = "";
-
-  appendToProfileGrid({
-    id: docRef.id,
-    title, type, subtype,
-    mediaURL, thumbnailURL: thumbURL
-  });
-
-  alert("Upload complete! Your post will appear in the feed shortly.");
-}
-if (btnUpload) btnUpload.addEventListener("click", handleUpload);
-
-// -----------------------------------------------------------------------------
-// 4) Live Feeds: stream 'posts' ordered by createdAt desc
-// -----------------------------------------------------------------------------
-function createCard(item) {
-  const thumb = item.thumbnailURL || "";
-  const isPodcast = item.type === "podcast";
-  const mediaTag = isPodcast
-    ? `<audio controls preload="metadata" style="width:100%; margin-top:8px;">
-         <source src="${item.mediaURL}">
-       </audio>`
-    : `<video controls preload="metadata" style="width:100%; border-radius:10px; margin-top:8px; max-height:420px;">
-         <source src="${item.mediaURL}">
-       </video>`;
-
-  return `
-    <div class="card">
-      <div class="row" style="justify-content:space-between;align-items:center;">
-        <h4 style="margin:0;">${escapeHtml(item.title || "Untitled")}</h4>
-        <span class="pill">${item.type}${item.subtype ? " · " + item.subtype : ""}</span>
-      </div>
-      ${thumb ? `<img src="${thumb}" alt="" style="width:100%; border-radius:10px; margin-top:8px;"/>` : ""}
-      ${item.mediaURL ? mediaTag : ""}
-    </div>
-  `;
-}
-
-function escapeHtml(s = "") {
-  return s.replace(/[&<>"']/g, m => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-  }[m]));
-}
-
-function mountFeedStream() {
-  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-  onSnapshot(q, (snap) => {
-    if (homeFeed)   homeFeed.innerHTML   = "";
-    if (videosFeed) videosFeed.innerHTML = "";
-    if (podcastFeed)podcastFeed.innerHTML= "";
-    if (clipsFeed)  clipsFeed.innerHTML  = "";
-
-    snap.forEach((docSnap) => {
-      const d = { id: docSnap.id, ...docSnap.data() };
-      const cardHtml = createCard(d);
-
-      if (homeFeed) homeFeed.insertAdjacentHTML("beforeend", cardHtml);
-      if (d.type === "video" && videosFeed)   videosFeed.insertAdjacentHTML("beforeend", cardHtml);
-      if (d.type === "clip" && clipsFeed)     clipsFeed.insertAdjacentHTML("beforeend", cardHtml);
-      if (d.type === "podcast" && podcastFeed)podcastFeed.insertAdjacentHTML("beforeend", cardHtml);
-    });
-  });
-}
-mountFeedStream();
-
-// -----------------------------------------------------------------------------
-// 5) Profile grid: append the uploaded item (simple visual confirmation)
-// -----------------------------------------------------------------------------
-function appendToProfileGrid(item) {
-  if (!profileGrid) return;
-  const thumb = item.thumbnailURL || "";
-  const tile = `
-    <div class="tile">
-      ${thumb
-        ? `<img class="thumb" src="${thumb}" alt="">`
-        : `<div class="thumb" style="display:flex;align-items:center;justify-content:center;color:#aaa;">No thumbnail</div>`}
-      <div class="meta">
-        <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-          ${escapeHtml(item.title || "Untitled")}
-        </div>
-        <div class="muted">${item.type}${item.subtype ? " · " + item.subtype : ""}</div>
-      </div>
-    </div>`;
-  profileGrid.insertAdjacentHTML("afterbegin", tile);
-  if (profileEmpty) profileEmpty.style.display = "none";
-}
-
-// -----------------------------------------------------------------------------
-// 6) Simple filter pills on Home (All, Videos, Podcasts, Clips, Following, Newest)
-// -----------------------------------------------------------------------------
-const homePills = Array.from(document.querySelectorAll('#tab-home .pill'));
-homePills.forEach(p => p.addEventListener('click', () => {
-  homePills.forEach(x => x.classList.toggle('active', x === p));
-  const filter = p.dataset.filter;
-
-  const cards = Array.from(homeFeed?.querySelectorAll('.card') || []);
-  cards.forEach(card => {
-    const label = card.querySelector('.pill')?.textContent || "";
-    const isVideo   = label.startsWith('video');
-    const isClip    = label.startsWith('clip');
-    const isPodcast = label.startsWith('podcast');
-
-    let show = true;
-    if (filter === 'video')   show = isVideo;
-    if (filter === 'clip')    show = isClip;
-    if (filter === 'podcast') show = isPodcast;
-    if (filter === 'following') show = true; // TODO: wire follow graph
-    if (filter === 'new')       show = true; // already newest by stream
-
-    card.style.display = show ? "" : "none";
-  });
-}));
-
-// -----------------------------------------------------------------------------
-// 7) Optional: expose for debugging (remove in production)
-// -----------------------------------------------------------------------------
-window.__INTAKEE__ = { app, auth, db, storage };
-// -----------------------------------------------------------------------------
+console.log("INTAKEE scaffold ready — UI is live with demo data. Wire Firebase next.");
