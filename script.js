@@ -47,7 +47,47 @@ document.getElementById("btnSignOut")?.addEventListener("click", async () => {
     await signOut(auth);
     console.log("User signed out");
   } catch (err) {
-    console.error("Logout error:", err);
+    
+// --- Firestore → fetch posts (basic) ---
+import {
+  collection, getDocs, query, orderBy, limit
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// Map Firestore 'type' → renderer function from index.html
+const RENDERER = {
+  "video": window.renderVideoCard,
+  "podcast-video": window.renderVideoCard,
+  "podcast-audio": window.renderPodcastRow,
+  "clip": window.renderClipFullScreen
+};
+
+// Load only HOME for now
+async function loadHomeFromFirestore() {
+  const root = document.getElementById("home-feed");
+  if (!root) return;
+  root.innerHTML = ""; // clear
+
+  try {
+    const col = collection(window.__fb.db, "posts");
+    const qy  = query(col, orderBy("createdAt", "desc"), limit(20));
+    const snap = await getDocs(qy);
+
+    if (snap.empty) {
+      root.innerHTML = `<p class="muted">No posts yet — add one in Firestore to test.</p>`;
+      return;
+    }
+      snap.forEach(docSnap => {
+      const p = { id: docSnap.id, ...docSnap.data() };
+      const render = RENDERER[p.type] || RENDERER["video"];
+      root.appendChild(render(p));
+    });
+  } catch (e) {
+    console.error("Home feed error:", e);
+    root.innerHTML = `<p class="muted">Error loading feed. Check console.</p>`;
+  }
+}
+// Call it once on load (others stay demo for now)
+loadHomeFromFirestore();    
   }
 });
 
