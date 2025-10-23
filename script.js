@@ -318,3 +318,42 @@ window.__INTAKEE__ = {
 };
 
 console.log("INTAKEE scaffold ready — UI is live with demo data. Wire Firebase next.");
+// --- Firestore → Fetch posts for Home feed ---
+import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+async function loadHomePosts() {
+  try {
+    const feed = document.getElementById("home-feed") || document.querySelector(".feed");
+    if (!feed) return;
+    feed.innerHTML = "<p style='color:gray;text-align:center;'>Loading posts...</p>";
+
+    const postsRef = collection(db, "posts");
+    const q = query(postsRef, orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
+
+    feed.innerHTML = "";
+
+    snapshot.forEach((doc) => {
+      const post = doc.data();
+      const card = `
+        <div class="post-card">
+          <img src="${post.thumbnailUrl}" alt="Thumbnail" style="width:100%;border-radius:12px;">
+          <h3>${post.title}</h3>
+          <p style="color:gray;">By ${post.creatorName}</p>
+          <video controls style="width:100%;border-radius:12px;">
+            <source src="${post.mediaUrl}" type="video/mp4">
+          </video>
+        </div>
+      `;
+      feed.innerHTML += card;
+    });
+
+    if (snapshot.empty) {
+      feed.innerHTML = "<p style='text-align:center;color:gray;'>No posts yet</p>";
+    }
+  } catch (err) {
+    console.error("Error loading posts:", err);
+  }
+}
+
+window.addEventListener("load", loadHomePosts);
