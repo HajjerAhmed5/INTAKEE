@@ -1,25 +1,31 @@
-// --- Firebase (modular CDN) ---
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+// ===============================
+// INTAKEE — Clean Script (Fixed)
+// ===============================
+
+// --- Firebase (modular CDN) — single version ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import {
   getAuth, onAuthStateChanged, signOut,
   createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import {
-  getFirestore, collection, getDocs, query, orderBy, limit
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  getFirestore, collection, getDocs, query, orderBy, limit,
+  doc, setDoc, getDoc, where, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
-// TODO: replace these with your real Firebase web config (from Firebase Console → Project settings → General → Your apps → Web app → "CDN")
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// --- Your real Firebase web config (fixed storageBucket) ---
 const firebaseConfig = {
   apiKey: "AIzaSyD0_tL8PxUvGT7JqCBj3tuL7s3Kipl5E6g",
   authDomain: "intakee-5785e.firebaseapp.com",
   projectId: "intakee-5785e",
-  storageBucket: "intakee-5785e.firebasestorage.app",
+  storageBucket: "intakee-5785e.appspot.com", // <-- FIXED
   messagingSenderId: "40666230072",
   appId: "1:40666230072:web:3e3875043b11d795b565cd",
   measurementId: "G-3319X7HL9G"
 };
+
+// --- Initialize ONCE ---
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
@@ -29,31 +35,81 @@ const st   = getStorage(app);
 window.__fb = { auth, db, st };
 
 /* ===============================
-   INTAKEE — Core JS Scaffold
+   0) Auth session bridge
    =============================== */
-
-// ---------- 0) Auth event ----------
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   document.dispatchEvent(new CustomEvent("intakee:auth", { detail: { user } }));
   console.log(user ? `Signed in as ${user.email}` : "Signed out");
-});
 
-// --- Logout button ---
-document.getElementById("btnSignOut")?.addEventListener("click", async () => {
-  try {
-    await signOut(auth);
-    console.log("User signed out");
-  } catch (err) {
-    console.error("Logout error:", err);
+  const authed = !!user;
+  document.body.classList.toggle("authed", authed);
+
+  if (!user) {
+    putProfile(null);
+    toggleAuthButtons(false);
+    return;
   }
+
+  // load or create Firestore user profile
+  const uref = doc(db, "users", user.uid);
+  const snap = await getDoc(uref);
+  let profile;
+  if (snap.exists()) {
+    profile = snap.data();
+  } else {
+    profile = {
+      uid: user.uid,
+      email: user.email || "",
+      displayName: user.displayName || "",
+      username: "",
+      usernameLower: "",
+      bio: "",
+      photoURL: user.photoURL || "",
+      bannerURL: "",
+      likes: 0,
+      posts: 0,
+      createdAt: serverTimestamp(),
+    };
+    await setDoc(uref, profile);
+  }
+  putProfile(profile);
+  toggleAuthButtons(true);
 });
 
-// ---------- 1) Tiny helpers ----------
+// Support either sign out button id
+document.getElementById("btnSignOut")?.addEventListener("click", () => signOut(auth));
+document.getElementById("signout-btn")?.addEventListener("click", () => signOut(auth));
+
+function toggleAuthButtons(on) {
+  const inBtn  = document.getElementById("open-auth");
+  const outBtn = document.getElementById("signout-btn") || document.getElementById("btnSignOut");
+  if (inBtn)  inBtn.style.display  = on ? "none" : "inline-block";
+  if (outBtn) outBtn.style.display = on ? "inline-block" : "none";
+}
+
+function putProfile(profile) {
+  localStorage.setItem("intakee:user", JSON.stringify(profile || {}));
+  // Optional UI hooks
+  document.querySelectorAll("[data-profile-name]").forEach(el => {
+    el.textContent = profile?.displayName || profile?.username || "Guest";
+  });
+  document.querySelectorAll("[data-username]").forEach(el => {
+    el.textContent = profile?.username ? `@${profile.username}` : "";
+  });
+  document.querySelectorAll("[data-profile-avatar]").forEach(el => {
+    el.src = profile?.photoURL || "/img/avatar-default.png";
+  });
+}
+
+/* ===============================
+   1) Tiny DOM helpers
+   =============================== */
 const qs  = (s, sc) => (sc || document).querySelector(s);
 const qsa = (s, sc) => Array.from((sc || document).querySelectorAll(s));
-const append = (el, ...kids) => { kids.forEach(k => k && el.appendChild(k)); return el; };
 
-// ---------- 2) Map Firestore 'type' → renderer from index.html ----------
+/* ===============================
+   2) Card renderers map (from index.html)
+   =============================== */
 const RENDERER = {
   "video":          window.renderVideoCard,
   "podcast-video":  window.renderVideoCard,
@@ -61,7 +117,9 @@ const RENDERER = {
   "clip":           window.renderClipFullScreen
 };
 
-// ---------- 3) Load HOME from Firestore ----------
+/* ===============================
+   3) Load HOME from Firestore
+   =============================== */
 async function loadHomeFromFirestore() {
   const root = document.getElementById("home-feed");
   if (!root) return;
@@ -73,7 +131,7 @@ async function loadHomeFromFirestore() {
     const qy  = query(col, orderBy("createdAt", "desc"), limit(20));
     const snap = await getDocs(qy);
 
-    root.innerHTML = ""; // clear
+    root.innerHTML = "";
 
     if (snap.empty) {
       root.innerHTML = `<p class="muted" style="text-align:center;">No posts yet — add one in Firestore to test.</p>`;
@@ -86,7 +144,6 @@ async function loadHomeFromFirestore() {
       try {
         root.appendChild(render(p));
       } catch (e) {
-        // Fallback simple card if a renderer is missing
         const card = document.createElement("article");
         card.className = "card ratio-16x9";
         card.innerHTML = `
@@ -101,20 +158,22 @@ async function loadHomeFromFirestore() {
     root.innerHTML = `<p class="muted" style="text-align:center;">Error loading feed. Check console.</p>`;
   }
 }
-
-// Run once on load
 window.addEventListener("load", loadHomeFromFirestore);
 
-// ---------- 4) (Optional) Search/filters placeholders ----------
+/* ===============================
+   4) Pills (UI only for now)
+   =============================== */
 qsa(".pills .pill").forEach(btn => {
   btn.addEventListener("click", () => {
     qsa(".pills .pill").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    // TODO: future filter by type
+    // TODO: optional filter by type later
   });
 });
 
-// ---------- 5) Upload / Profile / Settings placeholders (unchanged) ----------
+/* ===============================
+   5) Upload / Profile / Settings placeholders
+   =============================== */
 qs("#btnUpload")?.addEventListener("click", () => {
   alert("TODO: Wire Firebase upload logic here.");
 });
@@ -153,55 +212,28 @@ qs("#btnSaveProfile")?.addEventListener("click", () => {
 
 // Tiny dev hook
 window.__INTAKEE__ = { reloadHome: loadHomeFromFirestore };
-console.log("INTAKEE ready — Firebase wired for Home feed.");
-// --- Firebase (CDN modular) ---
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import {
-  getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
-  signInWithEmailAndPassword, updateProfile, signOut
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-import {
-  getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-// 1) Your Firebase config (fill these)
-const firebaseConfig = {
-  apiKey: "<API_KEY>",
-  authDomain: "<PROJECT_ID>.firebaseapp.com",
-  projectId: "<PROJECT_ID>",
-  storageBucket: "<PROJECT_ID>.appspot.com",
-  messagingSenderId: "<SENDER_ID>",
-  appId: "<APP_ID>",
-};
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
-
-// 2) Minimal helpers
+/* ===============================
+   6) AUTH: forms (unique username)
+   =============================== */
 async function isUsernameTaken(username) {
-  const q = query(collection(db, "users"), where("usernameLower", "==", username.toLowerCase()));
-  const s = await getDocs(q);
+  const qy = query(collection(db, "users"), where("usernameLower", "==", username.toLowerCase()));
+  const s = await getDocs(qy);
   return !s.empty;
 }
-function putProfile(profile) {
-  localStorage.setItem("intakee:user", JSON.stringify(profile || {}));
-  // optional: update UI spots if you already have them
-  document.querySelectorAll("[data-profile-name]").forEach(el => el.textContent = profile?.displayName || profile?.username || "Guest");
-  document.querySelectorAll("[data-username]").forEach(el => el.textContent = profile?.username ? `@${profile.username}` : "");
-  document.querySelectorAll("[data-profile-avatar]").forEach(el => el.src = profile?.photoURL || "/img/avatar-default.png");
-}
 
-// 3) Sign Up handler
+// Sign Up
 document.getElementById("signup-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name = document.getElementById("signup-name").value.trim();
-  const user = document.getElementById("signup-username").value.trim();
-  const email = document.getElementById("signup-email").value.trim();
-  const pass = document.getElementById("signup-password").value;
+  const name  = document.getElementById("signup-name")?.value.trim();
+  const uname = document.getElementById("signup-username")?.value.trim();
+  const email = document.getElementById("signup-email")?.value.trim();
+  const pass  = document.getElementById("signup-password")?.value;
+  const errEl = document.getElementById("signup-error");
 
   try {
-    if (user.length < 3) throw new Error("Username must be at least 3 characters.");
-    if (await isUsernameTaken(user)) throw new Error("Username is taken. Try another.");
+    if (!uname || uname.length < 3) throw new Error("Username must be at least 3 characters.");
+    if (await isUsernameTaken(uname)) throw new Error("Username is taken. Try another.");
 
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     if (name) await updateProfile(cred.user, { displayName: name });
@@ -211,8 +243,8 @@ document.getElementById("signup-form")?.addEventListener("submit", async (e) => 
       uid: cred.user.uid,
       email,
       displayName: name || "",
-      username: user,
-      usernameLower: user.toLowerCase(),
+      username: uname,
+      usernameLower: uname.toLowerCase(),
       bio: "",
       photoURL: cred.user.photoURL || "",
       bannerURL: "",
@@ -221,44 +253,30 @@ document.getElementById("signup-form")?.addEventListener("submit", async (e) => 
       createdAt: serverTimestamp(),
     });
 
-    // close your modal if you have one
-    document.getElementById("signup-error")?.textContent = "";
+    if (errEl) errEl.textContent = "";
+    // If you have a modal, close it here
+    // closeAuthModal?.();
   } catch (err) {
-    document.getElementById("signup-error")?.textContent = err.message || "Sign up failed.";
+    if (errEl) errEl.textContent = err.message || "Sign up failed.";
+    console.error(err);
   }
 });
 
-// 4) Sign In handler
+// Sign In
 document.getElementById("signin-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const email = document.getElementById("signin-email").value.trim();
-  const pass  = document.getElementById("signin-password").value;
+  const email = document.getElementById("signin-email")?.value.trim();
+  const pass  = document.getElementById("signin-password")?.value;
+  const errEl = document.getElementById("signin-error");
+
   try {
     await signInWithEmailAndPassword(auth, email, pass);
-    document.getElementById("signin-error")?.textContent = "";
+    if (errEl) errEl.textContent = "";
+    // closeAuthModal?.();
   } catch (err) {
-    document.getElementById("signin-error")?.textContent = err.message || "Sign in failed.";
+    if (errEl) errEl.textContent = err.message || "Sign in failed.";
+    console.error(err);
   }
 });
 
-// 5) Sign Out (optional button with id="signout-btn")
-document.getElementById("signout-btn")?.addEventListener("click", () => signOut(auth));
-
-// 6) Keep session & UI in sync
-onAuthStateChanged(auth, async (u) => {
-  const authed = !!u;
-  document.body.classList.toggle("authed", authed);
-  if (!u) { putProfile(null); return; }
-
-  const snap = await getDoc(doc(db, "users", u.uid));
-  const profile = snap.exists() ? snap.data() : {
-    uid: u.uid, email: u.email || "", displayName: u.displayName || "", username: "", photoURL: u.photoURL || ""
-  };
-  putProfile(profile);
-
-  // Toggle buttons if you have them
-  const inBtn = document.getElementById("open-auth");
-  const outBtn = document.getElementById("signout-btn");
-  if (inBtn) inBtn.style.display = authed ? "none" : "inline-block";
-  if (outBtn) outBtn.style.display = authed ? "inline-block" : "none";
-});
+console.log("INTAKEE ready — Firebase wired for Auth + Home feed (single init).");
