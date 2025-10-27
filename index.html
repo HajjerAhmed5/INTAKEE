@@ -454,4 +454,43 @@
   <!-- TODO: In script.js, you will fetch Firestore docs and append nodes returned by the render* functions above -->
   <script type="module" src="script.js?v=11"></script>
 </body>
+  <!-- Auth triggers (top-right) -->
+<button id="open-auth">Login / Sign Up</button>
+<button id="signout-btn" style="display:none">Sign out</button>
+
+<!-- Auth Modal -->
+<div id="auth-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(2px); z-index:9999;">
+  <div class="auth-card" style="max-width:380px; margin:8vh auto; background:#111; color:#fff; border:1px solid #222; border-radius:14px; padding:18px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="margin:0;">Welcome to INTAKEE</h3>
+      <button id="close-auth" style="font-size:20px; background:none; border:none; color:#aaa; cursor:pointer;">×</button>
+    </div>
+
+    <div style="display:flex; gap:8px; margin:14px 0;">
+      <button class="tab active" data-tab="signin">Sign In</button>
+      <button class="tab" data-tab="signup">Create Account</button>
+    </div>
+
+    <!-- Sign In -->
+    <form id="signin-form" class="tab-panel" data-panel="signin">
+      <input id="signin-email" type="email" placeholder="Email" required style="width:100%;margin:6px 0;">
+      <input id="signin-password" type="password" placeholder="Password" required style="width:100%;margin:6px 0;">
+      <button id="signin-submit" type="submit" style="width:100%;margin-top:8px;">Sign in</button>
+      <p id="signin-error" class="err" style="color:#f66; min-height:1.2em;"></p>
+    </form>
+
+    <!-- Sign Up -->
+    <form id="signup-form" class="tab-panel" data-panel="signup" style="display:none;">
+      <input id="signup-name" type="text" placeholder="Full name" required style="width:100%;margin:6px 0;">
+      <input id="signup-username" type="text" placeholder="Username (min 3 chars)" minlength="3" required style="width:100%;margin:6px 0;">
+      <input id="signup-email" type="email" placeholder="Email" required style="width:100%;margin:6px 0;">
+      <input id="signup-password" type="password" placeholder="Password" required style="width:100%;margin:6px 0;">
+      <button id="signup-submit" type="submit" style="width:100%;margin-top:8px;">Create account</button>
+      <p id="signup-error" class="err" style="color:#f66; min-height:1.2em;"></p>
+    </form>
+  </div>
+</div>
+
+<!-- Load your app JS as a module -->
+<script type="module" src="./script.js"></script>
 </html>
