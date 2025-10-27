@@ -154,3 +154,111 @@ qs("#btnSaveProfile")?.addEventListener("click", () => {
 // Tiny dev hook
 window.__INTAKEE__ = { reloadHome: loadHomeFromFirestore };
 console.log("INTAKEE ready — Firebase wired for Home feed.");
+// --- Firebase (CDN modular) ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+  signInWithEmailAndPassword, updateProfile, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+// 1) Your Firebase config (fill these)
+const firebaseConfig = {
+  apiKey: "<API_KEY>",
+  authDomain: "<PROJECT_ID>.firebaseapp.com",
+  projectId: "<PROJECT_ID>",
+  storageBucket: "<PROJECT_ID>.appspot.com",
+  messagingSenderId: "<SENDER_ID>",
+  appId: "<APP_ID>",
+};
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// 2) Minimal helpers
+async function isUsernameTaken(username) {
+  const q = query(collection(db, "users"), where("usernameLower", "==", username.toLowerCase()));
+  const s = await getDocs(q);
+  return !s.empty;
+}
+function putProfile(profile) {
+  localStorage.setItem("intakee:user", JSON.stringify(profile || {}));
+  // optional: update UI spots if you already have them
+  document.querySelectorAll("[data-profile-name]").forEach(el => el.textContent = profile?.displayName || profile?.username || "Guest");
+  document.querySelectorAll("[data-username]").forEach(el => el.textContent = profile?.username ? `@${profile.username}` : "");
+  document.querySelectorAll("[data-profile-avatar]").forEach(el => el.src = profile?.photoURL || "/img/avatar-default.png");
+}
+
+// 3) Sign Up handler
+document.getElementById("signup-form")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("signup-name").value.trim();
+  const user = document.getElementById("signup-username").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const pass = document.getElementById("signup-password").value;
+
+  try {
+    if (user.length < 3) throw new Error("Username must be at least 3 characters.");
+    if (await isUsernameTaken(user)) throw new Error("Username is taken. Try another.");
+
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    if (name) await updateProfile(cred.user, { displayName: name });
+
+    const uref = doc(db, "users", cred.user.uid);
+    await setDoc(uref, {
+      uid: cred.user.uid,
+      email,
+      displayName: name || "",
+      username: user,
+      usernameLower: user.toLowerCase(),
+      bio: "",
+      photoURL: cred.user.photoURL || "",
+      bannerURL: "",
+      likes: 0,
+      posts: 0,
+      createdAt: serverTimestamp(),
+    });
+
+    // close your modal if you have one
+    document.getElementById("signup-error")?.textContent = "";
+  } catch (err) {
+    document.getElementById("signup-error")?.textContent = err.message || "Sign up failed.";
+  }
+});
+
+// 4) Sign In handler
+document.getElementById("signin-form")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("signin-email").value.trim();
+  const pass  = document.getElementById("signin-password").value;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    document.getElementById("signin-error")?.textContent = "";
+  } catch (err) {
+    document.getElementById("signin-error")?.textContent = err.message || "Sign in failed.";
+  }
+});
+
+// 5) Sign Out (optional button with id="signout-btn")
+document.getElementById("signout-btn")?.addEventListener("click", () => signOut(auth));
+
+// 6) Keep session & UI in sync
+onAuthStateChanged(auth, async (u) => {
+  const authed = !!u;
+  document.body.classList.toggle("authed", authed);
+  if (!u) { putProfile(null); return; }
+
+  const snap = await getDoc(doc(db, "users", u.uid));
+  const profile = snap.exists() ? snap.data() : {
+    uid: u.uid, email: u.email || "", displayName: u.displayName || "", username: "", photoURL: u.photoURL || ""
+  };
+  putProfile(profile);
+
+  // Toggle buttons if you have them
+  const inBtn = document.getElementById("open-auth");
+  const outBtn = document.getElementById("signout-btn");
+  if (inBtn) inBtn.style.display = authed ? "none" : "inline-block";
+  if (outBtn) outBtn.style.display = authed ? "inline-block" : "none";
+});
