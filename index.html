@@ -6,12 +6,15 @@
   <title>INTAKEE — Videos, Podcasts, and Clips</title>
   <meta name="description" content="INTAKEE is the all-in-one platform for videos, podcasts, and clips — freedom to create, simple to share.">
   <link rel="canonical" href="https://intakee.vercel.app/">
+
+  <!-- Social -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
   <meta property="og:description" content="All-in-one platform for videos, podcasts, and clips.">
   <meta property="og:url" content="https://intakee.vercel.app/">
   <meta property="og:image" content="/og-image.jpg">
   <meta name="twitter:card" content="summary_large_image">
+
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
   <link rel="icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -28,9 +31,8 @@
       <input id="globalSearch" type="text" placeholder="Search…" />
     </div>
     <div class="auth">
+      <!-- single auth trigger; Logout lives in Settings only -->
       <button id="openAuth">Login / Sign Up</button>
-      <button id="btnSignOut" style="display:none;">Logout</button>
-      <span id="whoami" class="muted" style="margin-left:8px;"></span>
     </div>
   </header>
 
@@ -50,10 +52,10 @@
           <button class="pill" data-filter="new">Newest</button>
         </div>
       </div>
-      <div id="home-feed" class="feed-grid"><!-- TODO: populate trending feed here --></div>
+      <div id="home-feed" class="feed-grid"><!-- populated by JS --></div>
     </section>
 
-    <!-- VIDEOS (YouTube-style stacked feed) -->
+    <!-- VIDEOS -->
     <section id="tab-videos" style="display:none;">
       <div class="section-head">
         <h3>Videos</h3>
@@ -62,10 +64,10 @@
           <input id="videosSearch" type="text" placeholder="Search videos…">
         </div>
       </div>
-      <div id="videos-feed" class="feed-grid"><!-- TODO: render video cards here --></div>
+      <div id="videos-feed" class="feed-grid"><!-- populated by JS --></div>
     </section>
 
-    <!-- PODCASTS (Apple-Music style list + mini-player support) -->
+    <!-- PODCASTS -->
     <section id="tab-podcast" style="display:none;">
       <div class="section-head">
         <h3>Podcasts</h3>
@@ -74,10 +76,10 @@
           <input id="podcastSearch" type="text" placeholder="Search podcasts…">
         </div>
       </div>
-      <div id="podcast-feed" class="podcast-list"><!-- TODO: render podcast rows here --></div>
+      <div id="podcast-feed" class="podcast-list"><!-- populated by JS --></div>
     </section>
 
-    <!-- UPLOAD (Creators can post unlimited content) -->
+    <!-- UPLOAD -->
     <section id="tab-upload" class="card" style="display:none;">
       <h3>Upload</h3>
       <div class="upload-form">
@@ -92,6 +94,10 @@
         <label>Title</label>
         <input id="uploadTitleInput" type="text" placeholder="Add a title">
 
+        <!-- NEW: Description -->
+        <label>Description</label>
+        <textarea id="uploadDescInput" placeholder="Describe your video/clip/podcast…" rows="4"></textarea>
+
         <label>Thumbnail (cover image)</label>
         <input id="uploadThumbInput" type="file" accept="image/*">
 
@@ -102,13 +108,13 @@
 
         <div class="row">
           <button id="btnUpload" class="primary">Upload</button>
+          <!-- Keep Go Live as-is (no “coming soon” text) -->
           <button id="goLiveBtn" class="ghost">Go Live</button>
         </div>
       </div>
-      <!-- TODO: Wire Firebase upload logic -->
     </section>
 
-    <!-- CLIPS (TikTok-style vertical feed) -->
+    <!-- CLIPS -->
     <section id="tab-clips" style="display:none;">
       <div class="section-head">
         <h3>Clips</h3>
@@ -117,10 +123,10 @@
           <input id="clipsSearch" type="text" placeholder="Search clips…">
         </div>
       </div>
-      <div id="clips-feed" class="clip-feed"><!-- TODO: render full-screen clip cards --></div>
+      <div id="clips-feed" class="clip-feed"><!-- populated by JS --></div>
     </section>
 
-    <!-- PROFILE (Clean banner + avatar + grid) -->
+    <!-- PROFILE -->
     <section id="tab-profile" style="display:none;">
       <div id="profileBanner" class="profile-banner">
         <button id="btnAddBanner" class="add-btn owner-only" title="Change banner" style="display:none;">+</button>
@@ -130,6 +136,7 @@
         <div class="profile-header">
           <div class="avatar-wrap">
             <img id="profile-photo" src="" alt="" class="profile-avatar">
+            <!-- shows when logged-in -->
             <button id="btnAddAvatar" class="add-btn owner-only" title="Change photo" style="display:none;">+</button>
           </div>
 
@@ -140,7 +147,7 @@
 
             <div id="bio-edit-wrap" style="display:none;">
               <input id="profileNameInput" type="text" placeholder="Your name">
-              <textarea id="profileBioInput" placeholder="Write your bio..."></textarea>
+              <textarea id="profileBioInput" placeholder="Write your bio..." maxlength="300"></textarea>
               <div class="row">
                 <label class="ghost">Profile Photo <input id="profilePhotoInput" type="file" accept="image/*"></label>
                 <label class="ghost">Banner <input id="profileBannerInput" type="file" accept="image/*"></label>
@@ -181,7 +188,7 @@
       <input id="avatarInput" type="file" accept="image/*" hidden>
     </section>
 
-    <!-- SETTINGS (Privacy & policy) -->
+    <!-- SETTINGS -->
     <section id="tab-settings" style="display:none;">
       <div class="settings-section">
         <h3>Account</h3>
@@ -204,15 +211,51 @@
         <p class="muted small">
           INTAKEE supports freedom of speech and creative expression. Users are responsible for their own content.
         </p>
-        <a href="#" class="muted">Community Guidelines</a><br>
-        <a href="#" class="muted">Terms of Service</a><br>
-        <a href="#" class="muted">Privacy Policy</a><br>
-        <a href="mailto:intakee2025@gmail.com" class="muted">Contact: intakee2025@gmail.com</a>
+        <!-- Updated to in-app routes -->
+        <a href="#guidelines" class="muted">Community Guidelines</a><br>
+        <a href="#terms" class="muted">Terms of Service</a><br>
+        <a href="#privacy" class="muted">Privacy Policy</a><br>
+        <a href="mailto:intakee2025@gmail.com" class="muted">Contact: intakee2025@gmail.com</a><br>
+        <a href="mailto:intakee2025@gmail.com?subject=Report%20Content" class="muted">Report Content</a>
+      </div>
+
+      <!-- Logout lives here (only place) -->
+      <div class="settings-section">
+        <div class="settings-item danger">
+          <div><i class="fa fa-right-from-bracket"></i> Logout</div>
+          <button id="settings-logout" class="ghost">Log out</button>
+        </div>
       </div>
     </section>
+
+    <!-- LEGAL PAGES (in-app, scrollable) -->
+    <section id="tab-guidelines" style="display:none;">
+      <div class="legal-page">
+        <a href="#settings" class="muted small">← Back to Settings</a>
+        <h2>Community Guidelines</h2>
+        <div id="guidelines-content" class="legal-content"><!-- filled by JS or static text here --></div>
+      </div>
+    </section>
+
+    <section id="tab-terms" style="display:none;">
+      <div class="legal-page">
+        <a href="#settings" class="muted small">← Back to Settings</a>
+        <h2>Terms of Service</h2>
+        <div id="terms-content" class="legal-content"><!-- filled by JS or static text here --></div>
+      </div>
+    </section>
+
+    <section id="tab-privacy" style="display:none;">
+      <div class="legal-page">
+        <a href="#settings" class="muted small">← Back to Settings</a>
+        <h2>Privacy Policy</h2>
+        <div id="privacy-content" class="legal-content"><!-- filled by JS or static text here --></div>
+      </div>
+    </section>
+
   </main>
 
-  <!-- ===== MINI PLAYER (Apple Music–style) ===== -->
+  <!-- ===== MINI PLAYER (hidden unless playing) ===== -->
   <div id="mini-player" class="mini-player" hidden>
     <div class="mp-left">
       <div class="mp-art" id="mp-art"></div>
@@ -230,19 +273,18 @@
       <div class="mp-time muted small"><span id="mp-cur">0:00</span> / <span id="mp-dur">0:00</span></div>
       <button id="mp-close" class="icon-btn" title="Close"><i class="fa fa-xmark"></i></button>
     </div>
-    <!-- Hidden native audio element -->
     <audio id="mp-audio" preload="metadata"></audio>
   </div>
 
   <!-- ===== BOTTOM NAV ===== -->
   <nav class="bottom-nav">
-    <a href="#home"    data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
-    <a href="#videos"  data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
-    <a href="#podcast" data-tab="podcast"><i class="fa fa-podcast"></i><span>Podcast</span></a>
-    <a href="#upload"  data-tab="upload"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
-    <a href="#clips"   data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
-    <a href="#profile" data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
-    <a href="#settings"data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
+    <a href="#home"     data-tab="home"    class="active"><i class="fa fa-home"></i><span>Home</span></a>
+    <a href="#videos"   data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
+    <a href="#podcast"  data-tab="podcast"><i class="fa fa-podcast"></i><span>Podcast</span></a>
+    <a href="#upload"   data-tab="upload"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
+    <a href="#clips"    data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
+    <a href="#profile"  data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
+    <a href="#settings" data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
   </nav>
 
   <!-- ===== AUTH MODAL ===== -->
@@ -269,25 +311,30 @@
     </form>
   </dialog>
 
-  <!-- ===== CORE SHELL SCRIPTS (placeholders you’ll wire to Firebase) ===== -->
+  <!-- ===== CORE SHELL SCRIPTS (router + UI helpers) ===== -->
   <script>
     // ---------- Tab Router (hash-based) ----------
     (function initRouter(){
       const links = Array.from(document.querySelectorAll('.bottom-nav a'));
       const sections = {
-        home:     document.getElementById('tab-home'),
-        videos:   document.getElementById('tab-videos'),
-        podcast:  document.getElementById('tab-podcast'),
-        upload:   document.getElementById('tab-upload'),
-        clips:    document.getElementById('tab-clips'),
-        profile:  document.getElementById('tab-profile'),
-        settings: document.getElementById('tab-settings')
+        home:       document.getElementById('tab-home'),
+        videos:     document.getElementById('tab-videos'),
+        podcast:    document.getElementById('tab-podcast'),
+        upload:     document.getElementById('tab-upload'),
+        clips:      document.getElementById('tab-clips'),
+        profile:    document.getElementById('tab-profile'),
+        settings:   document.getElementById('tab-settings'),
+        // Legal routes
+        guidelines: document.getElementById('tab-guidelines'),
+        terms:      document.getElementById('tab-terms'),
+        privacy:    document.getElementById('tab-privacy')
       };
       const searchWrap = document.getElementById('searchWrap');
 
       function setTab(key){
-        Object.entries(sections).forEach(([k,el]) => el.style.display = (k === key) ? '' : 'none');
+        Object.entries(sections).forEach(([k,el]) => el && (el.style.display = (k === key) ? '' : 'none'));
         links.forEach(a => a.classList.toggle('active', a.dataset.tab === key));
+        // Search only visible on Home (global search lives there)
         if (searchWrap) searchWrap.style.display = (key === 'home') ? 'flex' : 'none';
         window.scrollTo({ top: 0, behavior: 'instant' });
       }
@@ -303,16 +350,11 @@
     })();
 
     // ---------- Auth header updater (listen for your script.js events) ----------
+    // Expect script.js to dispatch: document.dispatchEvent(new CustomEvent('intakee:auth',{detail:{user}}))
     function applyHeaderAuth(user) {
       const openBtn = document.getElementById('openAuth');
-      const outBtn  = document.getElementById('btnSignOut');
-      const whoami  = document.getElementById('whoami');
       const loggedIn = !!user;
       if (openBtn) openBtn.style.display = loggedIn ? 'none' : '';
-      if (outBtn)  outBtn.style.display  = loggedIn ? '' : 'none';
-      whoami && (whoami.textContent = loggedIn
-        ? (user.displayName ? `${user.displayName} (${user.email||''})` : (user.email||''))
-        : '');
     }
     document.addEventListener('intakee:auth', (e) => applyHeaderAuth(e.detail?.user ?? null));
     document.getElementById('openAuth')?.addEventListener('click', () => {
@@ -320,7 +362,6 @@
     });
 
     // ---------- MINI-PLAYER (Podcast audio across tabs) ----------
-    // TODO: In your Firebase code, call window.playPodcast({url, title, subtitle, cover})
     (function initMiniPlayer(){
       const wrap = document.getElementById('mini-player');
       const art  = document.getElementById('mp-art');
@@ -355,23 +396,18 @@
       audio.addEventListener('pause', ()=> { btnP.innerHTML = '<i class="fa fa-play"></i>'; cancelAnimationFrame(ticking); });
       audio.addEventListener('loadedmetadata', ()=> { dur.textContent = fmt(audio.duration||0); });
 
-      // Expose starter API for your Firebase renderers
+      // Expose starter API for renderers
       window.playPodcast = ({ url, title, subtitle, cover })=>{
-        // Auto-pause any video/clip currently playing — your video code should listen too.
         document.querySelectorAll('video').forEach(v=>{ try{ v.pause(); }catch{} });
-
         wrap.hidden = false;
         tEl.textContent = title || 'Untitled';
         sEl.textContent = subtitle || '';
         art.style.backgroundImage = cover ? `url(${cover})` : 'none';
-        audio.src = url; audio.play().catch(()=>{ /* autoplay blocked until user gesture */ });
+        audio.src = url; audio.play().catch(()=>{});
       };
     })();
 
-    // ---------- FEED RENDERING PLACEHOLDERS ----------
-    // TODO: Replace these with real Firebase-powered renderers in script.js
-
-    // Videos (YouTube-style cards)
+    // ---------- FEED RENDERING PLACEHOLDERS (your script.js will call these) ----------
     window.renderVideoCard = function(post){
       const card = document.createElement('article');
       card.className = 'video-card card';
@@ -384,11 +420,9 @@
           <h4 class="title">${post.title || 'Untitled'}</h4>
           <div class="sub muted small">${post.creatorName || 'Unknown'} • ${post.views || 0} views</div>
         </div>`;
-      // TODO: Hover preview logic & click → watch view
       return card;
     };
 
-    // Podcasts (Apple-Music rows; click → mini-player)
     window.renderPodcastRow = function(post){
       const row = document.createElement('div');
       row.className = 'podcast-row card';
@@ -412,12 +446,11 @@
       return row;
     };
 
-    // Clips (TikTok-style full screen items)
     window.renderClipFullScreen = function(post){
       const wrap = document.createElement('div');
       wrap.className = 'clip-card';
       wrap.innerHTML = `
-        <video class="clip-video" src="${post.mediaUrl||''}" playsinline loop></video>
+        <video class="clip-video" src="${post.mediaUrl||''}" playsinline loop muted></video>
         <div class="clip-rail">
           <button class="icon-btn"><i class="fa fa-heart"></i><span>${post.likeCount||0}</span></button>
           <button class="icon-btn"><i class="fa fa-comment"></i><span>${post.commentCount||0}</span></button>
@@ -428,12 +461,10 @@
           <div class="muted small">@${post.creatorHandle || 'user'}</div>
           <div class="text">${post.title || ''}</div>
         </div>`;
-      // Auto-play when visible; pause when not
       const vid = wrap.querySelector('.clip-video');
       const io = new IntersectionObserver((ents)=>{
         ents.forEach(e=>{
           if (e.isIntersecting && e.intersectionRatio > 0.6) {
-            // pause all others
             document.querySelectorAll('.clip-video').forEach(v=>{ if(v!==vid) try{v.pause()}catch{} });
             vid.play().catch(()=>{});
           } else {
@@ -450,47 +481,7 @@
     window.qsa = (s,sc)=> Array.from((sc||document).querySelectorAll(s));
   </script>
 
-  <!-- Your main app logic (keep using your existing file) -->
-  <!-- TODO: In script.js, you will fetch Firestore docs and append nodes returned by the render* functions above -->
-  <script type="module" src="script.js?v=11"></script>
+  <!-- Your main app logic (Firebase, data, actions) -->
+  <script type="module" src="script.js?v=12"></script>
 </body>
-  <!-- Auth triggers (top-right) -->
-<button id="open-auth">Login / Sign Up</button>
-<button id="signout-btn" style="display:none">Sign out</button>
-
-<!-- Auth Modal -->
-<div id="auth-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(2px); z-index:9999;">
-  <div class="auth-card" style="max-width:380px; margin:8vh auto; background:#111; color:#fff; border:1px solid #222; border-radius:14px; padding:18px;">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 style="margin:0;">Welcome to INTAKEE</h3>
-      <button id="close-auth" style="font-size:20px; background:none; border:none; color:#aaa; cursor:pointer;">×</button>
-    </div>
-
-    <div style="display:flex; gap:8px; margin:14px 0;">
-      <button class="tab active" data-tab="signin">Sign In</button>
-      <button class="tab" data-tab="signup">Create Account</button>
-    </div>
-
-    <!-- Sign In -->
-    <form id="signin-form" class="tab-panel" data-panel="signin">
-      <input id="signin-email" type="email" placeholder="Email" required style="width:100%;margin:6px 0;">
-      <input id="signin-password" type="password" placeholder="Password" required style="width:100%;margin:6px 0;">
-      <button id="signin-submit" type="submit" style="width:100%;margin-top:8px;">Sign in</button>
-      <p id="signin-error" class="err" style="color:#f66; min-height:1.2em;"></p>
-    </form>
-
-    <!-- Sign Up -->
-    <form id="signup-form" class="tab-panel" data-panel="signup" style="display:none;">
-      <input id="signup-name" type="text" placeholder="Full name" required style="width:100%;margin:6px 0;">
-      <input id="signup-username" type="text" placeholder="Username (min 3 chars)" minlength="3" required style="width:100%;margin:6px 0;">
-      <input id="signup-email" type="email" placeholder="Email" required style="width:100%;margin:6px 0;">
-      <input id="signup-password" type="password" placeholder="Password" required style="width:100%;margin:6px 0;">
-      <button id="signup-submit" type="submit" style="width:100%;margin-top:8px;">Create account</button>
-      <p id="signup-error" class="err" style="color:#f66; min-height:1.2em;"></p>
-    </form>
-  </div>
-</div>
-
-<!-- Load your app JS as a module -->
-<script type="module" src="./script.js"></script>
 </html>
