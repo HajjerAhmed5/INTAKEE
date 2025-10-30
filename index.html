@@ -298,9 +298,14 @@
       <input id="signUpName" type="text" placeholder="Display name (optional)" />
       <input id="signUpEmail" type="email" placeholder="Email" required />
       <input id="signUpPassword" type="password" placeholder="Password (min 6)" required />
-      <button type="submit" class="primary">Sign up</button>
-    </form>
+       <!-- ✅ Age confirmation -->
+    <label class="small muted" style="display:flex; gap:8px; align-items:center;">
+      <input id="signUpAge" type="checkbox" required>
+      I confirm I am 13 years old or older.
+    </label>
 
+    <button type="submit" class="primary">Sign up</button>
+  </form>
     <hr style="border-color:#1a1a1a; margin:12px 0;" />
 
     <h3 style="margin:0 0 8px;">Sign in</h3>
