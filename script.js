@@ -617,6 +617,59 @@ async function renderCurrentTab(){
 }
 window.addEventListener('hashchange', renderCurrentTab);
 window.addEventListener('load', renderCurrentTab);
+// (new MINI-PLAYER code block here)
+// -------------------- MINI-PLAYER FIX --------------------
+(function initMiniPlayer(){
+  const wrap  = qs('#mini-player');
+  const art   = qs('#mp-art');
+  const tEl   = qs('#mp-title');
+  const sEl   = qs('#mp-sub');
+  const cur   = qs('#mp-cur');
+  const dur   = qs('#mp-dur');
+  const audio = qs('#mp-audio');
+  const btnP  = qs('#mp-play');
+  const btnX  = qs('#mp-close');
+
+  let rafId = null;
+  const fmt = s => !isFinite(s) ? '0:00' : `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+
+  const tick = () => {
+    cur.textContent = fmt(audio.currentTime);
+    dur.textContent = fmt(audio.duration || 0);
+    if (!audio.paused) rafId = requestAnimationFrame(tick);
+  };
+
+  function hideMiniPlayer() {
+    try { audio.pause(); } catch {}
+    audio.removeAttribute('src'); audio.load();
+    cancelAnimationFrame(rafId);
+    wrap.style.display = 'none';
+  }
+
+  btnP.addEventListener('click', ()=> audio.paused ? audio.play() : audio.pause());
+  btnX.addEventListener('click', hideMiniPlayer);
+  audio.addEventListener('ended', hideMiniPlayer);
+  audio.addEventListener('play', ()=>{
+    wrap.style.display = 'flex';
+    btnP.innerHTML = '<i class="fa fa-pause"></i>';
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(tick);
+  });
+  audio.addEventListener('pause', ()=>{
+    btnP.innerHTML = '<i class="fa fa-play"></i>';
+    cancelAnimationFrame(rafId);
+  });
+
+  window.playMedia = ({ url, title, subtitle, cover })=>{
+    qsa('video').forEach(v=>{ try{v.pause();}catch{} });
+    tEl.textContent = title || 'Untitled';
+    sEl.textContent = subtitle || '';
+    art.style.backgroundImage = cover ? `url(${cover})` : 'none';
+    audio.src = url || '';
+    wrap.style.display = 'flex';
+    audio.play().catch(()=>{});
+  };
+})();
 
 // -------------------- Utilities --------------------
 function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t = setTimeout(()=>fn(...a), ms); }; }
