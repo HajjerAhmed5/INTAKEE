@@ -21,7 +21,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyD0_tL8PxUvGT7JqCBj3tuL7s3Kipl5E6g",
   authDomain: "intakee-5785e.firebaseapp.com",
   projectId: "intakee-5785e",
-  storageBucket: "intakee-5785e.firebasestorage.app",
+  storageBucket: "intakee-5785e.appspot.com",
   messagingSenderId: "40666230072",
   appId: "1:40666230072:web:49dd5e7db91c8a38b565cd",
   measurementId: "G-3C2YDV6T0G"
