@@ -50,14 +50,18 @@ dlg?.addEventListener('close', ()=> {
   qs('#authSignUpForm')?.reset();
   qs('#authSignInForm')?.reset();
 });
-
 // Sign Up
 qs('#authSignUpForm')?.addEventListener('submit', async (e)=>{
   e.preventDefault();
   const email = qs('#signUpEmail').value.trim();
   const pass  = qs('#signUpPassword').value.trim();
   const name  = qs('#signUpName').value.trim();
-
+// ✅ Check that the user confirmed they’re 13 or older
+  const is13 = qs('#signUpAge')?.checked;
+  if (!is13) {
+    alert('To use INTAKEE, you must confirm you are 13 or older.');
+    return;
+  }
   try{
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     if (name) { await updateProfile(cred.user, { displayName: name }); }
@@ -73,7 +77,6 @@ qs('#authSignUpForm')?.addEventListener('submit', async (e)=>{
     alert(`Sign up failed: ${err.message}`);
   }
 });
-
 // Sign In
 qs('#authSignInForm')?.addEventListener('submit', async (e)=>{
   e.preventDefault();
