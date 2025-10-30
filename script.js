@@ -1,4 +1,4 @@
-// script.js  — INTAKEE core app logic
+// script.js — INTAKEE core app logic
 // --------------------------------------------------
 // Firebase (Auth, Firestore, Storage) + UI behaviors
 // --------------------------------------------------
@@ -18,7 +18,7 @@ import {
 
 // -------------------- Firebase Init --------------------
 const firebaseConfig = {
-  // TODO: paste your real config here (public web keys OK)
+  // TODO: paste your real config here (public web keys are OK)
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
   projectId: "YOUR_PROJECT_ID",
@@ -46,7 +46,6 @@ const openAuthBtn = qs('#openAuth');
 
 openAuthBtn?.addEventListener('click', ()=> dlg?.showModal());
 dlg?.addEventListener('close', ()=> {
-  // clear forms on close
   qs('#authSignUpForm')?.reset();
   qs('#authSignInForm')?.reset();
 });
@@ -61,7 +60,6 @@ qs('#authSignUpForm')?.addEventListener('submit', async (e)=>{
   try{
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     if (name) { await updateProfile(cred.user, { displayName: name }); }
-    // Create basic profile doc
     await setDoc(doc(db, 'profiles', cred.user.uid), {
       displayName: name || "",
       bio: "",
@@ -69,7 +67,6 @@ qs('#authSignUpForm')?.addEventListener('submit', async (e)=>{
       bannerURL: "",
       createdAt: serverTimestamp()
     }, { merge:true });
-
     dlg.close();
   }catch(err){
     alert(`Sign up failed: ${err.message}`);
@@ -99,19 +96,11 @@ qs('#settings-logout')?.addEventListener('click', async ()=>{
   }
 });
 
-// Header visibility + avatar “＋” owner-only buttons
+// Header visibility + owner-only buttons
 onAuthStateChanged(auth, async (user)=>{
-  // Notify header (index.html listens and hides Login/Sign Up)
   document.dispatchEvent(new CustomEvent('intakee:auth', { detail:{ user } }));
-
-  // Owner-only UI (profile image/banner edit, edit profile button)
-  const ownerEls = qsa('.owner-only');
-  ownerEls.forEach(el => el.style.display = user ? '' : 'none');
-
-  // Home empty text depends on auth
+  qsa('.owner-only').forEach(el => el.style.display = user ? '' : 'none');
   updateHomeEmptyMessage(user);
-
-  // Refresh all active feeds when auth changes
   renderCurrentTab();
 });
 
@@ -149,9 +138,9 @@ const LEGAL = {
   `
 };
 function mountLegalPages(){
-  const g = qs('#guidelines-content'); if (g) g.innerHTML = LEGAL.guidelines;
-  const t = qs('#terms-content');      if (t) t.innerHTML = LEGAL.terms;
-  const p = qs('#privacy-content');    if (p) p.innerHTML = LEGAL.privacy;
+  qs('#guidelines-content') && (qs('#guidelines-content').innerHTML = LEGAL.guidelines);
+  qs('#terms-content')      && (qs('#terms-content').innerHTML      = LEGAL.terms);
+  qs('#privacy-content')    && (qs('#privacy-content').innerHTML    = LEGAL.privacy);
 }
 mountLegalPages();
 
@@ -173,11 +162,12 @@ async function handleUpload(){
 
   try{
     const uid = auth.currentUser.uid;
-    // Upload media
+
+    // media
     const mediaPath = `uploads/${uid}/${Date.now()}_${file.name}`;
     const mediaUrl  = await uploadAndGetURL(mediaPath, file);
 
-    // Upload thumbnail (optional)
+    // thumbnail
     let thumbUrl = "";
     if (thumb){
       const thumbPath = `thumbnails/${uid}/${Date.now()}_${thumb.name}`;
@@ -191,21 +181,16 @@ async function handleUpload(){
     if (typeSel === 'podcast-audio') { type = 'podcast'; subtype = 'audio'; }
     if (typeSel === 'podcast-video') { type = 'podcast'; subtype = 'video'; }
 
-    // Create Firestore doc
     await addDoc(collection(db, 'posts'), {
-      title, description: desc,
-      type, subtype, mediaUrl,
-      thumbnailUrl: thumbUrl,
-      uid,
-      likes: 0,
-      tags: [],
-      ageRestricted: false,
+      title, description: desc, type, subtype,
+      mediaUrl, thumbnailUrl: thumbUrl, uid,
+      likes: 0, tags: [], ageRestricted: false,
       createdAt: serverTimestamp()
     });
 
     alert('Uploaded! Your post is live.');
     location.hash = '#home';
-    await renderHome(); // refresh Home to show new post
+    await renderHome();
   }catch(err){
     console.error(err);
     alert('Upload failed: ' + err.message);
@@ -228,7 +213,6 @@ function uploadAndGetURL(path, file){
 const homeFeed = qs('#home-feed');
 const globalSearch = qs('#globalSearch');
 
-// Filter chips
 qsa('#tab-home .pills .pill').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     qsa('#tab-home .pills .pill').forEach(b=>b.classList.remove('active'));
@@ -238,7 +222,6 @@ qsa('#tab-home .pills .pill').forEach(btn=>{
   });
 });
 
-// Global search (search all content)
 globalSearch?.addEventListener('input', debounce(()=>{
   GLOBAL_TEXT = globalSearch.value.trim().toLowerCase();
   renderHome();
@@ -259,23 +242,18 @@ async function renderHome(){
   homeFeed.innerHTML = `<div class="muted">Loading posts…</div>`;
 
   try{
-    // Trending spec: “most liked today” (fallback to newest if no likes)
-    // For launch, we’ll just order by createdAt desc (simple and stable)
     let qBase = query(collection(db, 'posts'), orderBy('createdAt','desc'), limit(24));
     const snap = await getDocs(qBase);
     let items = snap.docs.map(d=>({ id:d.id, ...d.data() }));
 
-    // filter chips
     if (HOME_FILTER === 'video' || HOME_FILTER === 'podcast' || HOME_FILTER === 'clip'){
       items = items.filter(i => i.type === HOME_FILTER);
     } else if (HOME_FILTER === 'new') {
       // already newest
     } else if (HOME_FILTER === 'following') {
-      // Placeholder: until follow graph exists, show empty
-      items = [];
+      items = []; // until follow graph exists
     }
 
-    // global search (title + tags)
     if (GLOBAL_TEXT) {
       items = items.filter(i =>
         (i.title||'').toLowerCase().includes(GLOBAL_TEXT) ||
@@ -283,7 +261,6 @@ async function renderHome(){
       );
     }
 
-    // render
     homeFeed.innerHTML = '';
     items.forEach(p=>{
       let node;
@@ -302,10 +279,7 @@ async function renderHome(){
           title: p.title, thumbnailUrl: p.thumbnailUrl, mediaUrl: p.mediaUrl,
           creatorName: '', views: 0
         });
-        node.addEventListener('click', ()=> {
-          // dedicated watch view (future): for now stay on feed
-          // location.href = `#/watch?id=${p.id}`;
-        });
+        node.addEventListener('click', ()=> {/* future: watch view */});
       }
       homeFeed.appendChild(node);
     });
@@ -318,7 +292,7 @@ async function renderHome(){
   }
 }
 
-// -------------------- Videos Tab (most recent) --------------------
+// -------------------- Videos Tab --------------------
 const videosFeed = qs('#videos-feed');
 const videosSearch = qs('#videosSearch');
 let VIDEOS_TEXT = "";
@@ -340,9 +314,7 @@ async function renderVideos(){
     );
     const snap = await getDocs(qBase);
     let items = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    if (VIDEOS_TEXT) {
-      items = items.filter(i => (i.title||'').toLowerCase().includes(VIDEOS_TEXT));
-    }
+    if (VIDEOS_TEXT) items = items.filter(i => (i.title||'').toLowerCase().includes(VIDEOS_TEXT));
     videosFeed.innerHTML = '';
     items.forEach(p=>{
       const node = window.renderVideoCard({
@@ -358,7 +330,7 @@ async function renderVideos(){
   }
 }
 
-// -------------------- Podcasts Tab (most recent + mini-player) --------------------
+// -------------------- Podcasts Tab --------------------
 const podcastFeed = qs('#podcast-feed');
 const podcastSearch = qs('#podcastSearch');
 let POD_TEXT = "";
@@ -380,9 +352,7 @@ async function renderPodcasts(){
     );
     const snap = await getDocs(qBase);
     let items = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    if (POD_TEXT) {
-      items = items.filter(i => (i.title||'').toLowerCase().includes(POD_TEXT));
-    }
+    if (POD_TEXT) items = items.filter(i => (i.title||'').toLowerCase().includes(POD_TEXT));
     podcastFeed.innerHTML = '';
     items.forEach(p=>{
       const node = window.renderPodcastRow({
@@ -401,7 +371,7 @@ async function renderPodcasts(){
   }
 }
 
-// -------------------- Clips Tab (auto-play; infinite feed skeleton) --------------------
+// -------------------- Clips Tab (auto-play; infinite feed) --------------------
 const clipsFeed = qs('#clips-feed');
 const clipsSearch = qs('#clipsSearch');
 let CLIPS_TEXT = "";
@@ -410,7 +380,6 @@ let clipsLoading = false;
 
 clipsSearch?.addEventListener('input', debounce(()=>{
   CLIPS_TEXT = clipsSearch.value.trim().toLowerCase();
-  // simple re-render (no infinite paging for search yet)
   renderClips(true);
 }, 250));
 
@@ -457,7 +426,7 @@ async function renderClips(reset=false){
   }
   clipsLoading = false;
 }
-// Infinite scroll sentinel (very lightweight)
+
 window.addEventListener('scroll', ()=>{
   if (!clipsFeed || location.hash.slice(1) !== 'clips') return;
   const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 600);
@@ -487,7 +456,6 @@ qs('#bio-cancel')?.addEventListener('click', ()=>{
   bioView.style.display = '';
 });
 
-// Save profile (name, bio, optional photo/banner)
 qs('#btnSaveProfile')?.addEventListener('click', async ()=>{
   if(!auth.currentUser){ alert('Sign in to edit profile.'); return; }
   try{
@@ -495,7 +463,6 @@ qs('#btnSaveProfile')?.addEventListener('click', async ()=>{
     const bio  = qs('#profileBioInput').value.trim().slice(0,300);
     const uid  = auth.currentUser.uid;
 
-    // upload photo if provided
     const photoFile = profilePhotoInput?.files?.[0] || null;
     let photoURL = '';
     if (photoFile){
@@ -516,7 +483,6 @@ qs('#btnSaveProfile')?.addEventListener('click', async ()=>{
       ...(bannerURL? { bannerURL } : {})
     }, { merge:true });
 
-    // Update UI
     if (name) profileNameEl.textContent = name;
     bioView.textContent = bio || 'Add a short bio to introduce yourself.';
     if (photoURL) profilePhoto.src = photoURL;
@@ -530,7 +496,6 @@ qs('#btnSaveProfile')?.addEventListener('click', async ()=>{
   }
 });
 
-// Avatar “＋” → open file input
 btnAddAvatar?.addEventListener('click', ()=>{
   if(!auth.currentUser){ alert('Sign in first.'); return; }
   qs('#avatarInput')?.click();
@@ -548,7 +513,6 @@ qs('#avatarInput')?.addEventListener('change', async (e)=>{
   }
 });
 
-// Load profile basics & user grid
 async function renderProfile(){
   if (!profileGrid) return;
   profileGrid.innerHTML = `<div class="muted">Loading…</div>`;
@@ -559,14 +523,13 @@ async function renderProfile(){
     profileGrid.innerHTML = `<div class="muted">Sign in to view your profile and manage uploads.</div>`;
     return;
   }
-  // Load profile doc
+
   const profSnap = await getDoc(doc(db,'profiles', user.uid));
   const data = profSnap.exists() ? profSnap.data() : {};
   profileNameEl.textContent = data.displayName || user.displayName || 'Your Name';
   bioView.textContent = data.bio || 'Add a short bio to introduce yourself.';
   profilePhoto.src = data.photoURL || '';
 
-  // Load posts by user
   const qBase = query(
     collection(db,'posts'),
     where('uid','==',user.uid),
@@ -578,7 +541,6 @@ async function renderProfile(){
 
   profileGrid.innerHTML = '';
   items.forEach(p=>{
-    // reuse video card for grid
     const node = window.renderVideoCard({
       title: p.title, thumbnailUrl: p.thumbnailUrl, mediaUrl: p.mediaUrl,
       creatorName: '', views: 0
@@ -595,8 +557,7 @@ async function renderProfile(){
 
 // -------------------- Render on Route Change --------------------
 function currentTab(){
-  const k = (location.hash || '#home').slice(1);
-  return k;
+  return (location.hash || '#home').slice(1);
 }
 async function renderCurrentTab(){
   switch(currentTab()){
@@ -605,22 +566,21 @@ async function renderCurrentTab(){
     case 'podcast': await renderPodcasts(); break;
     case 'clips':   await renderClips(true); break;
     case 'profile': await renderProfile(); break;
-    case 'settings': /* nothing dynamic needed */ break;
+    case 'settings': break;
     case 'guidelines':
     case 'terms':
     case 'privacy':
-      // content already mounted
       break;
-    default:
-      await renderHome();
+    default: await renderHome();
   }
 }
 window.addEventListener('hashchange', renderCurrentTab);
 window.addEventListener('load', renderCurrentTab);
-// (new MINI-PLAYER code block here)
-// -------------------- MINI-PLAYER FIX --------------------
+
+// -------------------- MINI-PLAYER (fixed) --------------------
 (function initMiniPlayer(){
   const wrap  = qs('#mini-player');
+  if (!wrap) return; // if HTML doesn’t include it, bail safely
   const art   = qs('#mp-art');
   const tEl   = qs('#mp-title');
   const sEl   = qs('#mp-sub');
@@ -629,6 +589,9 @@ window.addEventListener('load', renderCurrentTab);
   const audio = qs('#mp-audio');
   const btnP  = qs('#mp-play');
   const btnX  = qs('#mp-close');
+
+  // keep hidden until user hits play
+  wrap.style.display = 'none';
 
   let rafId = null;
   const fmt = s => !isFinite(s) ? '0:00' : `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
@@ -646,22 +609,24 @@ window.addEventListener('load', renderCurrentTab);
     wrap.style.display = 'none';
   }
 
-  btnP.addEventListener('click', ()=> audio.paused ? audio.play() : audio.pause());
-  btnX.addEventListener('click', hideMiniPlayer);
-  audio.addEventListener('ended', hideMiniPlayer);
-  audio.addEventListener('play', ()=>{
+  btnP?.addEventListener('click', ()=> audio.paused ? audio.play() : audio.pause());
+  btnX?.addEventListener('click', hideMiniPlayer);
+  audio?.addEventListener('ended', hideMiniPlayer);
+
+  audio?.addEventListener('play', ()=>{
     wrap.style.display = 'flex';
-    btnP.innerHTML = '<i class="fa fa-pause"></i>';
+    if (btnP) btnP.innerHTML = '<i class="fa fa-pause"></i>';
     cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(tick);
   });
-  audio.addEventListener('pause', ()=>{
-    btnP.innerHTML = '<i class="fa fa-play"></i>';
+  audio?.addEventListener('pause', ()=>{
+    if (btnP) btnP.innerHTML = '<i class="fa fa-play"></i>';
     cancelAnimationFrame(rafId);
   });
 
+  // main API the feed calls
   window.playMedia = ({ url, title, subtitle, cover })=>{
-    qsa('video').forEach(v=>{ try{v.pause();}catch{} });
+    qsa('video').forEach(v=>{ try{ v.pause(); }catch{} }); // pause any inline video
     tEl.textContent = title || 'Untitled';
     sEl.textContent = subtitle || '';
     art.style.backgroundImage = cover ? `url(${cover})` : 'none';
@@ -669,6 +634,9 @@ window.addEventListener('load', renderCurrentTab);
     wrap.style.display = 'flex';
     audio.play().catch(()=>{});
   };
+
+  // keep old name working if your HTML uses playPodcast()
+  if (!window.playPodcast) window.playPodcast = window.playMedia;
 })();
 
 // -------------------- Utilities --------------------
