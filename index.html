@@ -520,5 +520,33 @@
 
   <!-- Your main app logic (Firebase, data, actions) -->
   <script type="module" src="script.js?v=13"></script>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+  // Your actual Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDb_tLBpVUqU7JqCBj3tuL7s3KipIspV2A",
+    authDomain: "intakee-5785e.firebaseapp.com",
+    projectId: "intakee-5785e",
+    storageBucket: "intakee-5785e.appspot.com",
+    messagingSenderId: "14066623072",
+    appId: "1:14066623072:web:49dd5e7db91c8a38b565cd",
+    measurementId: "G-3C2YDV6TGQ"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  window.firebaseRefs = {
+    app,
+    auth: getAuth(app),
+    db: getFirestore(app),
+    storage: getStorage(app)
+  };
+
+  console.log("✅ Firebase ready:", app.options.projectId);
+</script>
 </body>
 </html>
