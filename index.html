@@ -298,14 +298,14 @@
       <input id="signUpName" type="text" placeholder="Display name (optional)" />
       <input id="signUpEmail" type="email" placeholder="Email" required />
       <input id="signUpPassword" type="password" placeholder="Password (min 6)" required />
-       <!-- ✅ Age confirmation -->
-    <label class="small muted" style="display:flex; gap:8px; align-items:center;">
-      <input id="signUpAge" type="checkbox" required>
-      I confirm I am 13 years old or older.
-    </label>
+      <!-- ✅ Age confirmation -->
+      <label class="small muted" style="display:flex; gap:8px; align-items:center;">
+        <input id="signUpAge" type="checkbox" required>
+        I confirm I am 13 years old or older.
+      </label>
 
-    <button type="submit" class="primary">Sign up</button>
-  </form>
+      <button type="submit" class="primary">Sign up</button>
+    </form>
     <hr style="border-color:#1a1a1a; margin:12px 0;" />
 
     <h3 style="margin:0 0 8px;">Sign in</h3>
@@ -486,7 +486,39 @@
     window.qsa = (s,sc)=> Array.from((sc||document).querySelectorAll(s));
   </script>
 
+  <!-- ================== FIREBASE INIT (CDN, modular) ================== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+
+    // 👉 Replace with your real config (Firebase Console → Project settings → Your apps → Web app → CDN)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase and expose for script.js + Console
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    window.firebaseRefs = { app, auth, db, storage, onAuthStateChanged };
+
+    // Let the header know when auth changes
+    onAuthStateChanged(auth, (user) => {
+      document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
+    });
+
+    console.log('✅ Firebase ready:', app.options.projectId);
+  </script>
+
   <!-- Your main app logic (Firebase, data, actions) -->
-  <script type="module" src="script.js?v=12"></script>
+  <script type="module" src="script.js?v=13"></script>
 </body>
 </html>
