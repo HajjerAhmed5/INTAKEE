@@ -24,7 +24,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
 // Pull the already-initialized refs from index.html
-const { app, auth, db, storage } = (window.firebaseRefs || {});
+const { app, auth, db, storage, onAuthStateChanged: onAuthStateChangedFromInit } = (window.firebaseRefs || {});
 if (!app || !auth || !db || !storage) {
   console.error("❌ Firebase not ready. Check the init block in index.html.");
 }
@@ -33,6 +33,7 @@ if (!app || !auth || !db || !storage) {
 const qs  = (s,sc)=> (sc||document).querySelector(s);
 const qsa = (s,sc)=> Array.from((sc||document).querySelectorAll(s));
 const $on = (el, ev, fn) => el && el.addEventListener(ev, fn);
+const sleep = (ms)=> new Promise(r=>setTimeout(r,ms));
 
 // ---------- Elements ----------
 const dlgAuth = qs('#authDialog');
@@ -88,6 +89,7 @@ const playPodcast = window.playPodcast;
 
 // ---------- State ----------
 let _postsCache = [];  // latest pulled posts (up to 50)
+let _isLoadingFeed = false;
 
 // ============================================================================
 // AUTH
@@ -152,11 +154,19 @@ $on(logoutBtn, 'click', async () => {
 });
 
 // Reflect auth in UI and load profile section
-onAuthStateChanged(getAuth(), async (user) => {
+(onAuthStateChangedFromInit || onAuthStateChanged)(auth, async (user) => {
   console.log('Auth state:', user ? user.uid : '(no user)');
   document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
   applyOwnerVisibility(user);
-  await loadProfilePane(user);
+
+  // IMPORTANT: your Firestore rules require auth to read.
+  // Only load feeds/profile when signed in to avoid 400 errors.
+  if (user) {
+    await Promise.all([loadHomeFeed(), loadProfilePane(user)]);
+  } else {
+    clearAllFeedsForLoggedOut();
+    await loadProfilePane(null);
+  }
 });
 
 // ============================================================================
@@ -180,6 +190,10 @@ $on(btnUpload, 'click', async () => {
   if (!file)  return alert('Choose a video or audio file.');
   if (!title) return alert('Enter a title.');
 
+  const originalText = btnUpload.textContent;
+  btnUpload.disabled = true;
+  btnUpload.textContent = 'Uploading…';
+
   try {
     // 1) Upload media (with progress)
     const mediaPath = `uploads/${user.uid}/${Date.now()}_${file.name}`;
@@ -188,8 +202,7 @@ $on(btnUpload, 'click', async () => {
 
     task.on('state_changed', (snap) => {
       const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
-      // You can show a progress bar here if you want
-      console.log('Upload progress:', pct + '%');
+      btnUpload.textContent = `Uploading… ${pct}%`;
     });
 
     await task;
@@ -227,6 +240,9 @@ $on(btnUpload, 'click', async () => {
   } catch (err) {
     console.error('Upload failed:', err);
     alert('Upload failed: ' + err.message);
+  } finally {
+    btnUpload.disabled = false;
+    btnUpload.textContent = originalText;
   }
 });
 
@@ -234,10 +250,21 @@ $on(btnUpload, 'click', async () => {
 // FEEDS (Home, Videos, Podcast, Clips)
 // ============================================================================
 
+// Avoid Firestore calls when logged out (your rules require auth)
 async function fetchLatestPosts() {
+  if (!auth.currentUser) {
+    return [];
+  }
   const qRef = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(50));
   const snap = await getDocs(qRef);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+function clearAllFeedsForLoggedOut() {
+  if (homeFeed)   homeFeed.innerHTML   = `<div class="muted">No posts yet. Sign in and be the first to upload.</div>`;
+  if (videosFeed) videosFeed.innerHTML = `<div class="muted">Sign in to view videos.</div>`;
+  if (podcastFeed)podcastFeed.innerHTML= `<div class="muted">Sign in to view podcasts.</div>`;
+  if (clipsFeed)  clipsFeed.innerHTML  = `<div class="muted">Sign in to view clips.</div>`;
 }
 
 function renderHome(filter = 'all') {
@@ -254,7 +281,7 @@ function renderHome(filter = 'all') {
   });
 
   if (!list.length) {
-    homeFeed.innerHTML = `<div class="muted">No posts yet. Sign in and be the first to upload.</div>`;
+    homeFeed.innerHTML = `<div class="muted">No posts yet.</div>`;
     return;
   }
 
@@ -293,12 +320,17 @@ function renderByType(feedEl, typePrefix) {
 }
 
 async function loadHomeFeed() {
+  if (_isLoadingFeed) return;
+  _isLoadingFeed = true;
   try {
     _postsCache = await fetchLatestPosts();
   } catch (e) {
     console.warn('Feed load warning:', e.message);
     _postsCache = [];
+  } finally {
+    _isLoadingFeed = false;
   }
+
   renderHome('all');
   renderByType(videosFeed, 'video');
   renderByType(podcastFeed, 'podcast');
@@ -315,10 +347,13 @@ homePills.forEach(btn => {
 });
 
 // Searches (client-side filter against _postsCache)
-$on(searchGlobal,  'input', e => searchAll(e.target.value));
-$on(searchVideos,  'input', e => filterSection(videosFeed, 'video', e.target.value));
-$on(searchPodcast, 'input', e => filterSection(podcastFeed, 'podcast', e.target.value));
-$on(searchClips,   'input', e => filterSection(clipsFeed, 'clip', e.target.value));
+// simple debounce
+function debounce(fn, ms=200){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
+
+$on(searchGlobal,  'input', debounce(e => searchAll(e.target.value)));
+$on(searchVideos,  'input', debounce(e => filterSection(videosFeed, 'video', e.target.value)));
+$on(searchPodcast, 'input', debounce(e => filterSection(podcastFeed, 'podcast', e.target.value)));
+$on(searchClips,   'input', debounce(e => filterSection(clipsFeed, 'clip', e.target.value)));
 
 function searchAll(term = '') {
   if (!homeFeed) return;
@@ -329,6 +364,10 @@ function searchAll(term = '') {
     (p.desc||'').toLowerCase().includes(t)
   );
   homeFeed.innerHTML = '';
+  if (!list.length) {
+    homeFeed.innerHTML = `<div class="muted">No results.</div>`;
+    return;
+  }
   list.forEach(p => homeFeed.appendChild(
     (p.type==='clip' ? window.renderClipFullScreen?.(p)
      : p.type?.startsWith('podcast') ? window.renderPodcastRow?.(p)
@@ -344,6 +383,10 @@ function filterSection(feedEl, typePrefix, term='') {
     ((p.title||'').toLowerCase().includes(t) || (p.desc||'').toLowerCase().includes(t))
   );
   feedEl.innerHTML = '';
+  if (!list.length) {
+    feedEl.innerHTML = `<div class="muted">No results.</div>`;
+    return;
+  }
   list.forEach(p => {
     let el;
     if (typePrefix==='video') el = window.renderVideoCard?.(p);
@@ -360,6 +403,10 @@ function filterSection(feedEl, typePrefix, term='') {
 function applyOwnerVisibility(user) {
   const isOwner = !!user;
   qsa('.owner-only').forEach(el => el.style.display = isOwner ? '' : 'none');
+  // Hide mini-player if logging out (nice-to-have)
+  if (!isOwner) {
+    try { qs('#mp-audio')?.pause(); qs('#mini-player')?.setAttribute('hidden',''); } catch {}
+  }
 }
 
 // Edit toggles
@@ -434,17 +481,28 @@ async function loadProfilePane(user) {
     return;
   }
 
-  const uDoc = await getDoc(doc(db, 'users', user.uid));
-  const u = uDoc.exists() ? uDoc.data() : {};
-  profileName.textContent = user.displayName || u.name || 'Your Name';
-  profileHandle.textContent = '@' + (user.email?.split('@')[0] || 'username');
-  bioView.textContent = (u.bio || '').trim() || 'Add a short bio to introduce yourself.';
-  if (user.photoURL) profilePhotoImg.src = user.photoURL;
+  try {
+    const uDoc = await getDoc(doc(db, 'users', user.uid));
+    const u = uDoc.exists() ? uDoc.data() : {};
+    profileName.textContent = user.displayName || u.name || 'Your Name';
+    profileHandle.textContent = '@' + (user.email?.split('@')[0] || 'username');
+    bioView.textContent = (u.bio || '').trim() || 'Add a short bio to introduce yourself.';
+    if (user.photoURL) profilePhotoImg.src = user.photoURL;
+  } catch (e) {
+    console.warn('Profile fetch warning:', e.message);
+  }
 
   await loadProfileGrid(user.uid);
 }
 
 async function loadProfileGrid(uid) {
+  if (!auth.currentUser) {
+    profileGrid.innerHTML = '';
+    profileEmpty.style.display = '';
+    statPosts.textContent = '0';
+    return;
+  }
+
   const snap = await getDocs(query(collection(db, 'posts'),
     where('uid', '==', uid), orderBy('createdAt', 'desc')));
   const items = snap.docs.map(d => ({ id:d.id, ...d.data() }));
@@ -478,6 +536,11 @@ async function loadProfileGrid(uid) {
 // ============================================================================
 
 (async function boot() {
-  await loadHomeFeed();
+  // If logged out, render friendly placeholders and wait for auth.
+  if (!auth.currentUser) {
+    clearAllFeedsForLoggedOut();
+  } else {
+    await loadHomeFeed();
+  }
   console.log('✅ App boot complete');
 })();
