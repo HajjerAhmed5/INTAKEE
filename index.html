@@ -31,7 +31,6 @@
       <input id="globalSearch" type="text" placeholder="Search…" />
     </div>
     <div class="auth">
-      <!-- single auth trigger; Logout lives in Settings only -->
       <button id="openAuth">Login / Sign Up</button>
     </div>
   </header>
@@ -39,7 +38,7 @@
   <!-- ===== MAIN CONTENT ===== -->
   <main>
 
-    <!-- HOME (Trending feed like YouTube) -->
+    <!-- HOME -->
     <section id="tab-home">
       <div class="row space-between">
         <h2>Trending</h2>
@@ -52,7 +51,7 @@
           <button class="pill" data-filter="new">Newest</button>
         </div>
       </div>
-      <div id="home-feed" class="feed-grid"><!-- populated by JS --></div>
+      <div id="home-feed" class="feed-grid"></div>
     </section>
 
     <!-- VIDEOS -->
@@ -64,7 +63,7 @@
           <input id="videosSearch" type="text" placeholder="Search videos…">
         </div>
       </div>
-      <div id="videos-feed" class="feed-grid"><!-- populated by JS --></div>
+      <div id="videos-feed" class="feed-grid"></div>
     </section>
 
     <!-- PODCASTS -->
@@ -76,7 +75,7 @@
           <input id="podcastSearch" type="text" placeholder="Search podcasts…">
         </div>
       </div>
-      <div id="podcast-feed" class="podcast-list"><!-- populated by JS --></div>
+      <div id="podcast-feed" class="podcast-list"></div>
     </section>
 
     <!-- UPLOAD -->
@@ -94,7 +93,6 @@
         <label>Title</label>
         <input id="uploadTitleInput" type="text" placeholder="Add a title">
 
-        <!-- NEW: Description -->
         <label>Description</label>
         <textarea id="uploadDescInput" placeholder="Describe your video/clip/podcast…" rows="4"></textarea>
 
@@ -108,7 +106,6 @@
 
         <div class="row">
           <button id="btnUpload" class="primary">Upload</button>
-          <!-- Keep Go Live as-is (no “coming soon” text) -->
           <button id="goLiveBtn" class="ghost">Go Live</button>
         </div>
       </div>
@@ -123,7 +120,7 @@
           <input id="clipsSearch" type="text" placeholder="Search clips…">
         </div>
       </div>
-      <div id="clips-feed" class="clip-feed"><!-- populated by JS --></div>
+      <div id="clips-feed" class="clip-feed"></div>
     </section>
 
     <!-- PROFILE -->
@@ -136,7 +133,6 @@
         <div class="profile-header">
           <div class="avatar-wrap">
             <img id="profile-photo" src="" alt="" class="profile-avatar">
-            <!-- shows when logged-in -->
             <button id="btnAddAvatar" class="add-btn owner-only" title="Change photo" style="display:none;">+</button>
           </div>
 
@@ -211,7 +207,6 @@
         <p class="muted small">
           INTAKEE supports freedom of speech and creative expression. Users are responsible for their own content.
         </p>
-        <!-- Updated to in-app routes -->
         <a href="#guidelines" class="muted">Community Guidelines</a><br>
         <a href="#terms" class="muted">Terms of Service</a><br>
         <a href="#privacy" class="muted">Privacy Policy</a><br>
@@ -219,7 +214,6 @@
         <a href="mailto:intakee2025@gmail.com?subject=Report%20Content" class="muted">Report Content</a>
       </div>
 
-      <!-- Logout lives here (only place) -->
       <div class="settings-section">
         <div class="settings-item danger">
           <div><i class="fa fa-right-from-bracket"></i> Logout</div>
@@ -228,12 +222,12 @@
       </div>
     </section>
 
-    <!-- LEGAL PAGES (in-app, scrollable) -->
+    <!-- LEGAL PAGES -->
     <section id="tab-guidelines" style="display:none;">
       <div class="legal-page">
         <a href="#settings" class="muted small">← Back to Settings</a>
         <h2>Community Guidelines</h2>
-        <div id="guidelines-content" class="legal-content"><!-- filled by JS or static text here --></div>
+        <div id="guidelines-content" class="legal-content"></div>
       </div>
     </section>
 
@@ -241,7 +235,7 @@
       <div class="legal-page">
         <a href="#settings" class="muted small">← Back to Settings</a>
         <h2>Terms of Service</h2>
-        <div id="terms-content" class="legal-content"><!-- filled by JS or static text here --></div>
+        <div id="terms-content" class="legal-content"></div>
       </div>
     </section>
 
@@ -249,13 +243,13 @@
       <div class="legal-page">
         <a href="#settings" class="muted small">← Back to Settings</a>
         <h2>Privacy Policy</h2>
-        <div id="privacy-content" class="legal-content"><!-- filled by JS or static text here --></div>
+        <div id="privacy-content" class="legal-content"></div>
       </div>
     </section>
 
   </main>
 
-  <!-- ===== MINI PLAYER (hidden unless playing) ===== -->
+  <!-- ===== MINI PLAYER ===== -->
   <div id="mini-player" class="mini-player" hidden>
     <div class="mp-left">
       <div class="mp-art" id="mp-art"></div>
@@ -298,12 +292,10 @@
       <input id="signUpName" type="text" placeholder="Display name (optional)" />
       <input id="signUpEmail" type="email" placeholder="Email" required />
       <input id="signUpPassword" type="password" placeholder="Password (min 6)" required />
-      <!-- ✅ Age confirmation -->
       <label class="small muted" style="display:flex; gap:8px; align-items:center;">
         <input id="signUpAge" type="checkbox" required>
         I confirm I am 13 years old or older.
       </label>
-
       <button type="submit" class="primary">Sign up</button>
     </form>
     <hr style="border-color:#1a1a1a; margin:12px 0;" />
@@ -316,9 +308,8 @@
     </form>
   </dialog>
 
-  <!-- ===== CORE SHELL SCRIPTS (router + UI helpers) ===== -->
+  <!-- ===== CORE SHELL (router + UI helpers) ===== -->
   <script>
-    // ---------- Tab Router (hash-based) ----------
     (function initRouter(){
       const links = Array.from(document.querySelectorAll('.bottom-nav a'));
       const sections = {
@@ -329,17 +320,14 @@
         clips:      document.getElementById('tab-clips'),
         profile:    document.getElementById('tab-profile'),
         settings:   document.getElementById('tab-settings'),
-        // Legal routes
         guidelines: document.getElementById('tab-guidelines'),
         terms:      document.getElementById('tab-terms'),
         privacy:    document.getElementById('tab-privacy')
       };
       const searchWrap = document.getElementById('searchWrap');
-
       function setTab(key){
         Object.entries(sections).forEach(([k,el]) => el && (el.style.display = (k === key) ? '' : 'none'));
         links.forEach(a => a.classList.toggle('active', a.dataset.tab === key));
-        // Search only visible on Home (global search lives there)
         if (searchWrap) searchWrap.style.display = (key === 'home') ? 'flex' : 'none';
         window.scrollTo({ top: 0, behavior: 'instant' });
       }
@@ -347,15 +335,11 @@
         const key = (location.hash || '#home').slice(1);
         setTab(sections[key] ? key : 'home');
       }
-      links.forEach(a => a.addEventListener('click', (e) => {
-        e.preventDefault(); location.hash = a.getAttribute('href');
-      }));
+      links.forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); location.hash = a.getAttribute('href'); }));
       window.addEventListener('hashchange', applyHash);
       applyHash();
     })();
 
-    // ---------- Auth header updater (listen for your script.js events) ----------
-    // Expect script.js to dispatch: document.dispatchEvent(new CustomEvent('intakee:auth',{detail:{user}}))
     function applyHeaderAuth(user) {
       const openBtn = document.getElementById('openAuth');
       const loggedIn = !!user;
@@ -366,7 +350,6 @@
       document.getElementById('authDialog')?.showModal();
     });
 
-    // ---------- MINI-PLAYER (Podcast audio across tabs) ----------
     (function initMiniPlayer(){
       const wrap = document.getElementById('mini-player');
       const art  = document.getElementById('mp-art');
@@ -392,8 +375,8 @@
 
       btnP.addEventListener('click', ()=> audio.paused ? audio.play() : audio.pause());
       btnX.addEventListener('click', ()=> { audio.pause(); wrap.hidden = true; });
-      btnPrev.addEventListener('click', ()=>{/* optional: queue support */});
-      btnNext.addEventListener('click', ()=>{/* optional: queue support */});
+      btnPrev.addEventListener('click', ()=>{});
+      btnNext.addEventListener('click', ()=>{});
       audio.addEventListener('play', ()=>{
         btnP.innerHTML = '<i class="fa fa-pause"></i>';
         cancelAnimationFrame(ticking); ticking = requestAnimationFrame(syncTime);
@@ -401,7 +384,6 @@
       audio.addEventListener('pause', ()=> { btnP.innerHTML = '<i class="fa fa-play"></i>'; cancelAnimationFrame(ticking); });
       audio.addEventListener('loadedmetadata', ()=> { dur.textContent = fmt(audio.duration||0); });
 
-      // Expose starter API for renderers
       window.playPodcast = ({ url, title, subtitle, cover })=>{
         document.querySelectorAll('video').forEach(v=>{ try{ v.pause(); }catch{} });
         wrap.hidden = false;
@@ -412,7 +394,6 @@
       };
     })();
 
-    // ---------- FEED RENDERING PLACEHOLDERS (your script.js will call these) ----------
     window.renderVideoCard = function(post){
       const card = document.createElement('article');
       card.className = 'video-card card';
@@ -481,46 +462,41 @@
       return wrap;
     };
 
-    // ---------- SIMPLE HELPERS ----------
     window.qs  = (s,sc)=> (sc||document).querySelector(s);
     window.qsa = (s,sc)=> Array.from((sc||document).querySelectorAll(s));
   </script>
 
-  <!-- ================== FIREBASE INIT (CDN, modular) — SINGLE SOURCE OF TRUTH ================== -->
+  <!-- ================== FIREBASE INIT (FINAL — ONE BLOCK ONLY) ================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
     import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
     import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
-    // ✅ INTAKEE (intakee-5785e) — from Firebase Console → Project settings → Your apps → Web → Config
     const firebaseConfig = {
-      apiKey: "AIzaSyDq_tL8PxUvGT7JqCBj3tuL7s3Kipl5E6g",
+      apiKey: "AIzaSyD0_tL8PxUvGT7JqCBj3tuL7s3Kipl5E6g",
       authDomain: "intakee-5785e.firebaseapp.com",
       projectId: "intakee-5785e",
-      storageBucket: "intakee-5785e.firebasestorage.app",
+      storageBucket: "intakee-5785e.appspot.com",
       messagingSenderId: "40666230072",
       appId: "1:40666230072:web:49dd5e7db91c8a38b565cd",
-      measurementId: "G-3C2YDV6TGQ"
+      measurementId: "G-3C2YDV6T0G"
     };
 
-    // Initialize Firebase and expose to script.js + Console
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
     window.firebaseRefs = { app, auth, db, storage, onAuthStateChanged };
 
-    // Bubble auth state to header/UI
     onAuthStateChanged(auth, (user) => {
       document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
-      console.log('Auth state:', user ? '(logged in)' : '(no user)');
     });
 
     console.log('✅ Firebase ready:', app.options.projectId);
   </script>
 
-  <!-- Your main app logic (Firebase, data, actions) — must come AFTER init -->
+  <!-- ===== MAIN APP LOGIC (loads AFTER init) ===== -->
   <script type="module" src="script.js?v=13"></script>
 </body>
 </html>
