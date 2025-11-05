@@ -486,67 +486,41 @@
     window.qsa = (s,sc)=> Array.from((sc||document).querySelectorAll(s));
   </script>
 
-  <!-- ================== FIREBASE INIT (CDN, modular) ================== -->
+  <!-- ================== FIREBASE INIT (CDN, modular) — SINGLE SOURCE OF TRUTH ================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
     import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
     import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
-    // 👉 Replace with your real config (Firebase Console → Project settings → Your apps → Web app → CDN)
+    // ✅ INTAKEE (intakee-5785e) — from Firebase Console → Project settings → Your apps → Web → Config
     const firebaseConfig = {
-    apiKey: "AIzaSyD4R...",
-  authDomain: "intakee.firebaseapp.com",
-  projectId: "intakee",
-  storageBucket: "intakee.appspot.com",
-  messagingSenderId: "4066623072",
-  appId: "1:4066623072:web:49dd5e7db91c8a38b565cd"  
+      apiKey: "AIzaSyDq_tL8PxUvGT7JqCBj3tuL7s3Kipl5E6g",
+      authDomain: "intakee-5785e.firebaseapp.com",
+      projectId: "intakee-5785e",
+      storageBucket: "intakee-5785e.firebasestorage.app",
+      messagingSenderId: "40666230072",
+      appId: "1:40666230072:web:49dd5e7db91c8a38b565cd",
+      measurementId: "G-3C2YDV6TGQ"
     };
-    // Initialize Firebase and expose for script.js + Console
+
+    // Initialize Firebase and expose to script.js + Console
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
     window.firebaseRefs = { app, auth, db, storage, onAuthStateChanged };
 
-    // Let the header know when auth changes
+    // Bubble auth state to header/UI
     onAuthStateChanged(auth, (user) => {
       document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
+      console.log('Auth state:', user ? '(logged in)' : '(no user)');
     });
 
     console.log('✅ Firebase ready:', app.options.projectId);
   </script>
 
-  <!-- Your main app logic (Firebase, data, actions) -->
+  <!-- Your main app logic (Firebase, data, actions) — must come AFTER init -->
   <script type="module" src="script.js?v=13"></script>
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-
-  // Your actual Firebase config
- const firebaseConfig = {
-  apiKey: "AIzaSyD0_tL8PxUvGT7JqCBj3tuL7s3Kipl5E6g",
-  authDomain: "intakee-5785e.firebaseapp.com",
-  projectId: "intakee-5785e",
-  storageBucket: "intakee-5785e.firebasestorage.app",
-  messagingSenderId: "40666230072",
-  appId: "1:40666230072:web:49dd5e7db91c8a38b565cd",
-  measurementId: "G-3C2YDV6T0G"
-};
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  window.firebaseRefs = {
-    app,
-    auth: getAuth(app),
-    db: getFirestore(app),
-    storage: getStorage(app)
-  };
-
-  console.log("✅ Firebase ready:", app.options.projectId);
-</script>
-  <!-- Your app logic must come AFTER init -->
-<script type="module" src="script.js?v=13"></script>
 </body>
 </html>
