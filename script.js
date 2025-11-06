@@ -71,10 +71,6 @@ const profileGrid = qs('#profile-grid');
 const profileEmpty = qs('#profile-empty');
 const playPodcast = window.playPodcast;
 
-// ---------- STATE ----------
-let _postsCache = [];
-let _userSettings = {};
-let _isLoadingFeed = false;
  // ============================================================================
 let _isLoadingFeed = false;
 // ============================================================================
