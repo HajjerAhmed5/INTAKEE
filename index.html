@@ -351,5 +351,45 @@
 
   <!-- MAIN JS -->
   <script type="module" src="script.js?v=14"></script>
+<script>
+  // === Fix: Router + Auth UI re-attach after script.js loads ===
+  document.addEventListener("intakee:auth", e => {
+    const user = e.detail?.user;
+    const authBtn = document.getElementById("openAuth");
+    if (authBtn) authBtn.style.display = user ? "none" : "";
+  });
+
+  // Restore bottom nav tab routing
+  (function rebindRouter(){
+    const links = document.querySelectorAll('.bottom-nav a');
+    const sections = {
+      home:       document.getElementById('tab-home'),
+      videos:     document.getElementById('tab-videos'),
+      podcast:    document.getElementById('tab-podcast'),
+      upload:     document.getElementById('tab-upload'),
+      clips:      document.getElementById('tab-clips'),
+      profile:    document.getElementById('tab-profile'),
+      settings:   document.getElementById('tab-settings'),
+      guidelines: document.getElementById('tab-guidelines'),
+      terms:      document.getElementById('tab-terms'),
+      privacy:    document.getElementById('tab-privacy')
+    };
+    function setTab(key){
+      Object.entries(sections).forEach(([k,el]) => el && (el.style.display = (k===key)?'':'none'));
+      links.forEach(a => a.classList.toggle('active', a.dataset.tab===key));
+      document.getElementById('searchWrap').style.display = (key==='home')?'flex':'none';
+      window.scrollTo({top:0,behavior:'instant'});
+    }
+    function applyHash(){
+      const key=(location.hash||'#home').slice(1);
+      setTab(sections[key]?key:'home');
+    }
+    links.forEach(a=>a.addEventListener('click',e=>{
+      e.preventDefault(); location.hash=a.getAttribute('href');
+    }));
+    window.addEventListener('hashchange',applyHash);
+    applyHash();
+  })();
+</script>
 </body>
 </html>
