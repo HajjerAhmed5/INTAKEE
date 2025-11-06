@@ -21,7 +21,8 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body style="background-color:black; color:white;">
+
   <!-- ===== HEADER ===== -->
   <header>
     <div class="brand"><img src="logo.png" alt="INTAKEE"></div>
@@ -125,22 +126,17 @@
 
     <!-- PROFILE -->
     <section id="tab-profile" style="display:none;">
-      <div id="profileBanner" class="profile-banner">
-        <button id="btnAddBanner" class="add-btn owner-only" title="Change banner" style="display:none;">+</button>
-      </div>
-
+      <div id="profileBanner" class="profile-banner"></div>
       <div class="card">
         <div class="profile-header">
           <div class="avatar-wrap">
             <img id="profile-photo" src="" alt="" class="profile-avatar">
-            <button id="btnAddAvatar" class="add-btn owner-only" title="Change photo" style="display:none;">+</button>
+            <button id="btnAddAvatar" class="add-btn owner-only" style="display:none;">+</button>
           </div>
-
           <div>
             <h3 id="profile-name">Your Name</h3>
             <div id="profile-handle" class="muted">@username</div>
             <p id="bio-view" class="muted">Add a short bio to introduce yourself.</p>
-
             <div id="bio-edit-wrap" style="display:none;">
               <input id="profileNameInput" type="text" placeholder="Your name">
               <textarea id="profileBioInput" placeholder="Write your bio..." maxlength="300"></textarea>
@@ -151,7 +147,6 @@
                 <button id="bio-cancel" class="ghost">Cancel</button>
               </div>
             </div>
-
             <div class="stat-row">
               <span><strong id="stat-posts">0</strong> Posts</span>
               <span><strong id="stat-followers">0</strong> Followers</span>
@@ -159,7 +154,6 @@
               <span><strong id="stat-likes">0</strong> Likes</span>
             </div>
           </div>
-
           <div class="profile-actions">
             <button id="btn-follow" class="primary">Follow</button>
             <button id="btn-share-profile" class="ghost">Share</button>
@@ -167,7 +161,6 @@
           </div>
         </div>
       </div>
-
       <div class="card">
         <div class="profile-tabs">
           <button class="pill active" data-profiletab="all">All</button>
@@ -179,9 +172,6 @@
         <div id="profile-grid" class="grid"></div>
         <div id="profile-empty" class="muted" style="display:none;">No posts yet.</div>
       </div>
-
-      <input id="bannerInput" type="file" accept="image/*" hidden>
-      <input id="avatarInput" type="file" accept="image/*" hidden>
     </section>
 
     <!-- SETTINGS -->
@@ -227,7 +217,17 @@
       <div class="legal-page">
         <a href="#settings" class="muted small">← Back to Settings</a>
         <h2>Community Guidelines</h2>
-        <div id="guidelines-content" class="legal-content"></div>
+        <div class="legal-content">
+          <p>INTAKEE is built to protect freedom of expression while keeping the platform respectful and safe. The following are not allowed:</p>
+          <ul>
+            <li>No nudity, pornography, or sexually explicit material.</li>
+            <li>No harassment, bullying, or threats.</li>
+            <li>No promotion of violence or terrorism.</li>
+            <li>No doxxing or sharing personal data without consent.</li>
+            <li>No spam, scams, or misleading promotions.</li>
+          </ul>
+          <p>Creators are responsible for their words and uploads. INTAKEE reserves the right to remove content or suspend accounts that repeatedly violate these rules.</p>
+        </div>
       </div>
     </section>
 
@@ -235,7 +235,17 @@
       <div class="legal-page">
         <a href="#settings" class="muted small">← Back to Settings</a>
         <h2>Terms of Service</h2>
-        <div id="terms-content" class="legal-content"></div>
+        <div class="legal-content">
+          <p>By using INTAKEE, you agree that:</p>
+          <ul>
+            <li>All uploads and posts are the sole responsibility of the creator.</li>
+            <li>INTAKEE LLC is not liable for user-generated content or any damages arising from its use.</li>
+            <li>Users must be 13 years or older to create an account.</li>
+            <li>Creators grant INTAKEE a non-exclusive license to host and display content.</li>
+            <li>We reserve the right to remove illegal or harmful material.</li>
+          </ul>
+          <p>By continuing, you accept these terms in full.</p>
+        </div>
       </div>
     </section>
 
@@ -243,14 +253,19 @@
       <div class="legal-page">
         <a href="#settings" class="muted small">← Back to Settings</a>
         <h2>Privacy Policy</h2>
-        <div id="privacy-content" class="legal-content"></div>
+        <div class="legal-content">
+          <p>INTAKEE collects minimal personal information such as email and basic profile data for account creation.</p>
+          <p>Your data is never sold. Uploaded content and profile info may be visible publicly depending on your settings.</p>
+          <p>We use Firebase for authentication, data storage, and media hosting, subject to Google’s Privacy Policy.</p>
+          <p>Users may delete their accounts anytime through Settings. Deleted accounts permanently remove your posts and personal info from our system.</p>
+        </div>
       </div>
     </section>
 
   </main>
 
-  <!-- ===== MINI PLAYER ===== -->
-  <div id="mini-player" class="mini-player" hidden>
+  <!-- MINI PLAYER -->
+  <div id="mini-player" class="mini-player" hidden style="opacity:0; transition:opacity .3s ease;">
     <div class="mp-left">
       <div class="mp-art" id="mp-art"></div>
       <div class="mp-meta">
@@ -259,35 +274,34 @@
       </div>
     </div>
     <div class="mp-controls">
-      <button id="mp-prev" class="icon-btn" title="Previous"><i class="fa fa-backward-step"></i></button>
-      <button id="mp-play" class="icon-btn" title="Play/Pause"><i class="fa fa-play"></i></button>
-      <button id="mp-next" class="icon-btn" title="Next"><i class="fa fa-forward-step"></i></button>
+      <button id="mp-prev" class="icon-btn"><i class="fa fa-backward-step"></i></button>
+      <button id="mp-play" class="icon-btn"><i class="fa fa-play"></i></button>
+      <button id="mp-next" class="icon-btn"><i class="fa fa-forward-step"></i></button>
     </div>
     <div class="mp-right">
       <div class="mp-time muted small"><span id="mp-cur">0:00</span> / <span id="mp-dur">0:00</span></div>
-      <button id="mp-close" class="icon-btn" title="Close"><i class="fa fa-xmark"></i></button>
+      <button id="mp-close" class="icon-btn"><i class="fa fa-xmark"></i></button>
     </div>
     <audio id="mp-audio" preload="metadata"></audio>
   </div>
 
-  <!-- ===== BOTTOM NAV ===== -->
+  <!-- NAV -->
   <nav class="bottom-nav">
-    <a href="#home"     data-tab="home"    class="active"><i class="fa fa-home"></i><span>Home</span></a>
-    <a href="#videos"   data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
-    <a href="#podcast"  data-tab="podcast"><i class="fa fa-podcast"></i><span>Podcast</span></a>
-    <a href="#upload"   data-tab="upload"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
-    <a href="#clips"    data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
-    <a href="#profile"  data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
+    <a href="#home" data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
+    <a href="#videos" data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
+    <a href="#podcast" data-tab="podcast"><i class="fa fa-podcast"></i><span>Podcast</span></a>
+    <a href="#upload" data-tab="upload"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
+    <a href="#clips" data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
+    <a href="#profile" data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
     <a href="#settings" data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
   </nav>
 
-  <!-- ===== AUTH MODAL ===== -->
+  <!-- AUTH MODAL -->
   <dialog id="authDialog">
     <form method="dialog" style="text-align:right; margin:0 0 8px;">
       <button aria-label="Close">✕</button>
     </form>
-
-    <h3 style="margin:0 0 8px;">Create account</h3>
+    <h3>Create account</h3>
     <form id="authSignUpForm" style="display:grid; gap:8px;">
       <input id="signUpName" type="text" placeholder="Display name (optional)" />
       <input id="signUpEmail" type="email" placeholder="Email" required />
@@ -299,8 +313,7 @@
       <button type="submit" class="primary">Sign up</button>
     </form>
     <hr style="border-color:#1a1a1a; margin:12px 0;" />
-
-    <h3 style="margin:0 0 8px;">Sign in</h3>
+    <h3>Sign in</h3>
     <form id="authSignInForm" style="display:grid; gap:8px;">
       <input id="signInEmail" type="email" placeholder="Email" required />
       <input id="signInPassword" type="password" placeholder="Password" required />
@@ -308,165 +321,7 @@
     </form>
   </dialog>
 
-  <!-- ===== CORE SHELL (router + UI helpers) ===== -->
-  <script>
-    (function initRouter(){
-      const links = Array.from(document.querySelectorAll('.bottom-nav a'));
-      const sections = {
-        home:       document.getElementById('tab-home'),
-        videos:     document.getElementById('tab-videos'),
-        podcast:    document.getElementById('tab-podcast'),
-        upload:     document.getElementById('tab-upload'),
-        clips:      document.getElementById('tab-clips'),
-        profile:    document.getElementById('tab-profile'),
-        settings:   document.getElementById('tab-settings'),
-        guidelines: document.getElementById('tab-guidelines'),
-        terms:      document.getElementById('tab-terms'),
-        privacy:    document.getElementById('tab-privacy')
-      };
-      const searchWrap = document.getElementById('searchWrap');
-      function setTab(key){
-        Object.entries(sections).forEach(([k,el]) => el && (el.style.display = (k === key) ? '' : 'none'));
-        links.forEach(a => a.classList.toggle('active', a.dataset.tab === key));
-        if (searchWrap) searchWrap.style.display = (key === 'home') ? 'flex' : 'none';
-        window.scrollTo({ top: 0, behavior: 'instant' });
-      }
-      function applyHash(){
-        const key = (location.hash || '#home').slice(1);
-        setTab(sections[key] ? key : 'home');
-      }
-      links.forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); location.hash = a.getAttribute('href'); }));
-      window.addEventListener('hashchange', applyHash);
-      applyHash();
-    })();
-
-    function applyHeaderAuth(user) {
-      const openBtn = document.getElementById('openAuth');
-      const loggedIn = !!user;
-      if (openBtn) openBtn.style.display = loggedIn ? 'none' : '';
-    }
-    document.addEventListener('intakee:auth', (e) => applyHeaderAuth(e.detail?.user ?? null));
-    document.getElementById('openAuth')?.addEventListener('click', () => {
-      document.getElementById('authDialog')?.showModal();
-    });
-
-    (function initMiniPlayer(){
-      const wrap = document.getElementById('mini-player');
-      const art  = document.getElementById('mp-art');
-      const tEl  = document.getElementById('mp-title');
-      const sEl  = document.getElementById('mp-sub');
-      const cur  = document.getElementById('mp-cur');
-      const dur  = document.getElementById('mp-dur');
-      const audio= document.getElementById('mp-audio');
-      const btnP = document.getElementById('mp-play');
-      const btnX = document.getElementById('mp-close');
-      const btnPrev = document.getElementById('mp-prev');
-      const btnNext = document.getElementById('mp-next');
-
-      let ticking = null;
-      function fmt(sec){ if(!isFinite(sec)) return '0:00';
-        const m=Math.floor(sec/60), s=Math.floor(sec%60).toString().padStart(2,'0'); return `${m}:${s}`; }
-
-      function syncTime(){
-        cur.textContent = fmt(audio.currentTime);
-        dur.textContent = fmt(audio.duration || 0);
-        if (!audio.paused) ticking = requestAnimationFrame(syncTime);
-      }
-
-      btnP.addEventListener('click', ()=> audio.paused ? audio.play() : audio.pause());
-      btnX.addEventListener('click', ()=> { audio.pause(); wrap.hidden = true; });
-      btnPrev.addEventListener('click', ()=>{});
-      btnNext.addEventListener('click', ()=>{});
-      audio.addEventListener('play', ()=>{
-        btnP.innerHTML = '<i class="fa fa-pause"></i>';
-        cancelAnimationFrame(ticking); ticking = requestAnimationFrame(syncTime);
-      });
-      audio.addEventListener('pause', ()=> { btnP.innerHTML = '<i class="fa fa-play"></i>'; cancelAnimationFrame(ticking); });
-      audio.addEventListener('loadedmetadata', ()=> { dur.textContent = fmt(audio.duration||0); });
-
-      window.playPodcast = ({ url, title, subtitle, cover })=>{
-        document.querySelectorAll('video').forEach(v=>{ try{ v.pause(); }catch{} });
-        wrap.hidden = false;
-        tEl.textContent = title || 'Untitled';
-        sEl.textContent = subtitle || '';
-        art.style.backgroundImage = cover ? `url(${cover})` : 'none';
-        audio.src = url; audio.play().catch(()=>{});
-      };
-    })();
-
-    window.renderVideoCard = function(post){
-      const card = document.createElement('article');
-      card.className = 'video-card card';
-      card.innerHTML = `
-        <div class="thumb-16x9">
-          <img src="${post.thumbnailUrl || ''}" alt="">
-          <video src="${post.mediaUrl || ''}" preload="metadata" muted playsinline></video>
-        </div>
-        <div class="meta">
-          <h4 class="title">${post.title || 'Untitled'}</h4>
-          <div class="sub muted small">${post.creatorName || 'Unknown'} • ${post.views || 0} views</div>
-        </div>`;
-      return card;
-    };
-
-    window.renderPodcastRow = function(post){
-      const row = document.createElement('div');
-      row.className = 'podcast-row card';
-      row.innerHTML = `
-        <div class="pod-art"><img src="${post.coverUrl || post.thumbnailUrl || ''}" alt=""></div>
-        <div class="pod-main">
-          <div class="pod-title">${post.title || 'Episode'}</div>
-          <div class="muted small">${post.showName || ''}</div>
-        </div>
-        <div class="pod-cta">
-          <button class="primary play">Play</button>
-        </div>`;
-      row.querySelector('.play').addEventListener('click', ()=>{
-        window.playPodcast({
-          url: post.mediaUrl,
-          title: post.title,
-          subtitle: post.showName || (post.creatorName||''),
-          cover: post.coverUrl || post.thumbnailUrl || ''
-        });
-      });
-      return row;
-    };
-
-    window.renderClipFullScreen = function(post){
-      const wrap = document.createElement('div');
-      wrap.className = 'clip-card';
-      wrap.innerHTML = `
-        <video class="clip-video" src="${post.mediaUrl||''}" playsinline loop muted></video>
-        <div class="clip-rail">
-          <button class="icon-btn"><i class="fa fa-heart"></i><span>${post.likeCount||0}</span></button>
-          <button class="icon-btn"><i class="fa fa-comment"></i><span>${post.commentCount||0}</span></button>
-          <button class="icon-btn"><i class="fa fa-bookmark"></i></button>
-          <button class="icon-btn"><i class="fa fa-share"></i></button>
-        </div>
-        <div class="clip-caption">
-          <div class="muted small">@${post.creatorHandle || 'user'}</div>
-          <div class="text">${post.title || ''}</div>
-        </div>`;
-      const vid = wrap.querySelector('.clip-video');
-      const io = new IntersectionObserver((ents)=>{
-        ents.forEach(e=>{
-          if (e.isIntersecting && e.intersectionRatio > 0.6) {
-            document.querySelectorAll('.clip-video').forEach(v=>{ if(v!==vid) try{v.pause()}catch{} });
-            vid.play().catch(()=>{});
-          } else {
-            try{ vid.pause(); }catch{}
-          }
-        });
-      }, { threshold:[0,0.6,1]});
-      io.observe(wrap);
-      return wrap;
-    };
-
-    window.qs  = (s,sc)=> (sc||document).querySelector(s);
-    window.qsa = (s,sc)=> Array.from((sc||document).querySelectorAll(s));
-  </script>
-
-  <!-- ================== FIREBASE INIT (FINAL — ONE BLOCK ONLY) ================== -->
+  <!-- FIREBASE INIT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
@@ -492,11 +347,9 @@
     onAuthStateChanged(auth, (user) => {
       document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
     });
-
-    console.log('✅ Firebase ready:', app.options.projectId);
   </script>
 
-  <!-- ===== MAIN APP LOGIC (loads AFTER init) ===== -->
-  <script type="module" src="script.js?v=13"></script>
+  <!-- MAIN JS -->
+  <script type="module" src="script.js?v=14"></script>
 </body>
 </html>
