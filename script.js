@@ -130,6 +130,22 @@ $on(signInForm, 'submit', async (e) => {
 });
 
 // --- Logout ---
+// ============================================================================
+// OWNER VISIBILITY (shows/hides elements based on login state)
+// ============================================================================
+function applyOwnerVisibility(user) {
+  const isOwner = !!user;
+  qsa('.owner-only').forEach(el => el.style.display = isOwner ? '' : 'none');
+
+  // Hide mini-player when logged out
+  if (!isOwner) {
+    try {
+      qs('#mp-audio')?.pause();
+      qs('#mini-player')?.setAttribute('hidden', '');
+    } catch {}
+  }
+}
+
 $on(logoutBtn, 'click', async () => {
   try {
     await signOut(auth);
