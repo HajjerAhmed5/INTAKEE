@@ -76,17 +76,15 @@ let _postsCache = [];
 let _userSettings = {};
 let _isLoadingFeed = false;
  // ============================================================================
-// AUTH (fixed – ensures modal + Firebase link always works)
+let _isLoadingFeed = false;
+// ============================================================================
+// AUTH SECTION (fixed + stable Firebase connection)
 // ============================================================================
 
-const authRef = window.firebaseRefs?.auth || getAuth();
-const dbRef = window.firebaseRefs?.db || getFirestore();
-const storageRef = window.firebaseRefs?.storage || getStorage();
-
-// Create account
+// --- Create Account ---
 $on(signUpForm, 'submit', async (e) => {
   e.preventDefault();
-  const displayName = qs('#signUpName').value.trim();
+  const name = qs('#signUpName').value.trim();
   const email = qs('#signUpEmail').value.trim();
   const pass = qs('#signUpPassword').value.trim();
   const ageOK = qs('#signUpAge').checked;
@@ -95,65 +93,62 @@ $on(signUpForm, 'submit', async (e) => {
   if (!email || !pass) return alert("Enter email and password.");
 
   try {
-    const cred = await createUserWithEmailAndPassword(authRef, email, pass);
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    if (name) await updateProfile(cred.user, { displayName: name });
 
-    if (displayName) await updateProfile(cred.user, { displayName });
-
-    await setDoc(doc(dbRef, 'users', cred.user.uid), {
-      name: displayName || cred.user.displayName || '',
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name: name || cred.user.displayName || '',
       bio: '',
+      followers: 0,
+      following: 0,
+      likes: 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
-    }, { merge: true });
+    });
 
     dlgAuth?.close();
-    alert('✅ Account created successfully!');
+    alert('✅ Account created!');
   } catch (err) {
     console.error('Signup error:', err);
-    if (err.code === 'auth/email-already-in-use') {
+    if (err.code === 'auth/email-already-in-use')
       alert('You already have an account. Try signing in instead.');
-    } else {
-      alert(err.message);
-    }
+    else alert(err.message);
   }
 });
 
-// Sign in
+// --- Sign In ---
 $on(signInForm, 'submit', async (e) => {
   e.preventDefault();
   const email = qs('#signInEmail').value.trim();
-  const pass  = qs('#signInPassword').value.trim();
+  const pass = qs('#signInPassword').value.trim();
   try {
-    await signInWithEmailAndPassword(authRef, email, pass);
+    await signInWithEmailAndPassword(auth, email, pass);
     dlgAuth?.close();
-    alert('✅ Signed in successfully!');
+    alert('✅ Signed in!');
   } catch (err) {
     console.error('Signin error:', err);
-    if (err.code === 'auth/invalid-credential') {
+    if (err.code === 'auth/invalid-credential')
       alert('Invalid email or password. Please try again.');
-    } else {
-      alert(err.message);
-    }
+    else alert(err.message);
   }
 });
 
-// Logout
+// --- Logout ---
 $on(logoutBtn, 'click', async () => {
   try {
-    await signOut(authRef);
-    alert('You have been logged out.');
+    await signOut(auth);
+    alert('You’ve been logged out.');
   } catch (e) {
     console.error('Logout failed:', e);
     alert('Logout failed. Please refresh and try again.');
   }
 });
 
-// Auth state listener
-onAuthStateChanged(authRef, async (user) => {
+// --- Auth State Listener ---
+onAuthStateChanged(auth, async (user) => {
   console.log('Auth state:', user ? user.uid : '(no user)');
   document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
   applyOwnerVisibility(user);
-
   if (user) {
     await Promise.all([loadHomeFeed(), loadProfilePane(user)]);
   } else {
@@ -161,66 +156,6 @@ onAuthStateChanged(authRef, async (user) => {
     await loadProfilePane(null);
   }
 });
-// ---------- AUTH STATE LISTENER ----------
-(onAuthStateChangedFromInit || onAuthStateChanged)(auth, async (user) => {
-  console.log("Auth state:", user ? user.uid : "none");
-  document.dispatchEvent(new CustomEvent("intakee:auth", { detail: { user } }));
-  applyOwnerVisibility(user);
-  if (user) {
-    await Promise.all([loadHomeFeed(), loadProfilePane(user), loadUserSettings(user)]);
-  } else {
-    clearAllFeedsForLoggedOut();
-    await loadProfilePane(null);
-  }
-});
-
-// ---------- OWNER VISIBILITY ----------
-function applyOwnerVisibility(user) {
-  const isOwner = !!user;
-  qsa(".owner-only").forEach(el => el.style.display = isOwner ? "" : "none");
-  if (!isOwner) {
-    try { qs("#mp-audio")?.pause(); qs("#mini-player")?.setAttribute("hidden", ""); } catch {}
-  }
-}
-
-// ============================================================================
-// LEGAL CONTENT (Auto-loaded into in-app pages)
-// ============================================================================
-window.loadLegalPages = function() {
-  const guidelines = qs("#guidelines-content");
-  const terms = qs("#terms-content");
-  const privacy = qs("#privacy-content");
-
-  if (guidelines) guidelines.innerHTML = `
-  <h3>Community Guidelines</h3>
-  <p>INTAKEE believes in freedom of expression but prohibits hate speech, harassment, or nudity. Content must respect others and follow applicable laws.</p>
-  <ul>
-    <li>No explicit or pornographic material.</li>
-    <li>No promotion of violence or discrimination.</li>
-    <li>Respect intellectual property.</li>
-    <li>Report issues responsibly — false reporting may result in suspension.</li>
-  </ul>`;
-
-  if (terms) terms.innerHTML = `
-  <h3>Terms of Service</h3>
-  <p>By using INTAKEE, you agree that all content you upload is your responsibility. INTAKEE LLC is not liable for user-generated content.</p>
-  <ul>
-    <li>Creators own their content but grant INTAKEE a license to display it.</li>
-    <li>Users must be at least 13 years old.</li>
-    <li>INTAKEE may remove illegal or harmful material.</li>
-    <li>Violations may result in suspension or termination.</li>
-  </ul>`;
-
-  if (privacy) privacy.innerHTML = `
-  <h3>Privacy Policy</h3>
-  <p>We respect your privacy. INTAKEE collects only data necessary for functionality (like email, uploads, and profile info). We never sell user data.</p>
-  <ul>
-    <li>We use Firebase for authentication, hosting, and data storage.</li>
-    <li>Cookies may be used for login sessions.</li>
-    <li>You can delete your data anytime via account settings.</li>
-  </ul>`;
-};
-window.loadLegalPages();
 // ============================================================================
 // UPLOADS
 // ============================================================================
