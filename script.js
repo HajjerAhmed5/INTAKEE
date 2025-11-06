@@ -75,73 +75,92 @@ const playPodcast = window.playPodcast;
 let _postsCache = [];
 let _userSettings = {};
 let _isLoadingFeed = false;
+ // ============================================================================
+// AUTH (fixed – ensures modal + Firebase link always works)
+// ============================================================================
 
-// ============================================================================
-// AUTH SECTION
-// ============================================================================
+const authRef = window.firebaseRefs?.auth || getAuth();
+const dbRef = window.firebaseRefs?.db || getFirestore();
+const storageRef = window.firebaseRefs?.storage || getStorage();
+
+// Create account
 $on(signUpForm, 'submit', async (e) => {
   e.preventDefault();
-  const name = qs('#signUpName').value.trim();
+  const displayName = qs('#signUpName').value.trim();
   const email = qs('#signUpEmail').value.trim();
-  const pass  = qs('#signUpPassword').value.trim();
+  const pass = qs('#signUpPassword').value.trim();
   const ageOK = qs('#signUpAge').checked;
+
   if (!ageOK) return alert("You must confirm you are 13 or older.");
   if (!email || !pass) return alert("Enter email and password.");
 
   try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    if (name) await updateProfile(cred.user, { displayName: name });
+    const cred = await createUserWithEmailAndPassword(authRef, email, pass);
 
-    await setDoc(doc(db, "users", cred.user.uid), {
-      name: name || cred.user.displayName || '',
-      email,
+    if (displayName) await updateProfile(cred.user, { displayName });
+
+    await setDoc(doc(dbRef, 'users', cred.user.uid), {
+      name: displayName || cred.user.displayName || '',
       bio: '',
-      followers: 0,
-      following: 0,
-      likes: 0,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      settings: {
-        private: false,
-        uploadsVisible: true,
-        likesVisible: true,
-        savedVisible: true,
-        playlistsVisible: true
-      }
-    });
-    dlgAuth.close();
-    alert("✅ Account created successfully!");
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    dlgAuth?.close();
+    alert('✅ Account created successfully!');
   } catch (err) {
-    if (err.code === "auth/email-already-in-use") {
-      alert("⚠️ You already have an account. Please sign in instead.");
+    console.error('Signup error:', err);
+    if (err.code === 'auth/email-already-in-use') {
+      alert('You already have an account. Try signing in instead.');
     } else {
-      alert("Error: " + err.message);
+      alert(err.message);
     }
   }
 });
 
-$on(signInForm, "submit", async (e) => {
+// Sign in
+$on(signInForm, 'submit', async (e) => {
   e.preventDefault();
-  const email = qs("#signInEmail").value.trim();
-  const pass = qs("#signInPassword").value.trim();
+  const email = qs('#signInEmail').value.trim();
+  const pass  = qs('#signInPassword').value.trim();
   try {
-    await signInWithEmailAndPassword(auth, email, pass);
-    dlgAuth.close();
-    alert("✅ Signed in successfully!");
+    await signInWithEmailAndPassword(authRef, email, pass);
+    dlgAuth?.close();
+    alert('✅ Signed in successfully!');
   } catch (err) {
-    alert("❌ Sign in failed: " + err.message);
+    console.error('Signin error:', err);
+    if (err.code === 'auth/invalid-credential') {
+      alert('Invalid email or password. Please try again.');
+    } else {
+      alert(err.message);
+    }
   }
 });
 
-$on(logoutBtn, "click", async () => {
+// Logout
+$on(logoutBtn, 'click', async () => {
   try {
-    await signOut(auth);
-    alert("You’ve been logged out.");
-  } catch (err) {
-    alert("Logout failed: " + err.message);
+    await signOut(authRef);
+    alert('You have been logged out.');
+  } catch (e) {
+    console.error('Logout failed:', e);
+    alert('Logout failed. Please refresh and try again.');
   }
 });
 
+// Auth state listener
+onAuthStateChanged(authRef, async (user) => {
+  console.log('Auth state:', user ? user.uid : '(no user)');
+  document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
+  applyOwnerVisibility(user);
+
+  if (user) {
+    await Promise.all([loadHomeFeed(), loadProfilePane(user)]);
+  } else {
+    clearAllFeedsForLoggedOut();
+    await loadProfilePane(null);
+  }
+});
 // ---------- AUTH STATE LISTENER ----------
 (onAuthStateChangedFromInit || onAuthStateChanged)(auth, async (user) => {
   console.log("Auth state:", user ? user.uid : "none");
