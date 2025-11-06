@@ -141,6 +141,21 @@ $on(logoutBtn, 'click', async () => {
 });
 
 // --- Auth State Listener ---
+// ============================================================================
+// OWNER VISIBILITY (shows/hides elements based on login state)
+// ============================================================================
+function applyOwnerVisibility(user) {
+  const isOwner = !!user;
+  qsa('.owner-only').forEach(el => el.style.display = isOwner ? '' : 'none');
+
+  // Hide mini-player when logged out
+  if (!isOwner) {
+    try {
+      qs('#mp-audio')?.pause();
+      qs('#mini-player')?.setAttribute('hidden', '');
+    } catch {}
+  }
+}
 onAuthStateChanged(auth, async (user) => {
   console.log('Auth state:', user ? user.uid : '(no user)');
   document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
