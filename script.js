@@ -337,6 +337,88 @@ async function loadHomeFeed() {
     _isLoadingFeed = false;
   }
   renderHome("all");
+  // ============================================================================
+// ACCESS CONTROL — guest vs signed-in users
+// ============================================================================
+
+// 1. Allow everyone to view public feeds
+//    but block age-restricted posts unless logged in
+function canViewPost(post) {
+  // Always allow if no restriction flag
+  if (!post.ageRestricted) return true;
+
+  // If restricted, allow only signed-in users age 13+
+  const user = auth.currentUser;
+  if (!user) return false;
+  try {
+    const birthYear = user.birthYear || 0; // (optional: add in signup later)
+    const age = new Date().getFullYear() - birthYear;
+    return age >= 13;
+  } catch {
+    return true; // fallback allow
+  }
+}
+
+// Modify your feed rendering to respect this:
+function renderHome(filter = 'all') {
+  if (!homeFeed) return;
+  homeFeed.innerHTML = '';
+
+  const list = _postsCache.filter(p => {
+    if (!canViewPost(p)) return false;
+    if (filter === 'all') return true;
+    if (filter === 'new') return true;
+    if (filter === 'following') return false;
+    if (filter === 'podcast') return p.type?.startsWith('podcast');
+    return p.type === filter;
+  });
+
+  if (!list.length) {
+    homeFeed.innerHTML = `<div class="muted">No posts yet.</div>`;
+    return;
+  }
+
+  list.forEach(post => {
+    let el;
+    if (post.type === 'video' || post.type === 'podcast-video') {
+      el = window.renderVideoCard?.(post);
+    } else if (post.type?.startsWith('podcast')) {
+      el = window.renderPodcastRow?.(post);
+    } else if (post.type === 'clip') {
+      el = window.renderClipFullScreen?.(post);
+    }
+    if (el) homeFeed.appendChild(el);
+  });
+}
+
+// 2. Protect interactions (likes, comments, follows, uploads)
+window.requireAuth = function (action = "interact") {
+  if (!auth.currentUser) {
+    alert(`Sign in to ${action} on INTAKEE.`);
+    return false;
+  }
+  return true;
+};
+
+// Example usage inside your code:
+// if (!requireAuth("like this post")) return;
+// if (!requireAuth("upload")) return;
+
+// 3. Add guest warning for restricted posts
+function renderRestrictedMessage() {
+  const div = document.createElement('div');
+  div.className = 'restricted-overlay';
+  div.innerHTML = `
+    <div class="restricted-message">
+      <i class="fa fa-lock"></i>
+      <p>This content is age-restricted. Please sign in to view.</p>
+      <button class="primary" onclick="document.getElementById('authDialog').showModal()">Sign In</button>
+    </div>
+  `;
+  return div;
+}
+// Optional — in renderVideoCard/renderPodcastRow, you can insert:
+// if (post.ageRestricted && !auth.currentUser) return renderRestrictedMessage();
   renderByType(videosFeed, "video");
   renderByType(podcastFeed, "podcast");
   renderByType(clipsFeed, "clip");
