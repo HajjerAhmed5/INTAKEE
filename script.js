@@ -23,9 +23,7 @@ import {
 
 // ---------- FIREBASE REFERENCES ----------
 const { app, auth, db, storage, onAuthStateChanged: onAuthStateChangedFromInit } = (window.firebaseRefs || {});
-// Reconnect Firebase Auth instance (needed for modal sign-in)
-const authRef = auth || getAuth();
-window.auth = authRef;
+;
 if (!app || !auth || !db || !storage) {
   console.error("❌ Firebase not ready. Check the init block in index.html");
 }
