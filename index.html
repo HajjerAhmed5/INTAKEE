@@ -6,30 +6,26 @@
   <title>INTAKEE — Videos, Podcasts, and Clips</title>
   <meta name="description" content="INTAKEE is the all-in-one platform for videos, podcasts, and clips — freedom to create, simple to share.">
   <link rel="canonical" href="https://intakee.vercel.app/">
-
-  <!-- Social -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
   <meta property="og:description" content="All-in-one platform for videos, podcasts, and clips.">
   <meta property="og:url" content="https://intakee.vercel.app/">
   <meta property="og:image" content="/og-image.jpg">
   <meta name="twitter:card" content="summary_large_image">
-
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
   <link rel="icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body style="background-color:black; color:white;">
-
+<body class="dark">
   <!-- ===== HEADER ===== -->
   <header>
     <div class="brand"><img src="logo.png" alt="INTAKEE"></div>
     <div class="spacer"></div>
     <div id="searchWrap" class="search-bar">
-      <i class="fa fa-search" style="opacity:.6;"></i>
-      <input id="globalSearch" type="text" placeholder="Search…" />
+      <i class="fa fa-search"></i>
+      <input id="globalSearch" type="text" placeholder="Search…">
     </div>
     <div class="auth">
       <button id="openAuth">Login / Sign Up</button>
@@ -48,7 +44,6 @@
           <button class="pill" data-filter="video">Videos</button>
           <button class="pill" data-filter="podcast">Podcasts</button>
           <button class="pill" data-filter="clip">Clips</button>
-          <button class="pill" data-filter="following">Following</button>
           <button class="pill" data-filter="new">Newest</button>
         </div>
       </div>
@@ -95,7 +90,7 @@
         <input id="uploadTitleInput" type="text" placeholder="Add a title">
 
         <label>Description</label>
-        <textarea id="uploadDescInput" placeholder="Describe your video/clip/podcast…" rows="4"></textarea>
+        <textarea id="uploadDescInput" placeholder="Describe your upload…" rows="4"></textarea>
 
         <label>Thumbnail (cover image)</label>
         <input id="uploadThumbInput" type="file" accept="image/*">
@@ -103,7 +98,12 @@
         <label>File</label>
         <input id="uploadFileInput" type="file" accept="video/*,audio/*">
 
-        <p class="muted small">Processing starts after upload. You’ll be notified when it’s ready.</p>
+        <div class="row">
+          <label style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" id="ageRestricted">
+            <span>Mark as Age Restricted (18+)</span>
+          </label>
+        </div>
 
         <div class="row">
           <button id="btnUpload" class="primary">Upload</button>
@@ -130,47 +130,19 @@
       <div class="card">
         <div class="profile-header">
           <div class="avatar-wrap">
-            <img id="profile-photo" src="" alt="" class="profile-avatar">
-            <button id="btnAddAvatar" class="add-btn owner-only" style="display:none;">+</button>
+            <img id="profile-photo" class="profile-avatar" alt="">
           </div>
           <div>
             <h3 id="profile-name">Your Name</h3>
             <div id="profile-handle" class="muted">@username</div>
             <p id="bio-view" class="muted">Add a short bio to introduce yourself.</p>
-            <div id="bio-edit-wrap" style="display:none;">
-              <input id="profileNameInput" type="text" placeholder="Your name">
-              <textarea id="profileBioInput" placeholder="Write your bio..." maxlength="300"></textarea>
-              <div class="row">
-                <label class="ghost">Profile Photo <input id="profilePhotoInput" type="file" accept="image/*"></label>
-                <label class="ghost">Banner <input id="profileBannerInput" type="file" accept="image/*"></label>
-                <button id="btnSaveProfile" class="primary">Save Profile</button>
-                <button id="bio-cancel" class="ghost">Cancel</button>
-              </div>
-            </div>
-            <div class="stat-row">
-              <span><strong id="stat-posts">0</strong> Posts</span>
-              <span><strong id="stat-followers">0</strong> Followers</span>
-              <span><strong id="stat-following">0</strong> Following</span>
-              <span><strong id="stat-likes">0</strong> Likes</span>
-            </div>
-          </div>
-          <div class="profile-actions">
-            <button id="btn-follow" class="primary">Follow</button>
-            <button id="btn-share-profile" class="ghost">Share</button>
-            <button id="btn-edit-profile" class="ghost owner-only" style="display:none;">Edit Profile</button>
           </div>
         </div>
       </div>
       <div class="card">
-        <div class="profile-tabs">
-          <button class="pill active" data-profiletab="all">All</button>
-          <button class="pill" data-profiletab="videos">Videos</button>
-          <button class="pill" data-profiletab="podcasts">Podcasts</button>
-          <button class="pill" data-profiletab="clips">Clips</button>
-          <button class="pill" data-profiletab="playlists">Playlists</button>
-        </div>
+        <h4>Your Uploads</h4>
         <div id="profile-grid" class="grid"></div>
-        <div id="profile-empty" class="muted" style="display:none;">No posts yet.</div>
+        <div id="profile-empty" class="muted" style="display:none;">No uploads yet.</div>
       </div>
     </section>
 
@@ -178,18 +150,7 @@
     <section id="tab-settings" style="display:none;">
       <div class="settings-section">
         <h3>Account</h3>
-        <div class="settings-item"><div><i class="fa fa-user"></i> Name / Email</div><button class="ghost">Edit</button></div>
-        <div class="settings-item"><div><i class="fa fa-key"></i> Change Password</div><button class="ghost">Update</button></div>
-        <div class="settings-item"><div><i class="fa fa-trash"></i> Delete Account</div><button class="ghost">Start</button></div>
-      </div>
-
-      <div class="settings-section">
-        <h3>Privacy & Safety</h3>
-        <div class="settings-item"><span>Private account</span><div class="toggle" id="toggle-private" data-on="false"></div></div>
-        <div class="settings-item"><span>Uploads</span><div class="toggle" id="toggle-uploads" data-on="true"></div></div>
-        <div class="settings-item"><span>Likes</span><div class="toggle" id="toggle-likes" data-on="true"></div></div>
-        <div class="settings-item"><span>Saved</span><div class="toggle" id="toggle-saved" data-on="true"></div></div>
-        <div class="settings-item"><span>Playlists</span><div class="toggle" id="toggle-playlists" data-on="true"></div></div>
+        <div class="settings-item"><div><i class="fa fa-trash"></i> Delete Account</div><button id="deleteAccount" class="ghost">Delete</button></div>
       </div>
 
       <div class="settings-section">
@@ -215,57 +176,38 @@
     <!-- LEGAL PAGES -->
     <section id="tab-guidelines" style="display:none;">
       <div class="legal-page">
-        <a href="#settings" class="muted small">← Back to Settings</a>
+        <a href="#settings" class="muted small">← Back</a>
         <h2>Community Guidelines</h2>
-        <div class="legal-content">
-          <p>INTAKEE is built to protect freedom of expression while keeping the platform respectful and safe. The following are not allowed:</p>
-          <ul>
-            <li>No nudity, pornography, or sexually explicit material.</li>
-            <li>No harassment, bullying, or threats.</li>
-            <li>No promotion of violence or terrorism.</li>
-            <li>No doxxing or sharing personal data without consent.</li>
-            <li>No spam, scams, or misleading promotions.</li>
-          </ul>
-          <p>Creators are responsible for their words and uploads. INTAKEE reserves the right to remove content or suspend accounts that repeatedly violate these rules.</p>
-        </div>
+        <div id="guidelines-content" class="legal-content"></div>
       </div>
     </section>
-
     <section id="tab-terms" style="display:none;">
       <div class="legal-page">
-        <a href="#settings" class="muted small">← Back to Settings</a>
+        <a href="#settings" class="muted small">← Back</a>
         <h2>Terms of Service</h2>
-        <div class="legal-content">
-          <p>By using INTAKEE, you agree that:</p>
-          <ul>
-            <li>All uploads and posts are the sole responsibility of the creator.</li>
-            <li>INTAKEE LLC is not liable for user-generated content or any damages arising from its use.</li>
-            <li>Users must be 13 years or older to create an account.</li>
-            <li>Creators grant INTAKEE a non-exclusive license to host and display content.</li>
-            <li>We reserve the right to remove illegal or harmful material.</li>
-          </ul>
-          <p>By continuing, you accept these terms in full.</p>
-        </div>
+        <div id="terms-content" class="legal-content"></div>
       </div>
     </section>
-
     <section id="tab-privacy" style="display:none;">
       <div class="legal-page">
-        <a href="#settings" class="muted small">← Back to Settings</a>
+        <a href="#settings" class="muted small">← Back</a>
         <h2>Privacy Policy</h2>
-        <div class="legal-content">
-          <p>INTAKEE collects minimal personal information such as email and basic profile data for account creation.</p>
-          <p>Your data is never sold. Uploaded content and profile info may be visible publicly depending on your settings.</p>
-          <p>We use Firebase for authentication, data storage, and media hosting, subject to Google’s Privacy Policy.</p>
-          <p>Users may delete their accounts anytime through Settings. Deleted accounts permanently remove your posts and personal info from our system.</p>
-        </div>
+        <div id="privacy-content" class="legal-content"></div>
       </div>
     </section>
-
   </main>
 
+  <!-- LOCK OVERLAY -->
+  <div id="lock-overlay" class="lock-overlay hidden">
+    <div class="lock-box">
+      <i class="fa fa-lock fa-2x"></i>
+      <p>This content is age restricted. Please sign in to continue.</p>
+      <button id="lockSignInBtn" class="primary">Sign In</button>
+    </div>
+  </div>
+
   <!-- MINI PLAYER -->
-  <div id="mini-player" class="mini-player" hidden style="opacity:0; transition:opacity .3s ease;">
+  <div id="mini-player" class="mini-player" hidden>
     <div class="mp-left">
       <div class="mp-art" id="mp-art"></div>
       <div class="mp-meta">
@@ -274,12 +216,7 @@
       </div>
     </div>
     <div class="mp-controls">
-      <button id="mp-prev" class="icon-btn"><i class="fa fa-backward-step"></i></button>
       <button id="mp-play" class="icon-btn"><i class="fa fa-play"></i></button>
-      <button id="mp-next" class="icon-btn"><i class="fa fa-forward-step"></i></button>
-    </div>
-    <div class="mp-right">
-      <div class="mp-time muted small"><span id="mp-cur">0:00</span> / <span id="mp-dur">0:00</span></div>
       <button id="mp-close" class="icon-btn"><i class="fa fa-xmark"></i></button>
     </div>
     <audio id="mp-audio" preload="metadata"></audio>
@@ -298,25 +235,24 @@
 
   <!-- AUTH MODAL -->
   <dialog id="authDialog">
-    <form method="dialog" style="text-align:right; margin:0 0 8px;">
+    <form method="dialog" style="text-align:right;margin-bottom:8px;">
       <button aria-label="Close">✕</button>
     </form>
     <h3>Create account</h3>
-    <form id="authSignUpForm" style="display:grid; gap:8px;">
-      <input id="signUpName" type="text" placeholder="Display name (optional)" />
-      <input id="signUpEmail" type="email" placeholder="Email" required />
-      <input id="signUpPassword" type="password" placeholder="Password (min 6)" required />
-      <label class="small muted" style="display:flex; gap:8px; align-items:center;">
-        <input id="signUpAge" type="checkbox" required>
-        I confirm I am 13 years old or older.
+    <form id="authSignUpForm" style="display:grid;gap:8px;">
+      <input id="signUpName" type="text" placeholder="Display name (optional)">
+      <input id="signUpEmail" type="email" placeholder="Email" required>
+      <input id="signUpPassword" type="password" placeholder="Password (min 6)" required>
+      <label class="small muted" style="display:flex;align-items:center;gap:6px;">
+        <input id="signUpAge" type="checkbox" required> I confirm I am 13 or older
       </label>
       <button type="submit" class="primary">Sign up</button>
     </form>
-    <hr style="border-color:#1a1a1a; margin:12px 0;" />
+    <hr>
     <h3>Sign in</h3>
-    <form id="authSignInForm" style="display:grid; gap:8px;">
-      <input id="signInEmail" type="email" placeholder="Email" required />
-      <input id="signInPassword" type="password" placeholder="Password" required />
+    <form id="authSignInForm" style="display:grid;gap:8px;">
+      <input id="signInEmail" type="email" placeholder="Email" required>
+      <input id="signInPassword" type="password" placeholder="Password" required>
       <button type="submit">Sign in</button>
     </form>
   </dialog>
@@ -334,8 +270,7 @@
       projectId: "intakee-5785e",
       storageBucket: "intakee-5785e.appspot.com",
       messagingSenderId: "40666230072",
-      appId: "1:40666230072:web:49dd5e7db91c8a38b565cd",
-      measurementId: "G-3C2YDV6T0G"
+      appId: "1:40666230072:web:49dd5e7db91c8a38b565cd"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -343,53 +278,9 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
     window.firebaseRefs = { app, auth, db, storage, onAuthStateChanged };
-
-    onAuthStateChanged(auth, (user) => {
-      document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
-    });
   </script>
 
   <!-- MAIN JS -->
-  <script type="module" src="script.js?v=14"></script>
-<script>
-  // === Fix: Router + Auth UI re-attach after script.js loads ===
-  document.addEventListener("intakee:auth", e => {
-    const user = e.detail?.user;
-    const authBtn = document.getElementById("openAuth");
-    if (authBtn) authBtn.style.display = user ? "none" : "";
-  });
-
-  // Restore bottom nav tab routing
-  (function rebindRouter(){
-    const links = document.querySelectorAll('.bottom-nav a');
-    const sections = {
-      home:       document.getElementById('tab-home'),
-      videos:     document.getElementById('tab-videos'),
-      podcast:    document.getElementById('tab-podcast'),
-      upload:     document.getElementById('tab-upload'),
-      clips:      document.getElementById('tab-clips'),
-      profile:    document.getElementById('tab-profile'),
-      settings:   document.getElementById('tab-settings'),
-      guidelines: document.getElementById('tab-guidelines'),
-      terms:      document.getElementById('tab-terms'),
-      privacy:    document.getElementById('tab-privacy')
-    };
-    function setTab(key){
-      Object.entries(sections).forEach(([k,el]) => el && (el.style.display = (k===key)?'':'none'));
-      links.forEach(a => a.classList.toggle('active', a.dataset.tab===key));
-      document.getElementById('searchWrap').style.display = (key==='home')?'flex':'none';
-      window.scrollTo({top:0,behavior:'instant'});
-    }
-    function applyHash(){
-      const key=(location.hash||'#home').slice(1);
-      setTab(sections[key]?key:'home');
-    }
-    links.forEach(a=>a.addEventListener('click',e=>{
-      e.preventDefault(); location.hash=a.getAttribute('href');
-    }));
-    window.addEventListener('hashchange',applyHash);
-    applyHash();
-  })();
-</script>
+  <script type="module" src="script.js?v=launch1"></script>
 </body>
 </html>
