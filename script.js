@@ -359,7 +359,10 @@ toggles.forEach(t => {
     t.classList.toggle('active', !on);
   });
 });
-
+// ===== AUTH MODAL OPEN TRIGGER =====
+document.getElementById('openAuth')?.addEventListener('click', () => {
+  document.getElementById('authDialog')?.showModal();
+});
 // ============================================================================
 // BOOT
 // ============================================================================
