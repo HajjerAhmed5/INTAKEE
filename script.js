@@ -368,3 +368,34 @@ toggles.forEach(t => {
   if (auth.currentUser) await loadFeeds();
   console.log("✅ INTAKEE vLaunch1 Ready");
 })();
+// ================= TAB ROUTER =================
+(function initRouter() {
+  const links = Array.from(document.querySelectorAll('.bottom-nav a'));
+  const sections = {};
+  document.querySelectorAll('main > section').forEach(sec => {
+    sections[sec.id.replace('tab-', '')] = sec;
+  });
+
+  function setTab(key) {
+    Object.entries(sections).forEach(([k, el]) => {
+      el.style.display = k === key ? '' : 'none';
+    });
+    links.forEach(a => a.classList.toggle('active', a.dataset.tab === key));
+    window.scrollTo({ top: 0 });
+  }
+
+  function applyHash() {
+    const key = (location.hash || '#home').slice(1);
+    setTab(sections[key] ? key : 'home');
+  }
+
+  links.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      location.hash = a.getAttribute('href');
+    });
+  });
+
+  window.addEventListener('hashchange', applyHash);
+  applyHash();
+})();
