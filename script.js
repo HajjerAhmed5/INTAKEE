@@ -142,7 +142,14 @@ onAuthStateChanged(auth, async (user) => {
     resetProfile();
   }
 });
-
+onAuthStateChanged(auth, async (user) => {
+  const loginBtn = document.getElementById('openAuth');
+  if (user) {
+    if (loginBtn) loginBtn.style.display = 'none';
+  } else {
+    if (loginBtn) loginBtn.style.display = '';
+  }
+});
 // ============================================================================
 // UPLOADS
 // ============================================================================
@@ -280,7 +287,17 @@ $on(mpClose, 'click', () => {
   mpAudio.pause();
   miniPlayer.hidden = true;
 });
+// MINI PLAYER CLOSE FIX
+const miniPlayer = document.getElementById('mini-player');
+const miniAudio  = document.getElementById('mp-audio');
+const miniClose  = miniPlayer?.querySelector('.close-btn');
 
+if (miniClose) {
+  miniClose.addEventListener('click', () => {
+    try { miniAudio?.pause(); } catch {}
+    miniPlayer.setAttribute('hidden', '');
+  });
+}
 // ============================================================================
 // PROFILE
 // ============================================================================
