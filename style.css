@@ -345,3 +345,64 @@ dialog::backdrop{ background: rgba(0,0,0,.6); }
   /* default is handled inline via style="display:none" */
 }
 .hidden{ display:none !important; }
+/* MINI PLAYER */
+#mini-player {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 480px;
+  background: rgba(25, 25, 25, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.45);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, bottom 0.3s ease;
+}
+
+#mini-player.active {
+  opacity: 1;
+  pointer-events: auto;
+  bottom: 80px;
+}
+
+#mini-player audio {
+  width: 70%;
+  height: 32px;
+  background: transparent;
+}
+
+#mp-title {
+  flex: 1;
+  margin-left: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#mp-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 10px;
+  opacity: 0.8;
+  transition: 0.2s;
+}
+
+#mp-close:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
