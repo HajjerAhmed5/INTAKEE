@@ -451,45 +451,33 @@ qsa('.settings-item button.ghost').forEach(btn=>{
 // ============================================================================
 // MINI PLAYER — Full Functionality (Play, Pause, Close)
 // ============================================================================
+// MINI PLAYER — Smooth + Functional
 const miniPlayer = qs('#mini-player');
 const miniAudio = qs('#mp-audio');
 const miniTitle = qs('#mp-title');
 const miniClose = qs('#mp-close');
 
-// Function: play audio podcasts
 function playPodcast(url, title = 'Now Playing') {
   if (!url) return;
-  if (miniPlayer && miniAudio) {
-    miniPlayer.hidden = false;
-    miniAudio.src = url;
-    miniTitle.textContent = title;
-    miniAudio.play().catch(err => console.warn('Audio play failed:', err));
-  }
+  miniPlayer.classList.add('active');
+  miniPlayer.hidden = false;
+  miniAudio.src = url;
+  miniTitle.textContent = title;
+  miniAudio.play().catch(err => console.warn('Audio play failed:', err));
 }
 
-// Function: close mini player when ✕ is clicked
-if (miniClose) {
-  miniClose.addEventListener('click', () => {
-    try { miniAudio.pause(); } catch {}
-    miniAudio.currentTime = 0;
-    miniPlayer.hidden = true;
-  });
-}
-
-// Auto-hide when user logs out
-document.addEventListener('intakee:auth', e => {
-  const user = e.detail?.user;
-  if (!user && miniPlayer && !miniPlayer.hidden) {
-    try { miniAudio.pause(); } catch {}
-    miniPlayer.hidden = true;
-  }
+$on(miniClose, 'click', () => {
+  try { miniAudio.pause(); } catch {}
+  miniAudio.currentTime = 0;
+  miniPlayer.classList.remove('active');
+  setTimeout(() => (miniPlayer.hidden = true), 300);
 });
 
-// Stop playback when navigating to another tab
 window.addEventListener('hashchange', () => {
   try { miniAudio.pause(); } catch {}
-});
-
+  miniPlayer.classList.remove('active');
+  setTimeout(() => (miniPlayer.hidden = true), 300);
+});                      
 // ============================================================================
 // AUTH-DEPENDENT UI REFRESH
 // ============================================================================
