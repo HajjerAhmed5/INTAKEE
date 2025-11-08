@@ -448,25 +448,47 @@ qsa('.settings-item button.ghost').forEach(btn=>{
 // ============================================================================
 // MINI-PLAYER FIX + GLOBAL BEHAVIOR
 // ============================================================================
+// ============================================================================
+// MINI PLAYER — Full Functionality (Play, Pause, Close)
+// ============================================================================
+const miniPlayer = qs('#mini-player');
+const miniAudio = qs('#mp-audio');
+const miniTitle = qs('#mp-title');
+const miniClose = qs('#mp-close');
 
-(function initMiniPlayerFix(){
-  const wrap = qs('#mini-player');
-  const audio = qs('#mp-audio');
-  const closeBtn = qs('#mp-close');
+// Function: play audio podcasts
+function playPodcast(url, title = 'Now Playing') {
+  if (!url) return;
+  if (miniPlayer && miniAudio) {
+    miniPlayer.hidden = false;
+    miniAudio.src = url;
+    miniTitle.textContent = title;
+    miniAudio.play().catch(err => console.warn('Audio play failed:', err));
+  }
+}
 
-  if(!wrap || !audio || !closeBtn) return;
-
-  // When user clicks X → stop and hide
-  $on(closeBtn,'click',()=>{
-    try{ audio.pause(); }catch{}
-    wrap.hidden = true;
+// Function: close mini player when ✕ is clicked
+if (miniClose) {
+  miniClose.addEventListener('click', () => {
+    try { miniAudio.pause(); } catch {}
+    miniAudio.currentTime = 0;
+    miniPlayer.hidden = true;
   });
+}
 
-  // Pause mini-player whenever navigating away
-  window.addEventListener('hashchange',()=>{
-    try{ audio.pause(); }catch{}
-  });
-})();
+// Auto-hide when user logs out
+document.addEventListener('intakee:auth', e => {
+  const user = e.detail?.user;
+  if (!user && miniPlayer && !miniPlayer.hidden) {
+    try { miniAudio.pause(); } catch {}
+    miniPlayer.hidden = true;
+  }
+});
+
+// Stop playback when navigating to another tab
+window.addEventListener('hashchange', () => {
+  try { miniAudio.pause(); } catch {}
+});
 
 // ============================================================================
 // AUTH-DEPENDENT UI REFRESH
