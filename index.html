@@ -172,27 +172,66 @@
     </section>
 
     <!-- SETTINGS -->
-   <script>
-  // Handle Legal Policy toggling
-  document.addEventListener('DOMContentLoaded', () => {
-    const buttons = document.querySelectorAll('[data-legal]');
-    const sections = document.querySelectorAll('#legalContainer .legal-subsection');
-    const container = document.getElementById('legalContainer');
+    <section id="tab-settings" style="display:none;">
+      <!-- Account -->
+      <div class="settings-section">
+        <h3>Account</h3>
+        <div class="settings-item"><div><i class="fa fa-user"></i> Name / Email</div><button class="ghost">Edit</button></div>
+        <div class="settings-item"><div><i class="fa fa-key"></i> Change Password</div><button class="ghost">Update</button></div>
+        <div class="settings-item"><div><i class="fa fa-trash"></i> Delete Account</div><button class="ghost danger">Delete</button></div>
+      </div>
 
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetId = btn.dataset.legal;
-        if (targetId === 'report') {
-          window.location.href = "mailto:intakee2025@gmail.com?subject=Report%20Content";
-          return;
-        }
-        container.style.display = 'block';
-        sections.forEach(s => s.style.display = s.id === targetId ? 'block' : 'none');
-        window.scrollTo(0, container.offsetTop - 50);
-      });
-    });
-  });
-</script>
+      <!-- Privacy -->
+      <div class="settings-section">
+        <h3>Privacy & Safety</h3>
+        <div class="settings-item"><span>Private Account</span><div class="toggle" id="toggle-private" data-on="false"></div></div>
+        <div class="settings-item"><span>Show Uploads</span><div class="toggle" id="toggle-uploads" data-on="true"></div></div>
+        <div class="settings-item"><span>Show Saved</span><div class="toggle" id="toggle-saved" data-on="true"></div></div>
+      </div>
+
+      <!-- Legal -->
+      <div class="settings-section">
+        <h3>Legal & Policy</h3>
+        <p class="muted small">INTAKEE supports freedom of speech and creative expression. Users are responsible for their own content.</p>
+        <button class="link-btn" data-legal="guidelines">Community Guidelines</button><br>
+        <button class="link-btn" data-legal="terms">Terms of Service</button><br>
+        <button class="link-btn" data-legal="privacy">Privacy Policy</button><br>
+        <button class="link-btn" data-legal="report">Report Content</button><br>
+        <a href="mailto:intakee2025@gmail.com" class="muted">Contact: intakee2025@gmail.com</a>
+      </div>
+
+      <!-- Hidden Legal Content -->
+      <div id="legalContainer" style="display:none;">
+        <div id="guidelines" class="legal-subsection">
+          <h4>Community Guidelines</h4>
+          <p><strong>Our Mission:</strong> INTAKEE gives every creator a fair space to share ideas, stories, and art.</p>
+          <p><strong>What’s Allowed:</strong> Creative, educational, artistic, and opinion-based content.</p>
+          <p><strong>What’s Not Allowed:</strong> Nudity, violence, harassment, scams, or illegal activity.</p>
+        </div>
+
+        <div id="terms" class="legal-subsection" style="display:none;">
+          <h4>Terms of Service</h4>
+          <p>By creating an account, you agree to our platform rules. You retain ownership of your uploads.</p>
+          <p>INTAKEE may remove violating content and reserves the right to modify services.</p>
+        </div>
+
+        <div id="privacy" class="legal-subsection" style="display:none;">
+          <h4>Privacy Policy</h4>
+          <p>We collect basic info (email, uploads, analytics). INTAKEE never sells your data.</p>
+          <p>Contact: intakee2025@gmail.com</p>
+        </div>
+      </div>
+
+      <!-- Logout -->
+      <div class="settings-section">
+        <div class="settings-item danger">
+          <div><i class="fa fa-right-from-bracket"></i> Logout</div>
+          <button id="settings-logout" class="ghost">Log out</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
   <!-- ===== MINI PLAYER ===== -->
   <div id="mini-player" class="mini-player" hidden>
     <div class="mp-left">
@@ -209,7 +248,7 @@
     <audio id="mp-audio" preload="metadata"></audio>
   </div>
 
-  <!-- ===== BOTTOM NAV ===== -->
+  <!-- ===== NAV ===== -->
   <nav class="bottom-nav">
     <a href="#home" data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
     <a href="#videos" data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
@@ -271,23 +310,25 @@
     })();
   </script>
 
-  <!-- ===== MINI PLAYER CONTROL ===== -->
+  <!-- ===== SETTINGS TAB LOGIC ===== -->
   <script>
-    (function(){
-      const wrap=document.getElementById('mini-player');
-      const audio=document.getElementById('mp-audio');
-      const playBtn=document.getElementById('mp-play');
-      const closeBtn=document.getElementById('mp-close');
-      playBtn.addEventListener('click',()=>audio.paused?audio.play():audio.pause());
-      closeBtn.addEventListener('click',()=>{audio.pause();wrap.hidden=true;});
-      window.playPodcast=({url,title,subtitle,cover})=>{
-        wrap.hidden=false;
-        document.getElementById('mp-title').textContent=title||'Untitled';
-        document.getElementById('mp-sub').textContent=subtitle||'';
-        document.getElementById('mp-art').style.backgroundImage=cover?`url(${cover})`:'none';
-        audio.src=url; audio.play().catch(()=>{});
-      };
-    })();
+    document.addEventListener('DOMContentLoaded', () => {
+      const buttons = document.querySelectorAll('[data-legal]');
+      const sections = document.querySelectorAll('#legalContainer .legal-subsection');
+      const container = document.getElementById('legalContainer');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.dataset.legal;
+          if (targetId === 'report') {
+            window.location.href = "mailto:intakee2025@gmail.com?subject=Report%20Content";
+            return;
+          }
+          container.style.display = 'block';
+          sections.forEach(s => s.style.display = s.id === targetId ? 'block' : 'none');
+          window.scrollTo(0, container.offsetTop - 50);
+        });
+      });
+    });
   </script>
 
   <!-- ===== FIREBASE INIT ===== -->
@@ -302,29 +343,23 @@
       authDomain: "intakee-5785e.firebaseapp.com",
       projectId: "intakee-5785e",
       storageBucket: "intakee-5785e.appspot.com",
+      messagingSenderId: "406662300
       messagingSenderId: "40666230072",
       appId: "1:40666230072:web:49dd5e7db91c8a38b565cd",
       measurementId: "G-3C2YDV6T0G"
     };
-    const app=initializeApp(firebaseConfig);
-    const auth=getAuth(app);
-    const db=getFirestore(app);
-    const storage=getStorage(app);
-    window.firebaseRefs={app,auth,db,storage,onAuthStateChanged};
-    onAuthStateChanged(auth,(user)=>{
-      document.dispatchEvent(new CustomEvent('intakee:auth',{detail:{user}}));
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    window.firebaseRefs = { app, auth, db, storage, onAuthStateChanged };
+    onAuthStateChanged(auth, (user) => {
+      document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
     });
-    console.log('✅ Firebase ready:',app.options.projectId);
+    console.log('✅ Firebase ready:', app.options.projectId);
   </script>
 
   <!-- ===== MAIN LOGIC ===== -->
   <script type="module" src="script.js?v=final"></script>
-  <!-- MINI PLAYER (Audio Podcasts) -->
-<!-- ===== MINI PLAYER ===== -->
-<div id="mini-player" hidden>
-  <audio id="mp-audio" controls></audio>
-  <div id="mp-title">Now Playing</div>
-  <button id="mp-close" class="mp-close">✕</button>
-</div>
 </body>
 </html>
