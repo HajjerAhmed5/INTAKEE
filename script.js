@@ -1078,4 +1078,4 @@ document.addEventListener('intakee:profileRefresh', e => {
 document.addEventListener('intakee:auth', e => {
   const u = e.detail.user;
   if (u) loadFollowStats(u.uid);
-});
+})();
