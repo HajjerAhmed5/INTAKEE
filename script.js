@@ -1070,12 +1070,10 @@ loadFeeds = async function() {
 };
 
 // ---------- EVENT HOOKS ----------
-document.addEventListener('intakee:profileRefresh', e => {
-  const uid = e.detail?.uid;
-  if (uid) loadFollowStats(uid);
-});
-
 document.addEventListener('intakee:auth', e => {
   const u = e.detail.user;
   if (u) loadFollowStats(u.uid);
+});
+
+// closes the async wrapper cleanly
 })();
