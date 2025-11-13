@@ -827,3 +827,308 @@ document.addEventListener('intakee:feedRefresh', loadFeeds);
     console.error('❌ Boot failed:', err);
   }
 })();
+// ============================================================================
+// INTAKEE — Phase 2, Part 7(A): Likes / Dislikes / Comments
+// ============================================================================
+
+// ---------- Firestore Helpers ----------
+async function updatePostField(postId, data) {
+  const { doc, updateDoc } =
+    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+  await updateDoc(doc(db, 'posts', postId), data);
+}
+
+// ============================================================================
+// LIKE / DISLIKE SYSTEM
+// ============================================================================
+async function toggleLike(postId, isLike = true) {
+  const user = auth.currentUser;
+  if (!user) return alert('Please sign in to react.');
+  const { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } =
+    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+
+  const likeRef = doc(db, 'posts', postId, 'reactions', user.uid);
+  const postRef = doc(db, 'posts', postId);
+  const snap = await getDoc(likeRef);
+
+  // if user already liked/disliked → remove
+  if (snap.exists()) {
+    await updateDoc(postRef, {
+      likeCount: isLike ? firebase.firestore.FieldValue.increment(-1) : 0
+    });
+    await setDoc(likeRef, {}, { merge: false }); // clear
+  } else {
+    // add new reaction
+    await setDoc(likeRef, { type: isLike ? 'like' : 'dislike', at: Date.now() });
+    await updateDoc(postRef, {
+      likeCount: firebase.firestore.FieldValue.increment(isLike ? 1 : 0)
+    });
+  }
+  document.dispatchEvent(new CustomEvent('intakee:feedRefresh'));
+}
+
+// --- attach to every feed card dynamically ---
+function attachLikeButtons(card, postId) {
+  const likeBtn = document.createElement('button');
+  likeBtn.className = 'icon-btn like-btn';
+  likeBtn.innerHTML = '<i class="fa fa-thumbs-up"></i>';
+
+  const dislikeBtn = document.createElement('button');
+  dislikeBtn.className = 'icon-btn dislike-btn';
+  dislikeBtn.innerHTML = '<i class="fa fa-thumbs-down"></i>';
+
+  likeBtn.addEventListener('click', () => toggleLike(postId, true));
+  dislikeBtn.addEventListener('click', () => toggleLike(postId, false));
+
+  const footer = document.createElement('div');
+  footer.className = 'feed-footer';
+  footer.append(likeBtn, dislikeBtn);
+  card.appendChild(footer);
+}
+
+// ============================================================================
+// COMMENT SYSTEM (Videos + Clips only)
+// ============================================================================
+async function postComment(postId, text) {
+  const user = auth.currentUser;
+  if (!user) return alert('Please sign in to comment.');
+  if (!text.trim()) return;
+
+  const { collection, addDoc, serverTimestamp } =
+    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+  await addDoc(collection(db, 'posts', postId, 'comments'), {
+    uid: user.uid,
+    text: text.trim(),
+    createdAt: serverTimestamp()
+  });
+
+  loadComments(postId);
+}
+
+// --- render comments under each card ---
+async function loadComments(postId) {
+  const { collection, getDocs, orderBy, query } =
+    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+  const qRef = query(collection(db, 'posts', postId, 'comments'), orderBy('createdAt', 'asc'));
+  const snap = await getDocs(qRef);
+  const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  const commentBox = document.querySelector(`#comments-${postId}`);
+  if (!commentBox) return;
+
+  commentBox.innerHTML = list.map(c => `
+    <div class="comment">
+      <span class="muted small">${c.uid.slice(0, 6)}:</span> ${c.text}
+    </div>
+  `).join('') || '<div class="muted small">No comments yet.</div>';
+}
+
+// --- attach comment input to video/clip cards ---
+function attachCommentInput(card, postId, type) {
+  if (!['video', 'clip'].includes(type)) return;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'comment-wrapper';
+  wrapper.innerHTML = `
+    <input type="text" id="commentInput-${postId}" placeholder="Add a comment..." />
+    <button class="ghost" id="commentBtn-${postId}">Post</button>
+    <div class="comments" id="comments-${postId}"></div>
+  `;
+  card.appendChild(wrapper);
+
+  const btn = wrapper.querySelector(`#commentBtn-${postId}`);
+  btn.addEventListener('click', () => {
+    const val = wrapper.querySelector(`#commentInput-${postId}`).value;
+    postComment(postId, val);
+    wrapper.querySelector(`#commentInput-${postId}`).value = '';
+  });
+
+  // load existing comments
+  loadComments(postId);
+}
+
+// ============================================================================
+// INTEGRATE LIKES + COMMENTS INTO FEED
+// ============================================================================
+function renderFeed(container, list, type = 'all') {
+  container.innerHTML = '';
+  if (!list?.length) {
+    container.innerHTML = '<div class="muted">No posts yet.</div>';
+    return;
+  }
+
+  list.forEach(post => {
+    if (type !== 'all' && post.type !== type) return;
+
+    const card = document.createElement('div');
+    card.className = 'feed-card';
+
+    const thumbnail = post.thumbnailUrl || '/placeholder.png';
+    const mediaTypeIcon =
+      post.type === 'video' ? 'fa-video' :
+      post.type === 'clip' ? 'fa-bolt' : 'fa-podcast';
+
+    card.innerHTML = `
+      <div class="thumb">
+        <img src="${thumbnail}" alt="${post.title}">
+        <button class="play-btn" data-url="${post.mediaUrl}" data-type="${post.type}" data-title="${post.title}">
+          <i class="fa ${mediaTypeIcon}"></i>
+        </button>
+      </div>
+      <div class="feed-meta">
+        <h4>${post.title}</h4>
+        <p>${post.desc || ''}</p>
+        <span class="muted small">${post.type.toUpperCase()}</span>
+        <div class="small muted">❤️ ${post.likeCount || 0} likes</div>
+      </div>
+    `;
+
+    // Playback behavior
+    const playBtn = card.querySelector('.play-btn');
+    if (post.type.startsWith('podcast')) {
+      playBtn.addEventListener('click', () => playPodcast(post.mediaUrl, post.title));
+    } else {
+      playBtn.addEventListener('click', () => window.open(post.mediaUrl, '_blank'));
+    }
+
+    // Attach Like/Dislike + Comments
+    attachLikeButtons(card, post.id);
+    attachCommentInput(card, post.id, post.type);
+
+    container.appendChild(card);
+  });
+}
+// ============================================================================
+// INTAKEE — Phase 2 Part 7(B): Follow / Trending / Saved / Privacy Filtering
+// ============================================================================
+
+// ---------- FOLLOW / UNFOLLOW ----------
+async function toggleFollow(targetUid) {
+  const user = auth.currentUser;
+  if (!user) return alert('Sign in to follow creators.');
+  if (user.uid === targetUid) return alert('You cannot follow yourself.');
+
+  const { doc, getDoc, updateDoc, arrayUnion, arrayRemove } =
+    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+
+  const userRef   = doc(db, 'users', user.uid);
+  const targetRef = doc(db, 'users', targetUid);
+  const uSnap = await getDoc(userRef);
+
+  const isFollowing = (uSnap.exists() && (uSnap.data().following || []).includes(targetUid));
+
+  await updateDoc(userRef,   { following: isFollowing ? arrayRemove(targetUid) : arrayUnion(targetUid) });
+  await updateDoc(targetRef, { followers: isFollowing ? arrayRemove(user.uid) : arrayUnion(user.uid) });
+
+  alert(isFollowing ? 'Unfollowed user.' : 'Following user!');
+  document.dispatchEvent(new CustomEvent('intakee:profileRefresh', { detail: { uid: targetUid } }));
+}
+
+// Attach follow button logic to profile
+$on(qs('#btn-follow'), 'click', async () => {
+  const profileUid = auth.currentUser?.uid; // in real build you’d read from viewed profile
+  if (!profileUid) return alert('You can’t follow yourself here yet (placeholder).');
+  toggleFollow(profileUid);
+});
+
+// ---------- LOAD FOLLOW STATS ----------
+async function loadFollowStats(uid) {
+  const { doc, getDoc } =
+    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+  const uSnap = await getDoc(doc(db, 'users', uid));
+  if (!uSnap.exists()) return;
+  const u = uSnap.data();
+  statFollowers.textContent = (u.followers?.length || 0).toString();
+  statFollowing.textContent = (u.following?.length || 0).toString();
+}
+
+// ---------- SAVED / WATCH-LATER ----------
+async function toggleSave(postId) {
+  const user = auth.currentUser;
+  if (!user) return alert('Sign in to save posts.');
+  const { doc, updateDoc, arrayUnion, arrayRemove, getDoc } =
+    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+
+  const userRef = doc(db, 'users', user.uid);
+  const uSnap = await getDoc(userRef);
+  const saves = uSnap.exists() ? (uSnap.data().saved || []) : [];
+  const already = saves.includes(postId);
+
+  await updateDoc(userRef, {
+    saved: already ? arrayRemove(postId) : arrayUnion(postId)
+  });
+  alert(already ? 'Removed from Watch Later.' : 'Saved to Watch Later.');
+}
+
+// Add “save” icon to feed cards
+function attachSaveButton(card, postId) {
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'icon-btn save-btn';
+  saveBtn.innerHTML = '<i class="fa fa-bookmark"></i>';
+  saveBtn.addEventListener('click', () => toggleSave(postId));
+  card.appendChild(saveBtn);
+}
+
+// ---------- TRENDING ALGORITHM ----------
+function computeTrendingScore(post) {
+  const likes = post.likeCount || 0;
+  const views = post.viewCount || 0;
+  const ageHours = (Date.now() - (post.createdAt?.toMillis?.() || Date.now())) / 3600000;
+  // basic weight: newer + high likes/views → higher score
+  return (likes * 3 + views) / Math.max(1, ageHours);
+}
+
+// Render a sorted “trending” feed
+async function loadTrendingFeed() {
+  await fetchAllPosts();
+  const ranked = [..._allPosts]
+    .filter(p => !p.private)
+    .sort((a, b) => computeTrendingScore(b) - computeTrendingScore(a))
+    .slice(0, 50);
+  renderFeed(homeFeed, ranked);
+  console.log('🔥 Trending feed loaded');
+}
+
+// ---------- PRIVATE-POST FILTER ----------
+function filterVisiblePosts(list, currentUser) {
+  if (!list?.length) return [];
+  return list.filter(p => {
+    // Public posts always visible
+    if (!p.private) return true;
+    if (!currentUser) return false;
+
+    // Owner can always see their own
+    if (p.uid === currentUser.uid) return true;
+
+    // Check if viewer follows creator (if allowed)
+    // This can later be expanded with Firestore lookup for follow relationship
+    return false;
+  });
+}
+
+// Patch existing loadFeeds to use visibility filter
+const _oldLoadFeeds = loadFeeds;
+loadFeeds = async function() {
+  if (_isLoadingFeed) return;
+  _isLoadingFeed = true;
+  await fetchAllPosts();
+  _isLoadingFeed = false;
+  const user = auth.currentUser;
+
+  const visible = filterVisiblePosts(_allPosts, user);
+
+  renderFeed(homeFeed,   visible);
+  renderFeed(videosFeed, visible.filter(p => p.type === 'video'));
+  renderFeed(podcastFeed,visible.filter(p => p.type?.startsWith('podcast')));
+  renderFeed(clipsFeed,  visible.filter(p => p.type === 'clip'));
+};
+
+// ---------- EVENT HOOKS ----------
+document.addEventListener('intakee:profileRefresh', e => {
+  const uid = e.detail?.uid;
+  if (uid) loadFollowStats(uid);
+});
+
+document.addEventListener('intakee:auth', e => {
+  const u = e.detail.user;
+  if (u) loadFollowStats(u.uid);
+});
