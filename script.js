@@ -944,59 +944,6 @@ function attachCommentInput(card, postId, type) {
 
   // load existing comments
   loadComments(postId);
-}
-
-// ============================================================================
-// INTEGRATE LIKES + COMMENTS INTO FEED
-// ============================================================================
-function renderFeed(container, list, type = 'all') {
-  container.innerHTML = '';
-  if (!list?.length) {
-    container.innerHTML = '<div class="muted">No posts yet.</div>';
-    return;
-  }
-
-  list.forEach(post => {
-    if (type !== 'all' && post.type !== type) return;
-
-    const card = document.createElement('div');
-    card.className = 'feed-card';
-
-    const thumbnail = post.thumbnailUrl || '/placeholder.png';
-    const mediaTypeIcon =
-      post.type === 'video' ? 'fa-video' :
-      post.type === 'clip' ? 'fa-bolt' : 'fa-podcast';
-
-    card.innerHTML = `
-      <div class="thumb">
-        <img src="${thumbnail}" alt="${post.title}">
-        <button class="play-btn" data-url="${post.mediaUrl}" data-type="${post.type}" data-title="${post.title}">
-          <i class="fa ${mediaTypeIcon}"></i>
-        </button>
-      </div>
-      <div class="feed-meta">
-        <h4>${post.title}</h4>
-        <p>${post.desc || ''}</p>
-        <span class="muted small">${post.type.toUpperCase()}</span>
-        <div class="small muted">❤️ ${post.likeCount || 0} likes</div>
-      </div>
-    `;
-
-    // Playback behavior
-    const playBtn = card.querySelector('.play-btn');
-    if (post.type.startsWith('podcast')) {
-      playBtn.addEventListener('click', () => playPodcast(post.mediaUrl, post.title));
-    } else {
-      playBtn.addEventListener('click', () => window.open(post.mediaUrl, '_blank'));
-    }
-
-    // Attach Like/Dislike + Comments
-    attachLikeButtons(card, post.id);
-    attachCommentInput(card, post.id, post.type);
-
-    container.appendChild(card);
-  });
-}
 // ============================================================================
 // INTAKEE — Phase 2 Part 7(B): Follow / Trending / Saved / Privacy Filtering
 // ============================================================================
