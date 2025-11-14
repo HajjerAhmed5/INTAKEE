@@ -1075,7 +1075,7 @@ document.addEventListener('intakee:auth', e => {
   if (u) loadFollowStats(u.uid);
 });
 
-} // 👈 add this line — closes the async wrapper
+} // closes the async wrapper
 
 // closes the async wrapper cleanly
 })();
