@@ -246,31 +246,32 @@
     <a href="#profile" data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
     <a href="#settings" data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
   </nav>
+<!-- ===== AUTH MODAL ===== -->
+<dialog id="authDialog">
+  <form method="dialog" style="text-align:right; margin-bottom:8px;">
+    <button aria-label="Close">✕</button>
+  </form>
 
-  <!-- ===== AUTH MODAL ===== -->
-  <dialog id="authDialog">
-    <form method="dialog" style="text-align:right;">
-      <button aria-label="Close">✕</button>
-    </form>
-    <h3>Create account</h3>
-    <form id="authSignUpForm" style="display:grid;gap:8px;">
-      <input id="signUpName" type="text" placeholder="Display name (optional)" />
-      <input id="signUpEmail" type="email" placeholder="Email" required />
-      <input id="signUpPassword" type="password" placeholder="Password (min 6)" required />
-      <label class="small muted" style="display:flex;gap:8px;align-items:center;">
-        <input id="signUpAge" type="checkbox" required> I confirm I am 13 or older.
-      </label>
-      <button type="submit" class="primary">Sign Up</button>
-    </form>
-    <hr style="margin:12px 0;border-color:#1a1a1a;">
-    <h3>Sign In</h3>
-    <form id="authSignInForm" style="display:grid;gap:8px;">
-      <input id="signInEmail" type="email" placeholder="Email" required />
-      <input id="signInPassword" type="password" placeholder="Password" required />
-      <button type="submit">Sign In</button>
-    </form>
-  </dialog>
+  <h3 style="margin:0 0 8px;">Create account</h3>
+  <div style="display:grid; gap:8px;">
+    <input id="signupEmail" type="email" placeholder="Email" required />
+    <input id="signupPassword" type="password" placeholder="Password (min 6)" required />
+    <label style="font-size:13px;">
+      <input id="signupAgeConfirm" type="checkbox" required />
+      I confirm I am 13 or older.
+    </label>
+    <button id="signupBtn" type="button">Sign Up</button>
+  </div>
 
+  <hr style="margin:16px 0; border-color:#1a1a1a;">
+  
+  <h3 style="margin:0 0 8px;">Sign in</h3>
+  <div style="display:grid; gap:8px;">
+    <input id="loginEmail" type="email" placeholder="Email" required />
+    <input id="loginPassword" type="password" placeholder="Password" required />
+    <button id="loginBtn" type="button">Login</button>
+  </div>
+</dialog>
   <!-- ===== ROUTER (Tab Switching) ===== -->
   <script>
     (function(){
