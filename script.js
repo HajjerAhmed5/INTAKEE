@@ -8,7 +8,46 @@ const { app, auth, db, storage, onAuthStateChanged } = window.firebaseRefs || {}
 if (!app || !auth || !db || !storage) {
   console.error("❌ Firebase not ready — check index.html init block.");
 }
+// ---------- AUTH FORM HANDLERS ----------
+const signupBtn = document.getElementById('signupBtn');
+const loginBtn = document.getElementById('loginBtn');
 
+// SIGN UP
+if (signupBtn) {
+  signupBtn.addEventListener('click', async () => {
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value.trim();
+    const confirm = document.getElementById('signupAgeConfirm').checked;
+
+    if (!confirm) return alert('Please confirm you are 13 or older.');
+    if (!email || !password) return alert('Enter both email and password.');
+
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      alert(`🎉 Welcome to INTAKEE, ${userCred.user.email}!`);
+      document.getElementById('authDialog').close();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+}
+
+// LOGIN
+if (loginBtn) {
+  loginBtn.addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    if (!email || !password) return alert('Enter both email and password.');
+
+    try {
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      alert(`✅ Signed in as ${userCred.user.email}`);
+      document.getElementById('authDialog').close();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+}
 // ---------- Helpers ----------
 const qs = (s, sc = document) => sc.querySelector(s);
 const qsa = (s, sc = document) => Array.from(sc.querySelectorAll(s));
