@@ -1068,12 +1068,9 @@ loadFeeds = async function() {
   renderFeed(podcastFeed,visible.filter(p => p.type?.startsWith('podcast')));
   renderFeed(clipsFeed,  visible.filter(p => p.type === 'clip'));
 };
-
 // ----------- EVENT HOOKS -----------
 document.addEventListener('intakee:auth', e => {
   const u = e.detail.user;
   if (u) loadFollowStats(u.uid);
 });
-
-// closes the async wrapper cleanly
 })();
