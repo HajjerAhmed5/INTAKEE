@@ -1073,4 +1073,5 @@ document.addEventListener('intakee:auth', e => {
   const u = e.detail.user;
   if (u) loadFollowStats(u.uid);
 });
+// closes the async wrapper cleanly
 })();
