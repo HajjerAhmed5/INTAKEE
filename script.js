@@ -7,6 +7,13 @@
 const { app, auth, db, storage, onAuthStateChanged } = window.firebaseRefs || {};
 if (!app || !auth || !db || !storage) {
   console.error("❌ Firebase not ready — check index.html init block.");
+// --- Add Firebase Auth helpers manually ---
+const {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile
+} = window.firebaseAuthExports || {};
+
 }
 // ---------- AUTH FORM HANDLERS ----------
 const signupBtn = document.getElementById('signupBtn');
