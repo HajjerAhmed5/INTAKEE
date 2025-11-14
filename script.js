@@ -1051,7 +1051,7 @@ function filterVisiblePosts(list, currentUser) {
     return false;
   });
 }
-
+// closes the async wrapper cleanly
 // Patch existing loadFeeds to use visibility filter
 const _oldLoadFeeds = loadFeeds;
 loadFeeds = async function() {
@@ -1069,11 +1069,13 @@ loadFeeds = async function() {
   renderFeed(clipsFeed,  visible.filter(p => p.type === 'clip'));
 };
 
-// ---------- EVENT HOOKS ----------
+// ----------- EVENT HOOKS -----------
 document.addEventListener('intakee:auth', e => {
   const u = e.detail.user;
   if (u) loadFollowStats(u.uid);
 });
+
+} // 👈 add this line — closes the async wrapper
 
 // closes the async wrapper cleanly
 })();
