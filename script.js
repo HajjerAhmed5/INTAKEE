@@ -1076,4 +1076,16 @@ document.addEventListener('intakee:auth', e => {
 });
 
 // closes the async wrapper cleanly
-}
+} 
+// ---------- AUTH MODAL HANDLER ----------
+const authDialog = document.getElementById('authDialog');
+const loginButtons = document.querySelectorAll('button, a');
+
+loginButtons.forEach(el => {
+  if (el.textContent.includes('Login') || el.textContent.includes('Sign Up')) {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      if (authDialog) authDialog.showModal();
+    });
+  }
+});   
