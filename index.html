@@ -349,5 +349,17 @@
 
   <!-- ===== MAIN LOGIC ===== -->
   <script type="module" src="script.js?v=final"></script>
+    console.log('✅ Firebase ready:', app.options.projectId);
+</script>
+<!-- Add Firebase Auth helpers for INTAKEE -->
+<script>
+  window.firebaseAuthExports = {
+    createUserWithEmailAndPassword: firebase.auth().createUserWithEmailAndPassword,
+    signInWithEmailAndPassword: firebase.auth().signInWithEmailAndPassword,
+    updateProfile: user => user.updateProfile ? user.updateProfile() : null
+  };
+</script>
+
+<script type="module" src="script.js?v=final"></script>
 </body>
 </html>
