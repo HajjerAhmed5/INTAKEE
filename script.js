@@ -1076,4 +1076,4 @@ document.addEventListener('intakee:auth', e => {
 });
 
 // closes the async wrapper cleanly
-})();
+}
