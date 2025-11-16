@@ -19,6 +19,8 @@
 </head>
 
 <body class="dark-theme">
+  <body class="dark-theme" autocomplete="off" autocapitalize="none" spellcheck="false">
+  <form autocomplete="off"></form>
   <!-- ===== HEADER ===== -->
   <header class="app-header">
     <div class="brand">
@@ -27,7 +29,7 @@
     <div class="spacer"></div>
     <div id="searchWrap" class="search-bar">
   <i class="fa fa-search"></i>
- <input
+<input
   id="mainSearchBar"
   name="mainSearchBar"
   type="search"
@@ -39,6 +41,8 @@
   inputmode="none"
   role="presentation"
   style="ime-mode: disabled;"
+  readonly
+  onfocus="this.removeAttribute('readonly'); this.value='';"
 />
 </div>
     <div class="auth">
