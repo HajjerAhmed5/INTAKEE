@@ -138,38 +138,62 @@ $on(signUpForm, 'submit', async (e) => {
 // ============================================================================
 // SIGN IN
 // ============================================================================
-$on(signInForm, 'submit', async (e) => {
-  e.preventDefault();
-  const email = qs('#signInEmail').value.trim();
-  const pass = qs('#signInPassword').value.trim();
-  if (!email || !pass) return notify("Please fill both fields.");
+// --- SIGN UP ---
+const signupBtn = document.getElementById("signupBtn");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("settings-logout");
 
-  try {
-    const { signInWithEmailAndPassword } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
-    await signInWithEmailAndPassword(auth, email, pass);
-    dlgAuth.close();
-    notify("✅ Welcome back!");
-  } catch (err) {
-    console.error(err);
-    notify(err.message);
-  }
-});
+if (signupBtn) {
+  signupBtn.addEventListener("click", async () => {
+    const email = document.getElementById("signupEmail").value.trim();
+    const password = document.getElementById("signupPassword").value.trim();
+    const ageOK = document.getElementById("signupAgeConfirm").checked;
 
-// ============================================================================
-// LOGOUT
-// ============================================================================
-$on(logoutBtn, 'click', async () => {
-  try {
-    const { signOut } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
-    await signOut(auth);
-    notify("You’ve been logged out.");
-  } catch (err) {
-    notify("Logout failed: " + err.message);
-  }
-});
+    if (!ageOK) return alert("You must confirm you are 13 or older.");
+    if (!email || !password) return alert("Please enter email and password.");
 
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      alert(`✅ Welcome to INTAKEE, ${userCred.user.email}!`);
+      document.getElementById("authDialog").close();
+    } catch (err) {
+      alert("❌ Error: " + err.message);
+      console.error(err);
+    }
+  });
+}
+
+// --- LOGIN ---
+if (loginBtn) {
+  loginBtn.addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+
+    if (!email || !password) return alert("Please enter email and password.");
+
+    try {
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      alert(`✅ Logged in as ${userCred.user.email}`);
+      document.getElementById("authDialog").close();
+    } catch (err) {
+      alert("❌ Error: " + err.message);
+      console.error(err);
+    }
+  });
+}
+
+// --- LOGOUT ---
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+      alert("You’ve been logged out.");
+    } catch (err) {
+      alert("Logout failed: " + err.message);
+      console.error(err);
+    }
+  });
+}
 // ============================================================================
 // AUTH STATE CHANGE
 // ============================================================================
