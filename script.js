@@ -31,9 +31,9 @@ const {
 } = window.firebaseAuthExports || {};
 
 }
-// ---------- AUTH FORM HANDLERS ----------
-const signupBtn = document.getElementById('signupBtn');
-const loginBtn = document.getElementById('loginBtn');
+// ----- AUTH FORM HANDLERS -----
+// const signupBtn = document.getElementById('signupBtn');
+// const loginBtn = document.getElementById('loginBtn');
 
 // SIGN UP
 if (signupBtn) {
