@@ -359,7 +359,82 @@
     updateProfile: user => user.updateProfile ? user.updateProfile() : null
   };
 </script>
+<!-- ===== Add Firebase Auth helpers for INTAKEE ===== -->
+<script type="module">
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    updateProfile
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    setDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+  import { getApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 
-<script type="module" src="script.js?v=final"></script>
+  const app = getApp();
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // ✅ Sign Up
+  const signupForm = document.getElementById("authSignUpForm");
+  if (signupForm) {
+    signupForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signUpEmail").value.trim();
+      const password = document.getElementById("signUpPassword").value.trim();
+      const name = document.getElementById("signUpName")?.value?.trim() || "";
+      const ageOK = document.getElementById("signUpAge")?.checked;
+      if (!ageOK) return alert("You must confirm you are 13 or older.");
+      if (!email || !password) return alert("Email and password required.");
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        if (name) await updateProfile(cred.user, { displayName: name });
+        await setDoc(doc(db, "users", cred.user.uid), {
+          name,
+          email,
+          createdAt: serverTimestamp(),
+        });
+        alert(`✅ Welcome to INTAKEE, ${email}!`);
+        document.getElementById("authDialog").close();
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+  }
+
+  // ✅ Sign In
+  const signinForm = document.getElementById("authSignInForm");
+  if (signinForm) {
+    signinForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signInEmail").value.trim();
+      const password = document.getElementById("signInPassword").value.trim();
+      if (!email || !password) return alert("Enter email and password.");
+
+      try {
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        alert(`✅ Signed in as ${cred.user.email}`);
+        document.getElementById("authDialog").close();
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+  }
+
+  // ✅ Logout
+  const logoutBtn = document.getElementById("settings-logout");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      alert("You have logged out.");
+    });
+  }
+</script>
 </body>
 </html>
