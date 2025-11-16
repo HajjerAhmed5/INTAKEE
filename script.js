@@ -2,7 +2,32 @@
 // INTAKEE — Main Logic (Part 1: Authentication & User Setup)
 // ============================================================================
 'use strict';
+// --- Firebase Auth, Firestore, and Storage ---
+import {
+  getAuth,
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  query,
+  where,
+  orderBy,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 // Firebase refs (initialized in index.html)
 const { app, auth, db, storage, onAuthStateChanged } = window.firebaseRefs || {};
 if (!app || !auth || !db || !storage) {
