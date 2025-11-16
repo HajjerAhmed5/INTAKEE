@@ -26,9 +26,18 @@
     </div>
     <div class="spacer"></div>
     <div id="searchWrap" class="search-bar">
-      <i class="fa fa-search"></i>
-      <input id="globalSearch" type="text" placeholder="Search…" />
-    </div>
+  <i class="fa fa-search"></i>
+  <input 
+    id="mainSearchBar"
+    type="search"
+    name="mainSearchBar"
+    placeholder="Search…"
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="none"
+    spellcheck="false"
+  />
+</div>
     <div class="auth">
       <button id="openAuth" class="primary">Login / Sign Up</button>
     </div>
@@ -251,27 +260,55 @@
   <form method="dialog" style="text-align:right; margin-bottom:8px;">
     <button aria-label="Close">✕</button>
   </form>
+<!-- Create Account -->
+<h3 style="margin:0 0 8px;">Create account</h3>
+<div style="display:grid; gap:8px;">
+  <input 
+    id="signupEmail"
+    name="signupEmail"
+    type="email"
+    placeholder="Email"
+    autocomplete="new-email"
+    required
+  />
+  <input 
+    id="signupPassword"
+    name="signupPassword"
+    type="password"
+    placeholder="Password (min 6)"
+    autocomplete="new-password"
+    required
+  />
+  <label style="font-size:13px;">
+    <input id="signupAgeConfirm" type="checkbox" required />
+    I confirm I am 13 or older.
+  </label>
+  <button id="signupBtn" type="button">Sign Up</button>
+</div>
 
-  <h3 style="margin:0 0 8px;">Create account</h3>
-  <div style="display:grid; gap:8px;">
-    <input id="signupEmail" type="email" placeholder="Email" required />
-    <input id="signupPassword" type="password" placeholder="Password (min 6)" required />
-    <label style="font-size:13px;">
-      <input id="signupAgeConfirm" type="checkbox" required />
-      I confirm I am 13 or older.
-    </label>
-    <button id="signupBtn" type="button">Sign Up</button>
-  </div>
+<hr style="margin:16px 0; border-color:#1a1a1a;">
 
-  <hr style="margin:16px 0; border-color:#1a1a1a;">
-  
-  <h3 style="margin:0 0 8px;">Sign in</h3>
-  <div style="display:grid; gap:8px;">
-    <input id="loginEmail" type="email" placeholder="Email" required />
-    <input id="loginPassword" type="password" placeholder="Password" required />
-    <button id="loginBtn" type="button">Login</button>
-  </div>
-</dialog>
+<!-- Sign In -->
+<h3 style="margin:0 0 8px;">Sign in</h3>
+<div style="display:grid; gap:8px;">
+  <input 
+    id="loginEmail"
+    name="loginEmail"
+    type="email"
+    placeholder="Email"
+    autocomplete="off"
+    required
+  />
+  <input 
+    id="loginPassword"
+    name="loginPassword"
+    type="password"
+    placeholder="Password"
+    autocomplete="current-password"
+    required
+  />
+  <button id="loginBtn" type="button">Login</button>
+</div>
   <!-- ===== ROUTER (Tab Switching) ===== -->
   <script>
     (function(){
