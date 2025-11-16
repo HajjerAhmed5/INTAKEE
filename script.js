@@ -1184,3 +1184,62 @@ loginButtons.forEach(el => {
     });
   }
 });   
+// ===== AUTH BUTTON HANDLERS (Final Fix) =====
+document.addEventListener("DOMContentLoaded", () => {
+  const signupBtn = document.getElementById("signupBtn");
+  const loginBtn = document.getElementById("loginBtn");
+  const logoutBtn = document.getElementById("settings-logout");
+
+  // --- SIGN UP ---
+  if (signupBtn) {
+    signupBtn.addEventListener("click", async () => {
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("signupPassword").value.trim();
+      const ageOK = document.getElementById("signupAgeConfirm").checked;
+
+      if (!ageOK) return alert("You must confirm you are 13 or older.");
+      if (!email || !password) return alert("Please enter email and password.");
+
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        alert(`✅ Welcome to INTAKEE, ${userCred.user.email}!`);
+        document.getElementById("authDialog").close();
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+        console.error(err);
+      }
+    });
+  }
+
+  // --- LOGIN ---
+  if (loginBtn) {
+    loginBtn.addEventListener("click", async () => {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+
+      if (!email || !password) return alert("Please enter email and password.");
+
+      try {
+        const userCred = await signInWithEmailAndPassword(auth, email, password);
+        alert(`✅ Logged in as ${userCred.user.email}`);
+        document.getElementById("authDialog").close();
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+        console.error(err);
+      }
+    });
+  }
+
+  // --- LOGOUT ---
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        alert("You’ve been logged out.");
+      } catch (err) {
+        alert("Logout failed: " + err.message);
+        console.error(err);
+      }
+    });
+  }
+});
