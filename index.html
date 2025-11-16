@@ -321,37 +321,36 @@
   </script>
 
   <!-- ===== FIREBASE INIT ===== -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-    import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+  import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyD0_tL8PxUvGT7JqCBj3tuL7s3Kipl5E6g",
-      authDomain: "intakee-5785e.firebaseapp.com",
-      projectId: "intakee-5785e",
-      storageBucket: "intakee-5785e.appspot.com",
-      messagingSenderId: "40666230072",
-      appId: "1:40666230072:web:49dd5e7db91c8a38b565cd",
-      measurementId: "G-3C2YDV6T0G"
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-    window.firebaseRefs = { app, auth, db, storage, onAuthStateChanged };
-    onAuthStateChanged(auth, (user) => {
-      document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
-    });
-    console.log('✅ Firebase ready:', app.options.projectId);
-  </script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDp_tLBxUPvlvG7JqCBj3ItuL7sKjpL56g",
+    authDomain: "intakee-5785e.firebaseapp.com",
+    projectId: "intakee-5785e",
+    storageBucket: "intakee-5785e.appspot.com",
+    messagingSenderId: "140666230072",
+    appId: "1:140666230072:web:49dd5e7db91c8a38b56c5d",
+    measurementId: "G-3C2YDV6TG6"
+  };
 
-  <!-- ===== MAIN LOGIC ===== -->
-  <script type="module" src="script.js?v=final"></script>
-    console.log('✅ Firebase ready:', app.options.projectId);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  window.firebaseRefs = { app, auth, db, storage, onAuthStateChanged };
+  onAuthStateChanged(auth, (user) => {
+    document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
+  });
+
+  console.log('✅ Firebase ready:', app.options.projectId);
 </script>
-<!-- Add Firebase Auth helpers for INTAKEE -->
+
+<!-- ✅ Firebase Auth Helpers for INTAKEE -->
 <script type="module">
   import {
     createUserWithEmailAndPassword,
@@ -367,82 +366,8 @@
     updateProfile
   };
 </script>
-<!-- ===== Add Firebase Auth helpers for INTAKEE ===== -->
-<script type="module">
-  import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    updateProfile
-  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-  import {
-    getFirestore,
-    doc,
-    setDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-  import { getApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 
-  const app = getApp();
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // ✅ Sign Up
-  const signupForm = document.getElementById("authSignUpForm");
-  if (signupForm) {
-    signupForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("signUpEmail").value.trim();
-      const password = document.getElementById("signUpPassword").value.trim();
-      const name = document.getElementById("signUpName")?.value?.trim() || "";
-      const ageOK = document.getElementById("signUpAge")?.checked;
-      if (!ageOK) return alert("You must confirm you are 13 or older.");
-      if (!email || !password) return alert("Email and password required.");
-
-      try {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        if (name) await updateProfile(cred.user, { displayName: name });
-        await setDoc(doc(db, "users", cred.user.uid), {
-          name,
-          email,
-          createdAt: serverTimestamp(),
-        });
-        alert(`✅ Welcome to INTAKEE, ${email}!`);
-        document.getElementById("authDialog").close();
-      } catch (err) {
-        alert("Error: " + err.message);
-      }
-    });
-  }
-
-  // ✅ Sign In
-  const signinForm = document.getElementById("authSignInForm");
-  if (signinForm) {
-    signinForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("signInEmail").value.trim();
-      const password = document.getElementById("signInPassword").value.trim();
-      if (!email || !password) return alert("Enter email and password.");
-
-      try {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        alert(`✅ Signed in as ${cred.user.email}`);
-        document.getElementById("authDialog").close();
-      } catch (err) {
-        alert("Error: " + err.message);
-      }
-    });
-  }
-
-  // ✅ Logout
-  const logoutBtn = document.getElementById("settings-logout");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
-      alert("You have logged out.");
-    });
-  }
-</script>
+<!-- ✅ Main INTAKEE App Logic -->
+<script type="module" src="script.js?v=final"></script>
 </body>
 </html>
