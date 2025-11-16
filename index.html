@@ -352,11 +352,19 @@
     console.log('✅ Firebase ready:', app.options.projectId);
 </script>
 <!-- Add Firebase Auth helpers for INTAKEE -->
-<script>
+<script type="module">
+  import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    updateProfile
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
   window.firebaseAuthExports = {
-    createUserWithEmailAndPassword: firebase.auth().createUserWithEmailAndPassword,
-    signInWithEmailAndPassword: firebase.auth().signInWithEmailAndPassword,
-    updateProfile: user => user.updateProfile ? user.updateProfile() : null
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    updateProfile
   };
 </script>
 <!-- ===== Add Firebase Auth helpers for INTAKEE ===== -->
