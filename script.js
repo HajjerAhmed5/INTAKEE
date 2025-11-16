@@ -4,15 +4,6 @@
 'use strict';
 // --- Firebase Auth, Firestore, and Storage ---
 import {
-  getAuth,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-
-import {
   getFirestore,
   collection,
   addDoc,
