@@ -81,9 +81,7 @@ const notify = (msg) => alert(msg);
 const dlgAuth = qs('#authDialog');
 const signUpForm = qs('#authSignUpForm');
 const signInForm = qs('#authSignInForm');
-const logoutBtn = qs('#settings-logout');
 const openAuth = qs('#openAuth');
-
 // ============================================================================
 // SIGN UP
 // ============================================================================
