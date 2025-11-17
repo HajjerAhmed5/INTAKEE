@@ -128,10 +128,6 @@ $on(signUpForm, 'submit', async (e) => {
 // SIGN IN
 // ============================================================================
 // --- SIGN UP ---
-const signupBtn = document.getElementById("signupBtn");
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("settings-logout");
-
 if (signupBtn) {
   signupBtn.addEventListener("click", async () => {
     const email = document.getElementById("signupEmail").value.trim();
