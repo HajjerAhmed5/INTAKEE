@@ -1,209 +1,167 @@
 // ============================================================================
-// INTAKEE — Main Logic (Part 1: Authentication & User Setup)
+// INTAKEE — MAIN APP LOGIC (AUTHENTICATION + USER SETUP)
 // ============================================================================
 'use strict';
-// --- Firebase Auth, Firestore, and Storage ---
+
+// ----- FIREBASE IMPORTS -----
 import {
-  getFirestore,
-  collection,
-  addDoc,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-  updateDoc,
-  query,
-  where,
-  orderBy,
-  serverTimestamp
+  getFirestore, collection, doc, setDoc, getDoc, query, where, addDoc, updateDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
+  updateProfile, sendPasswordResetEmail, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
-// Firebase refs (initialized in index.html)
-const { app, auth, db, storage, onAuthStateChanged } = window.firebaseRefs || {};
-if (!app || !auth || !db || !storage) {
-  console.error("❌ Firebase not ready — check index.html init block.");
-// --- Add Firebase Auth helpers manually ---
-const {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile
-} = window.firebaseAuthExports || {};
 
-}
-// ----- AUTH FORM HANDLERS -----
-// const signupBtn = document.getElementById('signupBtn');
-// const loginBtn = document.getElementById('loginBtn');
-
-// SIGN UP
-if (signupBtn) {
-  signupBtn.addEventListener('click', async () => {
-    const email = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value.trim();
-    const confirm = document.getElementById('signupAgeConfirm').checked;
-
-    if (!confirm) return alert('Please confirm you are 13 or older.');
-    if (!email || !password) return alert('Enter both email and password.');
-
-    try {
-      const userCred = await createUserWithEmailAndPassword(auth, email, password);
-      alert(`🎉 Welcome to INTAKEE, ${userCred.user.email}!`);
-      document.getElementById('authDialog').close();
-    } catch (err) {
-      alert(err.message);
-    }
-  });
+// ----- FIREBASE REFS -----
+const { app, auth, db, storage } = window.firebaseRefs || {};
+if (!app || !auth || !db) {
+  console.error("❌ Firebase not initialized properly. Check your index.html init section.");
 }
 
-// LOGIN
-if (loginBtn) {
-  loginBtn.addEventListener('click', async () => {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value.trim();
-    if (!email || !password) return alert('Enter both email and password.');
-
-    try {
-      const userCred = await signInWithEmailAndPassword(auth, email, password);
-      alert(`✅ Signed in as ${userCred.user.email}`);
-      document.getElementById('authDialog').close();
-    } catch (err) {
-      alert(err.message);
-    }
-  });
-}
-// ---------- Helpers ----------
+// ----- SHORTCUT HELPERS -----
 const qs = (s, sc = document) => sc.querySelector(s);
 const qsa = (s, sc = document) => Array.from(sc.querySelectorAll(s));
 const $on = (el, ev, fn) => el && el.addEventListener(ev, fn);
 const notify = (msg) => alert(msg);
 
-// ---------- Auth Elements ----------
+// ============================================================================
+// SIGN UP LOGIC (Email + Password + Username + Age Confirm)
+// ============================================================================
+const signupBtn = qs('#signupBtn');
+const loginBtn = qs('#loginBtn');
+const logoutBtn = qs('#settings-logout');
 const dlgAuth = qs('#authDialog');
-const signUpForm = qs('#authSignUpForm');
-const signInForm = qs('#authSignInForm');
-const openAuth = qs('#openAuth');
-// ============================================================================
-// SIGN UP
-// ============================================================================
-$on(signUpForm, 'submit', async (e) => {
-  e.preventDefault();
-  const name = qs('#signUpName').value.trim();
-  const email = qs('#signUpEmail').value.trim();
-  const pass = qs('#signUpPassword').value.trim();
-  const ageOK = qs('#signUpAge').checked;
-  if (!ageOK) return notify("⚠️ You must confirm you are 13 or older.");
-  if (!email || !pass) return notify("Please enter email and password.");
 
+if (signupBtn) {
+  signupBtn.addEventListener('click', async () => {
+    const email = qs('#signupEmail').value.trim();
+    const password = qs('#signupPassword').value.trim();
+    const username = prompt("Choose a username (no spaces):")?.trim().toLowerCase();
+    const ageOK = qs('#signupAgeConfirm').checked;
+
+    if (!ageOK) return notify("⚠️ You must confirm you are 13 or older.");
+    if (!email || !password || !username) return notify("Please fill all fields.");
+
+    try {
+      // Check username availability
+      const usernameRef = query(collection(db, "users"), where("username", "==", username));
+      const snap = await getDocs(usernameRef);
+      if (!snap.empty) return notify("❌ That username is already taken. Please choose another one.");
+
+      // Create user in Firebase Auth
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(cred.user, { displayName: username });
+
+      // Create Firestore user document
+      await setDoc(doc(db, "users", cred.user.uid), {
+        uid: cred.user.uid,
+        email,
+        username,
+        bio: "",
+        createdAt: serverTimestamp(),
+        private: false,
+        showUploads: true,
+        showSaved: true,
+        followers: [],
+        following: [],
+        blocked: [],
+        saved: []
+      });
+
+      notify(`✅ Welcome to INTAKEE, @${username}!`);
+      dlgAuth.close();
+    } catch (err) {
+      console.error(err);
+      notify("❌ " + err.message);
+    }
+  });
+}
+
+// ============================================================================
+// LOGIN LOGIC
+// ============================================================================
+if (loginBtn) {
+  loginBtn.addEventListener('click', async () => {
+    const email = qs('#loginEmail').value.trim();
+    const password = qs('#loginPassword').value.trim();
+    if (!email || !password) return notify("Please enter email and password.");
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      notify(`✅ Signed in as ${cred.user.email}`);
+      dlgAuth.close();
+    } catch (err) {
+      console.error(err);
+      notify("❌ " + err.message);
+    }
+  });
+}
+
+// ============================================================================
+// FORGOT PASSWORD (Reset via Firebase Email Link)
+// ============================================================================
+const forgotPasswordBtn = document.createElement('button');
+forgotPasswordBtn.textContent = "Forgot Password?";
+forgotPasswordBtn.className = "ghost";
+forgotPasswordBtn.style.marginTop = "6px";
+qs('#authDialog div[style*="display:grid"]').appendChild(forgotPasswordBtn);
+
+$on(forgotPasswordBtn, 'click', async () => {
+  const email = prompt("Enter your account email:");
+  if (!email) return;
   try {
-    const { createUserWithEmailAndPassword, updateProfile } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    if (name) await updateProfile(cred.user, { displayName: name });
-
-    const { doc, setDoc, serverTimestamp } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-
-    await setDoc(doc(db, 'users', cred.user.uid), {
-      name,
-      bio: '',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      private: false,
-      showUploads: true,
-      showSaved: true,
-      blocked: [],
-      followers: [],
-      following: []
-    });
-
-    dlgAuth.close();
-    notify("✅ Account created successfully!");
+    await sendPasswordResetEmail(auth, email);
+    notify("📩 Password reset link sent to your email.");
   } catch (err) {
-    console.error(err);
-    notify(err.message);
+    notify("❌ " + err.message);
   }
 });
 
 // ============================================================================
-// SIGN IN
-// ============================================================================
-// --- SIGN UP ---
-if (signupBtn) {
-  signupBtn.addEventListener("click", async () => {
-    const email = document.getElementById("signupEmail").value.trim();
-    const password = document.getElementById("signupPassword").value.trim();
-    const ageOK = document.getElementById("signupAgeConfirm").checked;
-
-    if (!ageOK) return alert("You must confirm you are 13 or older.");
-    if (!email || !password) return alert("Please enter email and password.");
-
-    try {
-      const userCred = await createUserWithEmailAndPassword(auth, email, password);
-      alert(`✅ Welcome to INTAKEE, ${userCred.user.email}!`);
-      document.getElementById("authDialog").close();
-    } catch (err) {
-      alert("❌ Error: " + err.message);
-      console.error(err);
-    }
-  });
-}
-
-// --- LOGIN ---
-if (loginBtn) {
-  loginBtn.addEventListener("click", async () => {
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
-
-    if (!email || !password) return alert("Please enter email and password.");
-
-    try {
-      const userCred = await signInWithEmailAndPassword(auth, email, password);
-      alert(`✅ Logged in as ${userCred.user.email}`);
-      document.getElementById("authDialog").close();
-    } catch (err) {
-      alert("❌ Error: " + err.message);
-      console.error(err);
-    }
-  });
-}
-
-// --- LOGOUT ---
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", async () => {
-    try {
-      await signOut(auth);
-      alert("You’ve been logged out.");
-    } catch (err) {
-      alert("Logout failed: " + err.message);
-      console.error(err);
-    }
-  });
-}
-// ============================================================================
-// AUTH STATE CHANGE
+// AUTH STATE CHANGE — Update UI, Profile, and Feed
 // ============================================================================
 onAuthStateChanged(auth, async (user) => {
   console.log("👤 Auth state:", user ? user.email : "(signed out)");
-
-  // Dispatch global event for profile/settings/etc.
   document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
 
+  const openAuth = qs('#openAuth');
   if (openAuth) openAuth.style.display = user ? 'none' : 'block';
 
   if (user) {
-    qs('#profile-name').textContent = user.displayName || 'Your Name';
-    qs('#profile-handle').textContent = '@' + (user.email.split('@')[0] || 'username');
+    qs('#profile-name').textContent = user.displayName || user.email.split('@')[0];
+    qs('#profile-handle').textContent = '@' + (user.displayName || user.email.split('@')[0]);
   } else {
     qs('#profile-name').textContent = 'Your Name';
     qs('#profile-handle').textContent = '@username';
   }
 });
+
 // ============================================================================
-// INTAKEE — Part 2: Upload System (Video / Clip / Podcast)
+// LOGOUT
+// ============================================================================
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      await signOut(auth);
+      notify("👋 You’ve been logged out.");
+    } catch (err) {
+      notify("❌ " + err.message);
+    }
+  });
+}
+// ============================================================================
+// INTAKEE — PART 2: UPLOADS / FEEDS / LIKES & DISLIKES
 // ============================================================================
 'use strict';
 
-// --- Upload Elements ---
+// --- Helper Shortcuts (reuse from above) ---
+const qs = (s, sc = document) => sc.querySelector(s);
+const qsa = (s, sc = document) => Array.from(sc.querySelectorAll(s));
+const $on = (el, ev, fn) => el && el.addEventListener(ev, fn);
+const notify = (msg) => alert(msg);
+
+// ---------- Upload Form ----------
 const upType   = qs('#uploadTypeSelect');
 const upTitle  = qs('#uploadTitleInput');
 const upDesc   = qs('#uploadDescInput');
@@ -212,59 +170,55 @@ const upFile   = qs('#uploadFileInput');
 const btnUpload = qs('#btnUpload');
 const goLiveBtn = qs('#goLiveBtn');
 
-// --- Utility ---
+// Reset upload inputs
 function resetUploadForm() {
+  upType.value = 'video';
   upTitle.value = '';
-  upDesc.value  = '';
+  upDesc.value = '';
   upThumb.value = '';
-  upFile.value  = '';
-  upType.value  = 'video';
+  upFile.value = '';
   btnUpload.textContent = 'Upload';
   btnUpload.disabled = false;
 }
 
-// --- Upload Handler ---
+// ============================================================================
+// UPLOAD HANDLER (VIDEO / CLIP / PODCAST)
+// ============================================================================
 $on(btnUpload, 'click', async () => {
   const user = auth.currentUser;
-  if (!user) return alert('Please log in before uploading.');
+  if (!user) return notify("Please sign in before uploading.");
 
-  const type  = upType.value;
+  const type = upType.value;
   const title = upTitle.value.trim();
-  const desc  = upDesc.value.trim();
-  const file  = upFile.files[0];
+  const desc = upDesc.value.trim();
+  const file = upFile.files[0];
   const thumb = upThumb.files[0];
 
-  if (!file)  return alert('Please select a file to upload.');
-  if (!title) return alert('Please enter a title.');
-
+  if (!title || !file) return notify("Please add a title and select a file.");
   btnUpload.disabled = true;
   btnUpload.textContent = 'Uploading... 0%';
 
   try {
-    // --- Firebase imports ---
     const { ref, uploadBytesResumable, getDownloadURL, uploadBytes } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js");
     const { addDoc, collection, serverTimestamp } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
 
-    // --- File path logic ---
     const ext = file.name.split('.').pop();
     const safeTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
     const filePath = `uploads/${user.uid}/${Date.now()}_${safeTitle}.${ext}`;
-
-    // --- Upload main file ---
     const storageRef = ref(storage, filePath);
-    const task = uploadBytesResumable(storageRef, file);
 
+    const task = uploadBytesResumable(storageRef, file);
     task.on('state_changed', snap => {
       const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
       btnUpload.textContent = `Uploading... ${pct}%`;
     });
 
     await task;
-    const fileUrl = await getDownloadURL(storageRef);
+    const mediaUrl = await getDownloadURL(storageRef);
 
-    // --- Upload thumbnail if provided ---
+    // Thumbnail (optional)
     let thumbUrl = '';
     if (thumb) {
       const thumbPath = `thumbnails/${user.uid}/${Date.now()}_${thumb.name}`;
@@ -273,56 +227,45 @@ $on(btnUpload, 'click', async () => {
       thumbUrl = await getDownloadURL(tRef);
     }
 
-    // --- Save metadata to Firestore ---
     await addDoc(collection(db, 'posts'), {
       uid: user.uid,
+      username: user.displayName || user.email.split('@')[0],
       type,
       title,
       desc,
-      mediaUrl: fileUrl,
+      mediaUrl,
       thumbnailUrl: thumbUrl,
       private: false,
-      createdAt: serverTimestamp(),
       likeCount: 0,
-      viewCount: 0,
-      comments: 0
+      dislikeCount: 0,
+      createdAt: serverTimestamp()
     });
 
-    alert('✅ Upload complete!');
+    notify("✅ Upload complete!");
     resetUploadForm();
-
-    // Trigger feed refresh event
     document.dispatchEvent(new CustomEvent('intakee:feedRefresh'));
   } catch (err) {
-    console.error('Upload failed:', err);
-    alert('❌ Upload failed: ' + err.message);
+    console.error("Upload error:", err);
+    notify("❌ Upload failed: " + err.message);
     btnUpload.disabled = false;
     btnUpload.textContent = 'Upload';
   }
 });
 
-// --- Go Live (placeholder) ---
 $on(goLiveBtn, 'click', () => {
-  alert('🚀 Live streaming will be available in a future update.');
+  notify("🚀 Live streaming feature coming soon!");
 });
-// ============================================================================
-// INTAKEE — Part 3: Feed Rendering (Home, Videos, Podcasts, Clips)
-// ============================================================================
-'use strict';
 
-// --- Feed Containers ---
+// ============================================================================
+// FEED & LIKE / DISLIKE SYSTEM
+// ============================================================================
 const homeFeed   = qs('#home-feed');
 const videosFeed = qs('#videos-feed');
 const podcastFeed = qs('#podcast-feed');
 const clipsFeed  = qs('#clips-feed');
-
-const searchGlobal  = qs('#globalSearch');
 let _allPosts = [];
-let _isLoadingFeed = false;
 
-// ============================================================================
-// FETCH POSTS
-// ============================================================================
+// --- Fetch All Posts ---
 async function fetchAllPosts() {
   try {
     const { collection, getDocs, orderBy, query, limit } =
@@ -332,488 +275,299 @@ async function fetchAllPosts() {
     _allPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (err) {
     console.error("❌ Error loading feed:", err);
-    _allPosts = [];
   }
 }
 
-// ============================================================================
-// RENDER FUNCTIONS
-// ============================================================================
+// --- Render Feed Cards ---
 function renderFeed(container, list, type = 'all') {
   container.innerHTML = '';
-
   if (!list || !list.length) {
     container.innerHTML = `<div class="muted">No posts yet.</div>`;
     return;
   }
 
   list.forEach(post => {
-    // Filter by type
     if (type !== 'all' && post.type !== type) return;
 
-    // Create post card
     const card = document.createElement('div');
-    card.className = 'feed-card';
+    card.className = 'card video-card';
+    const thumb = post.thumbnailUrl || '/placeholder.png';
 
-    const thumbnail = post.thumbnailUrl || '/placeholder.png';
-    const mediaTypeIcon = post.type === 'video'
-      ? 'fa-video'
-      : post.type === 'clip'
-      ? 'fa-bolt'
-      : 'fa-podcast';
-
-    // Main card HTML
+    // Card HTML
     card.innerHTML = `
-      <div class="thumb">
-        <img src="${thumbnail}" alt="${post.title}">
-        <button class="play-btn" data-url="${post.mediaUrl}" data-type="${post.type}" data-title="${post.title}">
-          <i class="fa ${mediaTypeIcon}"></i>
+      <div class="thumb-16x9">
+        <img src="${thumb}" alt="${post.title}">
+        <button class="play-btn" data-url="${post.mediaUrl}">
+          <i class="fa fa-play"></i>
         </button>
       </div>
-      <div class="feed-meta">
-        <h4>${post.title}</h4>
-        <p>${post.desc || ''}</p>
-        <span class="muted small">${post.type.toUpperCase()}</span>
+      <div class="meta">
+        <h4 class="title">${post.title}</h4>
+        <p class="muted small">${post.username || 'Unknown'}</p>
+      </div>
+      <div class="row space-between small muted">
+        <span>${post.type.toUpperCase()}</span>
+        <span>${post.likeCount || 0} 👍 | ${post.dislikeCount || 0} 👎</span>
       </div>
     `;
 
-    // Add click event to play podcasts in mini-player
-    const playBtn = card.querySelector('.play-btn');
+    // --- Play Button ---
+    const btn = card.querySelector('.play-btn');
     if (post.type.startsWith('podcast')) {
-      playBtn.addEventListener('click', () => {
-        playPodcast(post.mediaUrl, post.title);
-      });
-    } else if (post.type === 'video' || post.type === 'clip') {
-      playBtn.addEventListener('click', () => {
-        window.open(post.mediaUrl, '_blank');
-      });
+      btn.addEventListener('click', () => playPodcast(post.mediaUrl, post.title));
+    } else {
+      btn.addEventListener('click', () => window.open(post.mediaUrl, '_blank'));
+    }
+
+    // --- Likes & Dislikes (only for video/podcast) ---
+    if (['video', 'podcast', 'podcast-audio'].includes(post.type)) {
+      const footer = document.createElement('div');
+      footer.className = 'row';
+      footer.style.marginTop = "8px";
+
+      const likeBtn = document.createElement('button');
+      likeBtn.className = 'ghost';
+      likeBtn.innerHTML = '👍 Like';
+      likeBtn.addEventListener('click', () => toggleReaction(post.id, true));
+
+      const dislikeBtn = document.createElement('button');
+      dislikeBtn.className = 'ghost';
+      dislikeBtn.innerHTML = '👎 Dislike';
+      dislikeBtn.addEventListener('click', () => toggleReaction(post.id, false));
+
+      footer.append(likeBtn, dislikeBtn);
+      card.appendChild(footer);
     }
 
     container.appendChild(card);
   });
 }
 
-// ============================================================================
-// LOAD & DISPLAY FEEDS
-// ============================================================================
-async function loadFeeds() {
-  if (_isLoadingFeed) return;
-  _isLoadingFeed = true;
-  await fetchAllPosts();
-  _isLoadingFeed = false;
-
-  // Home Feed — all posts
-  renderFeed(homeFeed, _allPosts, 'all');
-
-  // Video Feed
-  renderFeed(videosFeed, _allPosts.filter(p => p.type === 'video'), 'video');
-
-  // Podcast Feed
-  renderFeed(podcastFeed, _allPosts.filter(p => p.type.startsWith('podcast')), 'podcast');
-
-  // Clips Feed
-  renderFeed(clipsFeed, _allPosts.filter(p => p.type === 'clip'), 'clip');
-}
-
-// ============================================================================
-// GLOBAL SEARCH
-// ============================================================================
-$on(searchGlobal, 'input', (e) => {
-  const term = e.target.value.toLowerCase().trim();
-  if (!term) {
-    renderFeed(homeFeed, _allPosts);
-    return;
-  }
-
-  const filtered = _allPosts.filter(p =>
-    (p.title || '').toLowerCase().includes(term) ||
-    (p.desc || '').toLowerCase().includes(term)
-  );
-  renderFeed(homeFeed, filtered);
-});
-
-// ============================================================================
-// REFRESH FEED ON UPLOAD / LOGIN
-// ============================================================================
-document.addEventListener('intakee:auth', (e) => {
-  const user = e.detail.user;
-  if (user) loadFeeds();
-  else homeFeed.innerHTML = `<div class="muted">Sign in to upload or interact.</div>`;
-});
-
-document.addEventListener('intakee:feedRefresh', loadFeeds);
-
-// Initial load
-loadFeeds();
-// ============================================================================
-// INTAKEE — Part 4: Profile Management (Bio, Photo, Banner, Delete Posts)
-// ============================================================================
-'use strict';
-
-// --- Profile Elements ---
-const profileName      = qs('#profile-name');
-const profileHandle    = qs('#profile-handle');
-const profilePhotoImg  = qs('#profile-photo');
-const profileBanner    = qs('#profileBanner');
-const bioView          = qs('#bio-view');
-const bioEditWrap      = qs('#bio-edit-wrap');
-const nameInput        = qs('#profileNameInput');
-const bioInput         = qs('#profileBioInput');
-const photoInput       = qs('#profilePhotoInput');
-const bannerInput      = qs('#profileBannerInput');
-const btnEditProfile   = qs('#btn-edit-profile');
-const btnSaveProfile   = qs('#btnSaveProfile');
-const btnCancelEdit    = qs('#bio-cancel');
-const statPosts        = qs('#stat-posts');
-const statFollowers    = qs('#stat-followers');
-const statFollowing    = qs('#stat-following');
-const statLikes        = qs('#stat-likes');
-const profileGrid      = qs('#profile-grid');
-const profileEmpty     = qs('#profile-empty');
-
-// --- Visibility Controls ---
-function applyOwnerVisibility(user) {
-  const isOwner = !!user;
-  qsa('.owner-only').forEach(el => el.style.display = isOwner ? '' : 'none');
-}
-
-// ============================================================================
-// EDIT PROFILE UI TOGGLE
-// ============================================================================
-$on(btnEditProfile, 'click', () => {
-  if (!auth.currentUser) return alert('Sign in to edit your profile.');
-  bioEditWrap.style.display = '';
-  nameInput.value = profileName.textContent.trim();
-  bioInput.value  = bioView.textContent === 'Add a short bio to introduce yourself.'
-    ? ''
-    : bioView.textContent.trim();
-});
-
-$on(btnCancelEdit, 'click', () => {
-  bioEditWrap.style.display = 'none';
-});
-
-// ============================================================================
-// SAVE PROFILE CHANGES
-// ============================================================================
-$on(btnSaveProfile, 'click', async () => {
+// --- Like / Dislike Toggle (mutually exclusive) ---
+async function toggleReaction(postId, isLike = true) {
   const user = auth.currentUser;
-  if (!user) return alert('You must be signed in.');
-
-  const name = nameInput.value.trim();
-  const bio  = bioInput.value.trim();
+  if (!user) return notify("Sign in to react.");
 
   try {
-    const { ref, uploadBytes, getDownloadURL } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js");
-    const { doc, setDoc, serverTimestamp } =
+    const { doc, getDoc, updateDoc, increment } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-    const { updateProfile } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
 
-    // Upload new avatar
-    if (photoInput.files[0]) {
-      const avatarRef = ref(storage, `avatars/${user.uid}_${Date.now()}.jpg`);
-      await uploadBytes(avatarRef, photoInput.files[0]);
-      const photoURL = await getDownloadURL(avatarRef);
-      await updateProfile(user, { photoURL });
-      profilePhotoImg.src = photoURL;
+    const postRef = doc(db, 'posts', postId);
+    const snap = await getDoc(postRef);
+    if (!snap.exists()) return;
+
+    const post = snap.data();
+    const userReaction = post?.[`${user.uid}_reaction`];
+
+    // Clear old reaction
+    const updates = {};
+    if (userReaction === 'like' && !isLike) {
+      updates.likeCount = increment(-1);
+      updates.dislikeCount = increment(1);
+    } else if (userReaction === 'dislike' && isLike) {
+      updates.dislikeCount = increment(-1);
+      updates.likeCount = increment(1);
+    } else if (!userReaction) {
+      updates[isLike ? 'likeCount' : 'dislikeCount'] = increment(1);
+    } else {
+      // Toggle off same reaction
+      updates[userReaction === 'like' ? 'likeCount' : 'dislikeCount'] = increment(-1);
+      updates[`${user.uid}_reaction`] = null;
+      await updateDoc(postRef, updates);
+      document.dispatchEvent(new CustomEvent('intakee:feedRefresh'));
+      return;
     }
 
-    // Upload new banner
-    if (bannerInput.files[0]) {
-      const bannerRef = ref(storage, `banners/${user.uid}_${Date.now()}.jpg`);
-      await uploadBytes(bannerRef, bannerInput.files[0]);
-      const bannerURL = await getDownloadURL(bannerRef);
-      profileBanner.style.backgroundImage = `url(${bannerURL})`;
-    }
-
-    // Update name & bio
-    if (name) await updateProfile(user, { displayName: name });
-    await setDoc(doc(db, 'users', user.uid), {
-      name: name || user.displayName || '',
-      bio: bio || '',
-      updatedAt: serverTimestamp()
-    }, { merge: true });
-
-    // Update UI
-    profileName.textContent = name || user.displayName || 'Your Name';
-    bioView.textContent = bio || 'Add a short bio to introduce yourself.';
-    bioEditWrap.style.display = 'none';
-    alert('✅ Profile updated!');
+    updates[`${user.uid}_reaction`] = isLike ? 'like' : 'dislike';
+    await updateDoc(postRef, updates);
+    document.dispatchEvent(new CustomEvent('intakee:feedRefresh'));
   } catch (err) {
     console.error(err);
-    alert('Update failed: ' + err.message);
+    notify("Error: " + err.message);
   }
-});
-
-// ============================================================================
-// LOAD PROFILE DATA
-// ============================================================================
-async function loadProfilePane(user) {
-  if (!user) {
-    // Reset when logged out
-    profileName.textContent = 'Your Name';
-    profileHandle.textContent = '@username';
-    profilePhotoImg.removeAttribute('src');
-    bioView.textContent = 'Add a short bio to introduce yourself.';
-    profileBanner.style.backgroundImage = 'none';
-    profileGrid.innerHTML = '';
-    profileEmpty.style.display = '';
-    statPosts.textContent = '0';
-    statFollowers.textContent = '0';
-    statFollowing.textContent = '0';
-    statLikes.textContent = '0';
-    return;
-  }
-
-  try {
-    const { doc, getDoc } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-    const uDoc = await getDoc(doc(db, 'users', user.uid));
-    const u = uDoc.exists() ? uDoc.data() : {};
-
-    profileName.textContent = user.displayName || u.name || 'Your Name';
-    profileHandle.textContent = '@' + (user.email.split('@')[0] || 'username');
-    bioView.textContent = (u.bio || '').trim() || 'Add a short bio to introduce yourself.';
-    if (user.photoURL) profilePhotoImg.src = user.photoURL;
-  } catch (err) {
-    console.error('Error loading profile:', err);
-  }
-
-  await loadUserPosts(user.uid);
 }
 
 // ============================================================================
-// LOAD USER POSTS INTO PROFILE GRID
+// LOAD FEEDS
 // ============================================================================
-async function loadUserPosts(uid) {
-  const { collection, getDocs, query, where, orderBy } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-
-  const qRef = query(
-    collection(db, 'posts'),
-    where('uid', '==', uid),
-    orderBy('createdAt', 'desc')
-  );
-
-  const snap = await getDocs(qRef);
-  const posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-  profileGrid.innerHTML = '';
-  if (!posts.length) {
-    profileEmpty.style.display = '';
-  } else {
-    profileEmpty.style.display = 'none';
-    posts.forEach(p => {
-      const card = document.createElement('div');
-      card.className = 'profile-post-card';
-      const thumb = p.thumbnailUrl || '/placeholder.png';
-
-      card.innerHTML = `
-        <div class="thumb">
-          <img src="${thumb}" alt="">
-          <div class="overlay">
-            <span>${p.type.toUpperCase()}</span>
-            <button class="danger delete-post" data-id="${p.id}"><i class="fa fa-trash"></i></button>
-          </div>
-        </div>
-        <h4>${p.title || 'Untitled'}</h4>
-      `;
-      profileGrid.appendChild(card);
-    });
-  }
-
-  statPosts.textContent = posts.length;
+async function loadFeeds() {
+  await fetchAllPosts();
+  renderFeed(homeFeed, _allPosts);
+  renderFeed(videosFeed, _allPosts.filter(p => p.type === 'video'));
+  renderFeed(podcastFeed, _allPosts.filter(p => p.type.startsWith('podcast')));
+  renderFeed(clipsFeed, _allPosts.filter(p => p.type === 'clip'));
 }
 
-// ============================================================================
-// DELETE A POST
-// ============================================================================
-$on(profileGrid, 'click', async (e) => {
-  const btn = e.target.closest('.delete-post');
-  if (!btn) return;
-
-  const id = btn.dataset.id;
-  if (!confirm('Delete this post permanently?')) return;
-
-  try {
-    const { doc, deleteDoc } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-    await deleteDoc(doc(db, 'posts', id));
-    btn.closest('.profile-post-card').remove();
-    alert('🗑️ Post deleted.');
-  } catch (err) {
-    alert('Failed to delete: ' + err.message);
-  }
-});
-
-// ============================================================================
-// HANDLE LOGIN STATE
-// ============================================================================
-document.addEventListener('intakee:auth', (e) => {
+document.addEventListener('intakee:feedRefresh', loadFeeds);
+document.addEventListener('intakee:auth', e => {
   const user = e.detail.user;
-  applyOwnerVisibility(user);
-  if (user) loadProfilePane(user);
+  if (user) loadFeeds();
+  else homeFeed.innerHTML = `<div class="muted">Please sign in to view content.</div>`;
 });
+loadFeeds();
 // ============================================================================
-// INTAKEE — Part 5: Settings, Privacy & Account Actions
+// INTAKEE — PART 3: SETTINGS, PRIVACY, BLOCK/UNBLOCK, FINAL BOOT
 // ============================================================================
 'use strict';
 
-// ---------- Settings Elements ----------
+// ----- HELPERS -----
+const qs = (s, sc = document) => sc.querySelector(s);
+const qsa = (s, sc = document) => Array.from(sc.querySelectorAll(s));
+const $on = (el, ev, fn) => el && el.addEventListener(ev, fn);
+const notify = (msg) => alert(msg);
+
+// ============================================================================
+// SETTINGS — TOGGLES & SAVES
+// ============================================================================
 const togglePrivate  = qs('#toggle-private');
 const toggleUploads  = qs('#toggle-uploads');
 const toggleSaved    = qs('#toggle-saved');
 const settingsLogout = qs('#settings-logout');
 
-// ---------- Toggle Helper ----------
+// Apply visual state
 function applyToggleState(tog, on) {
-  tog.dataset.on = on.toString();
+  if (!tog) return;
+  tog.dataset.on = on ? 'true' : 'false';
   tog.classList.toggle('active', on);
 }
 
-// ============================================================================
-// LOAD SETTINGS FROM FIRESTORE
-// ============================================================================
+// Load settings from Firestore
 async function loadUserSettings(uid) {
   try {
-    const { doc, getDoc } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+    const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
     const uDoc = await getDoc(doc(db, 'users', uid));
     if (!uDoc.exists()) return;
 
     const s = uDoc.data();
     applyToggleState(togglePrivate, s.private || false);
     applyToggleState(toggleUploads, s.showUploads ?? true);
-    applyToggleState(toggleSaved,   s.showSaved ?? true);
+    applyToggleState(toggleSaved, s.showSaved ?? true);
   } catch (err) {
-    console.warn('⚠️ Could not load settings:', err.message);
+    console.warn("⚠️ Settings load failed:", err.message);
   }
 }
 
-// ============================================================================
-// SAVE SETTINGS TO FIRESTORE
-// ============================================================================
+// Save user setting
 async function saveUserSetting(field, value) {
   const user = auth.currentUser;
   if (!user) return;
-
   try {
-    const { doc, updateDoc } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+    const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
     await updateDoc(doc(db, 'users', user.uid), { [field]: value });
   } catch (err) {
-    console.error('⚠️ Failed to save setting:', err.message);
+    console.error("⚠️ Save failed:", err);
   }
 }
 
-// ============================================================================
-// TOGGLE CLICKS
-// ============================================================================
+// Toggle click handlers
 [ togglePrivate, toggleUploads, toggleSaved ].forEach(tog => {
   $on(tog, 'click', () => {
     const newState = !(tog.dataset.on === 'true');
     applyToggleState(tog, newState);
-
-    // save to Firestore
     if (tog.id === 'toggle-private') saveUserSetting('private', newState);
     if (tog.id === 'toggle-uploads') saveUserSetting('showUploads', newState);
-    if (tog.id === 'toggle-saved')   saveUserSetting('showSaved', newState);
-
-    alert(`Setting updated: ${tog.id.replace('toggle-', '')} → ${newState}`);
+    if (tog.id === 'toggle-saved') saveUserSetting('showSaved', newState);
+    notify(`Setting updated: ${tog.id.replace('toggle-', '')} → ${newState}`);
   });
 });
 
 // ============================================================================
-// LOGOUT BUTTON
+// BLOCK / UNBLOCK SYSTEM
 // ============================================================================
-$on(settingsLogout, 'click', async () => {
-  try {
-    const { signOut } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
-    await signOut(auth);
-    alert('✅ You have been logged out.');
-  } catch (err) {
-    alert('Logout failed: ' + err.message);
-  }
-});
 
-// ============================================================================
-// DELETE ACCOUNT (Placeholder with Warning)
-// ============================================================================
-document.querySelectorAll('.settings-item button.danger').forEach(btn => {
-  $on(btn, 'click', async () => {
-    const user = auth.currentUser;
-    if (!user) return alert('You must be signed in.');
-    if (!confirm('⚠️ Delete your account permanently? This cannot be undone.')) return;
+// Add buttons dynamically under profile section
+const profileActions = qs('.profile-actions');
+if (profileActions) {
+  const blockBtn = document.createElement('button');
+  blockBtn.textContent = '🚫 Block User';
+  blockBtn.className = 'ghost';
+  blockBtn.id = 'btn-block';
+  profileActions.appendChild(blockBtn);
 
-    try {
-      const { deleteUser } =
-        await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
-      const { doc, deleteDoc } =
-        await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+  const unblockBtn = document.createElement('button');
+  unblockBtn.textContent = '✅ Unblock User';
+  unblockBtn.className = 'ghost';
+  unblockBtn.id = 'btn-unblock';
+  profileActions.appendChild(unblockBtn);
+}
 
-      // delete Firestore user doc
-      await deleteDoc(doc(db, 'users', user.uid));
-
-      // delete from Auth
-      await deleteUser(user);
-
-      alert('🗑️ Account deleted successfully.');
-    } catch (err) {
-      alert('Delete failed: ' + err.message);
-    }
-  });
-});
-
-// ============================================================================
-// BLOCK / UNBLOCK USERS (foundation)
-// ============================================================================
+// Block a user
 async function blockUser(targetUid) {
   const user = auth.currentUser;
-  if (!user || !targetUid) return;
+  if (!user || !targetUid) return notify('You must be signed in.');
   try {
     const { doc, updateDoc, arrayUnion } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
     await updateDoc(doc(db, 'users', user.uid), {
       blocked: arrayUnion(targetUid)
     });
-    alert('🚫 User blocked.');
+    notify('🚫 User blocked. They will no longer appear in your feed.');
   } catch (err) {
     console.error('Block failed:', err);
+    notify('Block failed: ' + err.message);
   }
 }
 
+// Unblock a user
 async function unblockUser(targetUid) {
   const user = auth.currentUser;
-  if (!user || !targetUid) return;
+  if (!user || !targetUid) return notify('You must be signed in.');
   try {
     const { doc, updateDoc, arrayRemove } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
     await updateDoc(doc(db, 'users', user.uid), {
       blocked: arrayRemove(targetUid)
     });
-    alert('✅ User unblocked.');
+    notify('✅ User unblocked.');
   } catch (err) {
     console.error('Unblock failed:', err);
+    notify('Unblock failed: ' + err.message);
   }
 }
+
+// Hook up buttons
+$on(qs('#btn-block'), 'click', async () => {
+  const targetUid = prompt("Enter the user ID to block:");
+  if (targetUid) await blockUser(targetUid);
+});
+$on(qs('#btn-unblock'), 'click', async () => {
+  const targetUid = prompt("Enter the user ID to unblock:");
+  if (targetUid) await unblockUser(targetUid);
+});
+
+// ============================================================================
+// DELETE ACCOUNT
+// ============================================================================
+document.querySelectorAll('.settings-item button.danger').forEach(btn => {
+  $on(btn, 'click', async () => {
+    const user = auth.currentUser;
+    if (!user) return notify("You must be signed in.");
+    if (!confirm("⚠️ Delete your account permanently? This cannot be undone.")) return;
+
+    try {
+      const { deleteUser } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
+      const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+
+      await deleteDoc(doc(db, 'users', user.uid));
+      await deleteUser(user);
+      notify("🗑️ Account deleted.");
+    } catch (err) {
+      console.error(err);
+      notify("❌ " + err.message);
+    }
+  });
+});
 
 // ============================================================================
 // AUTO-LOAD SETTINGS ON LOGIN
 // ============================================================================
-document.addEventListener('intakee:auth', (e) => {
+document.addEventListener('intakee:auth', e => {
   const user = e.detail.user;
   if (user) loadUserSettings(user.uid);
 });
-// ============================================================================
-// INTAKEE — Part 6: Mini-Player, Event Handling & Safe Boot
-// ============================================================================
-'use strict';
 
 // ============================================================================
-// MINI-PLAYER AUDIO CONTROLS
+// MINI-PLAYER AUDIO HANDLER
 // ============================================================================
 const miniPlayer = qs('#mini-player');
 const miniAudio  = qs('#mp-audio');
@@ -821,460 +575,108 @@ const miniTitle  = qs('#mp-title');
 const miniSub    = qs('#mp-sub');
 const miniPlay   = qs('#mp-play');
 const miniClose  = qs('#mp-close');
-
-// Track play state
 let isPlaying = false;
 
-// Function to start playing a podcast or audio post
-function playPodcast(url, title = 'Now Playing', subtitle = '') {
-  if (!url) return alert('Invalid podcast URL.');
+function playPodcast(url, title = 'Now Playing') {
+  if (!url) return notify("Invalid podcast file.");
   miniPlayer.hidden = false;
   miniTitle.textContent = title;
-  miniSub.textContent   = subtitle || '';
   miniAudio.src = url;
 
-  miniAudio.play()
-    .then(() => {
-      isPlaying = true;
-      miniPlay.innerHTML = '<i class="fa fa-pause"></i>';
-    })
-    .catch(err => console.warn('Audio play failed:', err));
+  miniAudio.play().then(() => {
+    isPlaying = true;
+    miniPlay.innerHTML = '<i class="fa fa-pause"></i>';
+  }).catch(err => console.warn('Audio failed:', err));
 }
 
-// Play / Pause toggle
 $on(miniPlay, 'click', () => {
   if (!miniAudio.src) return;
   if (isPlaying) {
     miniAudio.pause();
     miniPlay.innerHTML = '<i class="fa fa-play"></i>';
-    isPlaying = false;
   } else {
-    miniAudio.play().catch(() => {});
+    miniAudio.play();
     miniPlay.innerHTML = '<i class="fa fa-pause"></i>';
-    isPlaying = true;
   }
+  isPlaying = !isPlaying;
 });
 
-// Close mini-player
 $on(miniClose, 'click', () => {
-  try { miniAudio.pause(); } catch {}
+  miniAudio.pause();
   miniAudio.src = '';
   miniPlayer.hidden = true;
   isPlaying = false;
 });
 
-// Auto-pause when navigating away
-window.addEventListener('hashchange', () => {
-  if (!miniAudio.paused) miniAudio.pause();
-  miniPlayer.hidden = true;
-  isPlaying = false;
-});
-
 // ============================================================================
-// EVENT LISTENERS (GLOBAL REFRESH)
-// ============================================================================
-
-// Feed refresh whenever user logs in/out or uploads
-document.addEventListener('intakee:auth', (e) => {
-  const user = e.detail.user;
-  if (user) {
-    loadFeeds();
-    loadProfilePane(user);
-  } else {
-    homeFeed.innerHTML = '<div class="muted">Welcome to INTAKEE — sign in to post.</div>';
-    profileGrid.innerHTML = '';
-  }
-});
-
-document.addEventListener('intakee:feedRefresh', loadFeeds);
-
-// ============================================================================
-// SAFE BOOT (App Initialization)
+// SAFE BOOT (APP INITIALIZATION)
 // ============================================================================
 (async function bootApp() {
-  console.log('🚀 Booting INTAKEE...');
+  console.log("🚀 Booting INTAKEE...");
   try {
-    // If user already signed in (Firebase caches), load immediately
     const user = auth.currentUser;
-    if (user) {
-      await Promise.all([loadFeeds(), loadProfilePane(user), loadUserSettings(user.uid)]);
-    } else {
-      await loadFeeds();
-    }
-
-    console.log('✅ App ready.');
+    if (user) await loadUserSettings(user.uid);
+    await loadFeeds();
+    console.log("✅ INTAKEE ready.");
   } catch (err) {
-    console.error('❌ Boot failed:', err);
+    console.error("❌ Boot failed:", err);
   }
 })();
 // ============================================================================
-// INTAKEE — Phase 2, Part 7(A): Likes / Dislikes / Comments
+// INTAKEE — PART 4: USERNAME RECOVERY (FORGOT USERNAME)
 // ============================================================================
+'use strict';
 
-// ---------- Firestore Helpers ----------
-async function updatePostField(postId, data) {
-  const { doc, updateDoc } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-  await updateDoc(doc(db, 'posts', postId), data);
-}
-
-// ============================================================================
-// LIKE / DISLIKE SYSTEM
-// ============================================================================
-async function toggleLike(postId, isLike = true) {
-  const user = auth.currentUser;
-  if (!user) return alert('Please sign in to react.');
-  const { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-
-  const likeRef = doc(db, 'posts', postId, 'reactions', user.uid);
-  const postRef = doc(db, 'posts', postId);
-  const snap = await getDoc(likeRef);
-
-  // if user already liked/disliked → remove
-  if (snap.exists()) {
-    await updateDoc(postRef, {
-      likeCount: isLike ? firebase.firestore.FieldValue.increment(-1) : 0
-    });
-    await setDoc(likeRef, {}, { merge: false }); // clear
-  } else {
-    // add new reaction
-    await setDoc(likeRef, { type: isLike ? 'like' : 'dislike', at: Date.now() });
-    await updateDoc(postRef, {
-      likeCount: firebase.firestore.FieldValue.increment(isLike ? 1 : 0)
-    });
-  }
-  document.dispatchEvent(new CustomEvent('intakee:feedRefresh'));
-}
-
-// --- attach to every feed card dynamically ---
-function attachLikeButtons(card, postId) {
-  const likeBtn = document.createElement('button');
-  likeBtn.className = 'icon-btn like-btn';
-  likeBtn.innerHTML = '<i class="fa fa-thumbs-up"></i>';
-
-  const dislikeBtn = document.createElement('button');
-  dislikeBtn.className = 'icon-btn dislike-btn';
-  dislikeBtn.innerHTML = '<i class="fa fa-thumbs-down"></i>';
-
-  likeBtn.addEventListener('click', () => toggleLike(postId, true));
-  dislikeBtn.addEventListener('click', () => toggleLike(postId, false));
-
-  const footer = document.createElement('div');
-  footer.className = 'feed-footer';
-  footer.append(likeBtn, dislikeBtn);
-  card.appendChild(footer);
-}
-
-// ============================================================================
-// COMMENT SYSTEM (Videos + Clips only)
-// ============================================================================
-async function postComment(postId, text) {
-  const user = auth.currentUser;
-  if (!user) return alert('Please sign in to comment.');
-  if (!text.trim()) return;
-
-  const { collection, addDoc, serverTimestamp } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-  await addDoc(collection(db, 'posts', postId, 'comments'), {
-    uid: user.uid,
-    text: text.trim(),
-    createdAt: serverTimestamp()
-  });
-
-  loadComments(postId);
-}
-
-// --- render comments under each card ---
-async function loadComments(postId) {
-  const { collection, getDocs, orderBy, query } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-  const qRef = query(collection(db, 'posts', postId, 'comments'), orderBy('createdAt', 'asc'));
-  const snap = await getDocs(qRef);
-  const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-  const commentBox = document.querySelector(`#comments-${postId}`);
-  if (!commentBox) return;
-
-  commentBox.innerHTML = list.map(c => `
-    <div class="comment">
-      <span class="muted small">${c.uid.slice(0, 6)}:</span> ${c.text}
-    </div>
-  `).join('') || '<div class="muted small">No comments yet.</div>';
-}
-
-// --- attach comment input to video/clip cards ---
-function attachCommentInput(card, postId, type) {
-  if (!['video', 'clip'].includes(type)) return;
-  const wrapper = document.createElement('div');
-  wrapper.className = 'comment-wrapper';
-  wrapper.innerHTML = `
-    <input type="text" id="commentInput-${postId}" placeholder="Add a comment..." />
-    <button class="ghost" id="commentBtn-${postId}">Post</button>
-    <div class="comments" id="comments-${postId}"></div>
-  `;
-  card.appendChild(wrapper);
-
-  const btn = wrapper.querySelector(`#commentBtn-${postId}`);
-  btn.addEventListener('click', () => {
-    const val = wrapper.querySelector(`#commentInput-${postId}`).value;
-    postComment(postId, val);
-    wrapper.querySelector(`#commentInput-${postId}`).value = '';
-  });
-
-  // load existing comments
-  loadComments(postId);
-// ============================================================================
-// INTAKEE — Phase 2 Part 7(B): Follow / Trending / Saved / Privacy Filtering
-// ============================================================================
-
-// ---------- FOLLOW / UNFOLLOW ----------
-async function toggleFollow(targetUid) {
-  const user = auth.currentUser;
-  if (!user) return alert('Sign in to follow creators.');
-  if (user.uid === targetUid) return alert('You cannot follow yourself.');
-
-  const { doc, getDoc, updateDoc, arrayUnion, arrayRemove } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-
-  const userRef   = doc(db, 'users', user.uid);
-  const targetRef = doc(db, 'users', targetUid);
-  const uSnap = await getDoc(userRef);
-
-  const isFollowing = (uSnap.exists() && (uSnap.data().following || []).includes(targetUid));
-
-  await updateDoc(userRef,   { following: isFollowing ? arrayRemove(targetUid) : arrayUnion(targetUid) });
-  await updateDoc(targetRef, { followers: isFollowing ? arrayRemove(user.uid) : arrayUnion(user.uid) });
-
-  alert(isFollowing ? 'Unfollowed user.' : 'Following user!');
-  document.dispatchEvent(new CustomEvent('intakee:profileRefresh', { detail: { uid: targetUid } }));
-}
-
-// Attach follow button logic to profile
-$on(qs('#btn-follow'), 'click', async () => {
-  const profileUid = auth.currentUser?.uid; // in real build you’d read from viewed profile
-  if (!profileUid) return alert('You can’t follow yourself here yet (placeholder).');
-  toggleFollow(profileUid);
-});
-
-// ---------- LOAD FOLLOW STATS ----------
-async function loadFollowStats(uid) {
-  const { doc, getDoc } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-  const uSnap = await getDoc(doc(db, 'users', uid));
-  if (!uSnap.exists()) return;
-  const u = uSnap.data();
-  statFollowers.textContent = (u.followers?.length || 0).toString();
-  statFollowing.textContent = (u.following?.length || 0).toString();
-}
-
-// ---------- SAVED / WATCH-LATER ----------
-async function toggleSave(postId) {
-  const user = auth.currentUser;
-  if (!user) return alert('Sign in to save posts.');
-  const { doc, updateDoc, arrayUnion, arrayRemove, getDoc } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-
-  const userRef = doc(db, 'users', user.uid);
-  const uSnap = await getDoc(userRef);
-  const saves = uSnap.exists() ? (uSnap.data().saved || []) : [];
-  const already = saves.includes(postId);
-
-  await updateDoc(userRef, {
-    saved: already ? arrayRemove(postId) : arrayUnion(postId)
-  });
-  alert(already ? 'Removed from Watch Later.' : 'Saved to Watch Later.');
-}
-
-// Add “save” icon to feed cards
-function attachSaveButton(card, postId) {
-  const saveBtn = document.createElement('button');
-  saveBtn.className = 'icon-btn save-btn';
-  saveBtn.innerHTML = '<i class="fa fa-bookmark"></i>';
-  saveBtn.addEventListener('click', () => toggleSave(postId));
-  card.appendChild(saveBtn);
-}
-
-// ---------- TRENDING ALGORITHM ----------
-function computeTrendingScore(post) {
-  const likes = post.likeCount || 0;
-  const views = post.viewCount || 0;
-  const ageHours = (Date.now() - (post.createdAt?.toMillis?.() || Date.now())) / 3600000;
-  // basic weight: newer + high likes/views → higher score
-  return (likes * 3 + views) / Math.max(1, ageHours);
-}
-
-// Render a sorted “trending” feed
-async function loadTrendingFeed() {
-  await fetchAllPosts();
-  const ranked = [..._allPosts]
-    .filter(p => !p.private)
-    .sort((a, b) => computeTrendingScore(b) - computeTrendingScore(a))
-    .slice(0, 50);
-  renderFeed(homeFeed, ranked);
-  console.log('🔥 Trending feed loaded');
-}
-
-// ---------- PRIVATE-POST FILTER ----------
-function filterVisiblePosts(list, currentUser) {
-  if (!list?.length) return [];
-  return list.filter(p => {
-    // Public posts always visible
-    if (!p.private) return true;
-    if (!currentUser) return false;
-
-    // Owner can always see their own
-    if (p.uid === currentUser.uid) return true;
-
-    // Check if viewer follows creator (if allowed)
-    // This can later be expanded with Firestore lookup for follow relationship
-    return false;
-  });
-}
-// closes the async wrapper cleanly
-// Patch existing loadFeeds to use visibility filter
-const _oldLoadFeeds = loadFeeds;
-loadFeeds = async function() {
-  if (_isLoadingFeed) return;
-  _isLoadingFeed = true;
-  await fetchAllPosts();
-  _isLoadingFeed = false;
-  const user = auth.currentUser;
-
-  const visible = filterVisiblePosts(_allPosts, user);
-
-  renderFeed(homeFeed,   visible);
-  renderFeed(videosFeed, visible.filter(p => p.type === 'video'));
-  renderFeed(podcastFeed,visible.filter(p => p.type?.startsWith('podcast')));
-  renderFeed(clipsFeed,  visible.filter(p => p.type === 'clip'));
- }; // ✅ closes the async loadFeeds function
-
-// ----------- EVENT HOOKS -----------
-document.addEventListener('intakee:auth', e => {
-  const u = e.detail.user;
-  if (u) loadFollowStats(u.uid);
-});
-
-// closes the async wrapper cleanly
-} 
-// ---------- AUTH MODAL HANDLER ----------
 const authDialog = document.getElementById('authDialog');
-const loginButtons = document.querySelectorAll('button, a');
 
-loginButtons.forEach(el => {
-  if (el.textContent.includes('Login') || el.textContent.includes('Sign Up')) {
-    el.addEventListener('click', e => {
-      e.preventDefault();
-      if (authDialog) authDialog.showModal();
+// --- Create “Forgot Username?” link below Login form ---
+const forgotUserBtn = document.createElement('button');
+forgotUserBtn.textContent = "Forgot Username?";
+forgotUserBtn.className = "ghost";
+forgotUserBtn.style.marginTop = "6px";
+
+const loginSection = document.querySelectorAll('#authDialog div[style*="display:grid"]')[1];
+if (loginSection) loginSection.appendChild(forgotUserBtn);
+
+// --- Handler ---
+$on(forgotUserBtn, 'click', async () => {
+  const email = prompt("Enter your account email:");
+  if (!email) return;
+
+  try {
+    const { collection, getDocs, query, where, doc, setDoc, serverTimestamp } =
+      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+
+    // Step 1: Check if this email exists
+    const usersRef = query(collection(db, "users"), where("email", "==", email));
+    const snap = await getDocs(usersRef);
+
+    if (snap.empty) return notify("❌ No account found with that email.");
+
+    // Step 2: Generate recovery code
+    const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
+    await setDoc(doc(db, "recoveries", email.replace(/\W/g, "_")), {
+      email,
+      code,
+      createdAt: serverTimestamp()
     });
-  }
-});   
-// ===============================
-// FINAL AUTH SECTION — INTAKEE
-// ===============================
-document.addEventListener("DOMContentLoaded", () => {
-  const signupBtn = document.getElementById('signupBtn');
-  const loginBtn = document.getElementById('loginBtn');
-  const logoutBtn = document.getElementById('settings-logout');
 
-  // --- SIGN UP ---
-  if (signupBtn) {
-    signupBtn.addEventListener("click", async () => {
-      const email = document.getElementById("signupEmail").value.trim();
-      const password = document.getElementById("signupPassword").value.trim();
-      const ageOK = document.getElementById("signupAgeConfirm").checked;
-      if (!ageOK) return alert("You must confirm you are 13 or older.");
-      if (!email || !password) return alert("Please enter email and password.");
+    // Step 3: “Send” the code (console now, later email)
+    console.log(`📩 Recovery code for ${email}: ${code}`);
+    notify("A 6-digit recovery code has been sent to your email. (Check console in dev mode)");
 
-      try {
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
-        alert(`✅ Welcome to INTAKEE, ${userCred.user.email}!`);
-        document.getElementById("authDialog").close();
-      } catch (err) {
-        console.error(err);
-        alert("❌ " + err.message);
-      }
-    });
-  }
+    // Step 4: Prompt user for code
+    const entered = prompt("Enter the 6-digit recovery code:");
+    if (!entered) return notify("Cancelled.");
+    if (entered !== code) return notify("❌ Invalid code.");
 
-  // --- LOGIN ---
-  if (loginBtn) {
-    loginBtn.addEventListener("click", async () => {
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value.trim();
-      if (!email || !password) return alert("Please enter email and password.");
+    // Step 5: Display username
+    const userData = snap.docs[0].data();
+    const username = userData.username || userData.email.split("@")[0];
+    notify(`✅ Your username is: ${username}`);
 
-      try {
-        const userCred = await signInWithEmailAndPassword(auth, email, password);
-        alert(`✅ Signed in as ${userCred.user.email}`);
-        document.getElementById("authDialog").close();
-      } catch (err) {
-        console.error(err);
-        alert("❌ " + err.message);
-      }
-    });
-  }
-
-  // --- LOGOUT ---
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-        alert("👋 You’ve been logged out.");
-      } catch (err) {
-        console.error(err);
-        alert("❌ Logout failed: " + err.message);
-      }
-    });
+  } catch (err) {
+    console.error(err);
+    notify("❌ " + err.message);
   }
 });
-  // --- SIGN UP ---
-  if (signupBtn) {
-    signupBtn.addEventListener("click", async () => {
-      const email = document.getElementById("signupEmail").value.trim();
-      const password = document.getElementById("signupPassword").value.trim();
-      const ageOK = document.getElementById("signupAgeConfirm").checked;
-      if (!ageOK) return alert("You must confirm you are 13 or older.");
-      if (!email || !password) return alert("Please enter email and password.");
-
-      try {
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
-        alert(`✅ Welcome to INTAKEE, ${userCred.user.email}!`);
-        document.getElementById("authDialog").close();
-      } catch (err) {
-        console.error(err);
-        alert("❌ " + err.message);
-      }
-    });
-  }
-
-  // --- LOGIN ---
-  if (loginBtn) {
-    loginBtn.addEventListener("click", async () => {
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value.trim();
-      if (!email || !password) return alert("Please enter email and password.");
-
-      try {
-        const userCred = await signInWithEmailAndPassword(auth, email, password);
-        alert(`✅ Signed in as ${userCred.user.email}`);
-        document.getElementById("authDialog").close();
-      } catch (err) {
-        console.error(err);
-        alert("❌ " + err.message);
-      }
-    });
-  }
-
-  // --- LOGOUT ---
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-        alert("👋 You’ve been logged out.");
-      } catch (err) {
-        console.error(err);
-        alert("❌ Logout failed: " + err.message);
-      }
-    });
-  }
