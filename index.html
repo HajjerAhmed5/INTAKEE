@@ -2,416 +2,182 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>INTAKEE — Videos, Podcasts, and Clips</title>
-  <meta name="description" content="INTAKEE is the all-in-one platform for videos, podcasts, and clips — freedom to create, simple to share.">
-  <link rel="canonical" href="https://intakee.vercel.app/">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="INTAKEE — Videos, Podcasts, and Clips">
-  <meta property="og:description" content="All-in-one platform for videos, podcasts, and clips.">
-  <meta property="og:url" content="https://intakee.vercel.app/">
-  <meta property="og:image" content="/og-image.jpg">
-  <meta name="twitter:card" content="summary_large_image">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
-  <link rel="icon" href="/favicon.ico">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INTAKEE — Videos, Podcasts & Clips</title>
+  <meta name="description" content="INTAKEE — freedom to create, simple to share. Watch videos, podcasts, and clips all in one place." />
+  <link rel="canonical" href="https://intakee.vercel.app/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="INTAKEE — Videos, Podcasts & Clips" />
+  <meta property="og:description" content="All-in-one platform for videos, podcasts, and clips." />
+  <meta property="og:url" content="https://intakee.vercel.app/" />
+  <meta property="og:image" content="/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+
+  <style>
+    body { margin:0; font-family:system-ui,Arial,sans-serif; background:#000; color:#fff; overflow-x:hidden; }
+    .fade-slide { animation:fadeSlide .5s ease; }
+    @keyframes fadeSlide { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+    header { position:sticky; top:0; background:#0a0a0a; display:flex; align-items:center; padding:10px 16px; z-index:1000; }
+    .search-bar { display:flex; align-items:center; background:#111; border-radius:10px; padding:6px 10px; flex:1; max-width:480px; margin:0 12px; }
+    .search-bar input { width:100%; background:transparent; border:none; color:#fff; outline:none; }
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; display:grid; grid-template-columns:repeat(7,1fr); background:#0b0b0b; border-top:1px solid #111; }
+    .bottom-nav a { text-align:center; padding:8px 0; color:#aaa; font-size:.8rem; }
+    .bottom-nav a.active { color:#fff; }
+    main { padding:20px; padding-bottom:100px; max-width:1000px; margin:auto; }
+    .card { background:#101010; border-radius:12px; padding:14px; margin:10px 0; border:1px solid #1a1a1a; }
+    .auth button.primary { background:#fff; color:#000; border-radius:8px; padding:8px 12px; }
+    dialog { background:#101010; color:#fff; border-radius:12px; border:1px solid #222; width:90%; max-width:400px; }
+    dialog::backdrop { background:rgba(0,0,0,0.6); }
+    input,textarea,select { background:#111; border:1px solid #333; color:#fff; padding:8px; border-radius:8px; width:100%; }
+    .fade { transition:opacity .25s ease; }
+    @media(max-width:700px){ header img{height:70px;} .search-bar{max-width:60%;} }
+  </style>
 </head>
 
 <body class="dark-theme">
-  <body class="dark-theme" autocomplete="off" autocapitalize="none" spellcheck="false">
-  <form autocomplete="off"></form>
-  <!-- ===== HEADER ===== -->
-  <header class="app-header">
-    <div class="brand">
-      <img src="logo.png" alt="INTAKEE logo" style="height:120px;">
+  <!-- HEADER -->
+  <header class="fade-slide">
+    <img src="logo.png" alt="INTAKEE Logo" style="height:90px;">
+    <div class="search-bar">
+      <i class="fa fa-search"></i>
+      <input id="mainSearchBar" placeholder="Search..." autocomplete="off" />
     </div>
-    <div class="spacer"></div>
-    <div id="searchWrap" class="search-bar">
-  <i class="fa fa-search"></i>
-<input
-  id="mainSearchBar"
-  name="mainSearchBar"
-  type="search"
-  placeholder="Search..."
-  autocomplete="off"
-  autocorrect="off"
-  autocapitalize="none"
-  spellcheck="false"
-  inputmode="none"
-  role="presentation"
-  style="ime-mode: disabled;"
-  readonly
-  onfocus="this.removeAttribute('readonly'); this.value='';"
-/>
-</div>
-    <div class="auth">
-      <button id="openAuth" class="primary">Login / Sign Up</button>
-    </div>
+    <button id="openAuth" class="primary">Login / Sign Up</button>
   </header>
 
-  <!-- ===== MAIN CONTENT ===== -->
+  <!-- MAIN CONTENT -->
   <main>
-
-    <!-- HOME -->
-    <section id="tab-home">
-      <div class="row space-between">
-        <h2>Trending</h2>
-        <div class="pills">
-          <button class="pill active" data-filter="all">All</button>
-          <button class="pill" data-filter="video">Videos</button>
-          <button class="pill" data-filter="podcast">Podcasts</button>
-          <button class="pill" data-filter="clip">Clips</button>
-          <button class="pill" data-filter="following">Following</button>
-          <button class="pill" data-filter="new">Newest</button>
-        </div>
+    <section id="tab-home" class="fade-slide">
+      <h2>Trending</h2>
+      <div class="pills">
+        <button class="pill active" data-filter="all">All</button>
+        <button class="pill" data-filter="video">Videos</button>
+        <button class="pill" data-filter="podcast">Podcasts</button>
+        <button class="pill" data-filter="clip">Clips</button>
       </div>
       <div id="home-feed" class="feed-grid"></div>
     </section>
 
-    <!-- VIDEOS -->
-    <section id="tab-videos" style="display:none;">
-      <div class="section-head">
-        <h3>Videos</h3>
-     </div>
+    <section id="tab-videos" style="display:none;" class="fade-slide">
+      <h3>Videos</h3>
       <div id="videos-feed" class="feed-grid"></div>
     </section>
 
-    <!-- PODCASTS -->
-    <section id="tab-podcast" style="display:none;">
-      <div class="section-head">
-        <h3>Podcasts</h3>
-      </div>
-      <div id="podcast-feed" class="podcast-list"></div>
+    <section id="tab-podcast" style="display:none;" class="fade-slide">
+      <h3>Podcasts</h3>
+      <div id="podcast-feed" class="feed-grid"></div>
     </section>
 
-    <!-- UPLOAD -->
-    <section id="tab-upload" class="card" style="display:none;">
+    <section id="tab-upload" style="display:none;" class="fade-slide card">
       <h3>Upload</h3>
-      <div class="upload-form">
-        <label>Choose type</label>
-        <select id="uploadTypeSelect">
-          <option value="video">Video</option>
-          <option value="clip">Clip</option>
-          <option value="podcast-audio">Podcast (Audio)</option>
-        </select>
-
-        <label>Title</label>
-        <input id="uploadTitleInput" type="text" placeholder="Add a title">
-
-        <label>Description</label>
-        <textarea id="uploadDescInput" placeholder="Describe your content…" rows="3"></textarea>
-
-        <label>Thumbnail (cover image)</label>
-        <input id="uploadThumbInput" type="file" accept="image/*">
-
-        <label>File</label>
-        <input id="uploadFileInput" type="file" accept="video/*,audio/*">
-
-        <p class="muted small">Processing starts after upload. You’ll be notified when it’s ready.</p>
-
-        <div class="row">
-          <button id="btnUpload" class="primary">Upload</button>
-          <button id="goLiveBtn" class="ghost">Go Live</button>
-        </div>
-      </div>
+      <select id="uploadTypeSelect">
+        <option value="video">Video</option>
+        <option value="clip">Clip</option>
+        <option value="podcast-audio">Podcast (Audio)</option>
+      </select>
+      <input id="uploadTitleInput" placeholder="Title">
+      <textarea id="uploadDescInput" placeholder="Description"></textarea>
+      <label>Thumbnail</label><input id="uploadThumbInput" type="file" accept="image/*">
+      <label>File</label><input id="uploadFileInput" type="file" accept="video/*,audio/*">
+      <button id="btnUpload" class="primary">Upload</button>
+      <button id="goLiveBtn" class="ghost">Go Live</button>
     </section>
 
-    <!-- CLIPS -->
-    <section id="tab-clips" style="display:none;">
-      <div class="section-head">
-        <h3>Clips</h3>
-      </div>
-      <div id="clips-feed" class="clip-feed"></div>
-    </section>
-
-    <!-- PROFILE -->
-    <section id="tab-profile" style="display:none;">
-      <div id="profileBanner" class="profile-banner"></div>
-      <div class="card profile-card">
-        <div class="profile-header">
-          <div class="avatar-wrap">
-            <img id="profile-photo" src="" alt="" class="profile-avatar">
-            <input id="profilePhotoInput" type="file" accept="image/*" hidden>
-          </div>
-          <div>
-            <h3 id="profile-name">Your Name</h3>
-            <div id="profile-handle" class="muted">@username</div>
-            <p id="bio-view" class="muted">Add a short bio to introduce yourself.</p>
-
-            <div id="bio-edit-wrap" style="display:none;">
-              <input id="profileNameInput" type="text" placeholder="Your name">
-              <textarea id="profileBioInput" placeholder="Write your bio…" maxlength="300"></textarea>
-              <div class="row">
-                <label class="ghost">Banner <input id="profileBannerInput" type="file" accept="image/*"></label>
-                <button id="btnSaveProfile" class="primary">Save</button>
-                <button id="bio-cancel" class="ghost">Cancel</button>
-              </div>
-            </div>
-
-            <div class="stat-row">
-              <span><strong id="stat-posts">0</strong> Posts</span>
-              <span><strong id="stat-followers">0</strong> Followers</span>
-              <span><strong id="stat-following">0</strong> Following</span>
-              <span><strong id="stat-likes">0</strong> Likes</span>
-            </div>
-          </div>
-          <div class="profile-actions">
-            <button id="btn-follow" class="primary">Follow</button>
-            <button id="btn-edit-profile" class="ghost owner-only" style="display:none;">Edit Profile</button>
-          </div>
-        </div>
-      </div>
-
+    <section id="tab-profile" style="display:none;" class="fade-slide">
       <div class="card">
-        <div class="profile-tabs">
-          <button class="pill active" data-profiletab="all">All</button>
-          <button class="pill" data-profiletab="videos">Videos</button>
-          <button class="pill" data-profiletab="podcasts">Podcasts</button>
-          <button class="pill" data-profiletab="clips">Clips</button>
+        <img id="profile-photo" src="" class="profile-avatar" style="width:100px;border-radius:50%;">
+        <h3 id="profile-name">Your Name</h3>
+        <p id="bio-view" class="muted">Add a bio...</p>
+        <button id="btn-edit-profile" class="primary">Edit Profile</button>
+        <div id="bio-edit-wrap" style="display:none;">
+          <input id="profileNameInput" placeholder="Your name">
+          <textarea id="profileBioInput" placeholder="Your bio..."></textarea>
+          <button id="btnSaveProfile" class="primary">Save</button>
+          <button id="bio-cancel" class="ghost">Cancel</button>
         </div>
-        <div id="profile-grid" class="grid"></div>
-        <div id="profile-empty" class="muted" style="display:none;">No posts yet.</div>
       </div>
+      <div id="profile-grid" class="grid"></div>
     </section>
 
-    <!-- SETTINGS -->
-    <section id="tab-settings" style="display:none;">
-      <!-- Account -->
-      <div class="settings-section">
+    <section id="tab-settings" style="display:none;" class="fade-slide">
+      <div class="settings-section card">
         <h3>Account</h3>
-        <div class="settings-item"><div><i class="fa fa-user"></i> Name / Email</div><button class="ghost">Edit</button></div>
-        <div class="settings-item"><div><i class="fa fa-key"></i> Change Password</div><button class="ghost">Update</button></div>
-        <div class="settings-item"><div><i class="fa fa-trash"></i> Delete Account</div><button class="ghost danger">Delete</button></div>
+        <button id="settings-logout" class="ghost">Log out</button>
+        <button id="forgotPasswordBtn" class="ghost">Forgot Password</button>
+        <button id="blockUserBtn" class="ghost danger">Block User</button>
       </div>
-
-      <!-- Privacy -->
-      <div class="settings-section">
-        <h3>Privacy & Safety</h3>
-        <div class="settings-item"><span>Private Account</span><div class="toggle" id="toggle-private" data-on="false"></div></div>
-        <div class="settings-item"><span>Show Uploads</span><div class="toggle" id="toggle-uploads" data-on="true"></div></div>
-        <div class="settings-item"><span>Show Saved</span><div class="toggle" id="toggle-saved" data-on="true"></div></div>
-      </div>
-
-      <!-- Legal -->
-      <div class="settings-section">
-        <h3>Legal & Policy</h3>
-        <p class="muted small">INTAKEE supports freedom of speech and creative expression. Users are responsible for their own content.</p>
-        <button class="link-btn" data-legal="guidelines">Community Guidelines</button><br>
-        <button class="link-btn" data-legal="terms">Terms of Service</button><br>
-        <button class="link-btn" data-legal="privacy">Privacy Policy</button><br>
-        <button class="link-btn" data-legal="report">Report Content</button><br>
-        <a href="mailto:intakee2025@gmail.com" class="muted">Contact: intakee2025@gmail.com</a>
-      </div>
-
-      <!-- Hidden Legal Content -->
-      <div id="legalContainer" style="display:none;">
-        <div id="guidelines" class="legal-subsection">
-          <h4>Community Guidelines</h4>
-          <p><strong>Our Mission:</strong> INTAKEE gives every creator a fair space to share ideas, stories, and art.</p>
-          <p><strong>What’s Allowed:</strong> Creative, educational, artistic, and opinion-based content.</p>
-          <p><strong>What’s Not Allowed:</strong> Nudity, violence, harassment, scams, or illegal activity.</p>
-        </div>
-
-        <div id="terms" class="legal-subsection" style="display:none;">
-          <h4>Terms of Service</h4>
-          <p>By creating an account, you agree to our platform rules. You retain ownership of your uploads.</p>
-          <p>INTAKEE may remove violating content and reserves the right to modify services.</p>
-        </div>
-
-        <div id="privacy" class="legal-subsection" style="display:none;">
-          <h4>Privacy Policy</h4>
-          <p>We collect basic info (email, uploads, analytics). INTAKEE never sells your data.</p>
-          <p>Contact: intakee2025@gmail.com</p>
-        </div>
-      </div>
-
-      <!-- Logout -->
-      <div class="settings-section">
-        <div class="settings-item danger">
-          <div><i class="fa fa-right-from-bracket"></i> Logout</div>
-          <button id="settings-logout" class="ghost">Log out</button>
-        </div>
+      <div class="settings-section card">
+        <h3>Privacy</h3>
+        <label><input id="toggle-private" type="checkbox"> Private Account</label>
       </div>
     </section>
   </main>
 
-  <!-- ===== MINI PLAYER ===== -->
-  <div id="mini-player" class="mini-player" hidden>
-    <div class="mp-left">
-      <div class="mp-art" id="mp-art"></div>
-      <div class="mp-meta">
-        <div id="mp-title" class="mp-title">—</div>
-        <div id="mp-sub" class="mp-sub muted small">—</div>
-      </div>
-    </div>
-    <div class="mp-controls">
-      <button id="mp-play" class="icon-btn"><i class="fa fa-play"></i></button>
-      <button id="mp-close" class="icon-btn"><i class="fa fa-xmark"></i></button>
-    </div>
+  <!-- MINI PLAYER -->
+  <div id="mini-player" hidden>
     <audio id="mp-audio" preload="metadata"></audio>
+    <button id="mp-play" class="icon-btn"><i class="fa fa-play"></i></button>
+    <button id="mp-close" class="icon-btn"><i class="fa fa-xmark"></i></button>
   </div>
 
-  <!-- ===== NAV ===== -->
-  <nav class="bottom-nav">
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav fade">
     <a href="#home" data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
     <a href="#videos" data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
     <a href="#podcast" data-tab="podcast"><i class="fa fa-podcast"></i><span>Podcast</span></a>
     <a href="#upload" data-tab="upload"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
-    <a href="#clips" data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
     <a href="#profile" data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
     <a href="#settings" data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
   </nav>
-<!-- ===== AUTH MODAL ===== -->
-<dialog id="authDialog">
-  <form method="dialog" style="text-align:right; margin-bottom:8px;">
-    <button aria-label="Close">✕</button>
-  </form>
-<!-- Create Account -->
-<h3 style="margin:0 0 8px;">Create account</h3>
-<div style="display:grid; gap:8px;">
-  <input 
-    id="signupEmail"
-    name="signupEmail"
-    type="email"
-    placeholder="Email"
-    autocomplete="new-email"
-    required
-  />
-  <input 
-    id="signupPassword"
-    name="signupPassword"
-    type="password"
-    placeholder="Password (min 6)"
-    autocomplete="new-password"
-    required
-  />
-  <label style="font-size:13px;">
-    <input id="signupAgeConfirm" type="checkbox" required />
-    I confirm I am 13 or older.
-  </label>
-  <button id="signupBtn" type="button">Sign Up</button>
-</div>
 
-<hr style="margin:16px 0; border-color:#1a1a1a;">
+  <!-- AUTH / FORGOT PASSWORD MODAL -->
+  <dialog id="authDialog" class="fade-slide">
+    <form method="dialog" style="text-align:right;"><button aria-label="Close">✕</button></form>
+    <h3>Create account</h3>
+    <input id="signupEmail" type="email" placeholder="Email" />
+    <input id="signupPassword" type="password" placeholder="Password (min 6)" />
+    <input id="signupUsername" type="text" placeholder="Choose a username" />
+    <label><input id="signupAgeConfirm" type="checkbox" /> I confirm I am 13 or older.</label>
+    <button id="signupBtn" type="button">Sign Up</button>
+    <hr>
+    <h3>Sign in</h3>
+    <input id="loginEmail" type="email" placeholder="Email" />
+    <input id="loginPassword" type="password" placeholder="Password" />
+    <button id="loginBtn" type="button">Login</button>
+    <button id="forgotPassBtn" type="button" class="ghost">Forgot Password?</button>
+  </dialog>
 
-<!-- Sign In -->
-<h3 style="margin:0 0 8px;">Sign in</h3>
-<div style="display:grid; gap:8px;">
-  <input 
-    id="loginEmail"
-    name="loginEmail"
-    type="email"
-    placeholder="Email"
-    autocomplete="off"
-    required
-  />
-  <input 
-    id="loginPassword"
-    name="loginPassword"
-    type="password"
-    placeholder="Password"
-    autocomplete="current-password"
-    required
-  />
-  <button id="loginBtn" type="button">Login</button>
-</div>
-  <!-- ===== ROUTER (Tab Switching) ===== -->
-  <script>
-    (function(){
-      const sections = [...document.querySelectorAll('main > section')];
-      const navLinks = [...document.querySelectorAll('.bottom-nav a')];
-      const searchBar = document.getElementById('searchWrap');
+  <!-- FIREBASE CONFIG -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+    import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
-      function setTab(key){
-        sections.forEach(s=>s.style.display = s.id === 'tab-'+key ? '' : 'none');
-        navLinks.forEach(a=>a.classList.toggle('active', a.dataset.tab === key));
-        if(searchBar) searchBar.style.display = ['home','videos','podcast','clips'].includes(key) ? 'flex' : 'none';
-        window.scrollTo(0,0);
-      }
-      window.addEventListener('hashchange', ()=>{
-        const key = (location.hash || '#home').slice(1);
-        setTab(key);
-      });
-      navLinks.forEach(a=>{
-        a.addEventListener('click', e=>{
-          e.preventDefault();
-          location.hash = a.getAttribute('href');
-        });
-      });
-      setTab((location.hash || '#home').slice(1) || 'home');
-    })();
+    const firebaseConfig = {
+      apiKey: "AIzaSyDp_tLBxUPvlvG7JqCBj3ItuL7sKjpL56g",
+      authDomain: "intakee-5785e.firebaseapp.com",
+      projectId: "intakee-5785e",
+      storageBucket: "intakee-5785e.appspot.com",
+      messagingSenderId: "140666230072",
+      appId: "1:140666230072:web:49dd5e7db91c8a38b56c5d",
+      measurementId: "G-3C2YDV6TG6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    window.firebaseRefs = { app, auth, db, storage, onAuthStateChanged };
   </script>
 
-  <!-- ===== SETTINGS TAB LOGIC ===== -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const buttons = document.querySelectorAll('[data-legal]');
-      const sections = document.querySelectorAll('#legalContainer .legal-subsection');
-      const container = document.getElementById('legalContainer');
-      buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const targetId = btn.dataset.legal;
-          if (targetId === 'report') {
-            window.location.href = "mailto:intakee2025@gmail.com?subject=Report%20Content";
-            return;
-          }
-          container.style.display = 'block';
-          sections.forEach(s => s.style.display = s.id === targetId ? 'block' : 'none');
-          window.scrollTo(0, container.offsetTop - 50);
-        });
-      });
-    });
-  </script>
-
-  <!-- ===== FIREBASE INIT ===== -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-  import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDp_tLBxUPvlvG7JqCBj3ItuL7sKjpL56g",
-    authDomain: "intakee-5785e.firebaseapp.com",
-    projectId: "intakee-5785e",
-    storageBucket: "intakee-5785e.appspot.com",
-    messagingSenderId: "140666230072",
-    appId: "1:140666230072:web:49dd5e7db91c8a38b56c5d",
-    measurementId: "G-3C2YDV6TG6"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const storage = getStorage(app);
-
-  window.firebaseRefs = { app, auth, db, storage, onAuthStateChanged };
-  onAuthStateChanged(auth, (user) => {
-    document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
-  });
-
-  console.log('✅ Firebase ready:', app.options.projectId);
-</script>
-
-<!-- ✅ Firebase Auth Helpers for INTAKEE -->
-<script type="module">
-  import {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    updateProfile
-  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-
-  window.firebaseAuthExports = {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    updateProfile
-  };
-</script>
-
-<!-- ✅ Main INTAKEE App Logic -->
-<script type="module" src="script.js?v=final"></script>
+  <!-- MAIN LOGIC -->
+  <script type="module" src="script.js?v=final"></script>
 </body>
 </html>
