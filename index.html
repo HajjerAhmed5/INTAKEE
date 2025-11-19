@@ -5,45 +5,126 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INTAKEE — Videos, Podcasts & Clips</title>
 
-  <meta name="description" content="INTAKEE — freedom to create, simple to share. Watch videos, podcasts, and clips all in one place." />
+  <meta name="description" content="INTAKEE — freedom to create, simple to share. Watch videos, podcasts, and clips all in one platform." />
   <link rel="stylesheet" href="style.css" />
-
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
 
   <style>
-    body { margin:0; font-family:system-ui,Arial,sans-serif; background:#000; color:#fff; }
-    header { position:sticky; top:0; z-index:1000; display:flex; align-items:center; padding:10px 16px; background:#0b0b0b; }
+    body {
+      margin:0; 
+      font-family:system-ui,Arial,sans-serif; 
+      background:#000; 
+      color:#fff;
+    }
+    header {
+      position:sticky; 
+      top:0; 
+      z-index:1000; 
+      display:flex; 
+      align-items:center;
+      padding:10px 16px; 
+      background:#0b0b0b;
+    }
     header img { height:90px; }
-    .search-bar { flex:1; display:flex; align-items:center; background:#111; border-radius:10px; padding:6px 10px; margin-left:15px; }
-    .search-bar input { background:transparent; border:none; outline:none; color:white; width:100%; }
 
-    main { padding:20px; padding-bottom:120px; max-width:900px; margin:auto; }
+    .search-bar {
+      flex:1; display:flex; align-items:center; 
+      background:#111; border-radius:10px;
+      padding:6px 10px; margin-left:15px;
+    }
+    .search-bar input {
+      background:transparent; border:none; 
+      outline:none; color:white; width:100%;
+    }
 
-    .card { background:#101010; border-radius:12px; padding:14px; margin:10px 0; border:1px solid #1a1a1a; }
+    main {
+      padding:20px;
+      padding-bottom:120px;
+      max-width:900px;
+      margin:auto;
+    }
 
-    .feed-grid, .grid { display:flex; flex-direction:column; gap:16px; }
+    .card { 
+      background:#101010; 
+      border-radius:12px; 
+      padding:14px; 
+      margin:10px 0; 
+      border:1px solid #1a1a1a; 
+    }
 
-    .bottom-nav { position:fixed; bottom:0; left:0; right:0; display:grid; grid-template-columns:repeat(6,1fr); background:#0b0b0b; border-top:1px solid #222; }
-    .bottom-nav a { padding:8px 0; display:flex; flex-direction:column; align-items:center; color:#aaa; font-size:0.8rem; }
+    .feed-grid, .grid { 
+      display:flex; 
+      flex-direction:column; 
+      gap:16px; 
+    }
+
+    .bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      display:grid; grid-template-columns:repeat(7,1fr);
+      background:#0b0b0b; border-top:1px solid #222;
+      z-index:2000;
+    }
+    .bottom-nav a {
+      padding:8px 0; 
+      display:flex; 
+      flex-direction:column; 
+      align-items:center; 
+      color:#aaa;
+      font-size:0.8rem;
+    }
     .bottom-nav a.active { color:white; }
 
-    dialog { background:#101010; color:#fff; border-radius:12px; border:1px solid #222; width:90%; max-width:420px; }
+    dialog {
+      background:#101010; 
+      color:#fff; 
+      border-radius:12px; 
+      border:1px solid #222;
+      width:90%; max-width:420px;
+    }
     dialog::backdrop { background:rgba(0,0,0,.6); }
 
-    input, textarea, select { background:#111; color:white; border:1px solid #333; border-radius:10px; padding:10px; width:100%; margin-bottom:10px; }
+    input, textarea, select {
+      background:#111; color:white;
+      border:1px solid #333;
+      border-radius:10px; padding:10px;
+      width:100%; margin-bottom:10px;
+    }
 
-    .profile-avatar { width:100px; height:100px; border-radius:50%; object-fit:cover; background:#333; }
-    .profile-banner { width:100%; height:150px; background-size:cover; background-position:center; border-radius:12px; }
+    .profile-avatar {
+      width:100px; height:100px; 
+      border-radius:50%; object-fit:cover; 
+      background:#333; margin-top:-50px;
+    }
+    .profile-banner {
+      width:100%; height:160px; 
+      background-size:cover; 
+      background-position:center; 
+      border-radius:12px;
+    }
 
-    .stats-row { display:flex; gap:20px; margin-top:10px; }
+    .stats-row {
+      display:flex; 
+      gap:20px; 
+      margin-top:10px; 
+      justify-content:center;
+    }
     .stat-item { text-align:center; }
-    .stat-item span { display:block; color:#888; font-size:0.8rem; }
+    .stat-item span { color:#888; font-size:0.8rem; }
 
-    .settings-section { margin-bottom:20px; }
-
-    .toggle-row { display:flex; align-items:center; justify-content:space-between; margin:8px 0; }
-    .toggle-btn { padding:6px 12px; border-radius:6px; background:#222; cursor:pointer; }
-    .toggle-btn.active { background:#fff; color:#000; }
+    /* Accordion */
+    .accordion-item {
+      border-bottom:1px solid #222;
+      padding:12px 0;
+    }
+    .accordion-header {
+      display:flex; justify-content:space-between; 
+      cursor:pointer;
+      font-weight:bold;
+    }
+    .accordion-body {
+      display:none; padding:10px 0; color:#ccc;
+      font-size:0.9rem; line-height:1.5;
+    }
   </style>
 </head>
 
@@ -51,40 +132,44 @@
 
 <!-- HEADER -->
 <header>
-  <img src="logo.png" alt="INTAKEE">
+  <img src="logo.png" alt="INTAKEE Logo">
+  
+  <!-- Search bar (hidden on Upload + Settings) -->
   <div class="search-bar">
     <i class="fa fa-search"></i>
     <input id="globalSearch" placeholder="Search..." autocomplete="off">
   </div>
+
   <button id="openAuth" class="primary">Login</button>
 </header>
 
 <main>
 
-<!-- HOME TAB -->
+<!-- ================== HOME TAB ================== -->
 <section id="tab-home">
   <h2>Trending</h2>
   <div id="home-feed" class="feed-grid"></div>
 </section>
 
-<!-- VIDEOS TAB -->
+<!-- ================== VIDEOS TAB ================== -->
 <section id="tab-videos" style="display:none;">
   <h2>Videos</h2>
   <div id="videos-feed" class="feed-grid"></div>
 </section>
 
-<!-- PODCAST TAB -->
+<!-- ================== PODCAST TAB ================== -->
 <section id="tab-podcast" style="display:none;">
   <h2>Podcasts</h2>
   <div id="podcast-feed" class="feed-grid"></div>
 </section>
 
-<!-- CLIPS TAB -->
+<!-- ================== CLIPS TAB ================== -->
 <section id="tab-clips" style="display:none;">
   <h2>Clips</h2>
   <div id="clips-feed" class="feed-grid"></div>
 </section>
-<!-- UPLOAD TAB -->
+
+<!-- ================== UPLOAD TAB ================== -->
 <section id="tab-upload" style="display:none;" class="card">
   <h2>Upload</h2>
 
@@ -108,22 +193,26 @@
   <button id="goLiveBtn" class="ghost">Go Live</button>
 </section>
 
-<!-- PROFILE TAB -->
+<!-- ================== PROFILE TAB ================== -->
 <section id="tab-profile" style="display:none;">
   <div class="card">
 
     <div class="profile-banner" id="profileBanner"></div>
 
-    <img id="profile-photo" class="profile-avatar">
+    <div style="text-align:center;">
+      <img id="profile-photo" class="profile-avatar" src="">
+    </div>
 
-    <h3 id="profile-name">Your Name</h3>
-    <p id="profile-handle">@username</p>
+    <h3 id="profile-name" style="text-align:center;">Your Name</h3>
+    <p id="profile-handle" style="text-align:center; color:#888;">@username</p>
+    <p id="bio-view" style="text-align:center;">Add a short bio to introduce yourself.</p>
 
-    <p id="bio-view">Add a short bio to introduce yourself.</p>
+    <div style="text-align:center;">
+      <button id="btn-edit-profile" class="primary owner-only">Edit Profile</button>
+    </div>
 
-    <button id="btn-edit-profile" class="primary owner-only">Edit Profile</button>
-
-    <div id="bio-edit-wrap" style="display:none;">
+    <!-- Edit Profile -->
+    <div id="bio-edit-wrap" style="display:none; margin-top:10px;">
       <input id="profileNameInput" placeholder="Your name">
       <textarea id="profileBioInput" placeholder="Your bio..."></textarea>
 
@@ -137,6 +226,7 @@
       <button id="bio-cancel" class="ghost">Cancel</button>
     </div>
 
+    <!-- Stats -->
     <div class="stats-row">
       <div class="stat-item">
         <strong id="stat-posts">0</strong>
@@ -161,13 +251,13 @@
   <div id="profile-grid" class="grid"></div>
   <div id="profile-empty" class="muted">No posts yet.</div>
 </section>
-
-<!-- SETTINGS TAB -->
+<!-- ================== SETTINGS TAB ================== -->
 <section id="tab-settings" style="display:none;">
   <div class="settings-section card">
     <h3>Account</h3>
-    <button id="settings-logout" class="ghost">Log out</button>
+    <button id="settings-logout" class="ghost">Log Out</button>
     <button id="forgotPassBtn" class="ghost">Forgot Password</button>
+    <button id="deleteAccountBtn" class="danger ghost">Delete Account</button>
   </div>
 
   <div class="settings-section card">
@@ -175,44 +265,118 @@
 
     <div class="toggle-row">
       <span>Private Account</span>
-      <div id="toggle-private" class="toggle-btn">OFF</div>
+      <div id="toggle-private" class="toggle-btn" data-on="false">OFF</div>
     </div>
 
     <div class="toggle-row">
       <span>Show Uploads</span>
-      <div id="toggle-uploads" class="toggle-btn active">ON</div>
+      <div id="toggle-uploads" class="toggle-btn active" data-on="true">ON</div>
     </div>
 
     <div class="toggle-row">
       <span>Show Saved</span>
-      <div id="toggle-saved" class="toggle-btn active">ON</div>
+      <div id="toggle-saved" class="toggle-btn active" data-on="true">ON</div>
     </div>
+  </div>
+
+  <div class="settings-section card">
+    <h3>Safety</h3>
+    <button id="blockedUsersBtn" class="ghost">Blocked Users</button>
+    <button id="reportContentBtn" class="ghost">Report Content</button>
+  </div>
+
+  <div class="settings-section card">
+    <h3>Legal</h3>
+
+    <!-- ACCORDION -->
+    <div class="accordion-item">
+      <div class="accordion-header" data-target="acc-privacy">
+        <span>Privacy Policy</span><i class="fa fa-chevron-down"></i>
+      </div>
+      <div class="accordion-body" id="acc-privacy">
+        <p><strong>Privacy Policy</strong><br><br>
+        INTAKEE respects user privacy and collects only essential information for account creation,
+        platform functionality, and creator protection. We do not sell personal information to third parties.
+        <br><br>
+        INTAKEE stores: email, username, display name, uploads, profile photo, banner, likes, comments,
+        and activity related to your use of the app.  
+        Creators are fully responsible for the content they upload. INTAKEE is not liable for any user-generated 
+        content including videos, podcasts, audio, comments, or thumbnails.
+        <br><br>
+        INTAKEE may remove content that violates laws or involves illegal or harmful behavior. 
+        You have the right to request deletion of your data by contacting intakee2025@gmail.com.
+        </p>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-header" data-target="acc-terms">
+        <span>Terms of Service</span><i class="fa fa-chevron-down"></i>
+      </div>
+      <div class="accordion-body" id="acc-terms">
+        <p><strong>Terms of Service</strong><br><br>
+        By using INTAKEE, you agree that all content you upload is your responsibility.  
+        INTAKEE provides the platform but is not legally responsible for what users post.
+        <br><br>
+        Users must be 13+ and may not upload:
+        <ul>
+          <li>nudity or pornographic content</li>
+          <li>harmful or illegal content</li>
+          <li>violent or hateful content</li>
+        </ul>
+        INTAKEE reserves the right to take action on accounts that violate these terms.
+        </p>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-header" data-target="acc-guidelines">
+        <span>Community Guidelines</span><i class="fa fa-chevron-down"></i>
+      </div>
+      <div class="accordion-body" id="acc-guidelines">
+        <p><strong>Community Guidelines</strong><br><br>
+        INTAKEE supports free speech, creativity, and expression.  
+        However, users must follow these rules:
+        <ul>
+          <li>No nudity or pornographic content</li>
+          <li>No harassment or threats</li>
+          <li>No promoting illegal activities</li>
+          <li>No hate speech targeting individuals or groups</li>
+        </ul>
+        Users who repeatedly violate guidelines may be suspended or removed.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="settings-section card">
+    <h3>Support</h3>
+    <p>Email us: <strong>intakee2025@gmail.com</strong></p>
   </div>
 </section>
 
 </main>
 
-<!-- MINI PLAYER -->
+<!-- ================== MINI AUDIO PLAYER ================== -->
 <div id="mini-player" hidden>
   <audio id="mp-audio" preload="metadata"></audio>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <button id="mp-play" class="icon-btn"><i class="fa fa-play"></i></button>
-    <button id="mp-close" class="icon-btn"><i class="fa fa-xmark"></i></button>
-  </div>
+  <button id="mp-play"><i class="fa fa-play"></i></button>
+  <button id="mp-close"><i class="fa fa-xmark"></i></button>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- ================== BOTTOM NAV ================== -->
 <nav class="bottom-nav">
   <a data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
   <a data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
   <a data-tab="podcast"><i class="fa fa-podcast"></i><span>Podcast</span></a>
-  <a data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
   <a data-tab="upload"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
+  <a data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
   <a data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
   <a data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
 </nav>
 
-<!-- AUTH MODAL -->
+<!-- ================== AUTH MODAL ================== -->
 <dialog id="authDialog">
   <form method="dialog" style="text-align:right;">
     <button aria-label="Close">✕</button>
@@ -234,7 +398,7 @@
   <button id="forgotBtn" type="button" class="ghost">Forgot Password?</button>
 </dialog>
 
-<!-- FIREBASE CONFIG -->
+<!-- ================== FIREBASE CONFIG ================== -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
   import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
@@ -259,7 +423,7 @@
   window.firebaseRefs = { app, auth, db, storage };
 </script>
 
-<!-- MAIN JS -->
+<!-- ================== MAIN JS ================== -->
 <script type="module" src="script.js"></script>
 
 </body>
