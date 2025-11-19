@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INTAKEE — Viewer</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: system-ui, Arial, sans-serif;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: #0b0b0b;
+      border-bottom: 1px solid #222;
+    }
+
+    header button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    #video-container,
+    #audio-container {
+      width: 100%;
+      background: #111;
+    }
+
+    video, audio {
+      width: 100%;
+      max-height: 70vh;
+      background: #000;
+    }
+
+    .content {
+      padding: 16px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 10px 0;
+    }
+
+    .creator-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .creator-row img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #333;
+    }
+
+    .follow-btn {
+      margin-left: auto;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: #fff;
+      color: #000;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+      color: #bbb;
+      margin: 10px 0;
+    }
+
+    .description {
+      margin: 15px 0;
+      line-height: 1.5;
+      color: #ccc;
+    }
+
+    .comment-box {
+      margin-top: 20px;
+    }
+
+    .comment-box input {
+      width: 80%;
+      padding: 10px;
+      background: #111;
+      border: 1px solid #333;
+      color: white;
+      border-radius: 8px;
+    }
+
+    .comment-box button {
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #fff;
+      color: #000;
+      border: none;
+      cursor: pointer;
+    }
+
+    .comments {
+      margin-top: 16px;
+      border-top: 1px solid #222;
+      padding-top: 16px;
+    }
+
+    .comment-item {
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: #ddd;
+    }
+
+    .muted {
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <button onclick="history.back()">
+      <i class="fa fa-arrow-left"></i>
+    </button>
+    <h2 style="margin:0;">Post Viewer</h2>
+  </header>
+
+  <!-- VIDEO PLAYER -->
+  <div id="video-container" style="display:none;">
+    <video id="viewer-video" controls></video>
+  </div>
+
+  <!-- AUDIO PLAYER -->
+  <div id="audio-container" style="display:none;">
+    <audio id="viewer-audio" controls></audio>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <h1 id="viewer-title"></h1>
+
+    <div class="creator-row">
+      <img id="viewer-creator-photo" src="">
+      <div>
+        <div id="viewer-creator-name"></div>
+        <div id="viewer-creator-username" class="muted" style="font-size:13px;"></div>
+      </div>
+
+      <button id="viewer-follow-btn" class="follow-btn">Follow</button>
+    </div>
+
+    <div class="stats">
+      <span id="viewer-likes">0 Likes</span>
+      <span id="viewer-comments-count">0 Comments</span>
+      <span id="viewer-views">0 Views</span>
+    </div>
+
+    <div id="viewer-description" class="description"></div>
+
+    <!-- COMMENTS -->
+    <div class="comment-box">
+      <input id="viewer-comment-input" placeholder="Add a comment...">
+      <button id="viewer-comment-btn">Post</button>
+    </div>
+
+    <div id="viewer-comments" class="comments"></div>
+  </div>
+
+  <!-- FIREBASE + VIEWER JS -->
+  <script type="module" src="viewer.js"></script>
+
+</body>
+</html>
