@@ -1,62 +1,119 @@
 // =======================================================
-// INTAKEE — MAIN JS (FINAL FIXED VERSION • PART 1/3)
-// ORDER: AUTH → TABS → UPLOAD (matching your preference)
+// INTAKEE — MAIN APP LOGIC (PART 1)
+// Auth, Tabs, Feed Loading, Viewer Redirect, Search Logic
 // =======================================================
 'use strict';
 
-// ---------- Firebase Instance (from index.html) ----------
+// -------------------------------
+// Firebase (from index.html setup)
+// -------------------------------
 const { app, auth, db, storage } = window.firebaseRefs || {};
-if (!app || !auth || !db || !storage) {
-  console.error("❌ Firebase did NOT initialize. Check index.html config.");
+if (!app || !auth || !db) {
+  console.error("❌ Firebase not initialized properly. Check index.html config.");
 }
 
-// ---------- Utility Helpers ----------
-const qs  = (s, sc = document) => sc.querySelector(s);
-const qsa = (s, sc = document) => [...sc.querySelectorAll(s)];
+// -------------------------------
+// Helpers
+// -------------------------------
+const qs  = (s, sc=document) => sc.querySelector(s);
+const qsa = (s, sc=document) => [...sc.querySelectorAll(s)];
 const $on = (el, ev, fn) => el && el.addEventListener(ev, fn);
 
+// =======================================================
+// TABS + SEARCH BAR LOGIC
+// =======================================================
+const tabs = {
+  home: qs('#tab-home'),
+  videos: qs('#tab-videos'),
+  podcast: qs('#tab-podcast'),
+  upload: qs('#tab-upload'),
+  clips: qs('#tab-clips'),
+  profile: qs('#tab-profile'),
+  settings: qs('#tab-settings')
+};
+
+const navLinks = qsa('.bottom-nav a');
+const searchBar = qs('.search-bar');
+
+// Hide search bar on Upload + Settings tabs
+function handleSearchBar(tab) {
+  if (tab === 'upload' || tab === 'settings') {
+    searchBar.style.display = 'none';
+  } else {
+    searchBar.style.display = 'flex';
+  }
+}
+
+function switchTab(tabName) {
+  Object.keys(tabs).forEach(name => {
+    tabs[name].style.display = name === tabName ? 'block' : 'none';
+  });
+
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.dataset.tab === tabName);
+  });
+
+  handleSearchBar(tabName);
+}
+
+navLinks.forEach(link => {
+  $on(link, 'click', () => {
+    const tabName = link.dataset.tab;
+    switchTab(tabName);
+  });
+});
+
+// Default tab = Home
+switchTab('home');
 
 // =======================================================
-// 🔐 AUTHENTICATION SYSTEM
+// AUTHENTICATION
 // =======================================================
-
-// Elements
-const dlgAuth   = qs('#authDialog');
+const dlgAuth = qs('#authDialog');
+const openAuthBtn = qs('#openAuth');
 const signupBtn = qs('#signupBtn');
 const loginBtn  = qs('#loginBtn');
 const forgotBtn = qs('#forgotBtn');
 const logoutBtn = qs('#settings-logout');
-const openAuth  = qs('#openAuth');
 
-// ---------- Open Auth Modal ----------
-$on(openAuth, 'click', () => dlgAuth.showModal());
+// Open modal
+$on(openAuthBtn, 'click', () => dlgAuth.showModal());
 
-// ---------- SIGN UP ----------
+// Close on clicking ✕
+dlgAuth.addEventListener('click', e => {
+  if (e.target.tagName === 'BUTTON' && e.target.textContent === '✕') {
+    dlgAuth.close();
+  }
+});
+
+// SIGN-UP
 $on(signupBtn, 'click', async () => {
-  const email    = qs('#signupEmail').value.trim();
+  const email = qs('#signupEmail').value.trim();
   const password = qs('#signupPassword').value.trim();
   const username = qs('#signupUsername').value.trim().toLowerCase();
-  const ageOK    = qs('#signupAgeConfirm').checked;
+  const ageOK = qs('#signupAgeConfirm').checked;
 
-  if (!email || !password || !username) return alert("⚠️ Fill all fields.");
-  if (!ageOK) return alert("⚠️ You must confirm you are 13+.");
+  if (!email || !password || !username || !ageOK) {
+    return alert("Fill all fields and confirm age 13+.");
+  }
 
   try {
-    // Check if username exists
-    const { collection, query, where, getDocs } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+    // Check username unique
+    const { 
+      getDocs, query, collection, where 
+    } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
 
-    const qRef = query(collection(db, "users"), where("username", "==", username));
-    const snap = await getDocs(qRef);
-    if (!snap.empty) return alert("❌ Username already taken.");
+    const q = query(collection(db, "users"), where("username", "==", username));
+    const snap = await getDocs(q);
+    if (!snap.empty) return alert("Username already taken.");
 
-    // Create the account
+    // Create account
     const { createUserWithEmailAndPassword, updateProfile } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
 
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-    // Save Firestore user
+    // Save user in Firestore
     const { doc, setDoc, serverTimestamp } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
 
@@ -65,48 +122,49 @@ $on(signupBtn, 'click', async () => {
       username,
       name: username,
       bio: "",
+      photoURL: "",
+      bannerURL: "",
+      followers: [],
+      following: [],
       private: false,
       showUploads: true,
       showSaved: true,
-      followers: [],
-      following: [],
       createdAt: serverTimestamp()
     });
 
     await updateProfile(cred.user, { displayName: username });
 
-    alert(`🎉 Welcome @${username}!`);
+    alert("Account created!");
     dlgAuth.close();
 
   } catch (err) {
-    alert("❌ " + err.message);
-    console.error(err);
+    alert("Error: " + err.message);
   }
 });
 
-// ---------- LOGIN ----------
+// LOGIN
 $on(loginBtn, 'click', async () => {
   const email = qs('#loginEmail').value.trim();
-  const pass  = qs('#loginPassword').value.trim();
-  if (!email || !pass) return alert("Enter email & password.");
+  const password = qs('#loginPassword').value.trim();
+
+  if (!email || !password) return alert("Enter email and password.");
 
   try {
     const { signInWithEmailAndPassword } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
 
-    const cred = await signInWithEmailAndPassword(auth, email, pass);
-    alert(`✅ Logged in as ${cred.user.displayName || cred.user.email}`);
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    alert(`Welcome back, ${cred.user.displayName || cred.user.email}`);
     dlgAuth.close();
 
   } catch (err) {
-    alert("❌ " + err.message);
-    console.error(err);
+    alert("Login failed: " + err.message);
   }
 });
 
-// ---------- FORGOT PASSWORD ----------
+// FORGOT PASSWORD
 $on(forgotBtn, 'click', async () => {
-  const email = prompt("Enter your email:");
+  const email = prompt("Enter your account email:");
   if (!email) return;
 
   try {
@@ -114,124 +172,154 @@ $on(forgotBtn, 'click', async () => {
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
 
     await sendPasswordResetEmail(auth, email);
-    alert("📩 Reset link sent to your email.");
-
+    alert("Password reset email sent.");
   } catch (err) {
-    alert("❌ " + err.message);
+    alert("Error: " + err.message);
   }
 });
 
-// ---------- LOGOUT ----------
+// LOGOUT
 $on(logoutBtn, 'click', async () => {
-  try {
-    const { signOut } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
+  const { signOut } =
+    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
 
-    await signOut(auth);
-    alert("👋 Logged out.");
-  } catch (err) {
-    alert("❌ Logout failed: " + err.message);
+  await signOut(auth);
+  alert("Logged out.");
+});
+
+// =======================================================
+// AUTH STATE LISTENER
+// =======================================================
+onAuthStateChanged(auth, user => {
+  if (user) {
+    openAuthBtn.style.display = 'none';
+    document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user } }));
+  } else {
+    openAuthBtn.style.display = 'block';
+    document.dispatchEvent(new CustomEvent('intakee:auth', { detail: { user: null } }));
   }
 });
 
-// ---------- AUTH STATE ----------
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-
-onAuthStateChanged(auth, (user) => {
-  console.log("AUTH STATE:", user);
-  document.dispatchEvent(new CustomEvent("intakee:auth", { detail: { user } }));
-
-  // Hide Login button if logged in
-  if (openAuth) openAuth.style.display = user ? 'none' : 'block';
-});
-
-
 // =======================================================
-// 🧭 TAB SWITCHING SYSTEM
+// FEED LOADING + VIEWER REDIRECT
 // =======================================================
+const homeFeed = qs('#home-feed');
+const videosFeed = qs('#videos-feed');
+const podcastFeed = qs('#podcast-feed');
+const clipsFeed = qs('#clips-feed');
 
-const tabs = {
-  home: qs("#tab-home"),
-  videos: qs("#tab-videos"),
-  podcast: qs("#tab-podcast"),
-  clips: qs("#tab-clips"),
-  upload: qs("#tab-upload"),
-  profile: qs("#tab-profile"),
-  settings: qs("#tab-settings")
-};
+let _allPosts = [];
 
-const navLinks = qsa(".bottom-nav a");
+async function fetchAllPosts() {
+  const { collection, getDocs, query, orderBy, limit } =
+    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
 
-function switchTab(tabName) {
-  Object.keys(tabs).forEach(name => {
-    tabs[name].style.display = name === tabName ? "block" : "none";
-  });
+  const qRef = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(200));
+  const snap = await getDocs(qRef);
 
-  navLinks.forEach(link =>
-    link.classList.toggle("active", link.dataset.tab === tabName)
-  );
+  _allPosts = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
 }
 
-navLinks.forEach(link => {
-  link.addEventListener("click", () => {
-    switchTab(link.dataset.tab);
-    window.scrollTo(0, 0);
+function renderFeed(container, list) {
+  container.innerHTML = "";
+
+  if (!list.length) {
+    container.innerHTML = `<div class="muted">No posts yet.</div>`;
+    return;
+  }
+
+  list.forEach(post => {
+    const card = document.createElement('div');
+    card.className = "feed-card";
+
+    const thumb = post.thumbnailUrl || "placeholder.png";
+
+    card.innerHTML = `
+      <div class="thumb">
+        <img src="${thumb}" alt="">
+        <button class="play-btn" data-id="${post.id}">
+          <i class="fa fa-play"></i>
+        </button>
+      </div>
+      <h4>${post.title}</h4>
+      <p class="muted small">${post.type.toUpperCase()}</p>
+    `;
+
+    // Viewer redirect
+    card.querySelector('.play-btn').addEventListener('click', () => {
+      window.location.href = `viewer.html?id=${post.id}`;
+    });
+
+    container.appendChild(card);
   });
-});
+}
 
-// Default tab
-switchTab("home");
+async function loadFeeds() {
+  await fetchAllPosts();
+  renderFeed(homeFeed, _allPosts);
+  renderFeed(videosFeed, _allPosts.filter(p => p.type === "video"));
+  renderFeed(podcastFeed, _allPosts.filter(p => p.type.includes("podcast")));
+  renderFeed(clipsFeed, _allPosts.filter(p => p.type === "clip"));
+}
 
+document.addEventListener('intakee:feedRefresh', loadFeeds);
 
+// Initial feed load
+loadFeeds();
 // =======================================================
-// 📤 UPLOAD SYSTEM
+// INTAKEE — MAIN APP LOGIC (PART 2)
+// Upload, Profile, Settings, Mini Player, Boot
 // =======================================================
 
-const upType  = qs('#uploadTypeSelect');
-const upTitle = qs('#uploadTitleInput');
-const upDesc  = qs('#uploadDescInput');
-const upThumb = qs('#uploadThumbInput');
-const upFile  = qs('#uploadFileInput');
-const btnUpload = qs('#btnUpload');
-const goLiveBtn = qs('#goLiveBtn');
+// -------------------------------
+// UPLOAD LOGIC
+// -------------------------------
+const upType   = qs("#uploadTypeSelect");
+const upTitle  = qs("#uploadTitleInput");
+const upDesc   = qs("#uploadDescInput");
+const upThumb  = qs("#uploadThumbInput");
+const upFile   = qs("#uploadFileInput");
+const btnUpload = qs("#btnUpload");
 
-// Clear upload form
 function resetUploadForm() {
-  upType.value = "video";
   upTitle.value = "";
   upDesc.value = "";
   upThumb.value = "";
   upFile.value = "";
+  upType.value = "video";
 }
 
-// ---------- UPLOAD HANDLER ----------
 $on(btnUpload, "click", async () => {
   const user = auth.currentUser;
-  if (!user) return alert("Please sign in to upload.");
+  if (!user) return alert("Sign in to upload.");
 
-  const type = upType.value;
   const title = upTitle.value.trim();
-  const desc = upDesc.value.trim();
-  const file = upFile.files[0];
+  const desc  = upDesc.value.trim();
+  const type  = upType.value;
+  const file  = upFile.files[0];
   const thumb = upThumb.files[0];
 
-  if (!file) return alert("Select a file to upload.");
-  if (!title) return alert("Enter a title.");
+  if (!title || !file) {
+    return alert("Add a title and file.");
+  }
 
   btnUpload.disabled = true;
-  btnUpload.textContent = "Uploading... 0%";
+  btnUpload.textContent = "Uploading...";
 
   try {
-    const { ref, uploadBytesResumable, getDownloadURL, uploadBytes } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js");
+    const {
+      ref, uploadBytesResumable, getDownloadURL, uploadBytes
+    } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js");
 
     const { addDoc, collection, serverTimestamp } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
 
-    // Upload main media
-    const ext = file.name.split('.').pop();
-    const safeTitle = title.replace(/[^a-z0-9]/gi, "_").toLowerCase();
-    const path = `uploads/${user.uid}/${Date.now()}_${safeTitle}.${ext}`;
+    const ext = file.name.split(".").pop();
+    const safe = title.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+    const path = `uploads/${user.uid}/${Date.now()}_${safe}.${ext}`;
 
     const storageRef = ref(storage, path);
     const task = uploadBytesResumable(storageRef, file);
@@ -244,7 +332,6 @@ $on(btnUpload, "click", async () => {
     await task;
     const mediaUrl = await getDownloadURL(storageRef);
 
-    // Upload thumbnail
     let thumbUrl = "";
     if (thumb) {
       const tRef = ref(storage, `thumbnails/${user.uid}/${Date.now()}_${thumb.name}`);
@@ -252,361 +339,137 @@ $on(btnUpload, "click", async () => {
       thumbUrl = await getDownloadURL(tRef);
     }
 
-    // Save post
     await addDoc(collection(db, "posts"), {
       uid: user.uid,
+      title, desc,
       type,
-      title,
-      desc,
       mediaUrl,
       thumbnailUrl: thumbUrl,
-      createdAt: serverTimestamp(),
       likeCount: 0,
-      commentCount: 0,
       viewCount: 0,
-      private: false,
+      commentCount: 0,
+      createdAt: serverTimestamp()
     });
 
-    alert("✅ Upload complete!");
+    alert("Upload complete!");
     resetUploadForm();
     document.dispatchEvent(new CustomEvent("intakee:feedRefresh"));
 
   } catch (err) {
-    alert("❌ Upload failed: " + err.message);
-    console.error(err);
+    alert("Upload failed: " + err.message);
   }
 
   btnUpload.disabled = false;
   btnUpload.textContent = "Upload";
 });
 
-// Go Live (coming soon)
-$on(goLiveBtn, "click", () => alert("🎥 Live streaming coming soon!"));
-// =======================================================
-// 📺 FEED SYSTEM — FETCH + RENDER
-// =======================================================
+// -------------------------------
+// PROFILE LOGIC
+// -------------------------------
+const profileName   = qs("#profile-name");
+const profileHandle = qs("#profile-handle");
+const profilePhoto  = qs("#profile-photo");
+const profileBanner = qs("#profileBanner");
+const bioView       = qs("#bio-view");
 
-const homeFeed    = qs('#home-feed');
-const videosFeed  = qs('#videos-feed');
-const podcastFeed = qs('#podcast-feed');
-const clipsFeed   = qs('#clips-feed');
+const btnEditProfile = qs("#btn-edit-profile");
+const bioWrap        = qs("#bio-edit-wrap");
 
-let _allPosts = [];
+const nameInput  = qs("#profileNameInput");
+const bioInput   = qs("#profileBioInput");
+const photoInput = qs("#profilePhotoInput");
+const bannerInput = qs("#profileBannerInput");
 
-// ---------- Fetch All Posts ----------
-async function fetchAllPosts() {
-  const { collection, getDocs, orderBy, query, limit } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+const btnSaveProfile = qs("#btnSaveProfile");
+const btnCancelEdit  = qs("#bio-cancel");
 
-  const qRef = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(200));
-  const snap = await getDocs(qRef);
+const profileGrid = qs("#profile-grid");
+const profileEmpty = qs("#profile-empty");
 
-  _allPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
+const statPosts = qs("#stat-posts");
+const statFollowers = qs("#stat-followers");
+const statFollowing = qs("#stat-following");
+const statLikes = qs("#stat-likes");
 
-// ---------- Render Feed ----------
-function renderFeed(container, list, type = "all") {
-  container.innerHTML = "";
-
-  if (!list || list.length === 0) {
-    container.innerHTML = `<p class="muted">No posts yet.</p>`;
-    return;
-  }
-
-  list.forEach(post => {
-    if (type !== "all" && post.type !== type) return;
-
-    const card = document.createElement("div");
-    card.className = "feed-card card";
-
-    const thumb = post.thumbnailUrl || "placeholder.png";
-    const icon = post.type === "video"
-      ? "fa-video"
-      : post.type === "clip"
-      ? "fa-bolt"
-      : "fa-podcast";
-
-    card.innerHTML = `
-      <div class="thumb-wrap">
-        <img class="thumb-img" src="${thumb}">
-        <button class="play-btn" data-url="${post.mediaUrl}" data-type="${post.type}">
-          <i class="fa ${icon}"></i>
-        </button>
-      </div>
-
-      <div class="feed-info">
-        <h3>${post.title}</h3>
-        <p>${post.desc || ""}</p>
-        <div class="muted small">${post.type.toUpperCase()}</div>
-      </div>
-    `;
-
-    // Play Button
-    const playBtn = card.querySelector(".play-btn");
-    playBtn.onclick = () => {
-      if (post.type.startsWith("podcast")) {
-        playPodcast(post.mediaUrl, post.title);
-      } else {
-        window.open(post.mediaUrl, "_blank");
-      }
-    };
-
-    attachLikeButtons(card, post.id, post.type);
-    if (post.type !== "clip") attachCommentInput(card, post.id);
-
-    container.appendChild(card);
-  });
-}
-
-// ---------- Load All Feeds ----------
-async function loadFeeds() {
-  await fetchAllPosts();
-
-  renderFeed(homeFeed,    _allPosts);
-  renderFeed(videosFeed,  _allPosts.filter(p => p.type === "video"));
-  renderFeed(podcastFeed, _allPosts.filter(p => p.type.startsWith("podcast")));
-  renderFeed(clipsFeed,   _allPosts.filter(p => p.type === "clip"));
-}
-
-document.addEventListener("intakee:feedRefresh", loadFeeds);
-
-
-// =======================================================
-// ❤️ LIKES / DISLIKES
-// =======================================================
-
-async function toggleLike(postId, isLike = true) {
-  const user = auth.currentUser;
-  if (!user) return alert("Sign in to like posts.");
-
-  const { doc, updateDoc, increment } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-
-  const ref = doc(db, "posts", postId);
-
-  await updateDoc(ref, {
-    likeCount: increment(isLike ? 1 : -1)
-  });
-
-  document.dispatchEvent(new CustomEvent("intakee:feedRefresh"));
-}
-
-function attachLikeButtons(card, postId, type) {
-  if (type === "clip") return; // clips have no likes/dislikes
-
-  const wrap = document.createElement("div");
-  wrap.className = "like-row";
-
-  const likeBtn = document.createElement("button");
-  const disBtn  = document.createElement("button");
-
-  likeBtn.className = "icon-btn";
-  disBtn.className  = "icon-btn";
-
-  likeBtn.innerHTML = `<i class="fa fa-thumbs-up"></i>`;
-  disBtn.innerHTML  = `<i class="fa fa-thumbs-down"></i>`;
-
-  likeBtn.onclick = () => toggleLike(postId, true);
-  disBtn.onclick  = () => toggleLike(postId, false);
-
-  wrap.append(likeBtn, disBtn);
-  card.appendChild(wrap);
-}
-
-
-// =======================================================
-// 💬 COMMENTS
-// =======================================================
-
-async function postComment(postId, text) {
-  const user = auth.currentUser;
-  if (!user) return alert("Sign in to comment.");
-  if (!text.trim()) return;
-
-  const { collection, addDoc, serverTimestamp } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-
-  await addDoc(collection(db, "posts", postId, "comments"), {
-    uid: user.uid,
-    text: text.trim(),
-    createdAt: serverTimestamp()
-  });
-
-  loadComments(postId);
-}
-
-async function loadComments(postId) {
-  const { collection, getDocs, query, orderBy } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-
-  const qRef = query(collection(db, "posts", postId, "comments"), orderBy("createdAt", "asc"));
-  const snap = await getDocs(qRef);
-
-  const box = qs(`#comments-${postId}`);
-  if (!box) return;
-
-  box.innerHTML = snap.empty
-    ? `<p class="muted small">No comments yet.</p>`
-    : snap.docs
-        .map(d => {
-          const data = d.data();
-          return `<p><span class="muted small">${data.uid.slice(0, 6)}:</span> ${data.text}</p>`;
-        })
-        .join("");
-}
-
-function attachCommentInput(card, postId) {
-  const wrap = document.createElement("div");
-  wrap.className = "comment-block";
-
-  wrap.innerHTML = `
-    <input type="text" id="commentInput-${postId}" placeholder="Add a comment..." />
-    <button class="ghost" id="commentBtn-${postId}">Post</button>
-    <div id="comments-${postId}" class="comments"></div>
-  `;
-
-  const btn = wrap.querySelector(`#commentBtn-${postId}`);
-  const input = wrap.querySelector(`#commentInput-${postId}`);
-
-  btn.onclick = () => {
-    postComment(postId, input.value);
-    input.value = "";
-  };
-
-  loadComments(postId);
-}
-// =======================================================
-// 👤 PROFILE SYSTEM
-// =======================================================
-
-const profileName      = qs('#profile-name');
-const profileHandle    = qs('#profile-handle');
-const profilePhotoImg  = qs('#profile-photo');
-const profileBanner    = qs('#profileBanner');
-
-const bioView       = qs('#bio-view');
-const bioEditWrap   = qs('#bio-edit-wrap');
-const nameInput     = qs('#profileNameInput');
-const bioInput      = qs('#profileBioInput');
-const photoInput    = qs('#profilePhotoInput');
-const bannerInput   = qs('#profileBannerInput');
-
-const btnEditProfile = qs('#btn-edit-profile');
-const btnSaveProfile = qs('#btnSaveProfile');
-const btnCancelEdit  = qs('#bio-cancel');
-
-const statPosts     = qs('#stat-posts');
-const statFollowers = qs('#stat-followers');
-const statFollowing = qs('#stat-following');
-const statLikes     = qs('#stat-likes');
-
-const profileGrid   = qs('#profile-grid');
-const profileEmpty  = qs('#profile-empty');
-
-
-// ---------- Only show “owner-only” elements when logged in ----------
-function applyOwnerVisibility(user) {
-  qsa('.owner-only').forEach(el => {
-    el.style.display = user ? '' : 'none';
-  });
-}
-
-
-// =======================================================
-// ✏️ EDIT PROFILE
-// =======================================================
-
-$on(btnEditProfile, 'click', () => {
-  if (!auth.currentUser) return alert("Sign in to edit profile.");
-
-  bioEditWrap.style.display = "block";
-
+// Show edit UI
+$on(btnEditProfile, "click", () => {
+  if (!auth.currentUser) return alert("Sign in first.");
+  bioWrap.style.display = "";
   nameInput.value = profileName.textContent.trim();
-  bioInput.value = bioView.textContent === "Add a short bio to introduce yourself."
-    ? ""
-    : bioView.textContent.trim();
+  bioInput.value = bioView.textContent.trim() === "Add a short bio to introduce yourself."
+    ? "" : bioView.textContent.trim();
 });
 
-$on(btnCancelEdit, 'click', () => {
-  bioEditWrap.style.display = "none";
+// Cancel edit
+$on(btnCancelEdit, "click", () => {
+  bioWrap.style.display = "none";
 });
 
-
-// ---------- SAVE PROFILE ----------
-$on(btnSaveProfile, 'click', async () => {
+// Save profile
+$on(btnSaveProfile, "click", async () => {
   const user = auth.currentUser;
-  if (!user) return alert("Sign in to update profile.");
+  if (!user) return alert("Sign in first.");
 
   const name = nameInput.value.trim();
   const bio  = bioInput.value.trim();
 
   try {
-    const { ref, uploadBytes, getDownloadURL } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js");
+    const {
+      ref, uploadBytes, getDownloadURL
+    } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js");
 
-    const { doc, setDoc, serverTimestamp } =
-      await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+    const {
+      setDoc, doc, serverTimestamp
+    } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
 
     const { updateProfile } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js");
 
-    // Avatar Upload
+    // Profile image
     if (photoInput.files[0]) {
-      const avatarRef = ref(storage, `avatars/${user.uid}_${Date.now()}.jpg`);
-      await uploadBytes(avatarRef, photoInput.files[0]);
-      const url = await getDownloadURL(avatarRef);
-      await updateProfile(user, { photoURL: url });
-      profilePhotoImg.src = url;
+      const pRef = ref(storage, `avatars/${user.uid}_${Date.now()}.jpg`);
+      await uploadBytes(pRef, photoInput.files[0]);
+      const photoURL = await getDownloadURL(pRef);
+      await updateProfile(user, { photoURL });
+      profilePhoto.src = photoURL;
     }
 
-    // Banner Upload
+    // Banner image
     if (bannerInput.files[0]) {
-      const bannerRef = ref(storage, `banners/${user.uid}_${Date.now()}.jpg`);
-      await uploadBytes(bannerRef, bannerInput.files[0]);
-      const url = await getDownloadURL(bannerRef);
-      profileBanner.style.backgroundImage = `url(${url})`;
+      const bRef = ref(storage, `banners/${user.uid}_${Date.now()}.jpg`);
+      await uploadBytes(bRef, bannerInput.files[0]);
+      const bannerURL = await getDownloadURL(bRef);
+      profileBanner.style.backgroundImage = `url(${bannerURL})`;
     }
 
-    // Update Firestore
+    // Save name + bio
     await setDoc(doc(db, "users", user.uid), {
       name,
       bio,
       updatedAt: serverTimestamp()
     }, { merge: true });
 
-    if (name) await updateProfile(user, { displayName: name });
-
     profileName.textContent = name || user.displayName || "Your Name";
     bioView.textContent = bio || "Add a short bio to introduce yourself.";
 
-    bioEditWrap.style.display = "none";
-    alert("✅ Profile updated!");
+    bioWrap.style.display = "none";
+    alert("Profile updated!");
 
   } catch (err) {
-    alert("❌ Update failed: " + err.message);
-    console.error(err);
+    alert("Profile update failed: " + err.message);
   }
 });
 
-
-// =======================================================
-// 📚 LOAD PROFILE PANEL
-// =======================================================
-
+// Load user profile + posts
 async function loadProfilePane(user) {
   if (!user) {
-    profileName.textContent = "Your Name";
-    profileHandle.textContent = "@username";
-    profilePhotoImg.src = "";
-    bioView.textContent = "Add a short bio to introduce yourself.";
-    profileBanner.style.backgroundImage = "none";
     profileGrid.innerHTML = "";
     profileEmpty.style.display = "block";
     return;
   }
 
   try {
-    const { doc, getDoc } =
+    const { getDoc, doc } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
 
     const snap = await getDoc(doc(db, "users", user.uid));
@@ -614,9 +477,10 @@ async function loadProfilePane(user) {
 
     profileName.textContent = data.name || user.displayName || "Your Name";
     profileHandle.textContent = "@" + (data.username || user.email.split("@")[0]);
-    bioView.textContent = data.bio?.trim() || "Add a short bio to introduce yourself.";
+    bioView.textContent = (data.bio || "").trim() || "Add a short bio to introduce yourself.";
 
-    if (user.photoURL) profilePhotoImg.src = user.photoURL;
+    if (user.photoURL) profilePhoto.src = user.photoURL;
+    if (data.bannerURL) profileBanner.style.backgroundImage = `url(${data.bannerURL})`;
 
     await loadUserPosts(user.uid);
 
@@ -625,14 +489,11 @@ async function loadProfilePane(user) {
   }
 }
 
-
-// =======================================================
-// 🖼️ LOAD USER POSTS ON PROFILE
-// =======================================================
-
+// Load posts for profile
 async function loadUserPosts(uid) {
-  const { collection, getDocs, query, where, orderBy } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+  const {
+    collection, getDocs, query, where, orderBy
+  } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
 
   const qRef = query(
     collection(db, "posts"),
@@ -644,97 +505,89 @@ async function loadUserPosts(uid) {
   const posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
   profileGrid.innerHTML = "";
-
-  if (posts.length === 0) {
+  if (!posts.length) {
     profileEmpty.style.display = "block";
   } else {
     profileEmpty.style.display = "none";
-
-    posts.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "profile-post-card";
-
-      const thumb = p.thumbnailUrl || "placeholder.png";
-
-      card.innerHTML = `
-        <div class="thumb">
-          <img src="${thumb}">
-          <div class="overlay">
-            <span>${p.type.toUpperCase()}</span>
-            <button class="danger delete-post" data-id="${p.id}">
-              <i class="fa fa-trash"></i>
-            </button>
-          </div>
-        </div>
-        <h4>${p.title}</h4>
-      `;
-
-      profileGrid.appendChild(card);
-    });
   }
+
+  posts.forEach(post => {
+    const card = document.createElement("div");
+    card.className = "profile-post-card";
+
+    const thumb = post.thumbnailUrl || "placeholder.png";
+
+    // Mixed layout:
+    // video → rectangle
+    // clip → square
+    // podcast → square
+    const isWide = post.type === "video" || post.type === "podcast-video";
+
+    card.innerHTML = `
+      <div class="thumb" style="aspect-ratio:${isWide ? '16/9' : '1/1'};">
+        <img src="${thumb}">
+        <div class="overlay">
+          <span>${post.type.toUpperCase()}</span>
+          <button class="danger delete-post" data-id="${post.id}">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </div>
+      <h4>${post.title}</h4>
+    `;
+
+    // click → viewer page
+    card.querySelector(".thumb").onclick = () => {
+      window.location.href = `viewer.html?id=${post.id}`;
+    };
+
+    profileGrid.appendChild(card);
+  });
 
   statPosts.textContent = posts.length;
 }
 
-
-// =======================================================
-// 🗑 DELETE POST
-// =======================================================
-
+// Delete post
 $on(profileGrid, "click", async e => {
   const btn = e.target.closest(".delete-post");
   if (!btn) return;
 
   if (!confirm("Delete this post permanently?")) return;
 
+  const id = btn.dataset.id;
+
   try {
-    const { doc, deleteDoc } =
+    const { deleteDoc, doc } =
       await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
 
-    await deleteDoc(doc(db, "posts", btn.dataset.id));
+    await deleteDoc(doc(db, "posts", id));
 
     btn.closest(".profile-post-card").remove();
-    alert("🗑️ Post deleted.");
+    alert("Post deleted.");
 
   } catch (err) {
-    alert("❌ Delete failed: " + err.message);
+    alert("Failed to delete: " + err.message);
   }
 });
 
-
-// =======================================================
-// ⚙️ SETTINGS — TOGGLES
-// =======================================================
-
+// -------------------------------
+// SETTINGS PAGE
+// -------------------------------
 const togglePrivate = qs("#toggle-private");
 const toggleUploads = qs("#toggle-uploads");
 const toggleSaved   = qs("#toggle-saved");
 
-function setToggle(el, on) {
-  el.dataset.on = on ? "true" : "false";
-  el.classList.toggle("active", on);
-  el.textContent = on ? "ON" : "OFF";
+function applyToggle(tog, state) {
+  tog.dataset.on = state ? "true" : "false";
+  tog.classList.toggle("active", state);
+  tog.textContent = state ? "ON" : "OFF";
 }
 
-async function loadUserSettings(uid) {
-  const { doc, getDoc } =
-    await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
-
-  const snap = await getDoc(doc(db, "users", uid));
-  if (!snap.exists()) return;
-
-  const s = snap.data();
-
-  setToggle(togglePrivate, s.private || false);
-  setToggle(toggleUploads, s.showUploads ?? true);
-  setToggle(toggleSaved,   s.showSaved ?? true);
-}
-
-async function saveUserSetting(field, value) {
+async function saveSetting(field, value) {
   const user = auth.currentUser;
   if (!user) return;
 
-  const { doc, updateDoc } =
+  const { updateDoc, doc } =
     await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
 
   await updateDoc(doc(db, "users", user.uid), { [field]: value });
@@ -742,83 +595,89 @@ async function saveUserSetting(field, value) {
 
 [togglePrivate, toggleUploads, toggleSaved].forEach(tog => {
   $on(tog, "click", () => {
-    const newState = tog.dataset.on !== "true";
-    setToggle(tog, newState);
+    const newState = !(tog.dataset.on === "true");
+    applyToggle(tog, newState);
 
-    if (tog === togglePrivate) saveUserSetting("private", newState);
-    if (tog === toggleUploads) saveUserSetting("showUploads", newState);
-    if (tog === toggleSaved)   saveUserSetting("showSaved", newState);
-
-    alert(`Setting updated: ${tog.id.replace("toggle-", "")}`);
+    if (tog.id === "toggle-private") saveSetting("private", newState);
+    if (tog.id === "toggle-uploads") saveSetting("showUploads", newState);
+    if (tog.id === "toggle-saved")   saveSetting("showSaved", newState);
   });
 });
 
+// Accordion for legal sections
+qsa(".accordion-header").forEach(header => {
+  header.addEventListener("click", () => {
+    const id = header.dataset.target;
+    const body = qs(`#${id}`);
+    const icon = header.querySelector("i");
 
-// =======================================================
-// 🎧 MINI AUDIO PLAYER
-// =======================================================
+    if (body.style.display === "block") {
+      body.style.display = "none";
+      icon.style.transform = "rotate(0deg)";
+    } else {
+      body.style.display = "block";
+      icon.style.transform = "rotate(180deg)";
+    }
+  });
+});
 
-const miniPlayer = qs('#mini-player');
-const miniAudio  = qs('#mp-audio');
-const miniPlay   = qs('#mp-play');
-const miniClose  = qs('#mp-close');
+// -------------------------------
+// MINI AUDIO PLAYER
+// -------------------------------
+const miniPlayer = qs("#mini-player");
+const miniAudio  = qs("#mp-audio");
+const miniPlay   = qs("#mp-play");
+const miniClose  = qs("#mp-close");
 
-let isPlaying = false;
+let mpIsPlaying = false;
 
-function playPodcast(url, title = "Now Playing") {
-  if (!url) return alert("Invalid audio URL");
-
+function playPodcast(url, title="Now Playing") {
   miniPlayer.hidden = false;
   miniAudio.src = url;
-
-  miniAudio.play()
-    .then(() => {
-      isPlaying = true;
-      miniPlay.innerHTML = `<i class="fa fa-pause"></i>`;
-    })
-    .catch(err => console.warn("Audio failed:", err));
+  miniAudio.play();
+  mpIsPlaying = true;
+  miniPlay.innerHTML = `<i class="fa fa-pause"></i>`;
 }
 
 $on(miniPlay, "click", () => {
   if (!miniAudio.src) return;
-  if (isPlaying) {
+
+  if (mpIsPlaying) {
     miniAudio.pause();
     miniPlay.innerHTML = `<i class="fa fa-play"></i>`;
+    mpIsPlaying = false;
   } else {
     miniAudio.play();
     miniPlay.innerHTML = `<i class="fa fa-pause"></i>`;
+    mpIsPlaying = true;
   }
-  isPlaying = !isPlaying;
 });
 
 $on(miniClose, "click", () => {
-  miniAudio.pause();
-  miniAudio.src = "";
+  try { miniAudio.pause(); } catch {}
   miniPlayer.hidden = true;
-  isPlaying = false;
+  miniAudio.src = "";
 });
 
-
-// =======================================================
-// 🚀 BOOT SYSTEM
-// =======================================================
-
-document.addEventListener("intakee:auth", async e => {
+// -------------------------------
+// AUTH + PROFILE INITIALIZER
+// -------------------------------
+document.addEventListener("intakee:auth", e => {
   const user = e.detail.user;
 
-  applyOwnerVisibility(user);
-
   if (user) {
-    await loadProfilePane(user);
-    await loadUserSettings(user.uid);
+    loadProfilePane(user);
+    loadFeeds();
+  } else {
+    profileGrid.innerHTML = "";
+    profileEmpty.style.display = "block";
   }
-
-  await loadFeeds();
 });
 
-// FIRST LOAD
-(async () => {
-  console.log("🚀 INTAKEE is starting...");
+// -------------------------------
+// INITIAL BOOT
+// -------------------------------
+(async function boot() {
+  console.log("🚀 INTAKEE app booted");
   await loadFeeds();
-  console.log("✅ INTAKEE ready.");
 })();
