@@ -70,7 +70,6 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-const auth = getAuth();
 const db = getFirestore();
 
 const dlgAuth = document.querySelector("#authDialog");
