@@ -31,7 +31,6 @@ const app = initializeApp(firebaseConfig);
 // ----------------------------------------------------
 // Export Services (Clean)
 // ----------------------------------------------------
-export const db = getFirestore(app);
 export const storage = getStorage(app);
 
 // ----------------------------------------------------
