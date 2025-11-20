@@ -251,43 +251,89 @@
   <div id="profile-grid" class="grid"></div>
   <div id="profile-empty" class="muted">No posts yet.</div>
 </section>
-<!-- ================== SETTINGS TAB ================== -->
-<section id="tab-settings" style="display:none;">
-  <div class="settings-section card">
+<!-- SETTINGS TAB -->
+<section id="tab-settings" style="display:none;" class="fade-slide">
+
+  <!-- ACCOUNT -->
+  <div class="settings-card">
     <h3>Account</h3>
-    <button id="settings-logout" class="ghost">Log Out</button>
-    <button id="forgotPassBtn" class="ghost">Forgot Password</button>
-    <button id="deleteAccountBtn" class="danger ghost">Delete Account</button>
+    <div class="settings-row">
+      <button id="settings-logout" class="settings-btn">Log Out</button>
+      <button id="settings-forgot-password" class="settings-btn">Forgot Password</button>
+      <button id="settings-forgot-username" class="settings-btn">Forgot Username</button>
+      <button id="settings-delete-account" class="settings-btn danger">Delete Account</button>
+    </div>
   </div>
 
-  <div class="settings-section card">
+  <!-- PRIVACY -->
+  <div class="settings-card">
     <h3>Privacy & Display</h3>
 
-    <div class="toggle-row">
-      <span>Private Account</span>
-      <div id="toggle-private" class="toggle-btn" data-on="false">OFF</div>
+    <div class="settings-toggle">
+      <label>Private Account</label>
+      <input type="checkbox" id="toggle-private">
     </div>
 
-    <div class="toggle-row">
-      <span>Show Uploads</span>
-      <div id="toggle-uploads" class="toggle-btn active" data-on="true">ON</div>
+    <div class="settings-toggle">
+      <label>Show Uploads</label>
+      <input type="checkbox" id="toggle-show-uploads">
     </div>
 
-    <div class="toggle-row">
-      <span>Show Saved</span>
-      <div id="toggle-saved" class="toggle-btn active" data-on="true">ON</div>
+    <div class="settings-toggle">
+      <label>Show Saved</label>
+      <input type="checkbox" id="toggle-show-saved">
     </div>
   </div>
 
-  <div class="settings-section card">
+  <!-- SAFETY -->
+  <div class="settings-card">
     <h3>Safety</h3>
-    <button id="blockedUsersBtn" class="ghost">Blocked Users</button>
-    <button id="reportContentBtn" class="ghost">Report Content</button>
+    <div class="settings-row">
+      <button id="openBlockedUsers" class="settings-btn">Blocked Users</button>
+      <button id="openReportModal" class="settings-btn">Report Content</button>
+    </div>
   </div>
 
-  <div class="settings-section card">
+  <!-- LEGAL -->
+  <div class="settings-card">
     <h3>Legal</h3>
 
+    <!-- PRIVACY POLICY -->
+    <div class="accordion">
+      <button class="accordion-header">
+        Privacy Policy
+        <span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body" id="legal-privacy"></div>
+    </div>
+
+    <!-- TERMS OF SERVICE -->
+    <div class="accordion">
+      <button class="accordion-header">
+        Terms of Service
+        <span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body" id="legal-terms"></div>
+    </div>
+
+    <!-- COMMUNITY GUIDELINES -->
+    <div class="accordion">
+      <button class="accordion-header">
+        Community Guidelines
+        <span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body" id="legal-guidelines"></div>
+    </div>
+  </div>
+
+  <!-- SUPPORT -->
+  <div class="settings-card">
+    <h3>Support</h3>
+    <p>Email us: <a href="mailto:intakee2025@gmail.com">intakee2025@gmail.com</a></p>
+  </div>
+
+</section>
+  
     <!-- ACCORDION -->
     <div class="accordion-item">
       <div class="accordion-header" data-target="acc-privacy">
