@@ -51,7 +51,6 @@ console.log("✅ Firebase initialized from firebase.js");
 'use strict';
 
 import {
-  getAuth,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
