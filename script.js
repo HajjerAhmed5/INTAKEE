@@ -1198,3 +1198,55 @@ document.querySelectorAll(".accordion-header").forEach(btn => {
     parent.classList.toggle("open");
   });
 });
+//----------------------------------------------------
+//  INTAKEE — MAIN BOOT FILE (script.js)
+//  Loads all modules and starts the app
+//----------------------------------------------------
+
+console.log("🚀 INTAKEE booting...");
+
+//----------------------------------------------
+// 1) IMPORT MODULES
+//----------------------------------------------
+import "./firebase-init.js";     // Firebase setup (auth, db, storage → window.firebaseRefs)
+import "./tabs.js";              // Tab switching
+import "./auth.js";              // Sign up / login / logout
+import "./feed.js";              // Home, Videos, Podcast, Clips feed loading
+import "./upload.js";            // Upload logic
+import "./profile.js";           // Profile page logic
+import "./settings.js";          // Settings page logic
+import "./player.js";            // Mini audio player
+
+//----------------------------------------------
+// 2) GLOBAL EVENTS
+//----------------------------------------------
+
+// Refresh feeds when a post is uploaded or deleted
+document.addEventListener("intakee:feedRefresh", () => {
+    if (window.loadFeeds) window.loadFeeds();
+});
+
+// Re-load profile after authentication changes
+document.addEventListener("intakee:auth", (e) => {
+    const user = e.detail.user;
+    if (window.loadProfilePane) window.loadProfilePane(user);
+});
+
+//----------------------------------------------
+// 3) INITIAL APP START
+//----------------------------------------------
+async function boot() {
+    console.log("⚡ Starting INTAKEE...");
+
+    // Load feed on first visit
+    if (window.loadFeeds) {
+        try {
+            await window.loadFeeds();
+            console.log("✓ Feeds loaded");
+        } catch (err) {
+            console.error("Feed loading failed:", err);
+        }
+    }
+}
+
+boot();
