@@ -681,3 +681,222 @@ document.addEventListener("intakee:auth", e => {
   console.log("🚀 INTAKEE app booted");
   await loadFeeds();
 })();
+// ===============================================
+// INTAKEE — SETTINGS PAGE CONTROLS
+// ===============================================
+
+// Shortcut
+const qs = s => document.querySelector(s);
+const qsa = s => document.querySelectorAll(s);
+
+// HIDE SEARCH BAR on Upload + Settings
+function updateSearchBarVisibility(activeTab) {
+  const search = qs(".search-bar");
+  if (!search) return;
+
+  if (activeTab === "upload" || activeTab === "settings") {
+    search.style.display = "none";
+  } else {
+    search.style.display = "flex";
+  }
+}
+
+// LISTEN FOR TAB SWITCH
+qsa(".bottom-nav a").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const tab = btn.dataset.tab;
+    updateSearchBarVisibility(tab);
+  });
+});
+
+// =================================================
+// 1) ACCORDION (Legal Section)
+// =================================================
+qsa(".accordion-header").forEach(header => {
+  header.addEventListener("click", () => {
+    const parent = header.parentElement;
+    parent.classList.toggle("open");
+  });
+});
+
+// =================================================
+// 2) AUTO-FILL LEGAL TEXT (SAFE + DETAILED)
+// =================================================
+qs("#legal-privacy").innerHTML = `
+<p>
+<strong>Privacy Policy</strong><br><br>
+INTAKEE collects only what is necessary to operate your account:
+email, username, profile details, uploads, likes, comments, and basic usage activity.
+We do <strong>not</strong> sell or share personal information with third parties.<br><br>
+
+All user-generated content (videos, podcasts, clips, thumbnails, audio, comments)
+is the full legal responsibility of the creator who uploaded it.
+INTAKEE is not liable for creator behavior, actions, or posted materials.<br><br>
+
+We may review or remove content only if it violates laws, involves serious harm,
+or threatens platform safety. Users may request deletion of their data at:
+<strong>intakee2025@gmail.com</strong>.
+</p>
+`;
+
+qs("#legal-terms").innerHTML = `
+<p>
+<strong>Terms of Service</strong><br><br>
+By using INTAKEE, you agree:
+<ul>
+  <li>You are 13 years or older.</li>
+  <li>You are responsible for all content you upload.</li>
+  <li>You agree not to upload nudity, pornographic material,
+      illegal content, hateful content, or violent threats.</li>
+</ul>
+
+Creators hold full ownership of their uploads and assume full legal responsibility
+for any consequences of their content.<br><br>
+
+INTAKEE provides the platform but is not responsible for user-generated content.
+Repeated violations may result in account limits or removal.
+</p>
+`;
+
+qs("#legal-guidelines").innerHTML = `
+<p>
+<strong>Community Guidelines</strong><br><br>
+INTAKEE supports creativity, free speech, and expression, but all users must follow these rules:
+<ul>
+  <li>No nudity or sexual content</li>
+  <li>No harassment or threats</li>
+  <li>No hate speech</li>
+  <li>No illegal activities</li>
+  <li>No violent or harmful content</li>
+</ul>
+
+Failure to follow these rules may result in content removal or account action.
+</p>
+`;
+
+// =================================================
+// 3) FIREBASE SETUP FROM WINDOW
+// =================================================
+const { auth, db } = window.firebaseRefs;
+
+// =================================================
+// 4) LOG OUT
+// =================================================
+qs("#settings-logout").addEventListener("click", async () => {
+  await auth.signOut();
+  alert("You have been logged out.");
+});
+
+// =================================================
+// 5) FORGOT PASSWORD
+// =================================================
+import("https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js")
+  .then(({ sendPasswordResetEmail }) => {
+    qs("#settings-forgot-password").addEventListener("click", async () => {
+      const email = prompt("Enter your account email:");
+      if (!email) return;
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert("A password reset email has been sent.");
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+  });
+
+// =================================================
+// 6) FORGOT USERNAME
+// =================================================
+qs("#settings-forgot-username").addEventListener("click", async () => {
+  const email = prompt("Enter your account email:");
+  if (!email) return;
+
+  try {
+    const snap = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js")
+      .then(({ collection, query, where, getDocs }) =>
+        getDocs(query(collection(db, "users"), where("email", "==", email)))
+      );
+
+    if (snap.empty) return alert("No account found for that email.");
+    
+    const data = snap.docs[0].data();
+    alert(`Your username is: @${data.username}`);
+  } catch (err) {
+    alert("Error retrieving username: " + err.message);
+  }
+});
+
+// =================================================
+// 7) DELETE ACCOUNT
+// =================================================
+qs("#settings-delete-account").addEventListener("click", async () => {
+  const confirmDelete = confirm("Delete your account permanently? This cannot be undone.");
+
+  if (!confirmDelete) return;
+
+  try {
+    const user = auth.currentUser;
+    if (!user) return alert("You must be logged in.");
+
+    // Delete Firestore user doc
+    const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+    await deleteDoc(doc(db, "users", user.uid));
+
+    // Delete Auth user
+    await user.delete();
+
+    alert("Account successfully deleted.");
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+});
+
+// =================================================
+// 8) PRIVACY & TOGGLES (PRIVATE / UPLOADS / SAVED)
+// =================================================
+async function saveSetting(field, value) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+  await updateDoc(doc(db, "users", user.uid), { [field]: value });
+}
+
+function setupToggle(id, field) {
+  const el = qs(id);
+  el.addEventListener("change", () => {
+    saveSetting(field, el.checked);
+  });
+}
+
+setupToggle("#toggle-private", "private");
+setupToggle("#toggle-show-uploads", "showUploads");
+setupToggle("#toggle-show-saved", "showSaved");
+
+// Load user settings on auth
+document.addEventListener("intakee:auth", async (e) => {
+  const user = e.detail.user;
+  if (!user) return;
+
+  const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js");
+  const snap = await getDoc(doc(db, "users", user.uid));
+  if (!snap.exists()) return;
+
+  const d = snap.data();
+
+  qs("#toggle-private").checked = d.private ?? false;
+  qs("#toggle-show-uploads").checked = d.showUploads ?? true;
+  qs("#toggle-show-saved").checked = d.showSaved ?? true;
+});
+
+// =================================================
+// 9) BLOCKED USERS & REPORT MODAL (Placeholders)
+// =================================================
+qs("#openBlockedUsers").addEventListener("click", () =>
+  alert("Blocked Users feature coming soon.")
+);
+
+qs("#openReportModal").addEventListener("click", () =>
+  alert("Report Content feature coming soon.")
+);
