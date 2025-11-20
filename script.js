@@ -1,3 +1,5 @@
+import { switchTab } from "./js/tabs.js";
+
 // ==========================================
 // INTAKEE — Firebase Core Setup (firebase.js)
 // This file initializes Firebase and exports
