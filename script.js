@@ -2,16 +2,13 @@ import { switchTab } from "./js/tabs.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
-// ==========================================
-// INTAKEE — Firebase Core Setup (firebase.js)
-// This file initializes Firebase and exports
-// Auth, Firestore, and Storage instances.
-// ==========================================
 
 'use strict';
+
 // ----------------------------------------------------
-// ✅ Your Firebase Config (already correct & valid)
+// Firebase Config
 // ----------------------------------------------------
 const firebaseConfig = {
   apiKey: "AIzaSyDp_tLBxUPvlvG7JqCBj3ItuL7sKjpL56g",
@@ -24,40 +21,19 @@ const firebaseConfig = {
 };
 
 // ----------------------------------------------------
-// 🔥 Initialize Firebase App
+// Initialize Firebase
 // ----------------------------------------------------
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
 // ----------------------------------------------------
-// Export Services (Clean)
-// ----------------------------------------------------
-export const storage = getStorage(app);
-
-// ----------------------------------------------------
-// Make available globally (optional but helpful)
+// Make available globally
 // ----------------------------------------------------
 window.firebaseRefs = { app, auth, db, storage };
 
-console.log("✅ Firebase initialized from firebase.js");
-// =======================================================
-// INTAKEE — AUTH SYSTEM (auth.js)
-// Handles sign-up, login, logout, forgot password,
-// and provides auth state updates to the whole app.
-// =======================================================
-
-'use strict';
-
-import {
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signOut,
-  updateProfile
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-
-import {
-  getFirestore,
+console.log("🔥 Firebase initialized");
   doc,
   setDoc,
   getDoc,
