@@ -1,220 +1,270 @@
-// ===============================
-// INTAKEE — viewer.js
-// Loads and displays a post in fullscreen viewer
-// ===============================
-
-'use strict';
-
-// -------------------------------
-// Firebase Access from viewer.html
-// -------------------------------
-import {
-  getFirestore, doc, getDoc, updateDoc, increment,
-  collection, addDoc, query, orderBy, getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+// =======================================================
+// INTAKEE — VIEWER.JS
+// Handles: load post, display media, creator info,
+// likes, views, comments, follow button.
+// =======================================================
 
 import {
-  getAuth, onAuthStateChanged, updateProfile
+  getAuth,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
 import {
-  getStorage, ref, getDownloadURL
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  increment,
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+import {
+  getStorage
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
-// Get Firebase refs (passed from viewer.html)
-const { app, auth, db, storage } = window.firebaseRefs || {};
+// Firebase
+const auth = getAuth();
+const db = getFirestore();
+const storage = getStorage();
 
-if (!app || !auth || !db || !storage) {
-  console.error("❌ Firebase not initialized in viewer.html");
-}
+// Helpers
+const qs = (s) => document.querySelector(s);
 
-// ===============================
-// Utility Helpers
-// ===============================
-const qs  = (sel) => document.querySelector(sel);
-const qsa = (sel) => [...document.querySelectorAll(sel)];
+// URL param
+const params = new URLSearchParams(window.location.search);
+const postId = params.get("id");
 
-// ===============================
-// Elements
-// ===============================
-const videoContainer   = qs("#video-container");
-const audioContainer   = qs("#audio-container");
-const videoEl          = qs("#viewer-video");
-const audioEl          = qs("#viewer-audio");
+// DOM elements
+const videoBox = qs("#video-container");
+const audioBox = qs("#audio-container");
+const videoEl = qs("#viewer-video");
+const audioEl = qs("#viewer-audio");
 
-const titleEl          = qs("#viewer-title");
-const creatorPhotoEl   = qs("#viewer-creator-photo");
-const creatorNameEl    = qs("#viewer-creator-name");
-const creatorUserEl    = qs("#viewer-creator-username");
+const titleEl = qs("#viewer-title");
+const descEl = qs("#viewer-description");
+const likesEl = qs("#viewer-likes");
+const commentsCountEl = qs("#viewer-comments-count");
+const viewsEl = qs("#viewer-views");
 
-const followBtn        = qs("#viewer-follow-btn");
+const creatorPhotoEl = qs("#viewer-creator-photo");
+const creatorNameEl = qs("#viewer-creator-name");
+const creatorUsernameEl = qs("#viewer-creator-username");
+const followBtn = qs("#viewer-follow-btn");
 
-const likesEl          = qs("#viewer-likes");
-const commentsCountEl  = qs("#viewer-comments-count");
-const viewsEl          = qs("#viewer-views");
+const commentInput = qs("#viewer-comment-input");
+const commentBtn = qs("#viewer-comment-btn");
+const commentsBox = qs("#viewer-comments");
 
-const descEl           = qs("#viewer-description");
+// =======================================================
+// LOAD POST DATA
+// =======================================================
 
-const commentInput     = qs("#viewer-comment-input");
-const commentBtn       = qs("#viewer-comment-btn");
-const commentsBox      = qs("#viewer-comments");
-
-// ===============================
-// Get Post ID from URL
-// ===============================
-const urlParams = new URLSearchParams(window.location.search);
-const postId = urlParams.get("id");
-
-if (!postId) {
-  alert("Invalid post ID.");
-  throw new Error("Missing post ID in URL");
-}
-
-// ===============================
-// Load Viewer Content
-// ===============================
 async function loadPost() {
-  try {
-    const postRef = doc(db, "posts", postId);
-    const snap = await getDoc(postRef);
+  if (!postId) {
+    titleEl.textContent = "Post not found.";
+    return;
+  }
 
+  try {
+    const snap = await getDoc(doc(db, "posts", postId));
     if (!snap.exists()) {
-      alert("Post not found.");
+      titleEl.textContent = "Post not found.";
       return;
     }
 
-    const post = snap.data();
-
-    // Title + Description
-    titleEl.textContent = post.title || "Untitled";
-    descEl.textContent  = post.desc || "";
-
-    // Likes
-    likesEl.textContent = `${post.likeCount || 0} Likes`;
-
-    // Views
-    const newViews = (post.viewCount || 0) + 1;
-    await updateDoc(postRef, { viewCount: increment(1) });
-    viewsEl.textContent = `${newViews} Views`;
-
-    // Load Creator Info
-    loadCreator(post.uid);
-
-    // Load Comments
-    loadComments();
-
-    // Display media
-    if (post.type === "video" || post.type === "clip" || post.type === "podcast-video") {
-      videoContainer.style.display = "block";
-      audioContainer.style.display = "none";
-      videoEl.src = post.mediaUrl;
-    } else {
-      // audio podcast
-      videoContainer.style.display = "none";
-      audioContainer.style.display = "block";
-      audioEl.src = post.mediaUrl;
-    }
-
-  } catch (err) {
-    console.error(err);
-    alert("Failed to load post.");
-  }
-}
-
-// ===============================
-// Load Creator Info
-// ===============================
-async function loadCreator(uid) {
-  try {
-    const userRef = doc(db, "users", uid);
-    const snap = await getDoc(userRef);
-
-    if (!snap.exists()) return;
-
     const data = snap.data();
 
-    creatorNameEl.textContent = data.name || "Unknown";
-    creatorUserEl.textContent = "@" + (data.username || "user");
+    // Title + description
+    titleEl.textContent = data.title || "";
+    descEl.textContent = data.desc || "";
 
-    if (data.photoURL) {
-      creatorPhotoEl.src = data.photoURL;
-    }
+    // Increment views
+    await updateDoc(doc(db, "posts", postId), {
+      viewCount: increment(1)
+    });
+
+    viewsEl.textContent = `${(data.viewCount || 0) + 1} Views`;
+
+    loadMedia(data);
+    loadCreator(data.uid);
+    loadComments();
+    updateLikesCount(data);
+
   } catch (err) {
-    console.error("Failed to load creator info:", err);
+    titleEl.textContent = "Error loading post.";
+    console.error(err);
   }
 }
 
-// ===============================
-// Comments
-// ===============================
-async function loadComments() {
-  const commentsRef = collection(db, "posts", postId, "comments");
-  const q = query(commentsRef, orderBy("createdAt", "asc"));
-  const snap = await getDocs(q);
+// =======================================================
+// LOAD MEDIA (video / audio / podcast)
+// =======================================================
 
-  commentsBox.innerHTML = "";
-  commentsCountEl.textContent = `${snap.docs.length} Comments`;
+function loadMedia(post) {
+  videoBox.style.display = "none";
+  audioBox.style.display = "none";
 
-  snap.docs.forEach(docSnap => {
-    const c = docSnap.data();
-    const item = document.createElement("div");
-    item.className = "comment-item";
-    item.innerHTML = `<span class="muted">${c.uid.slice(0,6)}:</span> ${c.text}`;
-    commentsBox.appendChild(item);
-  });
+  if (post.type === "video" || post.type === "podcast-video") {
+    videoBox.style.display = "block";
+    videoEl.src = post.mediaUrl;
+    videoEl.autoplay = false;
+
+  } else if (post.type === "podcast-audio") {
+    audioBox.style.display = "block";
+    audioEl.src = post.mediaUrl;
+    audioEl.autoplay = true;
+
+  } else if (post.type === "clip") {
+    videoBox.style.display = "block";
+    videoEl.src = post.mediaUrl;
+    videoEl.autoplay = true;
+    videoEl.loop = true;
+  }
 }
 
-commentBtn.addEventListener("click", async () => {
-  const user = auth.currentUser;
-  if (!user) return alert("Sign in to comment.");
+// =======================================================
+// LOAD CREATOR INFO
+// =======================================================
 
+async function loadCreator(uid) {
+  try {
+    const snap = await getDoc(doc(db, "users", uid));
+    const data = snap.data();
+
+    if (!data) return;
+
+    creatorNameEl.textContent = data.name || "Creator";
+    creatorUsernameEl.textContent = "@" + (data.username || "unknown");
+
+    creatorPhotoEl.src = data.photoURL || "";
+  } catch (err) {
+    console.error("Error loading creator:", err);
+  }
+}
+
+// =======================================================
+// LIKES
+// =======================================================
+
+async function updateLikesCount(data) {
+  likesEl.textContent = `${data.likeCount || 0} Likes`;
+}
+
+qs("#like-btn")?.addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) return alert("Login required.");
+
+  try {
+    await updateDoc(doc(db, "posts", postId), {
+      likeCount: increment(1)
+    });
+
+    const snap = await getDoc(doc(db, "posts", postId));
+    const data = snap.data();
+
+    updateLikesCount(data);
+
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+});
+
+// Dislike is placeholder
+qs("#dislike-btn")?.addEventListener("click", () => {
+  alert("You disliked this post.");
+});
+
+// =======================================================
+// COMMENTS (CREATE + LOAD)
+// =======================================================
+
+async function loadComments() {
+  try {
+    const qRef = query(
+      collection(db, "comments"),
+      where("postId", "==", postId)
+    );
+
+    const snap = await getDocs(qRef);
+    const comments = snap.docs.map(d => d.data());
+
+    commentsCountEl.textContent = `${comments.length} Comments`;
+
+    commentsBox.innerHTML = "";
+
+    if (comments.length === 0) {
+      commentsBox.innerHTML = `<p class="muted">No comments yet.</p>`;
+      return;
+    }
+
+    comments.forEach(c => {
+      const el = document.createElement("div");
+      el.className = "comment-item";
+
+      el.innerHTML = `
+        <strong>@${c.username}</strong>: ${c.text}
+      `;
+
+      commentsBox.appendChild(el);
+    });
+
+  } catch (err) {
+    console.error("Comments error:", err);
+  }
+}
+
+// Post a comment
+commentBtn.addEventListener("click", async () => {
   const text = commentInput.value.trim();
   if (!text) return;
 
+  const user = auth.currentUser;
+  if (!user) return alert("Login required.");
+
   try {
-    const commentsRef = collection(db, "posts", postId, "comments");
-    await addDoc(commentsRef, {
+    const snap = await getDoc(doc(db, "users", user.uid));
+    const userdata = snap.data();
+
+    await addDoc(collection(db, "comments"), {
+      postId,
       uid: user.uid,
+      username: userdata.username,
       text,
-      createdAt: new Date()
+      createdAt: serverTimestamp()
     });
 
     commentInput.value = "";
     loadComments();
 
   } catch (err) {
-    console.error("Comment failed:", err);
-    alert("Failed to comment.");
+    alert("Comment error: " + err.message);
   }
 });
 
-// ===============================
-// Follow Feature
-// ===============================
+// =======================================================
+// FOLLOW CREATOR
+// =======================================================
+
 followBtn.addEventListener("click", async () => {
   const user = auth.currentUser;
-  if (!user) return alert("Sign in to follow creators.");
+  if (!user) return alert("Login required.");
 
   try {
-    const authorRef = doc(db, "users", creatorUserEl.textContent.replace("@",""));
+    // (Simple placeholder)
+    alert("Following creator is coming soon.");
   } catch (err) {
-    console.error(err);
-  }
-
-  alert("Follow system will be expanded soon.");
-});
-
-// ===============================
-// AUTH LISTENER
-// ===============================
-onAuthStateChanged(auth, user => {
-  if (!user) {
-    followBtn.textContent = "Follow";
-    return;
+    alert("Error: " + err.message);
   }
 });
 
-// ===============================
-// INIT
-// ===============================
+// =======================================================
+// START VIEWER
+// =======================================================
+
 loadPost();
+console.log("📺 viewer.js loaded");
