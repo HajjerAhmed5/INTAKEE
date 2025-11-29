@@ -572,3 +572,37 @@ dialog::backdrop{ background: rgba(0,0,0,.6); }
 .settings-card a {
   color: #4da6ff;
 }
+/* ============================
+   iPhone-Style Settings Rows (for C option)
+   ============================ */
+
+.settings-section-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 25px 0 10px 0;
+  color: #888;
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #222;
+  cursor: pointer;
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-label {
+  font-size: 1rem;
+  color: #eee;
+}
+
+.settings-arrow {
+  color: #666;
+  font-size: 0.9rem;
+}
