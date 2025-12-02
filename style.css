@@ -131,7 +131,56 @@ main {
 /* ===========================
    PROFILE PAGE (UPDATED)
    =========================== */
+/* ===========================
+   PROFILE — CENTERED LAYOUT
+   =========================== */
 
+#tab-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px;
+}
+
+.profile-card,
+#tab-profile .card {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.profile-banner {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.profile-header,
+.profile-info,
+.stats-row,
+.profile-tabs {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+}
+
+/* Center the edit button */
+#btn-edit-profile {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Center the grid */
+#profile-grid {
+  margin: 20px auto;
+  max-width: 780px;
+}
+
+/* Center the empty state text */
+#profile-empty {
+  text-align: center;
+}
 /* Banner */
 .profile-banner {
   width: 100%;
