@@ -1,11 +1,9 @@
 /****************************************************
- * INTAKEE — CLEAN FINAL SCRIPT.JS (CHUNK 1)
- * Firebase + Auth + Tabs + Base Setup
+ * INTAKEE — MASTER SCRIPT.JS (FINAL BUILD)
+ * Part 1 — Firebase Init + Auth + Tabs
  ****************************************************/
 
-// ===================
-// FIREBASE IMPORTS
-// ===================
+// ============ FIREBASE IMPORTS ============
 
 import { initializeApp } 
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -16,25 +14,20 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut, updateProfile
-} 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import { 
-  getFirestore, doc, setDoc, getDoc, updateDoc, 
+  getFirestore, doc, setDoc, getDoc, updateDoc,
   addDoc, getDocs, collection, serverTimestamp,
-  query, where, orderBy
-} 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  query, where, orderBy, arrayUnion, arrayRemove
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 import {
   getStorage, ref, uploadBytesResumable, getDownloadURL
-}
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 
-// ===================
-// FIREBASE CONFIG
-// ===================
+// ============ FIREBASE CONFIG ============
 
 const firebaseConfig = {
   apiKey: "AIzaSyD0_tL8PxUvGT7JqCBj3tuL7s3Kipl5E6g",
@@ -47,9 +40,7 @@ const firebaseConfig = {
 };
 
 
-// ===================
-// INIT SERVICES
-// ===================
+// ============ INIT SERVICES ============
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -57,19 +48,14 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 
-// ===================
-// UTIL SHORTCUTS
-// ===================
+// ============ UTIL SHORTCUTS ============
 
 const qs = (x) => document.querySelector(x);
 const qsa = (x) => document.querySelectorAll(x);
-
 let currentUser = null;
 
 
-// ===================
-// AUTH STATE LISTENER
-// ===================
+// ============ AUTH STATE LISTENER ============
 
 onAuthStateChanged(auth, async (user) => {
   currentUser = user;
@@ -98,16 +84,11 @@ onAuthStateChanged(auth, async (user) => {
     qs("#openAuth").style.display = "block";
   }
 
-  // Let the entire app know auth changed
-  document.dispatchEvent(
-    new CustomEvent("intakee:auth", { detail: { user } })
-  );
+  document.dispatchEvent(new CustomEvent("intakee:auth", { detail: { user } }));
 });
 
 
-// ===================
-// LOGIN / SIGNUP / LOGOUT
-// ===================
+// ============ LOGIN / SIGNUP / LOGOUT ============
 
 const authDialog = qs("#authDialog");
 
@@ -171,38 +152,28 @@ qs("#forgotBtn").onclick = async () => {
 qs("#settings-logout").onclick = () => signOut(auth);
 
 
-// ===================
-// FINAL WORKING TAB SWITCHING
-// ===================
-/****************************************************
- * TAB SWITCHING — FINAL CLEAN VERSION
- ****************************************************/
+// ============ TAB SWITCHING ============
 
-const tabs = document.querySelectorAll(".bottom-nav a");
+const tabs = qsa(".bottom-nav a");
 
 const sections = {
-  home: document.querySelector("#tab-home"),
-  videos: document.querySelector("#tab-videos"),
-  podcast: document.querySelector("#tab-podcast"),
-  upload: document.querySelector("#tab-upload"),
-  clips: document.querySelector("#tab-clips"),
-  profile: document.querySelector("#tab-profile"),
-  settings: document.querySelector("#tab-settings"),
+  home: qs("#tab-home"),
+  videos: qs("#tab-videos"),
+  podcast: qs("#tab-podcast"),
+  upload: qs("#tab-upload"),
+  clips: qs("#tab-clips"),
+  profile: qs("#tab-profile"),
+  settings: qs("#tab-settings"),
 };
 
 function showTab(name) {
-  // hide all sections
   Object.values(sections).forEach(sec => sec.style.display = "none");
-
-  // show chosen
   sections[name].style.display = "block";
 
-  // update bottom nav active state
-  tabs.forEach(t => {
-    t.classList.toggle("active", t.dataset.tab === name);
-  });
+  tabs.forEach(t =>
+    t.classList.toggle("active", t.dataset.tab === name)
+  );
 
-  // load feed if needed
   if (name === "home")    loadHomeFeed();
   if (name === "videos")  loadVideosFeed();
   if (name === "podcast") loadPodcastFeed();
@@ -210,7 +181,6 @@ function showTab(name) {
   if (name === "profile" && currentUser) loadProfile(currentUser.uid);
 }
 
-// click event
 tabs.forEach(btn => {
   btn.addEventListener("click", () => {
     const tab = btn.dataset.tab;
@@ -224,14 +194,14 @@ tabs.forEach(btn => {
   });
 });
 
-// default screen
-showTab("home");
+showTab("home");  // default tab
 /****************************************************
- * CHUNK 2 — UPLOAD SYSTEM
+ * PART 2 — UPLOAD SYSTEM (FINAL)
  * Handles:
- * - Upload thumbnail to Storage
- * - Upload media file to Storage
+ * - Upload thumbnail
+ * - Upload media file
  * - Create Firestore post
+ * - Allowed types: video, clip, podcast-audio, podcast-video
  ****************************************************/
 
 // Upload inputs
@@ -274,7 +244,7 @@ uploadBtn.addEventListener("click", async () => {
     const thumbnailUrl = await getDownloadURL(thumbTask.snapshot.ref);
 
     // ========================
-    // 2. Upload media
+    // 2. Upload media file
     // ========================
     const fileRef = ref(storage, `uploads/${Date.now()}-${file.name}`);
     const fileTask = uploadBytesResumable(fileRef, file);
@@ -287,7 +257,7 @@ uploadBtn.addEventListener("click", async () => {
     // ========================
     await addDoc(collection(db, "posts"), {
       uid: currentUser.uid,
-      username: currentUser.displayName,
+      username: currentUser.displayName || currentUser.email.split("@")[0],
       title,
       desc,
       type,                // video, clip, podcast-audio, podcast-video
@@ -295,12 +265,12 @@ uploadBtn.addEventListener("click", async () => {
       fileUrl,
       likes: [],
       dislikes: [],
+      ageRestricted: false, // you can add this later
       createdAt: serverTimestamp()
     });
 
     alert("Upload complete!");
 
-    // Reset fields
     uploadTitleInput.value = "";
     uploadDescInput.value = "";
     uploadThumbInput.value = "";
@@ -309,8 +279,8 @@ uploadBtn.addEventListener("click", async () => {
     uploadBtn.textContent = "Upload";
     uploadBtn.disabled = false;
 
-    // Go to Home feed
-    activateTab("home");
+    // return to home feed
+    showTab("home");
 
   } catch (err) {
     console.error(err);
@@ -320,2046 +290,812 @@ uploadBtn.addEventListener("click", async () => {
   }
 });
 /****************************************************
- * CHUNK 3 — FEED SYSTEM
- * Loads posts into:
- * - Home
- * - Videos
- * - Podcast
- * - Clips
+ * PART 3 — FEED SYSTEM (Home, Videos, Podcast, Clips)
+ * Loads posts from Firestore and displays them in:
+ * - home-feed
+ * - videos-feed
+ * - podcast-feed
+ * - clips-feed
+ * Opens viewer.html?id=POST_ID when a post is clicked
  ****************************************************/
 
-// ALWAYS normalize post
-function normalizePost(p, id) {
-  return {
-    id,
-    uid: p.uid || "",
-    username: p.username || "unknown",
-    title: p.title || "Untitled",
-    desc: p.desc || "",
-    thumbnailUrl: p.thumbnailUrl || "placeholder.png",
-    fileUrl: p.fileUrl || "",
-    type: p.type || "video",
-    likes: p.likes || [],
-    dislikes: p.dislikes || [],
-    ageRestricted: p.ageRestricted || false,
-  };
-}
+async function loadFeed(targetId, filterType = null) {
+  const feedEl = qs(`#${targetId}`);
+  feedEl.innerHTML = `<p class="muted">Loading...</p>`;
 
-// ===============================
-// HOME FEED — all posts
-// ===============================
-async function loadHomeFeed() {
-  const wrap = qs("#home-feed");
-  wrap.innerHTML = `<p class="muted">Loading…</p>`;
+  let qRef;
 
-  const qRef = query(
-    collection(db, "posts"),
-    orderBy("createdAt", "desc")
-  );
-  const snap = await getDocs(qRef);
-
-  wrap.innerHTML = "";
-
-  if (snap.empty) {
-    wrap.innerHTML = `<p class="muted">No posts yet.</p>`;
-    return;
-  }
-
-  snap.forEach(docu => {
-    const post = normalizePost(docu.data(), docu.id);
-    wrap.appendChild(renderPostCard(post));
-  });
-}
-
-
-// ===============================
-// VIDEOS FEED — video & video podcasts
-// ===============================
-async function loadVideosFeed() {
-  const wrap = qs("#videos-feed");
-  wrap.innerHTML = `<p class="muted">Loading…</p>`;
-
-  const qRef = query(
-    collection(db, "posts"),
-    where("type", "in", ["video", "podcast-video"]),
-    orderBy("createdAt", "desc")
-  );
-  const snap = await getDocs(qRef);
-
-  wrap.innerHTML = "";
-
-  if (snap.empty) {
-    wrap.innerHTML = `<p class="muted">No videos yet.</p>`;
-    return;
-  }
-
-  snap.forEach(docu => {
-    const post = normalizePost(docu.data(), docu.id);
-    wrap.appendChild(renderPostCard(post));
-  });
-}
-
-
-// ===============================
-// PODCAST FEED — audio-only podcasts
-// ===============================
-async function loadPodcastFeed() {
-  const wrap = qs("#podcast-feed");
-  wrap.innerHTML = `<p class="muted">Loading…</p>`;
-
-  const qRef = query(
-    collection(db, "posts"),
-    where("type", "==", "podcast-audio"),
-    orderBy("createdAt", "desc")
-  );
-  const snap = await getDocs(qRef);
-
-  wrap.innerHTML = "";
-
-  if (snap.empty) {
-    wrap.innerHTML = `<p class="muted">No podcasts yet.</p>`;
-    return;
-  }
-
-  snap.forEach(docu => {
-    const post = normalizePost(docu.data(), docu.id);
-    wrap.appendChild(renderPostCard(post));
-  });
-}
-
-
-// ===============================
-// CLIPS FEED — short clips
-// ===============================
-async function loadClipsFeed() {
-  const wrap = qs("#clips-feed");
-  wrap.innerHTML = `<p class="muted">Loading…</p>`;
-
-  const qRef = query(
-    collection(db, "posts"),
-    where("type", "==", "clip"),
-    orderBy("createdAt", "desc")
-  );
-  const snap = await getDocs(qRef);
-
-  wrap.innerHTML = "";
-
-  if (snap.empty) {
-    wrap.innerHTML = `<p class="muted">No clips yet.</p>`;
-    return;
-  }
-
-  snap.forEach(docu => {
-    const post = normalizePost(docu.data(), docu.id);
-    wrap.appendChild(renderPostCard(post));
-  });
-}
-/****************************************************
- * CHUNK 4 — POST CARD RENDERER
- * Builds the UI card used in ALL feeds
- ****************************************************/
-
-function renderPostCard(p) {
-  const div = document.createElement("div");
-  div.className = "video-card";
-
-  div.innerHTML = `
-    <div class="thumb-16x9">
-      <img src="${p.thumbnailUrl}" alt="Thumbnail">
-    </div>
-
-    <div class="meta">
-      <h3 style="margin-bottom:4px;">${p.title}</h3>
-      <p class="muted" style="font-size:.9rem;">@${p.username}</p>
-
-      <div style="margin-top:10px; display:flex; gap:14px; align-items:center;">
-        
-        <!-- LIKE -->
-        <button class="like-btn"
-                data-id="${p.id}"
-                style="background:none; border:none; color:#bbb; cursor:pointer; font-size:1rem;">
-          👍 ${p.likes?.length || 0}
-        </button>
-
-        <!-- DISLIKE -->
-        <button class="dislike-btn"
-                data-id="${p.id}"
-                style="background:none; border:none; color:#bbb; cursor:pointer; font-size:1rem;">
-          👎 ${p.dislikes?.length || 0}
-        </button>
-
-        <!-- SAVE -->
-        <button class="save-btn"
-                data-id="${p.id}"
-                style="background:none; border:none; color:#bbb; cursor:pointer; font-size:1rem;">
-          💾 Save
-        </button>
-
-      </div>
-    </div>
-  `;
-
-  // ======================================
-  // ENTIRE CARD OPENS VIEWER PAGE
-  // BUT buttons inside do NOT open it
-  // ======================================
-  div.addEventListener("click", (e) => {
-    if (
-      e.target.closest(".like-btn") ||
-      e.target.closest(".dislike-btn") ||
-      e.target.closest(".save-btn")
-    ) {
-      return; // stop click → button only
-    }
-
-    // Go to viewer page
-    window.location.href = `viewer.html?id=${p.id}`;
-  });
-
-  return div;
-}
-/****************************************************
- * CHUNK 5 — LIKE / DISLIKE SYSTEM
- * - Like a post
- * - Dislike a post
- * - One reaction per user
- * - Auto-refresh active feed
- ****************************************************/
-
-// MAIN CLICK HANDLER
-document.addEventListener("click", async (e) => {
-  const likeBtn    = e.target.closest(".like-btn");
-  const dislikeBtn = e.target.closest(".dislike-btn");
-
-  // LIKE
-  if (likeBtn) {
-    if (!currentUser) return alert("You must be logged in to like posts.");
-    const postId = likeBtn.dataset.id;
-    await handleLike(postId);
-    refreshActiveFeed();
-  }
-
-  // DISLIKE
-  if (dislikeBtn) {
-    if (!currentUser) return alert("You must be logged in to dislike posts.");
-    const postId = dislikeBtn.dataset.id;
-    await handleDislike(postId);
-    refreshActiveFeed();
-  }
-});
-
-
-// ======================================
-// LIKE HANDLER
-// ======================================
-async function handleLike(postId) {
-  const refPost = doc(db, "posts", postId);
-  const snap = await getDoc(refPost);
-
-  if (!snap.exists()) return;
-
-  const post = snap.data();
-  const uid = currentUser.uid;
-
-  let likes    = post.likes || [];
-  let dislikes = post.dislikes || [];
-
-  const hasLiked = likes.includes(uid);
-  const hasDisliked = dislikes.includes(uid);
-
-  if (hasLiked) {
-    // Remove like
-    likes = likes.filter(id => id !== uid);
+  if (filterType) {
+    // Filter by type (video, clip, podcast-audio, podcast-video)
+    qRef = query(
+      collection(db, "posts"),
+      where("type", "==", filterType),
+      orderBy("createdAt", "desc")
+    );
   } else {
-    // Add like
-    likes.push(uid);
-    // Remove dislike if switching
-    if (hasDisliked) {
-      dislikes = dislikes.filter(id => id !== uid);
-    }
+    // All posts for Home feed
+    qRef = query(
+      collection(db, "posts"),
+      orderBy("createdAt", "desc")
+    );
   }
 
-  await updateDoc(refPost, { likes, dislikes });
-}
+  const snap = await getDocs(qRef);
 
-
-// ======================================
-// DISLIKE HANDLER
-// ======================================
-async function handleDislike(postId) {
-  const refPost = doc(db, "posts", postId);
-  const snap = await getDoc(refPost);
-
-  if (!snap.exists()) return;
-
-  const post = snap.data();
-  const uid = currentUser.uid;
-
-  let likes    = post.likes || [];
-  let dislikes = post.dislikes || [];
-
-  const hasLiked = likes.includes(uid);
-  const hasDisliked = dislikes.includes(uid);
-
-  if (hasDisliked) {
-    // Remove dislike
-    dislikes = dislikes.filter(id => id !== uid);
-  } else {
-    // Add dislike
-    dislikes.push(uid);
-    // Remove like if switching
-    if (hasLiked) {
-      likes = likes.filter(id => id !== uid);
-    }
-  }
-
-  await updateDoc(refPost, { likes, dislikes });
-}
-
-
-// ======================================
-// Refresh the currently active feed tab
-// ======================================
-function refreshActiveFeed() {
-  const tab = document.querySelector(".bottom-nav a.active")?.dataset.tab;
-
-  if (tab === "home")    loadHomeFeed();
-  if (tab === "videos")  loadVideosFeed();
-  if (tab === "podcast") loadPodcastFeed();
-  if (tab === "clips")   loadClipsFeed();
-}
-/****************************************************
- * CHUNK 6 — SAVE / WATCH LATER SYSTEM
- * - Save / Unsave a post
- * - Load saved posts in Profile tab
- ****************************************************/
-
-// Detect SAVE button click in any feed
-document.addEventListener("click", async (e) => {
-  const saveBtn = e.target.closest(".save-btn");
-  if (!saveBtn) return;
-
-  if (!currentUser) return alert("You must be logged in to save posts.");
-
-  const postId = saveBtn.dataset.id;
-  toggleSave(postId, saveBtn);
-});
-
-
-// ----------------------------------------------
-// Toggle Save / Unsave
-// ----------------------------------------------
-async function toggleSave(postId, btn) {
-  const userRef = doc(db, "users", currentUser.uid);
-  const snap = await getDoc(userRef);
-  const data = snap.data();
-
-  const savedList = data.saved || [];
-  let updated;
-
-  if (savedList.includes(postId)) {
-    // UNSAVE
-    updated = savedList.filter(id => id !== postId);
-    if (btn) btn.textContent = "💾 Save";
-  } else {
-    // SAVE
-    updated = [...savedList, postId];
-    if (btn) btn.textContent = "✔ Saved";
-  }
-
-  await updateDoc(userRef, { saved: updated });
-
-  // Refresh saved tab immediately if user is viewing it
-  if (window.currentProfileTab === "saved") {
-    loadSavedPosts(currentUser.uid);
-  }
-}
-
-
-// ----------------------------------------------
-// Load Saved Posts in Profile
-// ----------------------------------------------
-async function loadSavedPosts(uid) {
-  const wrap = qs("#profile-saved");
-  wrap.innerHTML = `<p class="muted">Loading saved...</p>`;
-
-  const userSnap = await getDoc(doc(db, "users", uid));
-  const userData = userSnap.data();
-  const savedList = userData.saved || [];
-
-  wrap.innerHTML = "";
-
-  if (savedList.length === 0) {
-    wrap.innerHTML = `<p class="muted">No saved posts yet.</p>`;
+  if (snap.empty) {
+    feedEl.innerHTML = `<p class="muted">No posts yet.</p>`;
     return;
   }
 
-  for (let postId of savedList) {
-    const snap = await getDoc(doc(db, "posts", postId));
-    if (!snap.exists()) continue;
+  feedEl.innerHTML = ""; // Clear old content
 
-    const post = snap.data();
-    post.id = postId;
+  snap.forEach((docSnap) => {
+    const post = docSnap.data();
+    const postId = docSnap.id;
 
-    const tile = document.createElement("div");
-    tile.className = "tile";
+    const card = document.createElement("div");
+    card.className = "card";
 
-    tile.innerHTML = `
-      <img class="thumb" src="${post.thumbnailUrl}">
-      <div class="meta">${post.title}</div>
+    // Thumbnail container
+    card.innerHTML = `
+      <img src="${post.thumbnailUrl}" 
+           style="width:100%;border-radius:10px;object-fit:cover;max-height:240px;">
+
+      <h3 style="margin:10px 0 6px 0;">${post.title}</h3>
+
+      <p class="muted" style="font-size:14px;">
+        @${post.username || "user"} • ${post.type.replace("-", " ")}
+      </p>
     `;
 
-    tile.addEventListener("click", () => {
+    // Click to open viewer
+    card.addEventListener("click", () => {
       window.location.href = `viewer.html?id=${postId}`;
     });
 
-    wrap.appendChild(tile);
-  }
+    feedEl.appendChild(card);
+  });
 }
+
+
 /****************************************************
- * CHUNK 7 — PROFILE SYSTEM
- * Uploads / Saved / Likes / Playlists
- * + Profile Tab Switching
+ * INDIVIDUAL FEED LOADERS
  ****************************************************/
 
-// Profile tab buttons (the pills in your UI)
-const pfTabs = qsa(".profile-tabs .pill");
+function loadHomeFeed() {
+  loadFeed("home-feed", null); // all posts
+}
 
-// Profile content sections
-const pfUploads   = qs("#profile-grid");   // default uploads grid
-const pfSaved     = qs("#profile-saved");
-const pfLikes     = qs("#profile-likes");
-const pfPlaylists = qs("#profile-playlists");
+function loadVideosFeed() {
+  loadFeed("videos-feed", "video");
+}
 
-// Track which tab is currently active
-window.currentProfileTab = "uploads";
+function loadPodcastFeed() {
+  // Load both audio + video podcasts
+  loadFeed("podcast-feed", "podcast-audio");
+  loadFeed("podcast-feed", "podcast-video");
+}
 
+function loadClipsFeed() {
+  loadFeed("clips-feed", "clip");
+}
+/****************************************************
+ * PART 4 — REAL TAB SWITCHING SYSTEM
+ * Controls navigation between:
+ * home, videos, podcast, upload, clips, profile, settings
+ ****************************************************/
 
-// ---------------------------------------------
-// SWITCH PROFILE TABS (THIS MAKES TABS WORK)
-// ---------------------------------------------
-function switchProfileTab(tabName) {
-  window.currentProfileTab = tabName;
+const sections = {
+  home: qs("#tab-home"),
+  videos: qs("#tab-videos"),
+  podcast: qs("#tab-podcast"),
+  upload: qs("#tab-upload"),
+  clips: qs("#tab-clips"),
+  profile: qs("#tab-profile"),
+  settings: qs("#tab-settings")
+};
 
-  // Update pill UI active state
-  pfTabs.forEach(btn =>
+const tabButtons = document.querySelectorAll(".bottom-nav a");
+
+/** Hide ALL tabs */
+function hideAllTabs() {
+  Object.values(sections).forEach(sec => {
+    if (sec) sec.style.display = "none";
+  });
+}
+
+/** Activate a specific tab */
+function activateTab(tabName) {
+  // Update active button style
+  tabButtons.forEach(btn =>
     btn.classList.toggle("active", btn.dataset.tab === tabName)
   );
 
-  // Hide all sections
-  pfUploads.style.display   = "none";
-  pfSaved.style.display     = "none";
-  pfLikes.style.display     = "none";
-  pfPlaylists.style.display = "none";
+  hideAllTabs();
+  sections[tabName].style.display = "block";
 
-  // Show selected section
-  if (tabName === "uploads")   pfUploads.style.display = "grid";
-  if (tabName === "saved")     pfSaved.style.display = "grid";
-  if (tabName === "likes")     pfLikes.style.display = "grid";
-  if (tabName === "playlists") pfPlaylists.style.display = "block";
+  // Load correct feed
+  if (tabName === "home") loadHomeFeed();
+  if (tabName === "videos") loadVideosFeed();
+  if (tabName === "podcast") loadPodcastFeed();
+  if (tabName === "clips") loadClipsFeed();
 
-  // Load content for each tab
-  if (!currentUser) return;
-
-  if (tabName === "uploads")   loadProfileUploads(currentUser.uid);
-  if (tabName === "saved")     loadSavedPosts(currentUser.uid);
-  if (tabName === "likes")     loadProfileLikes(currentUser.uid);
+  // Load logged-in profile
+  if (tabName === "profile" && currentUser) {
+    loadProfile(currentUser.uid);
+  }
 }
 
-
-// Add click events to pills
-pfTabs.forEach(btn => {
+/** Handle click on bottom nav */
+tabButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    switchProfileTab(btn.dataset.tab);
-  });
-});
-
-
-// Default tab on profile open
-switchProfileTab("uploads");
-
-
-// ---------------------------------------------
-// LOAD USER UPLOADS
-// ---------------------------------------------
-async function loadProfileUploads(uid) {
-  const qRef = query(
-    collection(db, "posts"),
-    where("uid", "==", uid),
-    orderBy("createdAt", "desc")
-  );
-
-  const snap = await getDocs(qRef);
-
-  pfUploads.innerHTML = snap.empty
-    ? `<p class="muted" style="text-align:center;">No uploads yet.</p>`
-    : "";
-
-  snap.forEach(docSnap => {
-    const p = docSnap.data();
-
-    const tile = document.createElement("div");
-    tile.className = "tile";
-    tile.innerHTML = `
-      <img class="thumb" src="${p.thumbnailUrl}">
-      <div class="meta">${p.title}</div>
-    `;
-
-    tile.addEventListener("click", () =>
-      window.location.href = `viewer.html?id=${docSnap.id}`
-    );
-
-    pfUploads.appendChild(tile);
-  });
-}
-
-
-// ---------------------------------------------
-// LOAD USER LIKED POSTS
-// ---------------------------------------------
-async function loadProfileLikes(uid) {
-  pfLikes.innerHTML = `<p class="muted">Loading...</p>`;
-
-  const userSnap = await getDoc(doc(db, "users", uid));
-  const data = userSnap.data();
-  const likesList = data.likes || [];
-
-  pfLikes.innerHTML = "";
-
-  if (likesList.length === 0) {
-    pfLikes.innerHTML =
-      `<p class="muted" style="text-align:center;">No likes yet.</p>`;
-    return;
-  }
-
-  for (let postId of likesList) {
-    const snap = await getDoc(doc(db, "posts", postId));
-    if (!snap.exists()) continue;
-
-    const p = snap.data();
-
-    const tile = document.createElement("div");
-    tile.className = "tile";
-    tile.innerHTML = `
-      <img class="thumb" src="${p.thumbnailUrl}">
-      <div class="meta">${p.title}</div>
-    `;
-
-    tile.addEventListener("click", () =>
-      window.location.href = `viewer.html?id=${postId}`
-    );
-
-    pfLikes.appendChild(tile);
-  }
-}
-
-
-// ---------------------------------------------
-// PLAYLISTS (placeholder for your future update)
-// ---------------------------------------------
-function loadUserPlaylists() {
-  pfPlaylists.innerHTML = `
-    <p class="muted" style="text-align:center;">Playlists coming soon.</p>
-  `;
-}
-/****************************************************
- * CHUNK 8 — FOLLOW SYSTEM
- * - Follow / Unfollow creators
- * - Update counts live
- * - Works on Profile + Viewer page
- ****************************************************/
-
-let viewingProfileUid = null; // whose profile you're looking at
-
-
-/****************************************************
- * 1. LOAD FOLLOW STATS (Followers / Following)
- ****************************************************/
-async function loadFollowStats(uid) {
-  const snap = await getDoc(doc(db, "users", uid));
-  if (!snap.exists()) return;
-
-  const data = snap.data();
-
-  // Update UI counters
-  qs("#stat-followers").textContent = data.followers?.length || 0;
-  qs("#stat-following").textContent = data.following?.length || 0;
-}
-
-
-/****************************************************
- * 2. SET THE CURRENT PROFILE BEING VIEWED
- ****************************************************/
-async function loadProfile(uid) {
-  viewingProfileUid = uid;
-
-  // Load uploads, saved, likes (from Chunk 7)
-  loadProfileUploads(uid);
-  loadSavedPosts(uid);
-  loadProfileLikes(uid);
-
-  // Load follow stats
-  loadFollowStats(uid);
-
-  // Show correct follow/unfollow button
-  updateFollowButtons();
-}
-
-
-/****************************************************
- * 3. FOLLOW + UNFOLLOW BUTTONS ON PROFILE
- ****************************************************/
-const followBtn   = qs("#btn-follow");
-const unfollowBtn = qs("#btn-unfollow");
-
-function updateFollowButtons() {
-  if (!currentUser) {
-    // Not logged in → only show Follow button
-    followBtn.style.display = "inline-block";
-    unfollowBtn.style.display = "none";
-    return;
-  }
-
-  // If viewing your own profile → hide both
-  if (currentUser.uid === viewingProfileUid) {
-    followBtn.style.display = "none";
-    unfollowBtn.style.display = "none";
-    return;
-  }
-
-  checkIfFollowing();
-}
-
-
-// Check if YOU follow THEM
-async function checkIfFollowing() {
-  const meSnap = await getDoc(doc(db, "users", currentUser.uid));
-  const me = meSnap.data();
-
-  const isFollowing = me.following?.includes(viewingProfileUid);
-
-  followBtn.style.display   = isFollowing ? "none" : "inline-block";
-  unfollowBtn.style.display = isFollowing ? "inline-block" : "none";
-}
-
-
-/****************************************************
- * 4. FOLLOW USER
- ****************************************************/
-followBtn?.addEventListener("click", async () => {
-  if (!currentUser) return alert("Log in to follow creators.");
-
-  const myRef = doc(db, "users", currentUser.uid);
-  const theirRef = doc(db, "users", viewingProfileUid);
-
-  const meSnap = await getDoc(myRef);
-  const themSnap = await getDoc(theirRef);
-
-  const me = meSnap.data();
-  const them = themSnap.data();
-
-  // Already following? Block duplicate
-  if (me.following?.includes(viewingProfileUid)) return;
-
-  await updateDoc(myRef, {
-    following: [...(me.following || []), viewingProfileUid],
-  });
-
-  await updateDoc(theirRef, {
-    followers: [...(them.followers || []), currentUser.uid],
-  });
-
-  loadFollowStats(viewingProfileUid);
-  updateFollowButtons();
-});
-
-
-/****************************************************
- * 5. UNFOLLOW USER
- ****************************************************/
-unfollowBtn?.addEventListener("click", async () => {
-  if (!currentUser) return alert("Log in to unfollow.");
-
-  const myRef = doc(db, "users", currentUser.uid);
-  const theirRef = doc(db, "users", viewingProfileUid);
-
-  const meSnap = await getDoc(myRef);
-  const themSnap = await getDoc(theirRef);
-
-  const me = meSnap.data();
-  const them = themSnap.data();
-
-  await updateDoc(myRef, {
-    following: me.following.filter(id => id !== viewingProfileUid),
-  });
-
-  await updateDoc(theirRef, {
-    followers: them.followers.filter(id => id !== currentUser.uid),
-  });
-
-  loadFollowStats(viewingProfileUid);
-  updateFollowButtons();
-});
-/****************************************************
- * CHUNK 9 — LIKE / DISLIKE SYSTEM
- * Clean, conflict-free, real social media behavior
- ****************************************************/
-
-// Handle like/dislike clicks anywhere in the app
-document.addEventListener("click", async (e) => {
-  const likeBtn    = e.target.closest(".like-btn");
-  const dislikeBtn = e.target.closest(".dislike-btn");
-
-  // LIKE BUTTON CLICK
-  if (likeBtn) {
-    if (!currentUser) return alert("Log in to like posts.");
-    const postId = likeBtn.dataset.id;
-    await handleLike(postId);
-    refreshActiveFeed();
-    if (window.location.pathname.includes("viewer.html"))
-      loadViewerReactions(postId);
-  }
-
-  // DISLIKE BUTTON CLICK
-  if (dislikeBtn) {
-    if (!currentUser) return alert("Log in to dislike posts.");
-    const postId = dislikeBtn.dataset.id;
-    await handleDislike(postId);
-    refreshActiveFeed();
-    if (window.location.pathname.includes("viewer.html"))
-      loadViewerReactions(postId);
-  }
-});
-
-
-/****************************************************
- * LIKE LOGIC
- ****************************************************/
-async function handleLike(postId) {
-  const refPost = doc(db, "posts", postId);
-  const snap    = await getDoc(refPost);
-  if (!snap.exists()) return;
-
-  const data = snap.data();
-  const uid  = currentUser.uid;
-
-  let likes    = data.likes    || [];
-  let dislikes = data.dislikes || [];
-
-  const hasLiked    = likes.includes(uid);
-  const hasDisliked = dislikes.includes(uid);
-
-  if (hasLiked) {
-    // REMOVE LIKE
-    likes = likes.filter(id => id !== uid);
-  } else {
-    // ADD LIKE
-    likes.push(uid);
-    // Remove dislike if switching
-    if (hasDisliked) {
-      dislikes = dislikes.filter(id => id !== uid);
+    const tab = btn.dataset.tab;
+
+    // Upload is protected
+    if (tab === "upload" && !currentUser) {
+      alert("Login to upload.");
+      return;
     }
-  }
 
-  await updateDoc(refPost, { likes, dislikes });
-}
+    activateTab(tab);
+  });
+});
 
-
+// Default starting page
+activateTab("home");
 /****************************************************
- * DISLIKE LOGIC
- ****************************************************/
-async function handleDislike(postId) {
-  const refPost = doc(db, "posts", postId);
-  const snap    = await getDoc(refPost);
-  if (!snap.exists()) return;
-
-  const data = snap.data();
-  const uid  = currentUser.uid;
-
-  let likes    = data.likes    || [];
-  let dislikes = data.dislikes || [];
-
-  const hasLiked    = likes.includes(uid);
-  const hasDisliked = dislikes.includes(uid);
-
-  if (hasDisliked) {
-    // REMOVE DISLIKE
-    dislikes = dislikes.filter(id => id !== uid);
-  } else {
-    // ADD DISLIKE
-    dislikes.push(uid);
-    // Remove like if switching
-    if (hasLiked) {
-      likes = likes.filter(id => id !== uid);
-    }
-  }
-
-  await updateDoc(refPost, { likes, dislikes });
-}
-
-
-/****************************************************
- * REFRESH CURRENT FEED WITHOUT LOSING TAB
- ****************************************************/
-function refreshActiveFeed() {
-  const active = document.querySelector(".bottom-nav a.active")?.dataset.tab;
-
-  if (active === "home")    loadHomeFeed();
-  if (active === "videos")  loadVideosFeed();
-  if (active === "podcast") loadPodcastFeed();
-  if (active === "clips")   loadClipsFeed();
-}
-/****************************************************
- * CHUNK 10 — COMMENT SYSTEM
- * Add, delete, load, and auto-refresh comments
+ * PART 5 — AUTHENTICATION SYSTEM
+ * Signup / Login / Logout / Delete / Forgot Password
  ****************************************************/
 
-// ---------------------------
-// ADD COMMENT
-// ---------------------------
-async function addComment(postId, text) {
-  if (!currentUser) {
-    alert("Log in to comment.");
-    return;
-  }
+// Firebase Auth refs
+const authDialog = qs("#authDialog");
+const openAuthBtn = qs("#openAuth");
 
-  text = text.trim();
-  if (!text) return;
+const signupEmail = qs("#signupEmail");
+const signupPassword = qs("#signupPassword");
+const signupUsername = qs("#signupUsername");
+const signupAgeConfirm = qs("#signupAgeConfirm");
+const signupBtn = qs("#signupBtn");
 
-  await addDoc(collection(db, "comments"), {
-    postId,
-    uid: currentUser.uid,
-    username: currentUser.displayName || "user",
-    text,
-    createdAt: serverTimestamp(),
-  });
+const loginEmail = qs("#loginEmail");
+const loginPassword = qs("#loginPassword");
+const loginBtn = qs("#loginBtn");
 
-  // Tell UI to refresh immediately
-  document.dispatchEvent(
-    new CustomEvent("intakee:commentsRefresh", { detail: { postId } })
-  );
-}
+const forgotBtn = qs("#forgotBtn");
 
+const logoutBtn = qs("#settings-logout");
+const deleteAccountBtn = qs("#settings-delete-account");
 
-// ---------------------------
-// LOAD COMMENTS
-// ---------------------------
-async function loadComments(postId, container) {
-  container.innerHTML = `<p class="muted">Loading comments...</p>`;
+let globalUser = null;
 
-  const qRef = query(
-    collection(db, "comments"),
-    where("postId", "==", postId),
-    orderBy("createdAt", "asc")
-  );
-
-  const snap = await getDocs(qRef);
-  container.innerHTML = "";
-
-  if (snap.empty) {
-    container.innerHTML = `<p class="muted">No comments yet.</p>`;
-    return;
-  }
-
-  snap.forEach((docSnap) => {
-    const c = docSnap.data();
-    const id = docSnap.id;
-
-    const isOwner = currentUser && currentUser.uid === c.uid;
-
-    const div = document.createElement("div");
-    div.className = "comment-item";
-    div.style = `
-      padding: 10px 0;
-      border-bottom: 1px solid #222;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-    `;
-
-    div.innerHTML = `
-      <div style="flex:1;">
-        <strong>@${c.username}</strong><br>
-        ${c.text}
-      </div>
-
-      ${
-        isOwner
-          ? `<button class="delete-comment"
-                     data-id="${id}"
-                     style="background:none; border:none; color:#ff4444; cursor:pointer;">
-               Delete
-             </button>`
-          : ""
-      }
-    `;
-
-    container.appendChild(div);
-  });
-}
-
-
-// ---------------------------
-// DELETE COMMENT
-// ---------------------------
-document.addEventListener("click", async (e) => {
-  const delBtn = e.target.closest(".delete-comment");
-  if (!delBtn) return;
-
-  const id = delBtn.dataset.id;
-
-  if (!confirm("Delete this comment?")) return;
-
-  await deleteDoc(doc(db, "comments", id));
-
-  // Trigger auto-refresh of comments
-  document.dispatchEvent(new CustomEvent("intakee:commentsRefresh"));
-});
-
-
-// ---------------------------
-// LIVE REFRESH COMMENTS
-// ---------------------------
-document.addEventListener("intakee:commentsRefresh", (e) => {
-  const postId = e.detail?.postId || window.currentPostId;
-
-  if (!postId || !window.commentsContainer) return;
-
-  loadComments(postId, window.commentsContainer);
-});
 /****************************************************
- * CHUNK 11 — SAVE / WATCH-LATER SYSTEM
- * - Save a post
- * - Unsave a post
- * - Load saved posts in Profile
- * - Viewer page support
+ * OPEN / CLOSE AUTH POPUP
  ****************************************************/
-
-// ---------------------------
-// CLICK HANDLER — SAVE BUTTONS
-// ---------------------------
-document.addEventListener("click", async (e) => {
-  const btn = e.target.closest(".save-btn");
-  if (!btn) return;
-
-  if (!currentUser) return alert("Log in to save posts.");
-
-  const postId = btn.dataset.id;
-  toggleSave(postId, btn);
+openAuthBtn?.addEventListener("click", () => {
+  authDialog.showModal();
 });
 
-
-// ---------------------------
-// SAVE / UNSAVE LOGIC
-// ---------------------------
-async function toggleSave(postId, btn) {
-  const userRef = doc(db, "users", currentUser.uid);
-  const snap = await getDoc(userRef);
-
-  const data = snap.data();
-  const saved = data.saved || [];
-
-  let updated;
-
-  if (saved.includes(postId)) {
-    // UNSAVE
-    updated = saved.filter((x) => x !== postId);
-    if (btn) btn.textContent = "💾 Save";
-  } else {
-    // SAVE
-    updated = [...saved, postId];
-    if (btn) btn.textContent = "✔ Saved";
-  }
-
-  await updateDoc(userRef, { saved: updated });
-
-  // If we are in the profile "Saved" tab → refresh
-  if (window.currentProfileTab === "saved") {
-    loadSavedPosts(currentUser.uid);
-  }
-}
-
-
-// ---------------------------
-// LOAD SAVED POSTS INTO PROFILE TAB
-// ---------------------------
-async function loadSavedPosts(uid) {
-  const container = qs("#profile-saved");
-  container.innerHTML = `<p class="muted">Loading saved posts...</p>`;
-
-  const userSnap = await getDoc(doc(db, "users", uid));
-  const data = userSnap.data();
-  const savedList = data.saved || [];
-
-  container.innerHTML = "";
-
-  if (savedList.length === 0) {
-    container.innerHTML = `<p class="muted" style="text-align:center;">No saved posts yet.</p>`;
-    return;
-  }
-
-  for (let postId of savedList) {
-    const snap = await getDoc(doc(db, "posts", postId));
-    if (!snap.exists()) continue;
-
-    const p = snap.data();
-
-    const tile = document.createElement("div");
-    tile.className = "tile";
-
-    tile.innerHTML = `
-      <img class="thumb" src="${p.thumbnailUrl}">
-      <div class="meta">${p.title}</div>
-    `;
-
-    tile.addEventListener("click", () => {
-      window.location.href = `viewer.html?id=${postId}`;
-    });
-
-    container.appendChild(tile);
-  }
-}
-
-
-// ---------------------------
-// VIEWER PAGE SUPPORT
-// ---------------------------
-async function loadViewerSaveState(postId) {
-  const saveBtn = qs("#viewer-save-btn");
-  if (!saveBtn) return;
-
-  if (!currentUser) {
-    saveBtn.textContent = "💾 Save";
-    return;
-  }
-
-  const userSnap = await getDoc(doc(db, "users", currentUser.uid));
-  const saved = userSnap.data().saved || [];
-
-  saveBtn.textContent = saved.includes(postId) ? "✔ Saved" : "💾 Save";
-
-  saveBtn.addEventListener("click", () => toggleSave(postId, saveBtn));
-}
 /****************************************************
- * CHUNK 12 — PROFILE SYSTEM
- * - Loads uploads, saved posts, liked posts
- * - Tab switching inside profile
- * - Loads user stats (posts, followers, following)
+ * SIGN UP USER
  ****************************************************/
-
-// ----------------------------------------------------
-// PROFILE ELEMENTS
-// ----------------------------------------------------
-const pfTabButtons = qsa(".profile-tabs .pill");
-
-const pfUploads   = qs("#profile-grid");
-const pfSaved     = document.createElement("div");
-const pfLikes     = document.createElement("div");
-const pfPlaylists = document.createElement("div");
-
-// Style the grids
-pfSaved.className     =
-pfLikes.className     =
-pfPlaylists.className = "grid";
-
-// Insert grids right after uploads container
-pfUploads.parentNode.appendChild(pfSaved);
-pfUploads.parentNode.appendChild(pfLikes);
-pfUploads.parentNode.appendChild(pfPlaylists);
-
-// Hide all except uploads at start
-pfSaved.style.display     = "none";
-pfLikes.style.display     = "none";
-pfPlaylists.style.display = "none";
-
-let currentProfileTab = "uploads";
-let currentProfileUid = null;
-
-
-// ----------------------------------------------------
-// SWITCH PROFILE TAB
-// ----------------------------------------------------
-function switchProfileTab(tabName) {
-  currentProfileTab = tabName;
-
-  // Update button UI
-  pfTabButtons.forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.profileTab === tabName);
-  });
-
-  // Hide all
-  pfUploads.style.display   = "none";
-  pfSaved.style.display     = "none";
-  pfLikes.style.display     = "none";
-  pfPlaylists.style.display = "none";
-
-  // Show selected
-  if (tabName === "uploads")   pfUploads.style.display = "grid";
-  if (tabName === "saved")     pfSaved.style.display = "grid";
-  if (tabName === "likes")     pfLikes.style.display = "grid";
-  if (tabName === "playlists") pfPlaylists.style.display = "block";
-
-  // Load content
-  if (currentProfileUid) {
-    if (tabName === "uploads") loadProfileUploads(currentProfileUid);
-    if (tabName === "saved")   loadSavedPosts(currentProfileUid);
-    if (tabName === "likes")   loadProfileLikes(currentProfileUid);
-  }
-}
-
-// Attach listeners
-pfTabButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    switchProfileTab(btn.dataset.profileTab);
-  });
-});
-
-
-// ----------------------------------------------------
-// LOAD PROFILE (called when switching to Profile tab)
-// ----------------------------------------------------
-async function loadProfile(uid) {
-  currentProfileUid = uid;
-
-  // Load stats
-  loadProfileStats(uid);
-
-  // Load default tab
-  switchProfileTab("uploads");
-}
-
-
-// ----------------------------------------------------
-// LOAD USER STATS (Posts, Followers, Following, Likes)
-// ----------------------------------------------------
-async function loadProfileStats(uid) {
-  const postsSnap = await getDocs(query(
-    collection(db, "posts"),
-    where("uid", "==", uid)
-  ));
-
-  const userSnap = await getDoc(doc(db, "users", uid));
-  const data = userSnap.data();
-
-  qs("#stat-posts").textContent     = postsSnap.size || 0;
-  qs("#stat-followers").textContent = data.followers?.length || 0;
-  qs("#stat-following").textContent = data.following?.length || 0;
-
-  // Count likes across all posts
-  let totalLikes = 0;
-  postsSnap.forEach((doc) => {
-    totalLikes += (doc.data().likes || []).length;
-  });
-
-  qs("#stat-likes").textContent = totalLikes;
-}
-
-
-// ----------------------------------------------------
-// LOAD USER UPLOADS
-// ----------------------------------------------------
-async function loadProfileUploads(uid) {
-  pfUploads.innerHTML = `<p class="muted">Loading uploads...</p>`;
-
-  const qRef = query(
-    collection(db, "posts"),
-    where("uid", "==", uid),
-    orderBy("createdAt", "desc")
-  );
-  const snap = await getDocs(qRef);
-
-  pfUploads.innerHTML = "";
-
-  if (snap.empty) {
-    pfUploads.innerHTML = `<p class="muted" style="text-align:center;">No uploads yet.</p>`;
-    return;
-  }
-
-  snap.forEach((docSnap) => {
-    const p = docSnap.data();
-
-    const tile = document.createElement("div");
-    tile.className = "tile";
-    tile.innerHTML = `
-      <img class="thumb" src="${p.thumbnailUrl}">
-      <div class="meta">${p.title}</div>
-    `;
-
-    tile.addEventListener("click", () => {
-      window.location.href = `viewer.html?id=${docSnap.id}`;
-    });
-
-    pfUploads.appendChild(tile);
-  });
-}
-
-
-// ----------------------------------------------------
-// LOAD LIKED POSTS
-// ----------------------------------------------------
-async function loadProfileLikes(uid) {
-  pfLikes.innerHTML = `<p class="muted">Loading likes...</p>`;
-
-  const userSnap = await getDoc(doc(db, "users", uid));
-  const likesList = userSnap.data().likes || [];
-
-  pfLikes.innerHTML = "";
-
-  if (likesList.length === 0) {
-    pfLikes.innerHTML = `<p class="muted" style="text-align:center;">No liked posts yet.</p>`;
-    return;
-  }
-
-  for (let id of likesList) {
-    const postSnap = await getDoc(doc(db, "posts", id));
-    if (!postSnap.exists()) continue;
-
-    const p = postSnap.data();
-
-    const tile = document.createElement("div");
-    tile.className = "tile";
-    tile.innerHTML = `
-      <img class="thumb" src="${p.thumbnailUrl}">
-      <div class="meta">${p.title}</div>
-    `;
-
-    tile.addEventListener("click", () => {
-      window.location.href = `viewer.html?id=${id}`;
-    });
-
-    pfLikes.appendChild(tile);
-  }
-}
-
-
-// ----------------------------------------------------
-// PLAYLISTS PLACEHOLDER
-// ----------------------------------------------------
-function loadUserPlaylists() {
-  pfPlaylists.innerHTML = `
-    <p class="muted" style="text-align:center;">Playlists coming soon.</p>
-  `;
-}
-/****************************************************
- * CHUNK 13 — SETTINGS SYSTEM (FINAL VERSION)
- * - Loads user settings from Firestore
- * - Saves toggles when switched
- * - Accordions
- * - Blocked users + report placeholders
- ****************************************************/
-
-// -----------------------------------------------------------
-// MAP SETTINGS KEYS
-// -----------------------------------------------------------
-const SETTINGS_MAP = {
-  "toggle-private":         "privateAccount",
-  "toggle-show-uploads":    "showUploads",
-  "toggle-show-saved":      "showSaved",
-  "toggle-restricted":      "restrictedMode",
-  "toggle-age-warning":     "ageWarning",
-  "toggle-notify-push":     "notifyPush",
-  "toggle-notify-email":    "notifyEmail",
-  "toggle-notify-follow":   "notifyFollow",
-  "toggle-notify-likes":    "notifyLikes",
-  "toggle-notify-comments": "notifyComments",
-};
-
-
-// -----------------------------------------------------------
-// LOAD SETTINGS WHEN USER LOGS IN
-// -----------------------------------------------------------
-document.addEventListener("intakee:auth", async (e) => {
-  const user = e.detail.user;
-  if (!user) return;
-
-  const snap = await getDoc(doc(db, "users", user.uid));
-  if (!snap.exists()) return;
-
-  const data = snap.data();
-
-  Object.entries(SETTINGS_MAP).forEach(([toggleId, key]) => {
-    const el = qs(`#${toggleId}`);
-    if (el) el.checked = data[key] || false;
-  });
-});
-
-
-// -----------------------------------------------------------
-// SAVE SETTINGS ON TOGGLE SWITCH
-// -----------------------------------------------------------
-qsa(".settings-toggle input").forEach((input) => {
-  input.addEventListener("change", async () => {
-    if (!currentUser) return alert("Login to change settings.");
-
-    const key = SETTINGS_MAP[input.id];
-    if (!key) return;
-
-    await updateDoc(doc(db, "users", currentUser.uid), {
-      [key]: input.checked,
-    });
-
-    console.log(`Setting updated: ${key} = ${input.checked}`);
-  });
-});
-
-
-// -----------------------------------------------------------
-// BLOCKED USERS (basic version)
-// -----------------------------------------------------------
-qs("#openBlockedUsers")?.addEventListener("click", async () => {
-  if (!currentUser) return alert("Login to view blocked users.");
-
-  const snap = await getDoc(doc(db, "users", currentUser.uid));
-  const data = snap.data();
-  const blocked = data.blockedUsers || [];
-
-  if (blocked.length === 0) {
-    alert("You have no blocked users.");
-    return;
-  }
-
-  let msg = "Blocked users:\n\n";
-
-  for (let uid of blocked) {
-    const userSnap = await getDoc(doc(db, "users", uid));
-    if (userSnap.exists()) {
-      msg += `@${userSnap.data().username} (UID: ${uid})\n`;
-    }
-  }
-
-  alert(msg + "\nUnblock feature UI coming soon.");
-});
-
-
-// -----------------------------------------------------------
-// REPORT CONTENT (placeholder)
-// -----------------------------------------------------------
-qs("#openReportModal")?.addEventListener("click", () => {
-  const reason = prompt("Report content — Enter a reason:");
-  if (!reason) return;
-
-  alert("Thank you. Your report has been logged for review.");
-});
-
-
-// -----------------------------------------------------------
-// ACCORDION SYSTEM FOR LEGAL SECTIONS
-// -----------------------------------------------------------
-const accordionItems = qsa(".accordion");
-
-accordionItems.forEach((acc) => {
-  const header = acc.querySelector(".accordion-header");
-  const body   = acc.querySelector(".accordion-body");
-
-  header.addEventListener("click", () => {
-    const isOpen = acc.classList.contains("open");
-
-    // Close all
-    accordionItems.forEach((item) => item.classList.remove("open"));
-
-    // Toggle selected
-    if (!isOpen) {
-      acc.classList.add("open");
-      body.style.display = "block";
-    } else {
-      acc.classList.remove("open");
-      body.style.display = "none";
-    }
-  });
-});
-
-
-// -----------------------------------------------------------
-// FORGOT USERNAME
-// -----------------------------------------------------------
-qs("#settings-forgot-username")?.addEventListener("click", () => {
-  if (!currentUser) return alert("You are not logged in.");
-  alert("Your username is your profile display name.");
-});
-
-
-// -----------------------------------------------------------
-// RESET PASSWORD (from settings)
- // -----------------------------------------------------------
-qs("#settings-forgot-password")?.addEventListener("click", async () => {
-  if (!currentUser) return alert("You must be logged in.");
+import {
+  createUserWithEmailAndPassword,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+signupBtn.addEventListener("click", async () => {
+  const email = signupEmail.value.trim();
+  const pass = signupPassword.value.trim();
+  const uname = signupUsername.value.trim();
+
+  if (!signupAgeConfirm.checked) return alert("You must be 13 or older.");
+  if (!email || !pass || !uname) return alert("Fill all fields.");
 
   try {
-    await sendPasswordResetEmail(auth, currentUser.email);
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+
+    // Set display name
+    await updateProfile(cred.user, { displayName: uname });
+
+    // Create Firestore profile
+    await setDoc(doc(db, "users", cred.user.uid), {
+      uid: cred.user.uid,
+      email,
+      username: uname,
+      profilePhotoUrl: "",
+      bannerUrl: "",
+      bio: "",
+      followers: [],
+      following: [],
+      saved: [],
+      private: false,
+      createdAt: Date.now()
+    });
+
+    alert("Account created!");
+    authDialog.close();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+/****************************************************
+ * LOGIN USER
+ ****************************************************/
+import {
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+loginBtn.addEventListener("click", async () => {
+  const email = loginEmail.value.trim();
+  const pass = loginPassword.value.trim();
+
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    alert("Logged in!");
+    authDialog.close();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+/****************************************************
+ * FORGOT PASSWORD
+ ****************************************************/
+forgotBtn.addEventListener("click", async () => {
+  const email = prompt("Enter your email:");
+  if (!email) return;
+
+  try {
+    await sendPasswordResetEmail(auth, email);
     alert("Password reset email sent.");
   } catch (err) {
     alert(err.message);
   }
 });
+
 /****************************************************
- * CHUNK 14 — MINI AUDIO PLAYER SYSTEM
- * - For audio podcasts
- * - Persistent across tabs
- * - One clean function to open player
+ * LOGOUT
  ****************************************************/
-
-const miniPlayer = qs("#mini-player");
-const mpAudio    = qs("#mp-audio");
-const mpPlay     = qs("#mp-play");
-const mpClose    = qs("#mp-close");
-
-
-// ----------------------------------------------------
-// OPEN MINI PLAYER — Call when clicking an audio post
-// ----------------------------------------------------
-export function openMiniPlayer(audioUrl) {
-  mpAudio.src = audioUrl;
-  mpAudio.play();
-
-  miniPlayer.classList.add("active");
-  mpPlay.innerHTML = `<i class="fa fa-pause"></i>`;
-}
-
-
-// ----------------------------------------------------
-// PLAY / PAUSE BUTTON
-// ----------------------------------------------------
-mpPlay.addEventListener("click", () => {
-  if (mpAudio.paused) {
-    mpAudio.play();
-    mpPlay.innerHTML = `<i class="fa fa-pause"></i>`;
-  } else {
-    mpAudio.pause();
-    mpPlay.innerHTML = `<i class="fa fa-play"></i>`;
-  }
+logoutBtn?.addEventListener("click", async () => {
+  await auth.signOut();
+  alert("Logged out.");
+  activateTab("home");
 });
 
-
-// ----------------------------------------------------
-// CLOSE PLAYER
-// ----------------------------------------------------
-mpClose.addEventListener("click", () => {
-  mpAudio.pause();
-  miniPlayer.classList.remove("active");
-});
 /****************************************************
- * CHUNK 15 — VIEWER PAGE SYSTEM (FINAL)
- * - Loads full post viewer
- * - Integrates media, reactions, comments, follow
- * - Supports audio + video
+ * DELETE ACCOUNT
  ****************************************************/
+import {
+  deleteUser
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// Only run on viewer.html
-if (window.location.pathname.endsWith("viewer.html")) {
-  document.addEventListener("DOMContentLoaded", () => {
-    initViewerPage();
-  });
-}
+deleteAccountBtn?.addEventListener("click", async () => {
+  if (!confirm("Are you sure? This cannot be undone.")) return;
 
+  if (!globalUser) return alert("No user.");
 
-// ----------------------------------------------------
-// INIT VIEWER PAGE
-// ----------------------------------------------------
-async function initViewerPage() {
-  const params = new URLSearchParams(window.location.search);
-  const postId = params.get("id");
-
-  if (!postId) {
-    alert("No post ID provided.");
-    return;
-  }
-
-  window.currentPostId = postId;
-
-  // DOM elements
-  const vMedia   = qs("#viewer-media");
-  const vTitle   = qs("#viewer-title");
-  const vUser    = qs("#viewer-user");
-  const vDesc    = qs("#viewer-desc");
-  const vComments = qs("#viewer-comments");
-  const addBtn    = qs("#viewer-add-comment");
-  const input     = qs("#viewer-comment-input");
-
-  const snap = await getDoc(doc(db, "posts", postId));
-  if (!snap.exists()) {
-    alert("Post not found.");
-    return;
-  }
-
-  const post = snap.data();
-
-  // ----------------------------------------------------
-  // AGE CHECK
-  // ----------------------------------------------------
-  const blocked = await enforceViewerAgeRestriction(post);
-  if (blocked) return;
-
-  // ----------------------------------------------------
-  // SET TEXT FIELDS
-  // ----------------------------------------------------
-  vTitle.textContent = post.title;
-  vUser.textContent  = "@" + (post.username || "unknown");
-  vDesc.textContent  = post.desc || "";
-
-  // ----------------------------------------------------
-  // RENDER MEDIA (VIDEO or AUDIO)
-  // ----------------------------------------------------
-  if (post.type === "podcast-audio") {
-    // AUDIO — use mini player instead of showing audio element
-    vMedia.innerHTML = `
-      <div class="card" style="padding:20px; text-align:center;">
-        <p>Playing audio in mini-player…</p>
-      </div>
-    `;
-    // Auto-open mini player
-    openMiniPlayer(post.fileUrl);
-  } else {
-    // VIDEO POSTS
-    vMedia.innerHTML = `
-      <video controls style="width:100%; border-radius:12px;">
-        <source src="${post.fileUrl}">
-      </video>
-    `;
-  }
-
-  // ----------------------------------------------------
-  // LOAD COMMENTS
-  // ----------------------------------------------------
-  window.commentsContainer = vComments;
-  loadComments(postId, vComments);
-
-  // Add comment
-  addBtn.addEventListener("click", () => {
-    const text = input.value.trim();
-    if (!text) return;
-    addComment(postId, text);
-    input.value = "";
-  });
-
-  // ----------------------------------------------------
-  // REACTIONS + SAVE
-  // ----------------------------------------------------
-  loadViewerReactions(postId);
-  loadViewerSaveState(postId);
-
-  // ----------------------------------------------------
-  // FOLLOW CREATOR
-  // ----------------------------------------------------
-  if (post.uid) loadViewerFollowState(post.uid);
-}
-/****************************************************
- * VIEWER — LIKE / DISLIKE / SAVE
- ****************************************************/
-async function loadViewerReactions(postId) {
-  const likeBtn      = qs("#viewer-like-btn");
-  const dislikeBtn   = qs("#viewer-dislike-btn");
-  const saveBtn      = qs("#viewer-save-btn");
-  const likeCount    = qs("#viewer-like-count");
-  const dislikeCount = qs("#viewer-dislike-count");
-
-  const snap = await getDoc(doc(db, "posts", postId));
-  if (!snap.exists()) return;
-
-  const p = snap.data();
-  const uid = currentUser?.uid;
-
-  likeCount.textContent = p.likes?.length || 0;
-  dislikeCount.textContent = p.dislikes?.length || 0;
-
-  if (uid) {
-    likeBtn.classList.toggle("active", p.likes?.includes(uid));
-    dislikeBtn.classList.toggle("active", p.dislikes?.includes(uid));
-  }
-
-  likeBtn.onclick = async () => {
-    if (!currentUser) return alert("Login to like.");
-    await handleLike(postId);
-    loadViewerReactions(postId);
-  };
-
-  dislikeBtn.onclick = async () => {
-    if (!currentUser) return alert("Login to dislike.");
-    await handleDislike(postId);
-    loadViewerReactions(postId);
-  };
-}
-/****************************************************
- * VIEWER — FOLLOW CREATOR
- ****************************************************/
-async function loadViewerFollowState(creatorUid) {
-  const followBtn   = qs("#viewer-follow-btn");
-  const unfollowBtn = qs("#viewer-unfollow-btn");
-
-  if (!followBtn || !unfollowBtn) return;
-
-  if (!currentUser) {
-    followBtn.style.display = "inline-block";
-    unfollowBtn.style.display = "none";
-    return;
-  }
-
-  if (creatorUid === currentUser.uid) {
-    followBtn.style.display = "none";
-    unfollowBtn.style.display = "none";
-    return;
-  }
-
-  const meSnap = await getDoc(doc(db, "users", currentUser.uid));
-  const me = meSnap.data();
-  const following = me.following || [];
-
-  const isFollowing = following.includes(creatorUid);
-
-  followBtn.style.display   = isFollowing ? "none" : "inline-block";
-  unfollowBtn.style.display = isFollowing ? "inline-block" : "none";
-
-  followBtn.onclick = async () => {
-    await updateDoc(doc(db, "users", currentUser.uid), {
-      following: [...following, creatorUid],
-    });
-    await updateDoc(doc(db, "users", creatorUid), {
-      followers: arrayUnion(currentUser.uid),
-    });
-    loadViewerFollowState(creatorUid);
-  };
-
-  unfollowBtn.onclick = async () => {
-    await updateDoc(doc(db, "users", currentUser.uid), {
-      following: following.filter((x) => x !== creatorUid),
-    });
-    await updateDoc(doc(db, "users", creatorUid), {
-      followers: arrayRemove(currentUser.uid),
-    });
-    loadViewerFollowState(creatorUid);
-  };
-}
-/****************************************************
- * CHUNK 16 — BLOCK + REPORT SYSTEM
- * - Block users (they disappear from your app)
- * - Unblock users
- * - Save list in Firestore
- * - Report posts
- * - Filter feeds to hide blocked users
- ****************************************************/
-
-// ----------------------------------------------------
-// BLOCK USER
-// ----------------------------------------------------
-async function blockUser(targetUid) {
-  if (!currentUser) return alert("Login to block users.");
-
-  const userRef = doc(db, "users", currentUser.uid);
-  const snap = await getDoc(userRef);
-  const data = snap.data();
-
-  const blocked = data.blockedUsers || [];
-
-  if (blocked.includes(targetUid)) {
-    alert("User already blocked.");
-    return;
-  }
-
-  await updateDoc(userRef, {
-    blockedUsers: [...blocked, targetUid]
-  });
-
-  alert("User blocked.");
-}
-
-
-// ----------------------------------------------------
-// UNBLOCK USER
-// ----------------------------------------------------
-async function unblockUser(targetUid) {
-  if (!currentUser) return;
-
-  const userRef = doc(db, "users", currentUser.uid);
-  const snap = await getDoc(userRef);
-  const data = snap.data();
-
-  const updated = (data.blockedUsers || []).filter(id => id !== targetUid);
-
-  await updateDoc(userRef, { blockedUsers: updated });
-
-  alert("User unblocked.");
-}
-
-
-// ----------------------------------------------------
-// SETTINGS — SHOW BLOCKED USERS LIST
-// ----------------------------------------------------
-qs("#openBlockedUsers")?.addEventListener("click", async () => {
-  if (!currentUser) return alert("Login first.");
-
-  const snap = await getDoc(doc(db, "users", currentUser.uid));
-  const data = snap.data();
-
-  const blocked = data.blockedUsers || [];
-
-  if (blocked.length === 0) {
-    alert("No blocked users.");
-    return;
-  }
-
-  let msg = "Blocked Users:\n\n";
-
-  for (let uid of blocked) {
-    const usnap = await getDoc(doc(db, "users", uid));
-    if (usnap.exists()) {
-      msg += `@${usnap.data().username} (UID: ${uid})\n`;
-    }
-  }
-
-  alert(msg + "\nUnblock UI coming soon.");
-});
-
-
-// ----------------------------------------------------
-// FEED FILTER — HIDE BLOCKED USERS
-// ----------------------------------------------------
-async function filterBlockedPosts(posts) {
-  if (!currentUser) return posts;
-
-  const userSnap = await getDoc(doc(db, "users", currentUser.uid));
-  const data = userSnap.data();
-
-  const blocked = data.blockedUsers || [];
-
-  return posts.filter((p) => !blocked.includes(p.uid));
-}
-
-
-// ----------------------------------------------------
-// REPORT CONTENT
-// ----------------------------------------------------
-qs("#openReportModal")?.addEventListener("click", () => {
-  const reason = prompt("Report content\n\nEnter a reason:");
-  if (!reason) return;
-  alert("Report submitted.");
-});
-
-
-// REPORT A SPECIFIC POST (viewer page)
-async function reportPost(postId, reason = "unspecified") {
-  if (!currentUser) return alert("Login to report posts.");
-
-  await addDoc(collection(db, "reports"), {
-    postId,
-    reason,
-    reportedBy: currentUser.uid,
-    createdAt: serverTimestamp()
-  });
-
-  alert("Post reported.");
-}
-/****************************************************
- * CHUNK 17 — AGE RESTRICTION SYSTEM
- * - Restricted mode toggle in Settings
- * - Age-restricted uploads
- * - Feeds hide age-restricted posts if enabled
- * - Viewer page blocks restricted content
- ****************************************************/
-
-// ----------------------------------------------------
-// OPTIONAL: Age-restricted checkbox on upload page
-// (Make sure your HTML has: <input type="checkbox" id="uploadAge">)
-function getAgeRestrictionFlag() {
-  const box = qs("#uploadAge");
-  return box ? box.checked : false;
-}
-
-
-// ----------------------------------------------------
-// SAVE AGE-RESTRICTED FLAG IN FIRESTORE DURING UPLOAD
-// (Modify your upload code to include this)
-// post.ageRestricted = getAgeRestrictionFlag();
-// ----------------------------------------------------
-
-
-// ----------------------------------------------------
-// APPLY AGE-FILTER BASED ON SETTINGS
-// ----------------------------------------------------
-async function applyAgeFilter(posts) {
-  if (!currentUser) return posts; // no restrictions when logged out
-
-  const snap = await getDoc(doc(db, "users", currentUser.uid));
-  const data = snap.data();
-
-  const restricted = data.restrictedMode || false;
-
-  // If restricted mode OFF → show all posts
-  if (!restricted) return posts;
-
-  // Filter out ageRestricted posts
-  return posts.filter((p) => !p.ageRestricted);
-}
-
-
-// ----------------------------------------------------
-// FEED INTEGRATION — FILTER AGE RESTRICTED POSTS
-// ----------------------------------------------------
-async function filterAgeAndBlocked(posts) {
-  // 1. remove blocked creators
-  posts = await filterBlockedPosts(posts);
-  // 2. apply restricted mode filter
-  posts = await applyAgeFilter(posts);
-  return posts;
-}
-
-
-// ----------------------------------------------------
-// VIEWER PAGE — SHOW WARNING OR BLOCK
-// ----------------------------------------------------
-async function enforceViewerAgeRestriction(post) {
-  if (!currentUser) return false;
-
-  const snap = await getDoc(doc(db, "users", currentUser.uid));
-  const settings = snap.data();
-
-  if (!post.ageRestricted) return false; // not restricted
-
-  const restrictedMode = settings.restrictedMode || false;
-
-  // RESTRICTED MODE: FULL BLOCK
-  if (restrictedMode) {
-    const warn = document.createElement("div");
-    warn.style = `
-      background:#330000;
-      padding:14px;
-      border-radius:10px;
-      margin-bottom:16px;
-      border:1px solid #660000;
-      text-align:center;
-      color:#ffb3b3;
-    `;
-    warn.textContent = "⚠ This video is age-restricted and blocked in Restricted Mode.";
-    qs("#viewer-media").innerHTML = "";
-    qs("#viewer-media").appendChild(warn);
-
-    return true;
-  }
-
-  // Allowed but warn
-  const warning = document.createElement("div");
-  warning.style = `
-    background:#333;
-    padding:10px;
-    border-radius:8px;
-    margin-bottom:12px;
-    text-align:center;
-    color:#ffc107;
-  `;
-  warning.textContent = "⚠ Age-restricted content";
-  qs("#viewer-media").prepend(warning);
-
-  return false;
-}
-
-
-// ----------------------------------------------------
-// VIEWER PAGE HOOK
-// ----------------------------------------------------
-async function initViewerAgeCheck(post) {
-  const blocked = await enforceViewerAgeRestriction(post);
-  return blocked; // true means STOP
-}
-/****************************************************
- * CHUNK 18 — FINAL OPTIMIZATION + LAUNCH CHECKS
- * - Smooth feed refresh
- * - Viewer autoloading
- * - Default field protection
- * - Profile safe-load
- * - Global debug logs
- ****************************************************/
-
-// ----------------------------------------------------
-// SAFE FEED RENDERER WRAPPER
-// Prevents any feed crash from breaking the app
-// ----------------------------------------------------
-async function safeRenderFeed(feedFn) {
   try {
-    await feedFn();
+    await deleteDoc(doc(db, "users", globalUser.uid));
+    await deleteUser(globalUser);
+
+    alert("Account deleted.");
+    activateTab("home");
   } catch (err) {
-    console.error("Feed load error:", err);
+    alert(err.message);
   }
-}
-
-
-// ----------------------------------------------------
-// AUTO-REFRESH FEED ON LIKE / SAVE / COMMENT
-// ----------------------------------------------------
-document.addEventListener("intakee:feedRefresh", () => {
-  const active = document.querySelector(".bottom-nav a.active")?.dataset.tab;
-
-  if (active === "home")    safeRenderFeed(loadHomeFeed);
-  if (active === "videos")  safeRenderFeed(loadVideosFeed);
-  if (active === "podcast") safeRenderFeed(loadPodcastFeed);
-  if (active === "clips")   safeRenderFeed(loadClipsFeed);
 });
 
+/****************************************************
+ * AUTH STATE LISTENER
+ ****************************************************/
+onAuthStateChanged(auth, async (user) => {
+  globalUser = user;
 
-// ----------------------------------------------------
-// ENSURE VIEWER PAGE INITIALIZES ONLY AFTER AUTH IS READY
-// ----------------------------------------------------
-if (window.location.pathname.endsWith("viewer.html")) {
-  document.addEventListener("DOMContentLoaded", () => {
-    let check = setInterval(() => {
-      if (typeof currentUser !== "undefined") {
-        clearInterval(check);
-        initViewerPage();
-      }
-    }, 200);
-  });
+  if (user) {
+    openAuthBtn.textContent = "Profile";
+  } else {
+    openAuthBtn.textContent = "Login";
+  }
+});
+/****************************************************
+ * PART 6 — UPLOAD SYSTEM
+ * Upload Videos, Clips, Podcasts (audio or video)
+ * Thumbnail + File Upload to Firebase Storage
+ * Save Post in Firestore
+ ****************************************************/
+
+// Upload elements
+const uploadTypeSelect  = qs("#uploadTypeSelect");
+const uploadTitleInput  = qs("#uploadTitleInput");
+const uploadDescInput   = qs("#uploadDescInput");
+const uploadThumbInput  = qs("#uploadThumbInput");
+const uploadFileInput   = qs("#uploadFileInput");
+const uploadBtn         = qs("#btnUpload");
+
+import {
+  getStorage, ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+const storage = getStorage(app);
+
+/****************************************************
+ * VALIDATE UPLOAD
+ ****************************************************/
+function validateUpload() {
+  if (!globalUser) {
+    alert("You must log in to upload.");
+    activateTab("profile");
+    return false;
+  }
+
+  if (!uploadTitleInput.value.trim()) {
+    alert("Title is required.");
+    return false;
+  }
+
+  if (!uploadFileInput.files[0]) {
+    alert("Upload a video or audio file.");
+    return false;
+  }
+
+  if (!uploadThumbInput.files[0]) {
+    alert("Upload a thumbnail image.");
+    return false;
+  }
+
+  return true;
 }
 
+/****************************************************
+ * UPLOAD FILE TO STORAGE
+ ****************************************************/
+async function uploadToStorage(file, path) {
+  const fileRef = ref(storage, path);
+  await uploadBytes(fileRef, file);
+  return await getDownloadURL(fileRef);
+}
 
-// ----------------------------------------------------
-// DEFAULT POST NORMALIZER
-// Ensures missing Firestore fields never break the UI
-// ----------------------------------------------------
-function normalizePost(p) {
-  return {
-    uid: p.uid || "",
-    username: p.username || "unknown",
-    title: p.title || "Untitled",
-    desc: p.desc || "",
-    thumbnailUrl: p.thumbnailUrl || "placeholder.png",
-    fileUrl: p.fileUrl || "",
-    type: p.type || "video",
-    likes: p.likes || [],
-    dislikes: p.dislikes || [],
-    ageRestricted: p.ageRestricted || false,
+/****************************************************
+ * MAIN UPLOAD HANDLER
+ ****************************************************/
+uploadBtn.addEventListener("click", async () => {
+  if (!validateUpload()) return;
+
+  const title = uploadTitleInput.value.trim();
+  const desc  = uploadDescInput.value.trim();
+  const type  = uploadTypeSelect.value;
+
+  const mediaFile = uploadFileInput.files[0];
+  const thumbFile = uploadThumbInput.files[0];
+
+  const postId = `${globalUser.uid}_${Date.now()}`;
+
+  uploadBtn.disabled = true;
+  uploadBtn.textContent = "Uploading...";
+
+  try {
+    // Upload media
+    const mediaUrl = await uploadToStorage(
+      mediaFile,
+      `posts/${postId}/media_${mediaFile.name}`
+    );
+
+    // Upload thumbnail
+    const thumbUrl = await uploadToStorage(
+      thumbFile,
+      `posts/${postId}/thumb_${thumbFile.name}`
+    );
+
+    // Save in Firestore
+    await setDoc(doc(db, "posts", postId), {
+      id: postId,
+      uid: globalUser.uid,
+      title,
+      desc,
+      type,
+      fileUrl: mediaUrl,
+      thumbUrl: thumbUrl,
+      createdAt: Date.now(),
+      likes: [],
+      dislikes: [],
+      views: 0,
+      comments: 0
+    });
+
+    alert("Uploaded successfully!");
+
+    // Reset UI
+    uploadTitleInput.value = "";
+    uploadDescInput.value  = "";
+    uploadFileInput.value  = "";
+    uploadThumbInput.value = "";
+
+    // Go to viewer
+    window.location.href = `viewer.html?id=${postId}`;
+
+  } catch (err) {
+    alert("Upload failed: " + err.message);
+  }
+
+  uploadBtn.disabled = false;
+  uploadBtn.textContent = "Upload";
+});
+/****************************************************
+ * PART 7 — FEED SYSTEM
+ * Loads all posts from Firestore
+ * Filters by type: video, podcast, clip, audio
+ * Works with viewer.html
+ ****************************************************/
+
+import {
+  collection, query, orderBy, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const homeFeed   = qs("#home-feed");
+const videosFeed = qs("#videos-feed");
+const podcastFeed = qs("#podcast-feed");
+const clipsFeed  = qs("#clips-feed");
+
+/****************************************************
+ * RENDER SMALL CARD FOR FEEDS
+ ****************************************************/
+function renderPostCard(post) {
+  const div = document.createElement("div");
+  div.className = "card";
+  div.style.cursor = "pointer";
+
+  div.innerHTML = `
+    <img src="${post.thumbUrl}" style="width:100%; border-radius:12px;">
+
+    <h3 style="margin:10px 0;">${post.title}</h3>
+
+    <p class="muted">@${post.uid.substring(0,6)}</p>
+  `;
+
+  div.onclick = () => {
+    window.location.href = `viewer.html?id=${post.id}`;
   };
+
+  return div;
 }
 
-
-// ----------------------------------------------------
-// NORMALIZE POSTS FROM SNAPSHOT
-// ----------------------------------------------------
-async function normalizePostsFromSnap(snap) {
-  let posts = [];
-
-  snap.forEach((docu) => {
-    const raw = docu.data();
-    const post = normalizePost(raw);
-    post.id = docu.id;
-    posts.push(post);
-  });
-
-  // Apply block + age filters
-  posts = await filterBlockedPosts(posts);
-  posts = await applyAgeFilter(posts);
-
-  return posts;
-}
-
-
-// ----------------------------------------------------
-// PATCH ALL FEEDS TO USE NORMALIZATION
-// ----------------------------------------------------
-async function loadHomeFeed() {
-  const wrap = qs("#home-feed");
-  wrap.innerHTML = "<p class='muted'>Loading...</p>";
-
+/****************************************************
+ * LOAD ALL POSTS
+ ****************************************************/
+async function loadAllPosts() {
   const qRef = query(collection(db, "posts"), orderBy("createdAt", "desc"));
   const snap = await getDocs(qRef);
 
-  const posts = await normalizePostsFromSnap(snap);
-  wrap.innerHTML = "";
+  let posts = [];
+  snap.forEach(doc => {
+    posts.push(doc.data());
+  });
+
+  return posts;
+}
+
+/****************************************************
+ * LOAD HOME FEED (Everything)
+ ****************************************************/
+async function loadHomeFeed() {
+  homeFeed.innerHTML = "<p class='muted'>Loading…</p>";
+
+  const posts = await loadAllPosts();
+  homeFeed.innerHTML = "";
 
   if (posts.length === 0) {
-    wrap.innerHTML = "<p class='muted'>No posts yet.</p>";
+    homeFeed.innerHTML = "<p class='muted'>No posts yet.</p>";
     return;
   }
 
-  posts.forEach((p) => wrap.appendChild(renderPostCard(p)));
+  posts.forEach(p => homeFeed.appendChild(renderPostCard(p)));
 }
 
+/****************************************************
+ * LOAD VIDEOS FEED
+ ****************************************************/
 async function loadVideosFeed() {
-  const wrap = qs("#videos-feed");
-  wrap.innerHTML = "<p class='muted'>Loading...</p>";
+  videosFeed.innerHTML = "<p class='muted'>Loading…</p>";
 
-  const qRef = query(
-    collection(db, "posts"),
-    where("type", "in", ["video", "podcast-video"]),
-    orderBy("createdAt", "desc")
-  );
+  const posts = await loadAllPosts();
+  videosFeed.innerHTML = "";
 
-  const snap = await getDocs(qRef);
-  const posts = await normalizePostsFromSnap(snap);
+  const filtered = posts.filter(p => p.type === "video");
 
-  wrap.innerHTML = "";
-
-  if (posts.length === 0) {
-    wrap.innerHTML = "<p class='muted'>No videos yet.</p>";
+  if (filtered.length === 0) {
+    videosFeed.innerHTML = "<p class='muted'>No videos yet.</p>";
     return;
   }
 
-  posts.forEach((p) => wrap.appendChild(renderPostCard(p)));
+  filtered.forEach(p => videosFeed.appendChild(renderPostCard(p)));
 }
 
+/****************************************************
+ * LOAD PODCAST FEED
+ ****************************************************/
 async function loadPodcastFeed() {
-  const wrap = qs("#podcast-feed");
-  wrap.innerHTML = "<p class='muted'>Loading...</p>";
+  podcastFeed.innerHTML = "<p class='muted'>Loading…</p>";
 
-  const qRef = query(
-    collection(db, "posts"),
-    where("type", "==", "podcast-audio"),
-    orderBy("createdAt", "desc")
-  );
+  const posts = await loadAllPosts();
+  podcastFeed.innerHTML = "";
 
-  const snap = await getDocs(qRef);
-  const posts = await normalizePostsFromSnap(snap);
+  const filtered = posts.filter(p => p.type.includes("podcast"));
 
-  wrap.innerHTML = "";
-
-  if (posts.length === 0) {
-    wrap.innerHTML = "<p class='muted'>No podcasts yet.</p>";
+  if (filtered.length === 0) {
+    podcastFeed.innerHTML = "<p class='muted'>No podcasts yet.</p>";
     return;
   }
 
-  posts.forEach((p) => wrap.appendChild(renderPostCard(p)));
+  filtered.forEach(p => podcastFeed.appendChild(renderPostCard(p)));
 }
 
+/****************************************************
+ * LOAD CLIPS FEED
+ ****************************************************/
 async function loadClipsFeed() {
-  const wrap = qs("#clips-feed");
-  wrap.innerHTML = "<p class='muted'>Loading...</p>";
+  clipsFeed.innerHTML = "<p class='muted'>Loading…</p>";
 
-  const qRef = query(
-    collection(db, "posts"),
-    where("type", "==", "clip"),
-    orderBy("createdAt", "desc")
-  );
+  const posts = await loadAllPosts();
+  clipsFeed.innerHTML = "";
 
-  const snap = await getDocs(qRef);
-  const posts = await normalizePostsFromSnap(snap);
+  const filtered = posts.filter(p => p.type === "clip");
 
-  wrap.innerHTML = "";
-
-  if (posts.length === 0) {
-    wrap.innerHTML = "<p class='muted'>No clips yet.</p>";
+  if (filtered.length === 0) {
+    clipsFeed.innerHTML = "<p class='muted'>No clips yet.</p>";
     return;
   }
 
-  posts.forEach((p) => wrap.appendChild(renderPostCard(p)));
+  filtered.forEach(p => clipsFeed.appendChild(renderPostCard(p)));
+}
+/****************************************************
+ * PART 8 — PROFILE SYSTEM
+ * Loads:
+ * - Uploads
+ * - Saved posts
+ * - Liked posts
+ * - User stats
+ * - Profile edit
+ * - Profile picture + banner
+ ****************************************************/
+
+const profileGrid       = qs("#profile-grid");
+const profileSavedGrid  = qs("#profile-saved");
+const profileLikesGrid  = qs("#profile-likes");
+const profilePlaylists  = qs("#profile-playlists");
+
+const profileNameEl   = qs("#profile-name");
+const profileHandleEl = qs("#profile-handle");
+const profileBioEl    = qs("#bio-view");
+
+const profilePhotoEl  = qs("#profile-photo");
+const profileBannerEl = qs("#profileBanner");
+
+const statPostsEl     = qs("#stat-posts");
+const statFollowersEl = qs("#stat-followers");
+const statFollowingEl = qs("#stat-following");
+const statLikesEl     = qs("#stat-likes");
+
+const editBtn          = qs("#btn-edit-profile");
+const saveProfileBtn   = qs("#btnSaveProfile");
+const cancelEditBtn    = qs("#bio-cancel");
+
+const profileNameInput = qs("#profileNameInput");
+const profileBioInput  = qs("#profileBioInput");
+const profilePhotoInput = qs("#profilePhotoInput");
+const profileBannerInput = qs("#profileBannerInput");
+
+let viewingUserId = null;
+
+/****************************************************
+ * OPEN PROFILE TAB
+ ****************************************************/
+async function loadProfile(uid) {
+  viewingUserId = uid;
+
+  const snap = await getDoc(doc(db, "users", uid));
+  if (!snap.exists()) return;
+
+  const u = snap.data();
+
+  // Set Name + Username + Bio
+  profileNameEl.textContent = u.username || "User";
+  profileHandleEl.textContent = "@" + (u.username || "user");
+  profileBioEl.textContent = u.bio || "No bio yet.";
+
+  // Photos
+  profilePhotoEl.src = u.profilePhotoUrl || "https://via.placeholder.com/100/333/fff?text=User";
+  profileBannerEl.style.backgroundImage = u.bannerUrl 
+    ? `url(${u.bannerUrl})` 
+    : `linear-gradient(45deg,#111,#000)`;
+
+  // Stats
+  statPostsEl.textContent     = u.posts?.length || 0;
+  statFollowersEl.textContent = u.followers?.length || 0;
+  statFollowingEl.textContent = u.following?.length || 0;
+
+  // Count total likes across all posts
+  let totalLikes = 0;
+  if (u.posts?.length) {
+    for (let postId of u.posts) {
+      const ps = await getDoc(doc(db,"posts",postId));
+      if (ps.exists()) {
+        totalLikes += (ps.data().likes?.length || 0);
+      }
+    }
+  }
+  statLikesEl.textContent = totalLikes;
+
+  // Owner-only buttons
+  if (currentUser && currentUser.uid === uid) {
+    document.querySelectorAll(".owner-only").forEach(el => el.style.display = "inline-block");
+    editBtn.style.display = "inline-block";
+  } else {
+    document.querySelectorAll(".owner-only").forEach(el => el.style.display = "none");
+    editBtn.style.display = "none";
+  }
+
+  loadProfileTabs();
 }
 
+/****************************************************
+ * PROFILE TABS (Uploads / Saved / Likes / Playlists)
+ ****************************************************/
+function loadProfileTabs() {
+  const pills = document.querySelectorAll(".profile-tabs .pill");
 
-// ----------------------------------------------------
-// SAFE PROFILE LOADING
-// ----------------------------------------------------
-function safeProfileLoad() {
-  if (!currentUser) return;
+  pills.forEach(pill => {
+    pill.onclick = () => {
+      pills.forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
 
-  loadProfileUploads(currentUser.uid);
-  loadSavedPosts(currentUser.uid);
-  loadProfileLikes(currentUser.uid);
+      const tab = pill.dataset.profileTab;
+      showProfileTab(tab);
+    };
+  });
+
+  showProfileTab("uploads");
 }
 
-document.addEventListener("intakee:auth", () => {
-  setTimeout(safeProfileLoad, 200);
-});
+/****************************************************
+ * SHOW TAB CONTENT
+ ****************************************************/
+async function showProfileTab(tab) {
+  profileGrid.style.display       = "none";
+  profileSavedGrid.style.display  = "none";
+  profileLikesGrid.style.display  = "none";
+  profilePlaylists.style.display  = "none";
 
+  if (tab === "uploads") {
+    profileGrid.style.display = "grid";
+    loadProfileUploads();
+  }
 
-// ----------------------------------------------------
-// FINAL DEBUG LOG
-// ----------------------------------------------------
-console.log(
-  "%cINTAKEE JS LOADED — APP IS READY FOR LAUNCH",
-  "color:#4cff4c; font-size:16px; font-weight:bold;"
-);
+  if (tab === "saved") {
+    profileSavedGrid.style.display = "grid";
+    loadProfileSaved();
+  }
+
+  if (tab === "likes") {
+    profileLikesGrid.style.display = "grid";
+    loadProfileLikes();
+  }
+
+  if (tab === "playlists") {
+    profilePlaylists.style.display = "block";
+  }
+}
+
+/****************************************************
+ * PROFILE — USER UPLOADS
+ ****************************************************/
+async function loadProfileUploads() {
+  profileGrid.innerHTML = "<p class='muted'>Loading…</p>";
+
+  const postsRef = collection(db, "posts");
+  const snap = await getDocs(postsRef);
+
+  profileGrid.innerHTML = "";
+
+  snap.forEach(docSnap => {
+    const post = docSnap.data();
+    if (post.uid === viewingUserId) {
+      profileGrid.appendChild(renderPostCard(post));
+    }
+  });
+
+  if (profileGrid.innerHTML === "") {
+    profileGrid.innerHTML = "<p class='muted'>No uploads yet.</p>";
+  }
+}
+
+/****************************************************
+ * PROFILE — SAVED POSTS
+ ****************************************************/
+async function loadProfileSaved() {
+  profileSavedGrid.innerHTML = "<p class='muted'>Loading…</p>";
+
+  const userSnap = await getDoc(doc(db,"users",viewingUserId));
+  const u = userSnap.data();
+  const saved = u.saved || [];
+
+  profileSavedGrid.innerHTML = "";
+
+  for (let postId of saved) {
+    const ps = await getDoc(doc(db,"posts",postId));
+    if (ps.exists()) {
+      profileSavedGrid.appendChild(renderPostCard(ps.data()));
+    }
+  }
+
+  if (profileSavedGrid.innerHTML === "") {
+    profileSavedGrid.innerHTML = "<p class='muted'>No saved posts.</p>";
+  }
+}
+
+/****************************************************
+ * PROFILE — LIKED POSTS
+ ****************************************************/
+async function loadProfileLikes() {
+  profileLikesGrid.innerHTML = "<p class='muted'>Loading…</p>";
+
+  const postsRef = collection(db,"posts");
+  const snap = await getDocs(postsRef);
+
+  profileLikesGrid.innerHTML = "";
+
+  snap.forEach(docSnap => {
+    const post = docSnap.data();
+    if (post.likes?.includes(viewingUserId)) {
+      profileLikesGrid.appendChild(renderPostCard(post));
+    }
+  });
+
+  if (profileLikesGrid.innerHTML === "") {
+    profileLikesGrid.innerHTML = "<p class='muted'>No liked posts.</p>";
+  }
+}
+
+/****************************************************
+ * EDIT PROFILE
+ ****************************************************/
+editBtn.onclick = () => {
+  qs("#bio-edit-wrap").style.display = "block";
+  profileNameInput.value = profileNameEl.textContent;
+  profileBioInput.value  = profileBioEl.textContent;
+};
+
+cancelEditBtn.onclick = () => {
+  qs("#bio-edit-wrap").style.display = "none";
+};
+
+saveProfileBtn.onclick = async () => {
+  const userRef = doc(db,"users",currentUser.uid);
+
+  const updates = {
+    username: profileNameInput.value.trim(),
+    bio: profileBioInput.value.trim()
+  };
+
+  // Photo upload?
+  if (profilePhotoInput.files[0]) {
+    const f = profilePhotoInput.files[0];
+    const storageRef = ref(storage, `profiles/${currentUser.uid}/photo.jpg`);
+    await uploadBytes(storageRef, f);
+    updates.profilePhotoUrl = await getDownloadURL(storageRef);
+  }
+
+  // Banner upload?
+  if (profileBannerInput.files[0]) {
+    const f = profileBannerInput.files[0];
+    const storageRef = ref(storage, `profiles/${currentUser.uid}/banner.jpg`);
+    await uploadBytes(storageRef, f);
+    updates.bannerUrl = await getDownloadURL(storageRef);
+  }
+
+  await updateDoc(userRef, updates);
+
+  qs("#bio-edit-wrap").style.display = "none";
+  loadProfile(currentUser.uid);
+};
