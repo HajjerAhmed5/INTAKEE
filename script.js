@@ -174,52 +174,58 @@ qs("#settings-logout").onclick = () => signOut(auth);
 // ===================
 // FINAL WORKING TAB SWITCHING
 // ===================
+/****************************************************
+ * TAB SWITCHING — FINAL CLEAN VERSION
+ ****************************************************/
+
+const tabs = document.querySelectorAll(".bottom-nav a");
 
 const sections = {
-  home: qs("#tab-home"),
-  videos: qs("#tab-videos"),
-  podcast: qs("#tab-podcast"),
-  upload: qs("#tab-upload"),
-  clips: qs("#tab-clips"),
-  profile: qs("#tab-profile"),
-  settings: qs("#tab-settings"),
+  home: document.querySelector("#tab-home"),
+  videos: document.querySelector("#tab-videos"),
+  podcast: document.querySelector("#tab-podcast"),
+  upload: document.querySelector("#tab-upload"),
+  clips: document.querySelector("#tab-clips"),
+  profile: document.querySelector("#tab-profile"),
+  settings: document.querySelector("#tab-settings"),
 };
 
-const tabButtons = qsa(".bottom-nav a");
-
-function hideAllTabs() {
+function showTab(name) {
+  // hide all sections
   Object.values(sections).forEach(sec => sec.style.display = "none");
+
+  // show chosen
+  sections[name].style.display = "block";
+
+  // update bottom nav active state
+  tabs.forEach(t => {
+    t.classList.toggle("active", t.dataset.tab === name);
+  });
+
+  // load feed if needed
+  if (name === "home")    loadHomeFeed();
+  if (name === "videos")  loadVideosFeed();
+  if (name === "podcast") loadPodcastFeed();
+  if (name === "clips")   loadClipsFeed();
+  if (name === "profile" && currentUser) loadProfile(currentUser.uid);
 }
 
-function activateTab(tabName) {
-  tabButtons.forEach(btn =>
-    btn.classList.toggle("active", btn.dataset.tab === tabName)
-  );
-
-  hideAllTabs();
-  sections[tabName].style.display = "block";
-
-  if (tabName === "home") loadHomeFeed();
-  if (tabName === "videos") loadVideosFeed();
-  if (tabName === "podcast") loadPodcastFeed();
-  if (tabName === "clips") loadClipsFeed();
-  if (tabName === "profile" && currentUser) loadProfile(currentUser.uid);
-}
-
-tabButtons.forEach(btn => {
+// click event
+tabs.forEach(btn => {
   btn.addEventListener("click", () => {
     const tab = btn.dataset.tab;
 
     if (tab === "upload" && !currentUser) {
-      alert("Login to upload.");
+      alert("Login required to upload");
       return;
     }
 
-    activateTab(tab);
+    showTab(tab);
   });
 });
 
-activateTab("home");
+// default screen
+showTab("home");
 /****************************************************
  * CHUNK 2 — UPLOAD SYSTEM
  * Handles:
