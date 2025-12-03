@@ -1,270 +1,373 @@
-// =======================================================
-// INTAKEE — VIEWER.JS
-// Handles: load post, display media, creator info,
-// likes, views, comments, follow button.
-// =======================================================
+/****************************************************
+ * VIEWER.JS — FULL FINAL VERSION
+ * Works with your main script.js
+ * Includes:
+ * - Load post
+ * - Video / Audio player
+ * - Like / Dislike
+ * - Save / Unsave
+ * - Comments
+ * - Comment count
+ * - Creator info
+ * - Follow / Unfollow
+ * - View counter
+ ****************************************************/
 
 import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  getFirestore, doc, getDoc, updateDoc, increment
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 import {
-  getFirestore,
-  doc,
-  getDoc,
-  updateDoc,
-  increment,
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+  getAuth, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import {
-  getStorage
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+  getApp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
-// Firebase
-const auth = getAuth();
-const db = getFirestore();
-const storage = getStorage();
+import {
+  collection, query, where, orderBy, addDoc, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Helpers
-const qs = (s) => document.querySelector(s);
+import {
+  arrayUnion, arrayRemove
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// URL param
-const params = new URLSearchParams(window.location.search);
-const postId = params.get("id");
+import {
+  sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// DOM elements
-const videoBox = qs("#video-container");
-const audioBox = qs("#audio-container");
-const videoEl = qs("#viewer-video");
-const audioEl = qs("#viewer-audio");
+import {
+  getStorage, ref, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-const titleEl = qs("#viewer-title");
-const descEl = qs("#viewer-description");
-const likesEl = qs("#viewer-likes");
-const commentsCountEl = qs("#viewer-comments-count");
-const viewsEl = qs("#viewer-views");
+// Init
+const app = getApp();
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-const creatorPhotoEl = qs("#viewer-creator-photo");
-const creatorNameEl = qs("#viewer-creator-name");
-const creatorUsernameEl = qs("#viewer-creator-username");
-const followBtn = qs("#viewer-follow-btn");
+// Shortcuts
+const qs  = (x) => document.querySelector(x);
 
-const commentInput = qs("#viewer-comment-input");
-const commentBtn = qs("#viewer-comment-btn");
-const commentsBox = qs("#viewer-comments");
+// Page Elements
+const vVideo        = qs("#viewer-video");
+const vAudio        = qs("#viewer-audio");
+const titleEl       = qs("#viewer-title");
+const descEl        = qs("#viewer-description");
+const usernameEl    = qs("#viewer-creator-username");
+const nameEl        = qs("#viewer-creator-name");
+const photoEl       = qs("#viewer-creator-photo");
 
-// =======================================================
-// LOAD POST DATA
-// =======================================================
+const likeBtn       = qs("#viewer-like-btn");
+const dislikeBtn    = qs("#viewer-dislike-btn");
+const saveBtn       = qs("#viewer-save-btn");
+const likeCountEl   = qs("#viewer-like-count");
 
-async function loadPost() {
-  if (!postId) {
-    titleEl.textContent = "Post not found.";
+const commentsWrap  = qs("#viewer-comments");
+const commentInput  = qs("#viewer-comment-input");
+const commentBtn    = qs("#viewer-comment-btn");
+
+const followBtn     = qs("#viewer-follow-btn");
+
+let currentUser = null;
+let currentPost = null;
+let currentPostId = null;
+
+
+/****************************************************
+ * AUTH LISTENER — get logged in user
+ ****************************************************/
+onAuthStateChanged(auth, (user) => {
+  currentUser = user || null;
+});
+
+
+/****************************************************
+ * INIT VIEWER
+ ****************************************************/
+document.addEventListener("DOMContentLoaded", () => {
+  initViewer();
+});
+
+
+async function initViewer() {
+  const params = new URLSearchParams(window.location.search);
+  currentPostId = params.get("id");
+
+  if (!currentPostId) {
+    alert("Missing post ID.");
     return;
   }
 
-  try {
-    const snap = await getDoc(doc(db, "posts", postId));
-    if (!snap.exists()) {
-      titleEl.textContent = "Post not found.";
-      return;
+  const snap = await getDoc(doc(db, "posts", currentPostId));
+  if (!snap.exists()) {
+    alert("Post not found.");
+    return;
+  }
+
+  currentPost = snap.data();
+
+  renderPost();
+  loadCreatorInfo(currentPost.uid);
+  loadComments();
+  increaseViewCount();
+  loadReactions();
+  loadSaveState();
+  loadFollowState();
+}
+
+
+/****************************************************
+ * RENDER POST
+ ****************************************************/
+function renderPost() {
+  titleEl.textContent = currentPost.title || "";
+  descEl.textContent  = currentPost.desc || "";
+
+  if (currentPost.type === "podcast-audio") {
+    qs("#video-container").style.display = "none";
+    qs("#audio-container").style.display = "block";
+    vAudio.src = currentPost.fileUrl;
+  } else {
+    qs("#video-container").style.display = "block";
+    qs("#audio-container").style.display = "none";
+    vVideo.src = currentPost.fileUrl;
+  }
+}
+
+
+/****************************************************
+ * LOAD CREATOR INFO
+ ****************************************************/
+async function loadCreatorInfo(uid) {
+  const snap = await getDoc(doc(db, "users", uid));
+  if (!snap.exists()) return;
+
+  const u = snap.data();
+
+  usernameEl.textContent = "@" + (u.username || "user");
+  nameEl.textContent     = u.username || "User";
+
+  if (u.profilePhotoUrl) {
+    photoEl.src = u.profilePhotoUrl;
+  } else {
+    photoEl.src = "https://via.placeholder.com/100/222/fff?text=User";
+  }
+}
+
+
+/****************************************************
+ * LIKE / DISLIKE
+ ****************************************************/
+async function loadReactions() {
+  const snap = await getDoc(doc(db, "posts", currentPostId));
+  const post = snap.data();
+  const uid  = currentUser?.uid;
+
+  likeCountEl.textContent = `${post.likes?.length || 0} likes`;
+
+  if (uid) {
+    likeBtn.classList.toggle("active", post.likes?.includes(uid));
+    dislikeBtn.classList.toggle("active", post.dislikes?.includes(uid));
+  }
+
+  likeBtn.onclick = async () => {
+    if (!currentUser) return alert("Login to like.");
+
+    const snap = await getDoc(doc(db, "posts", currentPostId));
+    const p = snap.data();
+
+    let likes    = p.likes || [];
+    let dislikes = p.dislikes || [];
+
+    const hasLike    = likes.includes(currentUser.uid);
+    const hasDislike = dislikes.includes(currentUser.uid);
+
+    if (hasLike) {
+      likes = likes.filter(id => id !== currentUser.uid);
+    } else {
+      likes.push(currentUser.uid);
+      if (hasDislike) {
+        dislikes = dislikes.filter(id => id !== currentUser.uid);
+      }
     }
 
-    const data = snap.data();
+    await updateDoc(doc(db, "posts", currentPostId), { likes, dislikes });
 
-    // Title + description
-    titleEl.textContent = data.title || "";
-    descEl.textContent = data.desc || "";
+    loadReactions();
+  };
 
-    // Increment views
-    await updateDoc(doc(db, "posts", postId), {
-      viewCount: increment(1)
-    });
+  dislikeBtn.onclick = async () => {
+    if (!currentUser) return alert("Login to dislike.");
 
-    viewsEl.textContent = `${(data.viewCount || 0) + 1} Views`;
+    const snap = await getDoc(doc(db, "posts", currentPostId));
+    const p = snap.data();
 
-    loadMedia(data);
-    loadCreator(data.uid);
-    loadComments();
-    updateLikesCount(data);
+    let likes    = p.likes || [];
+    let dislikes = p.dislikes || [];
 
-  } catch (err) {
-    titleEl.textContent = "Error loading post.";
-    console.error(err);
-  }
+    const hasLike    = likes.includes(currentUser.uid);
+    const hasDislike = dislikes.includes(currentUser.uid);
+
+    if (hasDislike) {
+      dislikes = dislikes.filter(id => id !== currentUser.uid);
+    } else {
+      dislikes.push(currentUser.uid);
+      if (hasLike) {
+        likes = likes.filter(id => id !== currentUser.uid);
+      }
+    }
+
+    await updateDoc(doc(db, "posts", currentPostId), { likes, dislikes });
+
+    loadReactions();
+  };
 }
 
-// =======================================================
-// LOAD MEDIA (video / audio / podcast)
-// =======================================================
 
-function loadMedia(post) {
-  videoBox.style.display = "none";
-  audioBox.style.display = "none";
-
-  if (post.type === "video" || post.type === "podcast-video") {
-    videoBox.style.display = "block";
-    videoEl.src = post.mediaUrl;
-    videoEl.autoplay = false;
-
-  } else if (post.type === "podcast-audio") {
-    audioBox.style.display = "block";
-    audioEl.src = post.mediaUrl;
-    audioEl.autoplay = true;
-
-  } else if (post.type === "clip") {
-    videoBox.style.display = "block";
-    videoEl.src = post.mediaUrl;
-    videoEl.autoplay = true;
-    videoEl.loop = true;
+/****************************************************
+ * SAVE / UNSAVE
+ ****************************************************/
+async function loadSaveState() {
+  if (!currentUser) {
+    saveBtn.textContent = "💾 Save";
+    return;
   }
+
+  const snap = await getDoc(doc(db, "users", currentUser.uid));
+  const saved = snap.data().saved || [];
+
+  saveBtn.textContent = saved.includes(currentPostId)
+    ? "✔ Saved"
+    : "💾 Save";
+
+  saveBtn.onclick = () => toggleSave();
 }
 
-// =======================================================
-// LOAD CREATOR INFO
-// =======================================================
+async function toggleSave() {
+  const userRef = doc(db, "users", currentUser.uid);
+  const snap = await getDoc(userRef);
 
-async function loadCreator(uid) {
-  try {
-    const snap = await getDoc(doc(db, "users", uid));
-    const data = snap.data();
+  const saved = snap.data().saved || [];
 
-    if (!data) return;
+  let updated;
 
-    creatorNameEl.textContent = data.name || "Creator";
-    creatorUsernameEl.textContent = "@" + (data.username || "unknown");
-
-    creatorPhotoEl.src = data.photoURL || "";
-  } catch (err) {
-    console.error("Error loading creator:", err);
+  if (saved.includes(currentPostId)) {
+    updated = saved.filter(id => id !== currentPostId);
+    saveBtn.textContent = "💾 Save";
+  } else {
+    updated = [...saved, currentPostId];
+    saveBtn.textContent = "✔ Saved";
   }
+
+  await updateDoc(userRef, { saved: updated });
 }
 
-// =======================================================
-// LIKES
-// =======================================================
 
-async function updateLikesCount(data) {
-  likesEl.textContent = `${data.likeCount || 0} Likes`;
+/****************************************************
+ * FOLLOW / UNFOLLOW CREATOR
+ ****************************************************/
+async function loadFollowState() {
+  if (!currentUser) {
+    followBtn.style.display = "block";
+    followBtn.textContent = "Follow";
+    return;
+  }
+
+  if (currentUser.uid === currentPost.uid) {
+    followBtn.style.display = "none";
+    return;
+  }
+
+  const mySnap = await getDoc(doc(db, "users", currentUser.uid));
+  const me = mySnap.data();
+
+  const isFollowing = me.following?.includes(currentPost.uid);
+
+  followBtn.textContent = isFollowing ? "Unfollow" : "Follow";
+
+  followBtn.onclick = async () => {
+    const myRef = doc(db, "users", currentUser.uid);
+    const creatorRef = doc(db, "users", currentPost.uid);
+
+    if (isFollowing) {
+      await updateDoc(myRef, {
+        following: me.following.filter(x => x !== currentPost.uid)
+      });
+      await updateDoc(creatorRef, {
+        followers: arrayRemove(currentUser.uid)
+      });
+    } else {
+      await updateDoc(myRef, {
+        following: [...(me.following || []), currentPost.uid]
+      });
+      await updateDoc(creatorRef, {
+        followers: arrayUnion(currentUser.uid)
+      });
+    }
+
+    loadFollowState();
+  };
 }
 
-qs("#like-btn")?.addEventListener("click", async () => {
-  const user = auth.currentUser;
-  if (!user) return alert("Login required.");
 
-  try {
-    await updateDoc(doc(db, "posts", postId), {
-      likeCount: increment(1)
-    });
+/****************************************************
+ * INCREASE VIEWS
+ ****************************************************/
+async function increaseViewCount() {
+  await updateDoc(doc(db, "posts", currentPostId), {
+    views: increment(1)
+  });
 
-    const snap = await getDoc(doc(db, "posts", postId));
-    const data = snap.data();
+  qs("#viewer-views").textContent = `${(currentPost.views || 0) + 1} Views`;
+}
 
-    updateLikesCount(data);
 
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
-});
-
-// Dislike is placeholder
-qs("#dislike-btn")?.addEventListener("click", () => {
-  alert("You disliked this post.");
-});
-
-// =======================================================
-// COMMENTS (CREATE + LOAD)
-// =======================================================
-
+/****************************************************
+ * COMMENTS
+ ****************************************************/
 async function loadComments() {
-  try {
-    const qRef = query(
-      collection(db, "comments"),
-      where("postId", "==", postId)
-    );
+  commentsWrap.innerHTML = "<p class='muted'>Loading comments...</p>";
 
-    const snap = await getDocs(qRef);
-    const comments = snap.docs.map(d => d.data());
+  const qRef = query(
+    collection(db, "comments"),
+    where("postId", "==", currentPostId),
+    orderBy("createdAt", "asc")
+  );
 
-    commentsCountEl.textContent = `${comments.length} Comments`;
+  const snap = await getDocs(qRef);
 
-    commentsBox.innerHTML = "";
+  commentsWrap.innerHTML = "";
+  qs("#viewer-comments-count").textContent = `${snap.size} Comments`;
 
-    if (comments.length === 0) {
-      commentsBox.innerHTML = `<p class="muted">No comments yet.</p>`;
-      return;
-    }
-
-    comments.forEach(c => {
-      const el = document.createElement("div");
-      el.className = "comment-item";
-
-      el.innerHTML = `
-        <strong>@${c.username}</strong>: ${c.text}
-      `;
-
-      commentsBox.appendChild(el);
-    });
-
-  } catch (err) {
-    console.error("Comments error:", err);
+  if (snap.empty) {
+    commentsWrap.innerHTML = "<p class='muted'>No comments yet.</p>";
+    return;
   }
+
+  snap.forEach((docSnap) => {
+    const c = docSnap.data();
+    const div = document.createElement("div");
+    div.className = "comment-item";
+    div.innerHTML = `<strong>@${c.username}</strong><br>${c.text}`;
+    commentsWrap.appendChild(div);
+  });
 }
 
-// Post a comment
-commentBtn.addEventListener("click", async () => {
+commentBtn.onclick = async () => {
+  if (!currentUser) return alert("Login to comment.");
+
   const text = commentInput.value.trim();
   if (!text) return;
 
-  const user = auth.currentUser;
-  if (!user) return alert("Login required.");
+  await addDoc(collection(db, "comments"), {
+    postId: currentPostId,
+    uid: currentUser.uid,
+    username: currentUser.displayName || currentUser.email.split("@")[0],
+    text,
+    createdAt: new Date()
+  });
 
-  try {
-    const snap = await getDoc(doc(db, "users", user.uid));
-    const userdata = snap.data();
-
-    await addDoc(collection(db, "comments"), {
-      postId,
-      uid: user.uid,
-      username: userdata.username,
-      text,
-      createdAt: serverTimestamp()
-    });
-
-    commentInput.value = "";
-    loadComments();
-
-  } catch (err) {
-    alert("Comment error: " + err.message);
-  }
-});
-
-// =======================================================
-// FOLLOW CREATOR
-// =======================================================
-
-followBtn.addEventListener("click", async () => {
-  const user = auth.currentUser;
-  if (!user) return alert("Login required.");
-
-  try {
-    // (Simple placeholder)
-    alert("Following creator is coming soon.");
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
-});
-
-// =======================================================
-// START VIEWER
-// =======================================================
-
-loadPost();
-console.log("📺 viewer.js loaded");
+  commentInput.value = "";
+  loadComments();
+};
