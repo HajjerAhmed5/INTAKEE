@@ -84,6 +84,37 @@
       gap: 20px;
       color: #bbb;
       margin: 10px 0;
+      align-items: center;
+    }
+
+    .reaction-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .reaction-buttons button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: #111;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .reaction-buttons button.active {
+      background: #fff;
+      color: #000;
+    }
+
+    .save-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: #444;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
 
     .description {
@@ -154,8 +185,11 @@
 
   <!-- CONTENT -->
   <div class="content">
+
+    <!-- TITLE -->
     <h1 id="viewer-title"></h1>
 
+    <!-- CREATOR -->
     <div class="creator-row">
       <img id="viewer-creator-photo" src="">
       <div>
@@ -166,21 +200,32 @@
       <button id="viewer-follow-btn" class="follow-btn">Follow</button>
     </div>
 
+    <!-- STATS -->
     <div class="stats">
-      <span id="viewer-likes">0 Likes</span>
+      <span id="viewer-like-count">0 Likes</span>
       <span id="viewer-comments-count">0 Comments</span>
       <span id="viewer-views">0 Views</span>
     </div>
 
+    <!-- REACTIONS -->
+    <div class="reaction-buttons">
+      <button id="viewer-like-btn"><i class="fa fa-thumbs-up"></i></button>
+      <button id="viewer-dislike-btn"><i class="fa fa-thumbs-down"></i></button>
+      <button id="viewer-save-btn" class="save-btn">💾 Save</button>
+    </div>
+
+    <!-- DESCRIPTION -->
     <div id="viewer-description" class="description"></div>
 
-    <!-- COMMENTS -->
+    <!-- COMMENTS INPUT -->
     <div class="comment-box">
       <input id="viewer-comment-input" placeholder="Add a comment...">
       <button id="viewer-comment-btn">Post</button>
     </div>
 
+    <!-- COMMENTS LIST -->
     <div id="viewer-comments" class="comments"></div>
+
   </div>
 
   <!-- JS -->
