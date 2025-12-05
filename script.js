@@ -321,7 +321,10 @@ const uploadFileInput = document.getElementById("uploadFileInput");
 const uploadBtn = document.getElementById("btnUpload");
 
 // --------------------------------------
-// UPLOAD HANDLER
+// PART 4 — UPLOAD SYSTEM + CONTENT FEEDS
+// --------------------------------------
+// --------------------------------------
+// UPLOAD HANDLER (FIXED VERSION)
 // --------------------------------------
 uploadBtn?.addEventListener("click", async () => {
   const user = getCurrentUser();
@@ -342,9 +345,11 @@ uploadBtn?.addEventListener("click", async () => {
     return;
   }
 
+  // Convert to base64
   const fileData = await readFileAsDataURL(file);
   const thumbData = await readFileAsDataURL(thumbFile);
 
+  // New post
   const newPost = {
     id: Date.now(),
     user: user.email,
@@ -359,25 +364,26 @@ uploadBtn?.addEventListener("click", async () => {
     dislikes: 0
   };
 
+  // Save post
   posts.unshift(newPost);
   saveData("intakee-posts", posts);
 
+  // Save under user
   user.posts.push(newPost.id);
   users = users.map(u => u.email === user.email ? user : u);
   saveData("intakee-users", users);
+
   alert("Upload complete!");
 
-// Reset form safely
-uploadTitleInput.value = "";
-uploadDescInput.value = "";
-uploadThumbInput.value = null;
-uploadFileInput.value = null;
+  // Reset form SAFELY
+  uploadTitleInput.value = "";
+  uploadDescInput.value = "";
+  uploadThumbInput.value = null;
+  uploadFileInput.value = null;
 
-refreshFeeds();
-refreshProfileUploads();
-  
+  refreshFeeds();
+  refreshProfileUploads();
 });
-
 // ======================================
 // FEED RENDERING
 // ======================================
