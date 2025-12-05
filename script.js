@@ -13,6 +13,13 @@ const sections = document.querySelectorAll("main section");
 // --------------------------
 // SHOW TAB FUNCTION
 // --------------------------
+// Hide search bar on Upload, Profile, and Settings
+const searchBar = document.querySelector(".search-bar");
+
+function updateSearchVisibility(tabName) {
+  const hideTabs = ["upload", "profile", "settings"];
+  searchBar.style.display = hideTabs.includes(tabName) ? "none" : "flex";
+}
 function showTab(tabName) {
   currentTab = tabName;
   localStorage.setItem("intakee-current-tab", tabName);
@@ -23,7 +30,7 @@ function showTab(tabName) {
   // show selected page
   const page = document.getElementById(`tab-${tabName}`);
   if (page) page.style.display = "block";
-
+  updateSearchVisibility(tabName);
   // update active button
   navLinks.forEach(link => link.classList.remove("active"));
   const activeLink = document.querySelector(`[data-tab="${tabName}"]`);
