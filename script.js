@@ -1,6 +1,6 @@
 // ======================================
 // INTAKEE — CORE APP ENGINE (PART 1)
-// Tab switching + auth modal + utilities
+// Tab switching + auth + utilities
 // ======================================
 
 // Restore last tab or default to "home"
@@ -10,37 +10,32 @@ let currentTab = localStorage.getItem("intakee-current-tab") || "home";
 const navLinks = document.querySelectorAll(".bottom-nav a");
 const sections = document.querySelectorAll("main section");
 
-// --------------------------
-// SHOW TAB FUNCTION
-// --------------------------
-// Hide search bar on Upload, Profile, and Settings
+// Hide search bar on Upload, Profile, Settings
 const searchBar = document.querySelector(".search-bar");
 
 function updateSearchVisibility(tabName) {
   const hideTabs = ["upload", "profile", "settings"];
   searchBar.style.display = hideTabs.includes(tabName) ? "none" : "flex";
 }
+
 function showTab(tabName) {
   currentTab = tabName;
   localStorage.setItem("intakee-current-tab", tabName);
 
-  // hide all pages
   sections.forEach(sec => sec.style.display = "none");
 
-  // show selected page
   const page = document.getElementById(`tab-${tabName}`);
   if (page) page.style.display = "block";
+
   updateSearchVisibility(tabName);
-  // update active button
+
   navLinks.forEach(link => link.classList.remove("active"));
   const activeLink = document.querySelector(`[data-tab="${tabName}"]`);
   if (activeLink) activeLink.classList.add("active");
 }
 
-// Initialize default tab
 showTab(currentTab);
 
-// Add click listeners to all nav items
 navLinks.forEach(link => {
   link.addEventListener("click", () => {
     const tab = link.getAttribute("data-tab");
@@ -49,23 +44,25 @@ navLinks.forEach(link => {
 });
 
 // ======================================
-// AUTH DIALOG (OPEN/CLOSE)
+// AUTH DIALOG
 // ======================================
-
 const authDialog = document.getElementById("authDialog");
 const openAuthBtn = document.getElementById("openAuth");
 
-// open modal
 openAuthBtn?.addEventListener("click", () => {
-  authDialog.showModal();
+  const user = getCurrentUser();
+  if (user) {
+    showTab("profile");
+  } else {
+    authDialog.showModal();
+  }
 });
 
-// close modal (button inside <form method="dialog">)
 authDialog.addEventListener("close", () => {
   console.log("Auth dialog closed");
 });
 
-// Utility: read file as data URL (used for avatar, banner, uploads)
+// Utilities
 function readFileAsDataURL(file) {
   return new Promise(resolve => {
     const reader = new FileReader();
@@ -74,7 +71,6 @@ function readFileAsDataURL(file) {
   });
 }
 
-// Utility: load or initialize localStorage JSON
 function loadData(key, fallback) {
   try {
     return JSON.parse(localStorage.getItem(key)) || fallback;
@@ -83,22 +79,17 @@ function loadData(key, fallback) {
   }
 }
 
-// Utility: save JSON to localStorage
 function saveData(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
-// ======================================
-// PART 2 — USER AUTH (LOCAL VERSION)
-// ======================================
 
-// Stored in localStorage:
-// intakee-users → list of all users
-// intakee-current-user → email of logged-in user
-
+// ======================================
+// USER AUTH (LOCAL STORAGE VERSION)
+// ======================================
 let users = loadData("intakee-users", []);
 let currentUserEmail = localStorage.getItem("intakee-current-user") || null;
 
-// Get UI elements
+// Elements
 const signupEmail = document.getElementById("signupEmail");
 const signupPassword = document.getElementById("signupPassword");
 const signupUsername = document.getElementById("signupUsername");
@@ -112,32 +103,17 @@ const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("settings-logout");
 const deleteAccountBtn = document.getElementById("settings-delete-account");
 
-
-// =====================================================
 // CREATE ACCOUNT
-// =====================================================
 signupBtn?.addEventListener("click", () => {
   const email = signupEmail.value.trim();
   const password = signupPassword.value.trim();
   const username = signupUsername.value.trim();
   const ageConfirmed = signupAgeConfirm.checked;
 
-  if (!email || !password || !username) {
-    alert("Fill all fields.");
-    return;
-  }
-  if (password.length < 6) {
-    alert("Password must be at least 6 characters.");
-    return;
-  }
-  if (!ageConfirmed) {
-    alert("You must confirm you are 13 or older.");
-    return;
-  }
-  if (users.some(u => u.email === email)) {
-    alert("Email already exists.");
-    return;
-  }
+  if (!email || !password || !username) return alert("Fill all fields.");
+  if (password.length < 6) return alert("Password must be at least 6 characters.");
+  if (!ageConfirmed) return alert("You must confirm you are 13 or older.");
+  if (users.some(u => u.email === email)) return alert("Email already exists.");
 
   const newUser = {
     email,
@@ -156,25 +132,20 @@ signupBtn?.addEventListener("click", () => {
   saveData("intakee-users", users);
 
   alert("Account created! Please sign in.");
+
   signupEmail.value = "";
   signupPassword.value = "";
   signupUsername.value = "";
   signupAgeConfirm.checked = false;
 });
 
-
-// =====================================================
 // LOGIN
-// =====================================================
 loginBtn?.addEventListener("click", () => {
   const email = loginEmail.value.trim();
   const password = loginPassword.value.trim();
 
   const user = users.find(u => u.email === email && u.password === password);
-  if (!user) {
-    alert("Invalid email or password.");
-    return;
-  }
+  if (!user) return alert("Invalid email or password.");
 
   currentUserEmail = user.email;
   localStorage.setItem("intakee-current-user", currentUserEmail);
@@ -184,35 +155,23 @@ loginBtn?.addEventListener("click", () => {
 
   refreshProfileUI();
   refreshLoginButton();
-
 });
 
-
-// =====================================================
 // LOGOUT
-// =====================================================
 logoutBtn?.addEventListener("click", () => {
   localStorage.removeItem("intakee-current-user");
   currentUserEmail = null;
 
   alert("Logged out.");
   refreshProfileUI();
+  refreshLoginButton();
   showTab("home");
 });
 
-
-// =====================================================
 // DELETE ACCOUNT
-// =====================================================
 deleteAccountBtn?.addEventListener("click", () => {
-  if (!currentUserEmail) {
-    alert("You are not logged in.");
-    return;
-  }
-
-  if (!confirm("Are you sure you want to permanently delete your account?")) {
-    return;
-  }
+  if (!currentUserEmail) return alert("You are not logged in.");
+  if (!confirm("Delete account permanently?")) return;
 
   users = users.filter(u => u.email !== currentUserEmail);
   saveData("intakee-users", users);
@@ -222,22 +181,36 @@ deleteAccountBtn?.addEventListener("click", () => {
 
   alert("Account deleted.");
   refreshProfileUI();
+  refreshLoginButton();
   showTab("home");
 });
 
-
-// =====================================================
-// FETCH CURRENT USER OBJECT
-// =====================================================
+// GET CURRENT USER
 function getCurrentUser() {
   if (!currentUserEmail) return null;
   return users.find(u => u.email === currentUserEmail) || null;
 }
 
+// ======================================
+// LOGIN BUTTON TEXT UPDATE ("Login" → username)
+// ======================================
+function refreshLoginButton() {
+  const user = getCurrentUser();
+  const btn = document.getElementById("openAuth");
 
-// =====================================================
-// UPDATE PROFILE UI BASED ON LOGIN STATE
-// =====================================================
+  if (!btn) return;
+
+  if (user) {
+    btn.textContent = user.username;
+  } else {
+    btn.textContent = "Login";
+  }
+}
+refreshLoginButton();
+
+// ======================================
+// PROFILE UI UPDATE
+// ======================================
 function refreshProfileUI() {
   const user = getCurrentUser();
 
@@ -252,7 +225,6 @@ function refreshProfileUI() {
   const unfollowBtn = document.getElementById("btn-unfollow");
 
   if (!user) {
-    // not logged in
     profileName.textContent = "Your Name";
     profileHandle.textContent = "@username";
     profileBio.textContent = "Add a short bio to introduce yourself.";
@@ -266,7 +238,6 @@ function refreshProfileUI() {
     return;
   }
 
-  // logged-in user
   profileName.textContent = user.username;
   profileHandle.textContent = "@" + user.username.toLowerCase();
   profileBio.textContent = user.bio || "Add a short bio to introduce yourself.";
@@ -278,56 +249,34 @@ function refreshProfileUI() {
   followBtn.style.display = "none";
   unfollowBtn.style.display = "none";
 }
-
-
-// Initialize profile UI on load
 refreshProfileUI();
-// ======================================
-// PART 3 — PROFILE EDITING (PHOTO, BANNER, BIO)
-// ======================================
 
+// ======================================
+// PROFILE EDITING
+// ======================================
 const editProfileBtn = document.getElementById("btn-edit-profile");
 const bioEditWrap = document.getElementById("bio-edit-wrap");
 const bioCancelBtn = document.getElementById("bio-cancel");
+
 const profileNameInput = document.getElementById("profileNameInput");
 const profileBioInput = document.getElementById("profileBioInput");
 const profilePhotoInput = document.getElementById("profilePhotoInput");
 const profileBannerInput = document.getElementById("profileBannerInput");
 const saveProfileBtn = document.getElementById("btnSaveProfile");
 
-const profilePhotoView = document.getElementById("profile-photo");
-const profileBannerView = document.getElementById("profileBanner");
-
-
-// --------------------------------------
-// OPEN PROFILE EDITOR
-// --------------------------------------
 editProfileBtn?.addEventListener("click", () => {
   const user = getCurrentUser();
-  if (!user) {
-    alert("You must be logged in.");
-    return;
-  }
+  if (!user) return alert("You must be logged in.");
 
-  // Fill form with existing data
   profileNameInput.value = user.username;
   profileBioInput.value = user.bio || "";
-
   bioEditWrap.style.display = "block";
 });
 
-
-// --------------------------------------
-// CANCEL EDIT
-// --------------------------------------
 bioCancelBtn?.addEventListener("click", () => {
   bioEditWrap.style.display = "none";
 });
 
-
-// --------------------------------------
-// SAVE PROFILE CHANGES
-// --------------------------------------
 saveProfileBtn?.addEventListener("click", async () => {
   let user = getCurrentUser();
   if (!user) return alert("Not logged in.");
@@ -337,52 +286,25 @@ saveProfileBtn?.addEventListener("click", async () => {
 
   if (!newName) return alert("Name cannot be empty.");
 
-  // Update name + bio
   user.username = newName;
   user.bio = newBio;
 
-  // Save profile photo
   if (profilePhotoInput.files.length > 0) {
-    const file = profilePhotoInput.files[0];
-    user.photo = await readFileAsDataURL(file);
+    user.photo = await readFileAsDataURL(profilePhotoInput.files[0]);
   }
 
-  // Save banner
   if (profileBannerInput.files.length > 0) {
-    const file = profileBannerInput.files[0];
-    user.banner = await readFileAsDataURL(file);
+    user.banner = await readFileAsDataURL(profileBannerInput.files[0]);
   }
 
-  // Save back to users list
   users = users.map(u => u.email === user.email ? user : u);
   saveData("intakee-users", users);
 
-  // Update current session
   refreshProfileUI();
+  refreshLoginButton();
 
   alert("Profile updated!");
   bioEditWrap.style.display = "none";
-});
-
-
-// --------------------------------------
-// PROFILE SUB-TABS (Uploads / Saved / Likes / Playlists)
-// --------------------------------------
-
-const profileTabs = document.querySelectorAll(".profile-tabs .pill");
-
-profileTabs.forEach(tab => {
-  tab.addEventListener("click", () => {
-    const selected = tab.getAttribute("data-profile-tab");
-
-    profileTabs.forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-
-    document.getElementById("profile-grid").style.display = selected === "uploads" ? "flex" : "none";
-    document.getElementById("profile-saved").style.display = selected === "saved" ? "flex" : "none";
-    document.getElementById("profile-likes").style.display = selected === "likes" ? "flex" : "none";
-    document.getElementById("profile-playlists").style.display = selected === "playlists" ? "flex" : "none";
-  });
 });
 // ======================================
 // PART 4 — UPLOAD SYSTEM + CONTENT FEEDS
@@ -390,7 +312,7 @@ profileTabs.forEach(tab => {
 
 let posts = loadData("intakee-posts", []);
 
-// Inputs
+// Upload inputs
 const uploadTypeSelect = document.getElementById("uploadTypeSelect");
 const uploadTitleInput = document.getElementById("uploadTitleInput");
 const uploadDescInput = document.getElementById("uploadDescInput");
@@ -398,10 +320,9 @@ const uploadThumbInput = document.getElementById("uploadThumbInput");
 const uploadFileInput = document.getElementById("uploadFileInput");
 const uploadBtn = document.getElementById("btnUpload");
 
-
-// =====================================================
-// UPLOAD BUTTON HANDLER
-// =====================================================
+// --------------------------------------
+// UPLOAD HANDLER
+// --------------------------------------
 uploadBtn?.addEventListener("click", async () => {
   const user = getCurrentUser();
   if (!user) {
@@ -428,7 +349,7 @@ uploadBtn?.addEventListener("click", async () => {
     id: Date.now(),
     user: user.email,
     username: user.username,
-    type,                // video, clip, podcast-audio, podcast-video
+    type,
     title,
     desc,
     fileData,
@@ -447,7 +368,6 @@ uploadBtn?.addEventListener("click", async () => {
 
   alert("Upload complete!");
 
-  // Reset form
   uploadTitleInput.value = "";
   uploadDescInput.value = "";
   uploadThumbInput.value = "";
@@ -457,25 +377,23 @@ uploadBtn?.addEventListener("click", async () => {
   refreshProfileUploads();
 });
 
-
-// =====================================================
+// ======================================
 // FEED RENDERING
-// =====================================================
+// ======================================
 const homeFeed = document.getElementById("home-feed");
 const videosFeed = document.getElementById("videos-feed");
 const podcastFeed = document.getElementById("podcast-feed");
 const clipsFeed = document.getElementById("clips-feed");
 
+// Create card
 function createPostCard(post) {
   const div = document.createElement("div");
   div.className = "card";
 
   div.innerHTML = `
     <img src="${post.thumbData}" style="width:100%; border-radius:12px; margin-bottom:10px;">
-
     <h3>${post.title}</h3>
     <p class="muted">${post.username}</p>
-
     <button class="play-btn" data-id="${post.id}" style="
       width:100%; padding:10px; margin-top:10px;
       background:#222; color:white; border:none; border-radius:8px;">
@@ -483,7 +401,6 @@ function createPostCard(post) {
     </button>
   `;
 
-  // Play button event
   div.querySelector(".play-btn").addEventListener("click", () => {
     openViewer(post);
   });
@@ -491,10 +408,7 @@ function createPostCard(post) {
   return div;
 }
 
-
-// =====================================================
-// REFRESH ALL FEEDS
-// =====================================================
+// Refresh feeds
 function refreshFeeds() {
   homeFeed.innerHTML = "";
   videosFeed.innerHTML = "";
@@ -502,32 +416,24 @@ function refreshFeeds() {
   clipsFeed.innerHTML = "";
 
   posts.forEach(post => {
-    const card = createPostCard(post);
+    homeFeed.appendChild(createPostCard(post));
 
-    // Home feed → ALL content
-    homeFeed.appendChild(card.cloneNode(true));
-
-    // Videos feed
     if (post.type === "video") videosFeed.appendChild(createPostCard(post));
-
-    // Podcast feed
-    if (post.type === "podcast-audio" || post.type === "podcast-video")
-      podcastFeed.appendChild(createPostCard(post));
-
-    // Clips feed
     if (post.type === "clip") clipsFeed.appendChild(createPostCard(post));
+    if (post.type.includes("podcast")) podcastFeed.appendChild(createPostCard(post));
   });
 }
 
+refreshFeeds();
 
-// =====================================================
-// PROFILE — SHOW USER'S OWN UPLOADS
-// =====================================================
+// ======================================
+// PROFILE — UPLOADS
+// ======================================
 function refreshProfileUploads() {
+  const user = getCurrentUser();
   const profileGrid = document.getElementById("profile-grid");
   const emptyMsg = document.getElementById("profile-empty");
 
-  const user = getCurrentUser();
   if (!user) {
     profileGrid.innerHTML = "";
     emptyMsg.style.display = "block";
@@ -545,22 +451,16 @@ function refreshProfileUploads() {
   emptyMsg.style.display = "none";
   profileGrid.innerHTML = "";
 
-  userPosts.forEach(post => {
-    const card = createPostCard(post);
-    profileGrid.appendChild(card);
-  });
+  userPosts.forEach(post => profileGrid.appendChild(createPostCard(post)));
 }
 
-
-// Run feeds on load
-refreshFeeds();
 refreshProfileUploads();
-// ======================================
-// PART 5 — MEDIA VIEWER + LIKE/SAVE
-// ======================================
 
-// Viewer elements
+// ======================================
+// PART 5 — VIEWER (PLAY VIDEO / AUDIO)
+// ======================================
 let viewerOverlay;
+
 function createViewer() {
   viewerOverlay = document.createElement("div");
   viewerOverlay.id = "viewer-overlay";
@@ -578,10 +478,6 @@ function createViewer() {
   document.body.appendChild(viewerOverlay);
 }
 
-
-// ---------------------------------------------------
-// OPEN VIEWER FOR ANY POST
-// ---------------------------------------------------
 function openViewer(post) {
   if (!viewerOverlay) createViewer();
 
@@ -596,21 +492,16 @@ function openViewer(post) {
     <div id="viewer-media" style="margin-top:15px;"></div>
 
     <div style="margin-top:20px;">
-      <button id="like-btn" style="padding:10px; margin-right:10px; background:#222; color:white; border:none; border-radius:8px;">
-        👍 Like (${post.likes})
-      </button>
-      <button id="dislike-btn" style="padding:10px; margin-right:10px; background:#222; color:white; border:none; border-radius:8px;">
-        👎 Dislike (${post.dislikes})
-      </button>
-      <button id="save-btn" style="padding:10px; background:#333; color:white; border:none; border-radius:8px;">
-        ⭐ Save
-      </button>
+      <button id="like-btn" class="viewer-btn">👍 Like (${post.likes})</button>
+      <button id="dislike-btn" class="viewer-btn">👎 Dislike (${post.dislikes})</button>
+      <button id="save-btn" class="viewer-btn">⭐ Save</button>
     </div>
 
     <p style="margin-top:20px;">${post.desc || ""}</p>
   `;
 
   showMedia(post);
+
   viewerOverlay.style.display = "block";
 
   document.getElementById("viewer-close").onclick = () => {
@@ -621,75 +512,27 @@ function openViewer(post) {
   setupSaveSystem(post);
 }
 
-
-// ---------------------------------------------------
-// SHOW MEDIA (VIDEO / AUDIO / PODCAST)
-// ---------------------------------------------------
+// Render media type
 function showMedia(post) {
-  const mediaBox = document.getElementById("viewer-media");
+  const box = document.getElementById("viewer-media");
 
-  // VIDEO or CLIP
   if (post.type === "video" || post.type === "clip" || post.type === "podcast-video") {
-    mediaBox.innerHTML = `
+    box.innerHTML = `
       <video controls style="width:100%; border-radius:12px;">
         <source src="${post.fileData}">
       </video>
     `;
-  }
-
-  // AUDIO PODCAST → USE MINI PLAYER
-  else if (post.type === "podcast-audio") {
-    mediaBox.innerHTML = `
-      <div style="padding:20px; background:#111; border-radius:12px; text-align:center;">
-        <p>Audio Podcast</p>
-        <button id="play-audio" style="
-          padding:12px 20px; background:#333; color:white;
-          border:none; border-radius:8px;
-        ">▶ Play Audio</button>
-      </div>
+  } else if (post.type === "podcast-audio") {
+    box.innerHTML = `
+      <audio controls style="width:100%">
+        <source src="${post.fileData}">
+      </audio>
     `;
-
-    document.getElementById("play-audio").onclick = () => {
-      startMiniPlayer(post);
-    };
   }
 }
 
-
 // ======================================
-// MINI PLAYER FOR AUDIO PODCASTS
-// ======================================
-const miniPlayer = document.getElementById("mini-player");
-const miniAudio = document.getElementById("mp-audio");
-const miniPlayBtn = document.getElementById("mp-play");
-const miniCloseBtn = document.getElementById("mp-close");
-
-function startMiniPlayer(post) {
-  miniAudio.src = post.fileData;
-  miniPlayer.hidden = false;
-  miniAudio.play();
-
-  miniPlayBtn.innerHTML = '<i class="fa fa-pause"></i>';
-
-  miniPlayBtn.onclick = () => {
-    if (miniAudio.paused) {
-      miniAudio.play();
-      miniPlayBtn.innerHTML = '<i class="fa fa-pause"></i>';
-    } else {
-      miniAudio.pause();
-      miniPlayBtn.innerHTML = '<i class="fa fa-play"></i>';
-    }
-  };
-
-  miniCloseBtn.onclick = () => {
-    miniPlayer.hidden = true;
-    miniAudio.pause();
-  };
-}
-
-
-// ======================================
-// LIKE + DISLIKE SYSTEM
+// LIKE / DISLIKE SYSTEM
 // ======================================
 function setupLikeSystem(post) {
   const likeBtn = document.getElementById("like-btn");
@@ -698,19 +541,18 @@ function setupLikeSystem(post) {
   likeBtn.onclick = () => {
     post.likes++;
     saveData("intakee-posts", posts);
-    likeBtn.innerHTML = `👍 Like (${post.likes})`;
+    likeBtn.textContent = `👍 Like (${post.likes})`;
   };
 
   dislikeBtn.onclick = () => {
     post.dislikes++;
     saveData("intakee-posts", posts);
-    dislikeBtn.innerHTML = `👎 Dislike (${post.dislikes})`;
+    dislikeBtn.textContent = `👎 Dislike (${post.dislikes})`;
   };
 }
 
-
 // ======================================
-// SAVE SYSTEM (FOR PROFILE → SAVED TAB)
+// SAVE SYSTEM
 // ======================================
 function setupSaveSystem(post) {
   const saveBtn = document.getElementById("save-btn");
@@ -722,28 +564,24 @@ function setupSaveSystem(post) {
   }
 
   saveBtn.onclick = () => {
-    if (!user.saved.includes(post.id)) {
-      user.saved.push(post.id);
-    }
+    if (!user.saved.includes(post.id)) user.saved.push(post.id);
 
     users = users.map(u => u.email === user.email ? user : u);
     saveData("intakee-users", users);
 
-    saveBtn.innerHTML = "⭐ Saved!";
+    saveBtn.textContent = "⭐ Saved!";
   };
 }
 // ======================================
 // PART 6 — SAVED POSTS + LIKED POSTS + STATS
 // ======================================
 
-// Elements
 const savedGrid = document.getElementById("profile-saved");
 const likedGrid = document.getElementById("profile-likes");
 
-
-// =====================================================
+// -----------------------
 // REFRESH SAVED POSTS
-// =====================================================
+// -----------------------
 function refreshSavedPosts() {
   const user = getCurrentUser();
   if (!user) {
@@ -759,16 +597,12 @@ function refreshSavedPosts() {
     return;
   }
 
-  savedPosts.forEach(post => {
-    const card = createPostCard(post);
-    savedGrid.appendChild(card);
-  });
+  savedPosts.forEach(post => savedGrid.appendChild(createPostCard(post)));
 }
 
-
-// =====================================================
+// -----------------------
 // REFRESH LIKED POSTS
-// =====================================================
+// -----------------------
 function refreshLikedPosts() {
   const user = getCurrentUser();
   if (!user) {
@@ -784,16 +618,12 @@ function refreshLikedPosts() {
     return;
   }
 
-  likedPosts.forEach(post => {
-    const card = createPostCard(post);
-    likedGrid.appendChild(card);
-  });
+  likedPosts.forEach(post => likedGrid.appendChild(createPostCard(post)));
 }
 
-
-// =====================================================
-// UPDATE PROFILE STATS
-// =====================================================
+// -----------------------
+// PROFILE STATS
+// -----------------------
 function refreshProfileStats() {
   const user = getCurrentUser();
   if (!user) {
@@ -804,23 +634,19 @@ function refreshProfileStats() {
     return;
   }
 
-  // Posts count
   const userPosts = posts.filter(p => p.user === user.email);
   document.getElementById("stat-posts").textContent = userPosts.length;
 
-  // Followers & following → will update when follow system is implemented
   document.getElementById("stat-followers").textContent = user.followers?.length || 0;
   document.getElementById("stat-following").textContent = user.following?.length || 0;
 
-  // Total likes received
   const totalLikes = userPosts.reduce((sum, p) => sum + p.likes, 0);
   document.getElementById("stat-likes").textContent = totalLikes;
 }
 
-
-// =====================================================
-// UPDATE EVERYTHING IN PROFILE PAGE
-// =====================================================
+// -----------------------
+// REFRESH ALL PROFILE SECTIONS
+// -----------------------
 function refreshAllProfileSections() {
   refreshProfileUploads();
   refreshSavedPosts();
@@ -829,51 +655,6 @@ function refreshAllProfileSections() {
 }
 
 
-// =====================================================
-// LIKE LISTENER — ADD POST TO USER'S LIKED LIST
-// (Modify Part 5's like system to support "Likes Tab")
-// =====================================================
-function addToLikedPosts(postId) {
-  const user = getCurrentUser();
-  if (!user) return;
-
-  if (!user.likes.includes(postId)) {
-    user.likes.push(postId);
-  }
-
-  users = users.map(u => u.email === user.email ? user : u);
-  saveData("intakee-users", users);
-
-  refreshLikedPosts();
-  refreshProfileStats();
-}
-
-// Override like system to also save liked post
-const oldSetupLike = setupLikeSystem;
-setupLikeSystem = function(post) {
-  const likeBtn = document.getElementById("like-btn");
-  const dislikeBtn = document.getElementById("dislike-btn");
-
-  likeBtn.onclick = () => {
-    post.likes++;
-    saveData("intakee-posts", posts);
-    likeBtn.innerHTML = `👍 Like (${post.likes})`;
-
-    addToLikedPosts(post.id);
-  };
-
-  dislikeBtn.onclick = () => {
-    post.dislikes++;
-    saveData("intakee-posts", posts);
-    dislikeBtn.innerHTML = `👎 Dislike (${post.dislikes})`;
-  };
-};
-
-
-// Run profile feeds on load
-refreshSavedPosts();
-refreshLikedPosts();
-refreshProfileStats();
 // ======================================
 // PART 7 — SETTINGS SYSTEM
 // ======================================
@@ -890,10 +671,7 @@ const toggleNotifyFollow = document.getElementById("toggle-notify-follow");
 const toggleNotifyLikes = document.getElementById("toggle-notify-likes");
 const toggleNotifyComments = document.getElementById("toggle-notify-comments");
 
-
-// ==========================
-// LOAD USER SETTINGS
-// ==========================
+// Load settings
 function loadUserSettings() {
   const user = getCurrentUser();
   if (!user) return;
@@ -911,7 +689,6 @@ function loadUserSettings() {
     notifyComments: true
   };
 
-  // Apply to toggles
   togglePrivate.checked = user.settings.private;
   toggleShowUploads.checked = user.settings.showUploads;
   toggleShowSaved.checked = user.settings.showSaved;
@@ -925,10 +702,7 @@ function loadUserSettings() {
   toggleNotifyComments.checked = user.settings.notifyComments;
 }
 
-
-// ==========================
-// SAVE SETTINGS
-// ==========================
+// Save settings
 function saveUserSettings() {
   const user = getCurrentUser();
   if (!user) return;
@@ -939,7 +713,6 @@ function saveUserSettings() {
     showSaved: toggleShowSaved.checked,
     restricted: toggleRestricted.checked,
     ageWarning: toggleAgeWarning.checked,
-
     notifyPush: toggleNotifyPush.checked,
     notifyEmail: toggleNotifyEmail.checked,
     notifyFollow: toggleNotifyFollow.checked,
@@ -951,10 +724,7 @@ function saveUserSettings() {
   saveData("intakee-users", users);
 }
 
-
-// ==========================
-// LISTENERS FOR EACH TOGGLE
-// ==========================
+// Add listeners
 [
   togglePrivate,
   toggleShowUploads,
@@ -967,216 +737,93 @@ function saveUserSettings() {
   toggleNotifyLikes,
   toggleNotifyComments
 ].forEach(toggle => {
-  toggle?.addEventListener("change", () => {
-    saveUserSettings();
-  });
+  toggle?.addEventListener("change", saveUserSettings);
 });
 
 
-// ==========================
-// INITIALIZE ON LOAD
-// ==========================
-loadUserSettings();
 // ======================================
-// PART 8 — FINAL POLISHING + ACCORDIONS
+// SETTINGS: BLOCKED USERS & REPORT PREVIEW
 // ======================================
-
-
-// ==========================
-// SETTINGS ACCORDIONS
-// ==========================
-const accordions = document.querySelectorAll(".accordion");
-
-accordions.forEach(acc => {
-  const header = acc.querySelector(".accordion-header");
-  const body = acc.querySelector(".accordion-body");
-
-  header.addEventListener("click", () => {
-    const isOpen = body.style.display === "block";
-    body.style.display = isOpen ? "none" : "block";
-    header.querySelector("span:last-child").textContent = isOpen ? "▼" : "▲";
-  });
-});
-
-
-// ==========================
-// BLOCKED USERS SYSTEM (PRE-FIREBASE)
-// ==========================
-let blockedUsers = loadData("intakee-blocked", []);
-
 document.getElementById("openBlockedUsers")?.addEventListener("click", () => {
-  alert(
-    "Blocked Users Feature (Preview)\n\n" +
-    "In the live Firebase version, you will be able to:\n" +
-    "- Block a user\n" +
-    "- Unblock a user\n" +
-    "- Prevent users from seeing your posts\n" +
-    "- Hide all content from blocked users\n\n" +
-    "This is a placeholder until Firebase is connected."
-  );
+  alert("Blocked Users feature activates when Firebase is added.");
 });
 
-
-// ==========================
-// REPORT CONTENT SYSTEM (PREVIEW)
-// ==========================
 document.getElementById("openReportModal")?.addEventListener("click", () => {
-  alert(
-    "Report System (Preview)\n\n" +
-    "Users will be able to report posts.\n" +
-    "Reports will be reviewed and action will be taken.\n" +
-    "This demo version unlocks once Firebase moderation is added."
-  );
-});
-
-
-// ==========================
-// FORGOT USERNAME / PASSWORD (PREVIEW)
-// ==========================
-document.getElementById("settings-forgot-username")?.addEventListener("click", () => {
-  alert("Forgot Username feature will be activated when Firebase login is implemented.");
+  alert("Report system activates when Firebase moderation is added.");
 });
 
 document.getElementById("settings-forgot-password")?.addEventListener("click", () => {
   alert("Password reset email will work when Firebase Auth is connected.");
 });
 
+document.getElementById("settings-forgot-username")?.addEventListener("click", () => {
+  alert("Username recovery will work when Firebase is connected.");
+});
+
 
 // ======================================
-// FINAL INITIALIZATION
-// Run all refresh functions so the app is ready on load
-// ======================================
-
-function initializeApp() {
-  refreshFeeds();
-  refreshProfileUI();
-  refreshAllProfileSections();
-  loadUserSettings();
-}
-
-initializeApp();
-
-console.log("%cINTAKEE FRONTEND READY", "color: #0f0; font-size: 16px; font-weight: bold;");
-// ======================================
-// PART 9 — LEGAL TEXT INJECTION
+// PART 8 — LEGAL TEXT (FULL PROTECTION)
 // ======================================
 
 const legalTexts = {
   privacy: `
 <h3>Privacy Policy</h3>
 <p>
-INTAKEE respects your privacy. We collect only the information needed to operate the platform, 
-including account details you provide (email, username, content uploads). We do not sell or 
-share your data with third parties except as required by law.
-</p>
-<p>
-Creators are responsible for the content they upload. INTAKEE is not liable for any user-generated 
-content, including videos, podcasts, clips, comments, messages, or uploads. By using INTAKEE, 
-you agree to allow us to store your content for platform functionality.
-</p>
-<p>
-You may request account deletion at any time, which will remove your stored data from our systems.
+INTAKEE respects your privacy. We only collect information required to operate the platform.
+We do NOT sell user data. Users are fully responsible for the content they upload.
+INTAKEE is not liable for user-generated content.
 </p>
 `,
 
   terms: `
 <h3>Terms of Service</h3>
 <p>
-By using INTAKEE, you agree that all content you upload is your responsibility. INTAKEE does not 
-review, approve, or verify user-generated content. We provide a platform for creators, but legal 
-liability for posted material lies solely with the creator who uploads it.
-</p>
-<p>
-You may not upload nudity, pornography, graphic sexual content, or content that violates any laws. 
-We reserve the right to remove content or suspend accounts that violate these standards.
-</p>
-<p>
-INTAKEE is not responsible for damages, losses, or disputes arising from user content, interactions, 
-or platform usage.
+By using INTAKEE, you accept full responsibility for any content you upload.
+INTAKEE does not review or verify user uploads, and legal liability remains with the creator.
 </p>
 `,
 
   guidelines: `
 <h3>Community Guidelines</h3>
-<p>
-INTAKEE promotes free expression but maintains boundaries to ensure user safety. The following 
-content is not allowed:
-</p>
-<ul>
-  <li>Nudity or pornographic material</li>
-  <li>Graphic violence or extreme gore</li>
-  <li>Harassment, hate speech, or targeted abuse</li>
-  <li>Copyright-infringing content</li>
-  <li>Posting private or confidential information</li>
-</ul>
-<p>
-Creators are fully responsible for what they upload. Repeated violations may lead to content removal 
-or account restriction.
-</p>
+<p>No nudity, pornographic content, copyright violations, harassment, or illegal activity.</p>
+<p>Creators are responsible for everything they upload.</p>
 `,
 
   dmca: `
 <h3>Copyright / DMCA</h3>
-<p>
-INTAKEE honors copyright law. If you believe your copyrighted material has been posted without 
-authorization, you may submit a DMCA takedown request. We will remove infringing content as required.
-</p>
-<p>
-Users who repeatedly upload copyrighted content without permission may have their accounts restricted 
-or removed.
-</p>
+<p>Copyright holders may request removal of infringing content. INTAKEE complies with legal DMCA requests.</p>
 `,
 
   liability: `
 <h3>Liability Disclaimer</h3>
 <p>
-INTAKEE provides a platform for user-generated content and does not control or endorse material posted 
-by users. All responsibility for uploaded content lies solely with the creator.
-</p>
-<p>
-INTAKEE is not liable for damages, losses, misinformation, or harm arising from use of the platform 
-or from viewing or interacting with user content.
+INTAKEE is not responsible for damages, misinformation, or harm resulting from user-generated content.
+All responsibility belongs to the user who uploads it.
 </p>
 `,
 
   safety: `
 <h3>Safety Policy</h3>
-<p>
-We aim to create a safe and respectful environment. Content promoting self-harm, terrorism, 
-criminal activity, or exploitation of minors is strictly prohibited.
-</p>
-<p>
-Age-sensitive content may include warnings, and some features may be restricted for minors.
-</p>
+<p>We prohibit harmful content, exploitation of minors, terrorism, and self-harm encouragement.</p>
 `,
 
   ownership: `
 <h3>Content Ownership & Responsibility</h3>
 <p>
-Creators retain ownership of the content they upload. However, by uploading, you grant INTAKEE a 
-license to display, distribute, and store your content for platform functionality.
-</p>
-<p>
-Creators bear full legal responsibility for anything they upload, including defamation, copyright 
-issues, misinformation, or illegal material.
+Creators retain ownership but grant INTAKEE permission to display their content.
+Creators accept full legal responsibility for anything they upload.
 </p>
 `,
 
   enforcement: `
 <h3>Reporting & Enforcement</h3>
 <p>
-Users may report content that violates laws or platform rules. INTAKEE will review reports but does 
-not guarantee content removal unless legally required.
-</p>
-<p>
-We reserve the right to remove content, restrict features, or suspend accounts that violate our 
-policies or pose safety risks.
+Users may report content. INTAKEE will review reports but does not guarantee removal unless required by law.
 </p>
 `
 };
 
-
-// Insert legal text into accordion bodies
+// Inject legal text
 function loadLegalText() {
   document.getElementById("legal-privacy").innerHTML = legalTexts.privacy;
   document.getElementById("legal-terms").innerHTML = legalTexts.terms;
@@ -1188,5 +835,19 @@ function loadLegalText() {
   document.getElementById("legal-enforcement").innerHTML = legalTexts.enforcement;
 }
 
-// Load legal content
-loadLegalText();
+
+// ======================================
+// FINAL INITIALIZATION
+// ======================================
+function initializeApp() {
+  refreshFeeds();
+  refreshProfileUI();
+  refreshAllProfileSections();
+  refreshLoginButton();
+  loadUserSettings();
+  loadLegalText();
+}
+
+initializeApp();
+
+console.log("%cINTAKEE READY — ALL SYSTEMS ACTIVE", "color:#0f0; font-size:16px;");
