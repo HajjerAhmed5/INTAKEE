@@ -284,7 +284,13 @@
 </dialog>
 
 <!-- FIXED SCRIPT TAG — THE IMPORTANT PART -->
-<script src="script.js"></script>
+<!-- Load Firebase first -->
+<script type="module" src="js/firebase-config.js"></script>
+<script type="module" src="js/firebase-init.js"></script>
 
+<!-- Then load your app -->
+<script src="js/script.js"></script>
+
+ 
 </body>
 </html>
