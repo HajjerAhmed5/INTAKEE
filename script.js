@@ -183,6 +183,8 @@ loginBtn?.addEventListener("click", () => {
   authDialog.close();
 
   refreshProfileUI();
+  refreshLoginButton();
+
 });
 
 
