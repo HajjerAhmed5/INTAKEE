@@ -365,16 +365,17 @@ uploadBtn?.addEventListener("click", async () => {
   user.posts.push(newPost.id);
   users = users.map(u => u.email === user.email ? user : u);
   saveData("intakee-users", users);
-
   alert("Upload complete!");
 
-  uploadTitleInput.value = "";
-  uploadDescInput.value = "";
-  uploadThumbInput.value = "";
-  uploadFileInput.value = "";
+// Reset form safely
+uploadTitleInput.value = "";
+uploadDescInput.value = "";
+uploadThumbInput.value = null;
+uploadFileInput.value = null;
 
-  refreshFeeds();
-  refreshProfileUploads();
+refreshFeeds();
+refreshProfileUploads();
+  
 });
 
 // ======================================
@@ -851,3 +852,46 @@ function initializeApp() {
 initializeApp();
 
 console.log("%cINTAKEE READY — ALL SYSTEMS ACTIVE", "color:#0f0; font-size:16px;");
+// ======================================
+// SEARCH SYSTEM
+// ======================================
+const searchInput = document.getElementById("globalSearch");
+
+searchInput?.addEventListener("input", () => {
+  const q = searchInput.value.toLowerCase().trim();
+  filterSearchResults(q);
+});
+
+function filterSearchResults(query) {
+  if (!query) {
+    refreshFeeds();
+    return;
+  }
+
+  homeFeed.innerHTML = "";
+  videosFeed.innerHTML = "";
+  podcastFeed.innerHTML = "";
+  clipsFeed.innerHTML = "";
+
+  const results = posts.filter(p =>
+    p.title.toLowerCase().includes(query) ||
+    p.username.toLowerCase().includes(query)
+  );
+
+  results.forEach(post => {
+    const card = createPostCard(post);
+
+    // Home
+    homeFeed.appendChild(card.cloneNode(true));
+
+    // Videos
+    if (post.type === "video") videosFeed.appendChild(createPostCard(post));
+
+    // Podcast
+    if (post.type.includes("podcast"))
+      podcastFeed.appendChild(createPostCard(post));
+
+    // Clips
+    if (post.type === "clip") clipsFeed.appendChild(createPostCard(post));
+  });
+}
