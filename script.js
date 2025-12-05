@@ -1055,3 +1055,136 @@ function initializeApp() {
 initializeApp();
 
 console.log("%cINTAKEE FRONTEND READY", "color: #0f0; font-size: 16px; font-weight: bold;");
+// ======================================
+// PART 9 — LEGAL TEXT INJECTION
+// ======================================
+
+const legalTexts = {
+  privacy: `
+<h3>Privacy Policy</h3>
+<p>
+INTAKEE respects your privacy. We collect only the information needed to operate the platform, 
+including account details you provide (email, username, content uploads). We do not sell or 
+share your data with third parties except as required by law.
+</p>
+<p>
+Creators are responsible for the content they upload. INTAKEE is not liable for any user-generated 
+content, including videos, podcasts, clips, comments, messages, or uploads. By using INTAKEE, 
+you agree to allow us to store your content for platform functionality.
+</p>
+<p>
+You may request account deletion at any time, which will remove your stored data from our systems.
+</p>
+`,
+
+  terms: `
+<h3>Terms of Service</h3>
+<p>
+By using INTAKEE, you agree that all content you upload is your responsibility. INTAKEE does not 
+review, approve, or verify user-generated content. We provide a platform for creators, but legal 
+liability for posted material lies solely with the creator who uploads it.
+</p>
+<p>
+You may not upload nudity, pornography, graphic sexual content, or content that violates any laws. 
+We reserve the right to remove content or suspend accounts that violate these standards.
+</p>
+<p>
+INTAKEE is not responsible for damages, losses, or disputes arising from user content, interactions, 
+or platform usage.
+</p>
+`,
+
+  guidelines: `
+<h3>Community Guidelines</h3>
+<p>
+INTAKEE promotes free expression but maintains boundaries to ensure user safety. The following 
+content is not allowed:
+</p>
+<ul>
+  <li>Nudity or pornographic material</li>
+  <li>Graphic violence or extreme gore</li>
+  <li>Harassment, hate speech, or targeted abuse</li>
+  <li>Copyright-infringing content</li>
+  <li>Posting private or confidential information</li>
+</ul>
+<p>
+Creators are fully responsible for what they upload. Repeated violations may lead to content removal 
+or account restriction.
+</p>
+`,
+
+  dmca: `
+<h3>Copyright / DMCA</h3>
+<p>
+INTAKEE honors copyright law. If you believe your copyrighted material has been posted without 
+authorization, you may submit a DMCA takedown request. We will remove infringing content as required.
+</p>
+<p>
+Users who repeatedly upload copyrighted content without permission may have their accounts restricted 
+or removed.
+</p>
+`,
+
+  liability: `
+<h3>Liability Disclaimer</h3>
+<p>
+INTAKEE provides a platform for user-generated content and does not control or endorse material posted 
+by users. All responsibility for uploaded content lies solely with the creator.
+</p>
+<p>
+INTAKEE is not liable for damages, losses, misinformation, or harm arising from use of the platform 
+or from viewing or interacting with user content.
+</p>
+`,
+
+  safety: `
+<h3>Safety Policy</h3>
+<p>
+We aim to create a safe and respectful environment. Content promoting self-harm, terrorism, 
+criminal activity, or exploitation of minors is strictly prohibited.
+</p>
+<p>
+Age-sensitive content may include warnings, and some features may be restricted for minors.
+</p>
+`,
+
+  ownership: `
+<h3>Content Ownership & Responsibility</h3>
+<p>
+Creators retain ownership of the content they upload. However, by uploading, you grant INTAKEE a 
+license to display, distribute, and store your content for platform functionality.
+</p>
+<p>
+Creators bear full legal responsibility for anything they upload, including defamation, copyright 
+issues, misinformation, or illegal material.
+</p>
+`,
+
+  enforcement: `
+<h3>Reporting & Enforcement</h3>
+<p>
+Users may report content that violates laws or platform rules. INTAKEE will review reports but does 
+not guarantee content removal unless legally required.
+</p>
+<p>
+We reserve the right to remove content, restrict features, or suspend accounts that violate our 
+policies or pose safety risks.
+</p>
+`
+};
+
+
+// Insert legal text into accordion bodies
+function loadLegalText() {
+  document.getElementById("legal-privacy").innerHTML = legalTexts.privacy;
+  document.getElementById("legal-terms").innerHTML = legalTexts.terms;
+  document.getElementById("legal-guidelines").innerHTML = legalTexts.guidelines;
+  document.getElementById("legal-dmca").innerHTML = legalTexts.dmca;
+  document.getElementById("legal-liability").innerHTML = legalTexts.liability;
+  document.getElementById("legal-safety").innerHTML = legalTexts.safety;
+  document.getElementById("legal-ownership").innerHTML = legalTexts.ownership;
+  document.getElementById("legal-enforcement").innerHTML = legalTexts.enforcement;
+}
+
+// Load legal content
+loadLegalText();
