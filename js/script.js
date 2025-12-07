@@ -533,3 +533,4 @@ async function saveUserSettings() {
 // (Your HTML already handles this)
 
 console.log("%cINTAKEE FIREBASE VERSION READY", "color:#0f0; font-size:16px;");
+
