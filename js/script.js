@@ -109,11 +109,11 @@ openAuthBtn.addEventListener("click", () => {
 // =================================================================
 // SIGN UP
 // =================================================================
-$("signupBtn").addEventListener("click", async () => {
-  const email = $("signupEmail").value.trim();
-  const password = $("signupPassword").value.trim();
-  const username = $("signupUsername").value.trim();
-  const ageOK = $("signupAgeConfirm").checked;
+  document.getElementById("signupBtn").addEventListener("click", async () => {
+  const email = document.getElementById("signupEmail").value.trim();
+  const password = document.getElementById("signupPassword").value.trim();
+  const username = document.getElementById("signupUsername").value.trim();
+  const ageOK = document.getElementById("signupAgeConfirm").checked;
 
   if (!email || !password || !username) return alert("Fill all fields");
   if (password.length < 6) return alert("Password too short");
@@ -122,7 +122,6 @@ $("signupBtn").addEventListener("click", async () => {
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-    // Create Firestore User document
     await setDoc(doc(db, "users", cred.user.uid), {
       username,
       bio: "Add a short bio to introduce yourself.",
