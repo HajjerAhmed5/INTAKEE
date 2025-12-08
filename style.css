@@ -1,18 +1,22 @@
 /* ===========================
-   INTAKEE — Global Styles
-   Clean, premium dark UI
+   INTAKEE — Global Styles (Corrected & Enhanced)
    =========================== */
 
 :root {
   --bg: #000;
-  --panel: #0d0d0d;
-  --panel-2: #121212;
+  --panel: #121212; 
+  --panel-2: #0d0d0d;
   --border: #1a1a1a;
   --text: #fff;
   --muted: #b7b7b7;
   --radius: 14px;
   --radius-lg: 20px;
   --shadow: 0 8px 28px rgba(0,0,0,.55);
+  
+  /* ACCENT COLORS */
+  --accent-red: #e30000; /* For primary buttons, etc. */
+  --accent-green: #4caf50; /* For active toggles */
+  --primary-button: var(--accent-red);
 }
 
 * { box-sizing: border-box; }
@@ -22,6 +26,7 @@ body {
   font-family: system-ui, -apple-system, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
+  min-height: 100vh;
 }
 
 /* Smooth fade-in */
@@ -35,7 +40,7 @@ header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: #0b0b0b;
+  background: var(--panel-2);
   padding: 12px 16px;
   display: flex;
   align-items: center;
@@ -43,7 +48,7 @@ header {
 }
 
 header img {
-  height: 90px;
+  height: 32px; /* Corrected height */
 }
 
 .search-bar {
@@ -54,7 +59,7 @@ header img {
   padding: 8px 14px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  margin-left: 12px;
+  margin: 0 12px;
 }
 .search-bar i { color: #888; }
 .search-bar input {
@@ -63,6 +68,7 @@ header img {
   border: none;
   outline: none;
   color: var(--text);
+  margin-left: 8px;
 }
 
 /* ===========================
@@ -88,22 +94,23 @@ main {
 }
 
 /* ===========================
-   FEEDS
+   FEEDS (Trending/Video Grid)
    =========================== */
 .feed-grid {
   display: grid;
   gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Enhanced responsiveness */
 }
 @media (min-width: 720px) {
   .feed-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr; /* Example for larger screens */
   }
 }
 
 .video-card {
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  background: var(--panel-2);
+  background: var(--panel);
   overflow: hidden;
   transition: .2s;
 }
@@ -117,22 +124,93 @@ main {
   overflow: hidden;
   border-radius: var(--radius);
   background: #111;
+  position: relative;
 }
 .thumb-16x9 img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
 .video-card .meta {
   padding: 10px;
 }
 
 /* ===========================
-   PROFILE PAGE (UPDATED)
+   UPLOAD PAGE (NEW)
    =========================== */
+.upload-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+.form-container {
+    background-color: var(--panel); 
+    padding: 30px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+.form-label {
+    display: block;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    margin-top: 15px;
+}
+.form-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    background-color: #0b0b0b;
+    border: 1px solid #333;
+    color: var(--text);
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+textarea.form-input {
+    resize: vertical;
+    min-height: 100px;
+}
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: #0b0b0b;
+    border: 1px solid #333;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+.file-input-hidden {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+.file-input-label {
+    padding: 10px 15px;
+    background-color: var(--primary-button);
+    color: var(--text);
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 4px 0 0 4px;
+    white-space: nowrap;
+}
+.filename-display {
+    padding: 0 10px;
+    color: #aaa;
+    flex-grow: 1;
+}
+.upload-actions {
+    display: flex;
+    gap: 15px;
+}
+.upload-btn {
+    background-color: var(--primary-button) !important;
+    color: var(--text) !important;
+}
+
 /* ===========================
-   PROFILE — CENTERED LAYOUT
+   PROFILE PAGE (Existing + New Components)
    =========================== */
 
 #tab-profile {
@@ -150,37 +228,6 @@ main {
   margin: 0 auto;
 }
 
-.profile-banner {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.profile-header,
-.profile-info,
-.stats-row,
-.profile-tabs {
-  display: flex;
-  justify-content: center;
-  text-align: center;
-  width: 100%;
-}
-
-/* Center the edit button */
-#btn-edit-profile {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Center the grid */
-#profile-grid {
-  margin: 20px auto;
-  max-width: 780px;
-}
-
-/* Center the empty state text */
-#profile-empty {
-  text-align: center;
-}
 /* Banner */
 .profile-banner {
   width: 100%;
@@ -192,41 +239,13 @@ main {
   margin-bottom: 20px;
   overflow: hidden;
 }
-.profile-banner::after {
-  content:"";
-  position:absolute;
-  inset:0;
-  background: linear-gradient(to bottom, transparent, rgba(0,0,0,.4));
-}
-
-/* Banner + button */
-.profile-banner .add-btn {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: #fff;
-  color:#000;
-  width:32px;
-  height:32px;
-  font-size:20px;
-  font-weight:600;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  transition:.2s;
-}
-.profile-banner .add-btn:hover {
-  transform: scale(1.1);
-}
 
 /* Avatar */
 .avatar-wrap {
   position: relative;
   width: 120px;
   height: 120px;
-  margin-top: -70px; /* Pull avatar forward */
+  margin-top: -70px;
 }
 .profile-avatar {
   width: 120px;
@@ -235,13 +254,6 @@ main {
   border: 2px solid #222;
   object-fit: cover;
   background: #222;
-}
-.avatar-wrap .add-btn {
-  bottom: 0;
-  right: 0;
-  width:28px;
-  height:28px;
-  font-size:18px;
 }
 
 /* Header layout */
@@ -253,22 +265,21 @@ main {
   margin-bottom: 10px;
 }
 
-.profile-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
 .stat-row {
   display: flex;
   gap: 24px;
   margin: 16px 0;
 }
-.stat-row strong {
-  font-size: 1.2rem;
-}
 
 /* Profile tabs */
+.profile-tabs-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 780px;
+    margin: 15px auto 0;
+}
 .profile-tabs {
   display: flex;
   gap: 10px;
@@ -285,38 +296,13 @@ main {
 }
 .pill:hover { background:#161616; }
 .pill.active {
-  background:#fff;
-  color:#000;
-  border-color:#fff;
-}
-
-/* Grid */
-.grid {
-  margin-top: 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 14px;
-}
-
-.grid .tile {
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background:#111;
-  overflow:hidden;
-  transition:.2s;
-}
-.grid .tile:hover {
-  transform: translateY(-3px);
-  border-color:#2a2a2a;
-}
-.grid .tile img {
-  width:100%;
-  aspect-ratio:16/9;
-  object-fit:cover;
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
 }
 
 /* ===========================
-   SETTINGS
+   SETTINGS (Existing + New Components)
    =========================== */
 .settings-section-title {
   font-size: .8rem;
@@ -339,7 +325,7 @@ main {
 .settings-label { font-size:1rem; }
 .settings-arrow { color:#777; }
 
-/* Toggles */
+/* Toggles (Corrected) */
 .settings-toggle {
   display:flex;
   justify-content:space-between;
@@ -372,7 +358,7 @@ main {
   transition:.2s;
 }
 .settings-toggle input:checked {
-  background:#4caf50;
+  background: var(--accent-green); /* Using variable */
 }
 .settings-toggle input:checked::before {
   transform: translateX(20px);
@@ -398,42 +384,6 @@ main {
 .accordion.open .accordion-body { display:block; }
 .accordion.open .arrow { transform: rotate(180deg); }
 
-/* ===========================
-   MINI PLAYER
-   =========================== */
-#mini-player {
-  position: fixed;
-  bottom: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 480px;
-  background:#111;
-  border:1px solid #1a1a1a;
-  border-radius:16px;
-  padding:10px 14px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  z-index:9999;
-  opacity:0;
-  pointer-events:none;
-  transition:.3s;
-}
-#mini-player.active {
-  opacity:1;
-  pointer-events:auto;
-  bottom:80px;
-}
-#mp-close {
-  color:#fff;
-  background:none;
-  border:none;
-  font-size:18px;
-  cursor:pointer;
-  opacity:.8;
-}
-#mp-close:hover { opacity:1; }
 
 /* ===========================
    BOTTOM NAV
@@ -441,7 +391,7 @@ main {
 .bottom-nav {
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  background:#0b0b0b;
+  background:var(--panel-2);
   border-top:1px solid #151515;
   display:grid;
   grid-template-columns:repeat(7,1fr);
@@ -464,27 +414,13 @@ main {
 .bottom-nav a.active { color:#fff; background:#111; }
 
 /* ===========================
-   DIALOG
-   =========================== */
-dialog {
-  background:#111;
-  border:1px solid #2a2a2a;
-  border-radius:var(--radius-lg);
-  color:#fff;
-  padding:20px;
-}
-dialog::backdrop {
-  background:rgba(0,0,0,.6);
-}
-/* ===========================
    GLOBAL BUTTON FIX (Dark Mode)
    =========================== */
-
 button,
 input[type="button"],
 input[type="submit"],
 input[type="file"]::file-selector-button {
-  background: #1a1a1a !important;
+  background: var(--primary-button) !important;
   color: #fff !important;
   border: 1px solid #2a2a2a !important;
   border-radius: 10px !important;
@@ -507,35 +443,9 @@ input[type="submit"]:active {
   background: #333 !important;
 }
 
-/* Upload input fields */
-input[type="file"] {
-  color: #ccc;
-}
-
-/* Fix "+" buttons on profile */
+/* Specific button fixes */
 .add-btn {
   background: #1a1a1a !important;
   color: #fff !important;
   border: 1px solid #333 !important;
-}
-.profile-tabs-wrap {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 780px;
-    margin: 15px auto 0;
-}
-
-.edit-profile-link {
-    color: #fff;
-    opacity: 0.8;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: 0.2s;
-}
-
-.edit-profile-link:hover {
-    opacity: 1;
-    text-decoration: underline;
 }
