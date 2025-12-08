@@ -158,16 +158,22 @@ $("loginBtn").addEventListener("click", async () => {
 // FORGOT USERNAME SYSTEM
 // ------------------------
 
-document.getElementById("forgot-username-btn")?.addEventListener("click", () => {
-    document.getElementById("forgotUserDialog").showModal();
+// NOTE: Forgot Password is a built-in Firebase Auth feature (sendPasswordResetEmail), 
+// but Forgot Username requires this custom Firestore query.
+
+// This relies on the HTML having a dialog with id "forgotUserDialog"
+// and an input with id "forgotUserEmail", and a button "recoverUsernameBtn"
+document.getElementById("settings-forgot-username")?.addEventListener("click", () => {
+    // Note: If you don't have the dialog in your HTML, this will fail silently
+    if ($("forgotUserDialog")) $("forgotUserDialog").showModal();
 });
 
 document.getElementById("closeForgotUser")?.addEventListener("click", () => {
-    document.getElementById("forgotUserDialog").close();
+    $("forgotUserDialog")?.close();
 });
 
 document.getElementById("recoverUsernameBtn")?.addEventListener("click", async () => {
-    const email = document.getElementById("forgotUserEmail").value.trim();
+    const email = document.getElementById("forgotUserEmail")?.value.trim();
 
     if (!email) {
         alert("Please enter your email.");
@@ -176,8 +182,6 @@ document.getElementById("recoverUsernameBtn")?.addEventListener("click", async (
 
     try {
         // Query to find the user by email
-        // NOTE: Firebase Auth doesn't store email in Firestore by default, 
-        // but since you store it in your Firestore user doc, this works.
         const q = query(collection(db, "users"), where("email", "==", email));
         const snap = await getDocs(q);
 
@@ -192,7 +196,7 @@ document.getElementById("recoverUsernameBtn")?.addEventListener("click", async (
         });
 
         alert("Your username is: " + username);
-        document.getElementById("forgotUserDialog").close();
+        $("forgotUserDialog")?.close();
 
     } catch (error) {
         console.error("Forgot username error:", error);
@@ -219,7 +223,9 @@ $("settings-delete-account").addEventListener("click", async () => {
     if (!user) return; 
 
     try {
+      // Delete user data from Firestore
       await deleteDoc(doc(db, "users", user.uid));
+      // Delete user authentication record
       await deleteUser(user);
     } catch (e) {
       // NOTE: User must be recently signed in to delete. Prompt to re-login if needed.
@@ -242,10 +248,13 @@ onAuthStateChanged(auth, async (user) => {
         return;
     }
 
+    // Fetch user profile data from Firestore
     const snap = await getDoc(doc(db, "users", user.uid));
     currentUserData = snap.data();
 
     refreshUI();
+    // Re-run feeds to include logged-in specific state (like/saved icons)
+    loadFeeds(); 
 });
 
 // ======================================
@@ -253,7 +262,10 @@ onAuthStateChanged(auth, async (user) => {
 // ======================================
 function refreshUI() {
     refreshLoginButton();
-    refreshProfileUI();
+    // Only refresh profile if the profile tab is active
+    if (currentTab === "profile") {
+        refreshProfileUI();
+    }
 }
 
 function refreshLoginButton() {
@@ -263,12 +275,13 @@ function refreshLoginButton() {
 }
 
 function refreshProfileUI() {
-    // Default/Logged Out State
+    // Exit if not on the profile page or if data is missing
     if (!auth.currentUser || !currentUserData) {
-        $("profile-name").textContent = "Your Name";
-        $("profile-handle").textContent = "@username";
-        $("profile-photo").src = "default-avatar.png"; // Use a default image
-        $("bio-view").textContent = "Add a short bio to introduce yourself.";
+        // Simplified rendering for logged-out/no data state (using placeholders from HTML)
+        $("profile-name").textContent = "Sign in to view profile";
+        $("profile-handle").textContent = "@intakee_user";
+        $("profile-photo").src = "default-avatar.png"; 
+        $("bio-view").textContent = "Login to manage your content and stats.";
         $("btn-edit-profile").style.display = "none";
         
         // FIX 4: Reset stats on logout
@@ -285,11 +298,11 @@ function refreshProfileUI() {
     $("bio-view").textContent = currentUserData.bio;
     
     // FIX 4: Stat updates
-    // Posts count requires a separate query or update logic (omitted here, defaulted to 0 for now)
+    // Posts count is hardcoded '0' as true counting logic is complex.
     $("stat-posts").textContent = "0"; 
-    $("stat-followers").textContent = currentUserData.followers.length;
-    $("stat-following").textContent = currentUserData.following.length;
-    $("stat-likes").textContent = currentUserData.liked.length;
+    $("stat-followers").textContent = currentUserData.followers?.length || 0;
+    $("stat-following").textContent = currentUserData.following?.length || 0;
+    $("stat-likes").textContent = currentUserData.liked?.length || 0;
 
 
     if (currentUserData.photoURL)
@@ -315,8 +328,13 @@ $("bio-cancel").addEventListener("click", () => {
 });
 
 $("btnSaveProfile").addEventListener("click", async () => {
+    if (!auth.currentUser) return;
+
     const newName = $("profileNameInput").value.trim();
     const newBio = $("profileBioInput").value.trim();
+
+    // Prevent saving if username is empty
+    if (!newName) return alert("Username cannot be empty.");
 
     let photoURL = currentUserData.photoURL;
     let bannerURL = currentUserData.bannerURL;
@@ -324,18 +342,21 @@ $("btnSaveProfile").addEventListener("click", async () => {
     try {
         // Upload profile photo
         if ($("profilePhotoInput").files.length) {
+            const file = $("profilePhotoInput").files[0];
             const fileRef = ref(storage, `profile/${auth.currentUser.uid}/photo.jpg`);
-            await uploadBytes(fileRef, $("profilePhotoInput").files[0]);
+            await uploadBytes(fileRef, file);
             photoURL = await getDownloadURL(fileRef);
         }
 
         // Upload banner
         if ($("profileBannerInput").files.length) {
+            const file = $("profileBannerInput").files[0];
             const fileRef = ref(storage, `profile/${auth.currentUser.uid}/banner.jpg`);
-            await uploadBytes(fileRef, $("profileBannerInput").files[0]);
+            await uploadBytes(fileRef, file);
             bannerURL = await getDownloadURL(fileRef);
         }
 
+        // Update Firestore document
         await updateDoc(doc(db, "users", auth.currentUser.uid), {
             username: newName,
             bio: newBio,
@@ -345,11 +366,13 @@ $("btnSaveProfile").addEventListener("click", async () => {
 
         alert("Profile updated!");
         $("bio-edit-wrap").style.display = "none";
+        // Auth state listener will catch the update and refresh the UI automatically
     } catch (e) {
         alert("Error saving profile: " + e.message);
     }
 });
 
+// Link the 'Edit Profile' text span to the button click for the owner
 document.getElementById("editProfileLink")?.addEventListener("click", () => {
     document.getElementById("btn-edit-profile").click();
 });
@@ -358,17 +381,18 @@ document.getElementById("editProfileLink")?.addEventListener("click", () => {
 // UPLOAD SYSTEM
 // ======================================
 $("btnUpload").addEventListener("click", async () => {
-    if (!auth.currentUser) return alert("Login first.");
+    if (!auth.currentUser || !currentUserData) return alert("Login first.");
 
     const title = $("uploadTitleInput").value.trim();
     const type = $("uploadTypeSelect").value;
     const desc = $("uploadDescInput").value.trim();
     const file = $("uploadFileInput").files[0];
     const thumb = $("uploadThumbInput").files[0];
+    const isAgeRestricted = $("ageRestrictionToggle")?.checked || false;
 
-    if (!title || !file || !thumb) return alert("All fields required.");
+    if (!title || !file || !thumb) return alert("Please provide a Title, Main File, and Thumbnail.");
 
-    const id = Date.now().toString();
+    const id = Date.now().toString(); // Simple unique ID based on timestamp
 
     try {
         // Upload thumbnail
@@ -381,26 +405,30 @@ $("btnUpload").addEventListener("click", async () => {
         await uploadBytes(fileRef, file);
         const fileURL = await getDownloadURL(fileRef);
 
+        // Create post document
         await setDoc(doc(db, "posts", id), {
             id,
             userId: auth.currentUser.uid,
             username: currentUserData.username,
+            photoURL: currentUserData.photoURL,
             title,
             desc,
             type,
             thumbURL,
             fileURL,
+            isAgeRestricted,
             createdAt: Date.now(),
             views: 0, 
             likes: [] // Initial likes array
         });
 
-        alert("Upload complete!");
+        alert("Upload complete! Content is now live.");
         // Clear form after successful upload
         $("uploadTitleInput").value = '';
         $("uploadDescInput").value = '';
         $("uploadFileInput").value = '';
         $("uploadThumbInput").value = '';
+        $("ageRestrictionToggle").checked = false;
 
     } catch (e) {
         alert("Upload failed: " + e.message);
@@ -408,10 +436,10 @@ $("btnUpload").addEventListener("click", async () => {
 });
 
 // ======================================
-// FEEDS (FIXED: Improved Post Card HTML)
+// FEEDS & POST RENDERING
 // ======================================
 function loadFeeds() {
-    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(50)); // Limit to 50 posts for performance
 
     onSnapshot(q, (snap) => {
         // Clear all feed grids
@@ -419,36 +447,32 @@ function loadFeeds() {
         $("videos-feed").innerHTML = "";
         $("clips-feed").innerHTML = "";
         $("podcast-feed").innerHTML = "";
-        $("profile-grid").innerHTML = ""; // Ensure profile is cleared too
-
-        const posts = [];
+        $("profile-grid").innerHTML = ""; 
+        
         const userPosts = [];
         
         snap.forEach((d) => {
             const p = d.data();
-            posts.push(p);
+            const card = createPostCard(p);
 
-            // Separate the current user's posts for the Profile tab
+            // 1. Home Feed (All Content)
+            $("home-feed").appendChild(card.cloneNode(true));
+
+            // 2. Filtered Feeds
+            if (p.type === "video") $("videos-feed").appendChild(createPostCard(p).cloneNode(true));
+            if (p.type === "clip") $("clips-feed").appendChild(createPostCard(p).cloneNode(true));
+            if (p.type.includes("podcast"))
+                $("podcast-feed").appendChild(createPostCard(p).cloneNode(true));
+
+            // 3. Current User's Posts for Profile Tab
             if (auth.currentUser && p.userId === auth.currentUser.uid) {
                  userPosts.push(p);
+                 // Note: Profile grid is populated later in the profile tab logic for proper tab handling.
+                 // For now, we'll use a direct append for simplicity (or let a dedicated profile tab function handle it)
+                 if (currentTab === "profile") {
+                     $("profile-grid").appendChild(createPostCard(p));
+                 }
             }
-        });
-        
-        // Loop through all posts for main feeds
-        posts.forEach(p => {
-             const card = createPostCard(p);
-
-             $("home-feed").appendChild(card.cloneNode(true));
-
-             if (p.type === "video") $("videos-feed").appendChild(createPostCard(p));
-             if (p.type === "clip") $("clips-feed").appendChild(createPostCard(p));
-             if (p.type.includes("podcast"))
-                 $("podcast-feed").appendChild(createPostCard(p));
-        });
-        
-        // Loop through user's own posts for the Profile uploads tab
-        userPosts.forEach(p => {
-             $("profile-grid").appendChild(createPostCard(p));
         });
 
     });
@@ -468,11 +492,12 @@ function createPostCard(p) {
         <div class="thumb-16x9">
             <img src="${p.thumbURL}" alt="${p.title} thumbnail">
             <span class="video-duration">${duration}</span>
+            ${p.isAgeRestricted ? '<span class="age-restricted-tag">18+</span>' : ''}
         </div>
         <div class="meta">
             <h3 class="video-title">${p.title}</h3>
             <p class="channel-name muted">@${p.username.toLowerCase()}</p>
-            <p class="video-stats muted">0 views • ${new Date(p.createdAt).toLocaleDateString()}</p>
+            <p class="video-stats muted">${p.views || 0} views • ${new Date(p.createdAt).toLocaleDateString()}</p>
         </div>
     `;
 
@@ -488,34 +513,53 @@ function createPostCard(p) {
 let overlay = null;
 
 function openViewer(p) {
+    // Basic Age Check (simplified, can be improved with user age data)
+    if (p.isAgeRestricted && !auth.currentUser) {
+        alert("This content is age-restricted. Please log in to continue.");
+        return;
+    }
+
     if (!overlay) {
         overlay = document.createElement("div");
-        overlay.id = "video-viewer-overlay"; // Give it an ID for better styling
+        overlay.id = "video-viewer-overlay"; 
         overlay.style.cssText = `
-            position:fixed; inset:0; background:#000d;
+            position:fixed; inset:0; background:#000e; 
             padding:20px; z-index:5000; overflow:auto;
-            display: none; /* Start hidden */
+            display: none; 
             transition: opacity 0.3s;
         `;
         document.body.appendChild(overlay);
     }
 
     overlay.innerHTML = `
-        <button id="closeView" style="float:right;font-size:30px;color:white;background:none;border:none;cursor:pointer;">✕</button>
-        <div class="viewer-content" style="max-width:800px; margin: 0 auto; padding-top: 40px;">
-            <h2>${p.title}</h2>
-            <p class="muted">${p.username}</p>
-            <div id="media-container" style="margin-top:15px; background: black; border-radius: 12px; overflow: hidden;"></div>
-            <p style="margin-top: 20px;">${p.desc}</p>
+        <button id="closeView" style="float:right;font-size:30px;color:white;background:none;border:none;cursor:pointer; position: sticky; top: 0; right: 0;">✕</button>
+        <div class="viewer-content" style="max-width:900px; margin: 0 auto; padding-top: 20px;">
+            <div id="media-container" style="margin-bottom:15px; background: black; border-radius: 12px; overflow: hidden;"></div>
+            
+            <div class="viewer-info-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="flex-grow: 1;">
+                    <h2>${p.title}</h2>
+                    <p class="muted">Uploaded by: <a href="#" data-user-id="${p.userId}" class="user-link">@${p.username.toLowerCase()}</a></p>
+                </div>
+                </div>
+
+            <div class="card" style="padding: 20px;">
+                <p style="white-space: pre-wrap;">${p.desc}</p>
             </div>
+
+            <h3 style="margin-top: 30px;">Comments</h3>
+            <div id="comments-section">
+                <p class="muted">Comment system coming soon.</p>
+            </div>
+        </div>
     `;
 
     const container = overlay.querySelector("#media-container");
 
-    if (p.type === "video" || p.type === "clip" || p.type === "podcast-video") {
+    if (p.type.includes("video") || p.type === "clip") {
         container.innerHTML = `<video controls autoplay style="width:100%; display:block;" src="${p.fileURL}"></video>`;
     } else {
-        container.innerHTML = `<audio controls autoplay style="width:100%; display:block;" src="${p.fileURL}"></audio>`;
+        container.innerHTML = `<audio controls autoplay style="width:100%; display:block; height: 100px;" src="${p.fileURL}"></audio>`;
     }
 
     overlay.querySelector("#closeView").onclick = () => {
@@ -524,8 +568,23 @@ function openViewer(p) {
         const media = container.querySelector('video, audio');
         if (media) media.pause();
     };
+    
+    // Add event listener for the user link to open their profile
+    overlay.querySelector(".user-link")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        const userId = e.target.getAttribute("data-user-id");
+        if (userId) {
+            // Close viewer and navigate to profile (This is a placeholder, as the provided HTML
+            // does not fully support viewing *other* users' profiles yet)
+            overlay.style.display = "none";
+            showTab("profile"); // This will currently only show the logged-in user's profile
+        }
+    });
+
 
     overlay.style.display = "block";
+    // Increment view count (simplified)
+    updateDoc(doc(db, "posts", p.id), { views: (p.views || 0) + 1 });
 }
 
 // ======================================
@@ -533,16 +592,17 @@ function openViewer(p) {
 // ======================================
 $("globalSearch").addEventListener("input", async (e) => {
     const q = e.target.value.toLowerCase().trim();
+    const feed = $("home-feed");
 
     // If search is cleared, reload the full feeds
     if (!q) return loadFeeds(); 
 
-    $("home-feed").innerHTML = `<p class="muted" style="padding: 20px;">Searching...</p>`;
+    feed.innerHTML = `<p class="muted" style="padding: 20px;">Searching...</p>`;
 
     // Perform a client-side search (Firestore search is complex without extensions)
     const snap = await getDocs(collection(db, "posts"));
     
-    $("home-feed").innerHTML = "";
+    feed.innerHTML = "";
     let found = false;
 
     snap.forEach((d) => {
@@ -551,14 +611,41 @@ $("globalSearch").addEventListener("input", async (e) => {
             p.title.toLowerCase().includes(q) ||
             p.username.toLowerCase().includes(q)
         ) {
-            $("home-feed").appendChild(createPostCard(p));
+            feed.appendChild(createPostCard(p));
             found = true;
         }
     });
 
     if (!found) {
-        $("home-feed").innerHTML = `<p class="muted" style="padding: 20px;">No results found for "${q}".</p>`;
+        feed.innerHTML = `<p class="muted" style="padding: 20px;">No results found for "${q}".</p>`;
     }
+});
+
+// ======================================
+// SETTINGS ACCORDION
+// ======================================
+document.querySelectorAll(".accordion").forEach(header => {
+    header.addEventListener("click", () => {
+        const bodyId = header.getAttribute("data-accordion-id");
+        const body = $(`acc-body-${bodyId}`);
+        const parent = header.closest(".accordion");
+        const arrow = header.querySelector(".settings-arrow");
+
+        if (body.style.display === "block") {
+            body.style.display = "none";
+            parent.classList.remove("open");
+        } else {
+            // Close all other open accordions in the list first
+            document.querySelectorAll(".accordion.open").forEach(openAcc => {
+                openAcc.classList.remove("open");
+                openAcc.nextElementSibling.style.display = "none";
+            });
+            
+            // Open the clicked one
+            body.style.display = "block";
+            parent.classList.add("open");
+        }
+    });
 });
 
 console.log("💚 INTAKEE script.js loaded successfully. READY FOR LAUNCH!");
