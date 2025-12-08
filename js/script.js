@@ -139,7 +139,48 @@ $("loginBtn").addEventListener("click", async () => {
     alert("Wrong email or password.");
   }
 });
+// ------------------------
+// FORGOT USERNAME SYSTEM
+// ------------------------
 
+document.getElementById("forgot-username-btn")?.addEventListener("click", () => {
+    document.getElementById("forgotUserDialog").showModal();
+});
+
+document.getElementById("closeForgotUser")?.addEventListener("click", () => {
+    document.getElementById("forgotUserDialog").close();
+});
+
+document.getElementById("recoverUsernameBtn")?.addEventListener("click", async () => {
+    const email = document.getElementById("forgotUserEmail").value.trim();
+
+    if (!email) {
+        alert("Please enter your email.");
+        return;
+    }
+
+    try {
+        const q = query(collection(db, "users"), where("email", "==", email));
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+            alert("No account found with that email.");
+            return;
+        }
+
+        let username = "";
+        snap.forEach(doc => {
+            username = doc.data().username;
+        });
+
+        alert("Your username is: " + username);
+        document.getElementById("forgotUserDialog").close();
+
+    } catch (error) {
+        console.error("Forgot username error:", error);
+        alert("Something went wrong. Try again.");
+    }
+});
 // ======================================
 // LOGOUT
 // ======================================
