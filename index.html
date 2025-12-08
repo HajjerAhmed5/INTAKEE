@@ -150,11 +150,16 @@
   </div>
 
   <!-- Profile Posts -->
-  <div class="profile-tabs">
-    <button class="pill active" data-profile-tab="uploads">Uploads</button>
-    <button class="pill" data-profile-tab="saved">Saved</button>
-    <button class="pill" data-profile-tab="likes">Likes</button>
-  </div>
+<div class="profile-tabs-wrap">
+    <div class="profile-tabs">
+        <button class="pill active" data-profile-tab="uploads">Uploads</button>
+        <button class="pill" data-profile-tab="saved">Saved</button>
+        <button class="pill" data-profile-tab="likes">Likes</button>
+        <button class="pill" data-profile-tab="playlists">Playlists</button>
+    </div>
+
+    <span id="editProfileLink" class="edit-profile-link owner-only">Edit Profile</span>
+</div>
 
   <div id="profile-grid" class="grid"></div>
   <div id="profile-empty" class="muted">No posts yet.</div>
