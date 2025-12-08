@@ -1,5 +1,5 @@
 /* ========================================================================= */
-/* INTAKEE — Global Styles (FINAL MONOCHROME DARK MODE)                      */
+/* INTAKEE — Global Styles (FINAL MONOCHROME DARK MODE) */
 /* ========================================================================= */
 
 :root {
@@ -7,9 +7,9 @@
     --bg: #000000;      /* Pure Black main background */
     --panel: #101010;    /* Card and general panel background */
     --panel-2: #0b0b0b;  /* Header/Nav background */
-    --border: #222222;   /* Subtle dark grey borders */
+    --border: #222222;    /* Subtle dark grey borders */
     --text: #ffffff;    /* Pure White text */
-    --muted: #aaaaaa;   /* Muted grey text for details */
+    --muted: #aaaaaa;    /* Muted grey text for details */
 
     /* MONOCHROME ACCENTS (Replaced Red/Green) */
     --primary-accent: #FFFFFF; /* Pure White for active states, highlights, and primary buttons */
@@ -49,8 +49,16 @@ header {
     border-bottom: 1px solid var(--border);
 }
 
+/* 🟢 CHANGE 1: Increase Logo Size (Global) */
 header img {
-    height: 32px;
+    height: 38px; /* Increased from 32px to 38px (approx 18% increase) */
+}
+
+/* 🟢 CHANGE 2: Login Button Style (Global) */
+.login-button {
+    background-color: #000000 !important; /* Force Black background */
+    color: #ffffff !important;           /* Force White text */
+    border-color: #ffffff !important;     /* Subtle white border */
 }
 
 .search-bar {
@@ -157,22 +165,21 @@ main {
 }
 /* Liked state uses the white accent */
 .interaction-row button.liked {
-    color: var(--primary-accent); 
+    color: var(--primary-accent);  
 }
 
 
 /* ===========================
     UPLOAD PAGE
     =========================== */
-.upload-form {
-    max-width: 600px;
-    margin: 0 auto;
-}
+
+/* 🟢 CHANGE 3: Apply black/white styling to form container */
 .form-container {
-    background-color: var(--panel); 
+    background-color: var(--bg); /* Set to pure black */
     padding: 30px;
     border-radius: 8px;
     margin-bottom: 20px;
+    border: 1px solid var(--border); /* Optional: add border for contrast */
 }
 .form-label {
     display: block;
@@ -186,7 +193,7 @@ main {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
-    background-color: #0b0b0b;
+    background-color: #1a1a1a; /* Darker input field */
     border: 1px solid #333;
     color: var(--text);
     border-radius: 4px;
@@ -200,7 +207,7 @@ textarea.form-input {
 .file-input-wrapper {
     display: flex;
     align-items: center;
-    background-color: #0b0b0b;
+    background-color: #1a1a1a; /* Darker input field */
     border: 1px solid #333;
     border-radius: 4px;
     margin-bottom: 15px;
@@ -278,10 +285,11 @@ textarea.form-input {
     margin-top: -70px;
 }
 .profile-avatar {
+    /* 🟢 CHANGE 4: Make Profile Avatar a perfect circle */
     width: 120px;
     height: 120px;
-    border-radius: 50%;
-    border: 4px solid var(--bg); /* Border is the background color */
+    border-radius: 50%; /* <-- Implemented change */
+    border: 4px solid var(--bg);
     object-fit: cover;
     background: #222;
 }
@@ -315,21 +323,28 @@ textarea.form-input {
     gap: 10px;
     margin-top: 12px;
 }
-.pill {
+/* 🟢 CHANGE 5: Black/White styling for Profile Tab Buttons/Pills */
+.pill,
+.profile-nav-btn { /* Assuming a class for profile navigation buttons */
     padding: 8px 14px;
-    background: #111;
-    border: 1px solid var(--border);
+    background: #000 !important; /* Force black background */
+    color: #fff !important;      /* Force white text */
+    border: 1px solid #fff;      /* White border for visibility */
     border-radius: 20px;
     cursor: pointer;
     font-size: 0.9rem;
     transition: .2s;
 }
-.pill:hover { background:#161616; }
+.pill:hover,
+.profile-nav-btn:hover { 
+    background:#161616 !important; 
+    border-color: var(--primary-accent) !important;
+}
 .pill.active {
     /* High-contrast White/Black active pill */
-    background: var(--primary-accent);
-    color: var(--primary-text-dark);
-    border-color: var(--primary-accent);
+    background: var(--primary-accent) !important;
+    color: var(--primary-text-dark) !important;
+    border-color: var(--primary-accent) !important;
 }
 
 /* ===========================
