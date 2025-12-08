@@ -518,3 +518,24 @@ input[type="file"] {
   color: #fff !important;
   border: 1px solid #333 !important;
 }
+.profile-tabs-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 780px;
+    margin: 15px auto 0;
+}
+
+.edit-profile-link {
+    color: #fff;
+    opacity: 0.8;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.edit-profile-link:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
