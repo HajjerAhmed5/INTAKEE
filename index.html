@@ -1,233 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>INTAKEE — Videos, Podcasts & Clips</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>INTAKEE — Videos, Podcasts & Clips</title>
 
-  <!-- META -->
-  <meta name="description" content="INTAKEE — freedom to create, simple to share." />
+    <meta name="description" content="INTAKEE — freedom to create, simple to share." />
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
 
-  <!-- INLINE MINOR FIXES -->
-  <style>
-    body { margin:0; font-family:system-ui,Arial,sans-serif; background:#000; color:#fff; }
-    header { position:sticky; top:0; z-index:1000; display:flex; align-items:center; padding:10px 16px; background:#0b0b0b; }
-    header img { height:90px; }
-
-    .search-bar { flex:1; display:flex; align-items:center; background:#111; border-radius:10px; padding:6px 10px; margin-left:15px; }
-    .search-bar input { background:transparent; border:none; outline:none; color:white; width:100%; }
-
-    main { padding:20px; padding-bottom:120px; max-width:900px; margin:auto; }
-    .card { background:#101010; border-radius:12px; padding:14px; margin:10px 0; border:1px solid #1a1a1a; }
-    .feed-grid, .grid { display:flex; flex-direction:column; gap:16px; }
-
-    .bottom-nav {
-      position:fixed; bottom:0; left:0; right:0;
-      display:grid; grid-template-columns:repeat(7,1fr);
-      background:#0b0b0b; border-top:1px solid #222;
-      z-index:2000;
-    }
-    .bottom-nav a {
-      padding:8px 0;
-      display:flex; flex-direction:column; align-items:center;
-      color:#aaa; font-size:0.8rem;
-    }
-    .bottom-nav a.active { color:white; }
-
-    dialog {
-      background:#101010; color:#fff;
-      border-radius:12px; border:1px solid #222;
-      width:90%; max-width:420px;
-    }
-    dialog::backdrop { background:rgba(0,0,0,.6); }
-  </style>
-</head>
+    </head>
 
 <body>
 
-<!-- HEADER -->
 <header>
-  <img src="logo.png" alt="INTAKEE Logo" />
-  <div class="search-bar">
-    <i class="fa fa-search"></i>
-    <input id="globalSearch" placeholder="Search..." autocomplete="off" />
-  </div>
-  <button id="openAuth" class="primary">Login</button>
+    <img src="logo.png" alt="INTAKEE Logo" />
+    <div class="search-bar">
+        <i class="fa fa-search"></i> 
+        <input id="globalSearch" placeholder="Search..." autocomplete="off" />
+    </div>
+    <button id="openAuth" class="primary">Login</button>
 </header>
 
 
-<!-- MAIN APP -->
 <main>
 
-<!-- HOME TAB -->
-<section id="tab-home">
-  <h2>Trending</h2>
-  <div id="home-feed" class="feed-grid"></div>
-</section>
+    <section id="tab-home">
+        <h2>Trending</h2>
+        <div id="home-feed" class="feed-grid">
+            <p class="muted">Loading trending content...</p>
+        </div>
+    </section>
 
-<!-- VIDEOS TAB -->
-<section id="tab-videos" style="display:none;">
-  <h2>Videos</h2>
-  <div id="videos-feed" class="feed-grid"></div>
-</section>
+    <section id="tab-videos" style="display:none;">
+        <h2>Videos</h2>
+        <div id="videos-feed" class="feed-grid"></div>
+    </section>
 
-<!-- PODCAST TAB -->
-<section id="tab-podcast" style="display:none;">
-  <h2>Podcasts</h2>
-  <div id="podcast-feed" class="feed-grid"></div>
-</section>
+    <section id="tab-podcast" style="display:none;">
+        <h2>Podcasts</h2>
+        <div id="podcast-feed" class="feed-grid"></div>
+    </section>
 
-<!-- CLIPS TAB -->
-<section id="tab-clips" style="display:none;">
-  <h2>Clips</h2>
-  <div id="clips-feed" class="feed-grid"></div>
-</section>
+    <section id="tab-clips" style="display:none;">
+        <h2>Clips</h2>
+        <div id="clips-feed" class="feed-grid"></div>
+    </section>
 
-<!-- UPLOAD TAB -->
-<section id="tab-upload" style="display:none;" class="card">
-  <h2>Upload</h2>
+    <section id="tab-upload" style="display:none;" class="card">
+        <h2>Upload</h2>
 
-  <select id="uploadTypeSelect">
-    <option value="video">Video</option>
-    <option value="clip">Clip</option>
-    <option value="podcast-audio">Podcast (Audio)</option>
-    <option value="podcast-video">Podcast (Video)</option>
-  </select>
+        <select id="uploadTypeSelect" class="form-input">
+            <option value="video">Video</option>
+            <option value="clip">Clip</option>
+            <option value="podcast-audio">Podcast (Audio)</option>
+            <option value="podcast-video">Podcast (Video)</option>
+        </select>
 
-  <input id="uploadTitleInput" placeholder="Title" />
-  <textarea id="uploadDescInput" placeholder="Description"></textarea>
+        <input id="uploadTitleInput" class="form-input" placeholder="Title" />
+        <textarea id="uploadDescInput" class="form-input" placeholder="Description"></textarea>
 
-  <label>Thumbnail</label>
-  <input id="uploadThumbInput" type="file" accept="image/*" />
+        <label>Thumbnail</label>
+        <input id="uploadThumbInput" class="form-input" type="file" accept="image/*" />
 
-  <label>File</label>
-  <input id="uploadFileInput" type="file" accept="video/*,audio/*" />
+        <label>File</label>
+        <input id="uploadFileInput" class="form-input" type="file" accept="video/*,audio/*" />
 
-  <button id="btnUpload" class="primary">Upload</button>
-</section>
+        <button id="btnUpload" class="primary">Upload</button>
+    </section>
 
 
-<!-- PROFILE TAB -->
-<section id="tab-profile" style="display:none;">
-  <div class="profile-banner" id="profileBanner"></div>
+    <section id="tab-profile" style="display:none;">
+        <div class="profile-banner" id="profileBanner"></div>
 
-  <div class="profile-header">
-    <div class="avatar-wrap">
-      <img id="profile-photo" class="profile-avatar" src="" />
-    </div>
+        <div class="profile-header">
+            <div class="avatar-wrap">
+                <img id="profile-photo" class="profile-avatar" src="" />
+            </div>
 
-    <div>
-      <h3 id="profile-name">Your Name</h3>
-      <p id="profile-handle" class="muted">@username</p>
-      <p id="bio-view" class="muted" style="max-width:420px;"></p>
-    </div>
+            <div>
+                <h3 id="profile-name">Your Name</h3>
+                <p id="profile-handle" class="muted">@username</p>
+                <p id="bio-view" class="muted" style="max-width:420px;"></p>
+            </div>
 
-    <div class="profile-actions">
-      <button id="btn-edit-profile" class="primary owner-only">Edit Profile</button>
-    </div>
-  </div>
+            <div class="profile-actions">
+                <button id="btn-edit-profile" class="primary owner-only">Edit Profile</button>
+            </div>
+        </div>
 
-  <div class="stat-row">
-    <div><strong id="stat-posts">0</strong><br><span class="muted small">Posts</span></div>
-    <div><strong id="stat-followers">0</strong><br><span class="muted small">Followers</span></div>
-    <div><strong id="stat-following">0</strong><br><span class="muted small">Following</span></div>
-    <div><strong id="stat-likes">0</strong><br><span class="muted small">Likes</span></div>
-  </div>
+        <div class="stat-row">
+            <div><strong id="stat-posts">0</strong><br><span class="muted small">Posts</span></div>
+            <div><strong id="stat-followers">0</strong><br><span class="muted small">Followers</span></div>
+            <div><strong id="stat-following">0</strong><br><span class="muted small">Following</span></div>
+            <div><strong id="stat-likes">0</strong><br><span class="muted small">Likes</span></div>
+        </div>
 
-  <!-- Edit Profile -->
-  <div id="bio-edit-wrap" style="display:none;" class="card">
-    <input id="profileNameInput" placeholder="Your name" />
-    <textarea id="profileBioInput" placeholder="Your bio..."></textarea>
-    <input id="profilePhotoInput" type="file" accept="image/*" />
-    <input id="profileBannerInput" type="file" accept="image/*" />
+        <div id="bio-edit-wrap" style="display:none;" class="card">
+            <input id="profileNameInput" class="form-input" placeholder="Your name" />
+            <textarea id="profileBioInput" class="form-input" placeholder="Your bio..."></textarea>
+            <input id="profilePhotoInput" class="form-input" type="file" accept="image/*" />
+            <input id="profileBannerInput" class="form-input" type="file" accept="image/*" />
 
-    <button id="btnSaveProfile" class="primary">Save</button>
-    <button id="bio-cancel" class="ghost">Cancel</button>
-  </div>
+            <button id="btnSaveProfile" class="primary">Save</button>
+            <button id="bio-cancel" class="ghost">Cancel</button>
+        </div>
 
-  <!-- Profile Posts -->
-<div class="profile-tabs-wrap">
-    <div class="profile-tabs">
-        <button class="pill active" data-profile-tab="uploads">Uploads</button>
-        <button class="pill" data-profile-tab="saved">Saved</button>
-        <button class="pill" data-profile-tab="likes">Likes</button>
-        <button class="pill" data-profile-tab="playlists">Playlists</button>
-    </div>
+        <div class="profile-tabs-wrap">
+            <div class="profile-tabs">
+                <button class="pill active" data-profile-tab="uploads">Uploads</button>
+                <button class="pill" data-profile-tab="saved">Saved</button>
+                <button class="pill" data-profile-tab="likes">Likes</button>
+                <button class="pill" data-profile-tab="playlists">Playlists</button>
+            </div>
 
-    <span id="editProfileLink" class="edit-profile-link owner-only">Edit Profile</span>
-</div>
+            <span id="editProfileLink" class="edit-profile-link owner-only">Edit Profile</span>
+        </div>
 
-  <div id="profile-grid" class="grid"></div>
-  <div id="profile-empty" class="muted">No posts yet.</div>
+        <div id="profile-grid" class="grid"></div>
+        <div id="profile-empty" class="muted">No posts yet.</div>
 
-  <div id="profile-saved" class="grid" style="display:none;"></div>
-  <div id="profile-likes" class="grid" style="display:none;"></div>
-</section>
+        <div id="profile-saved" class="grid" style="display:none;"></div>
+        <div id="profile-likes" class="grid" style="display:none;"></div>
+    </section>
 
 
-<!-- SETTINGS TAB -->
-<section id="tab-settings" style="display:none;">
-  <h2>Settings</h2>
+    <section id="tab-settings" style="display:none;" class="card">
+        <h2>Settings</h2>
 
-  <div class="settings-row" id="settings-logout">Log Out</div>
-  <div class="settings-row" id="settings-delete-account">Delete Account</div>
+        <div class="settings-row" id="settings-logout">Log Out <i class="fa-solid fa-chevron-right settings-arrow"></i></div>
+        <div class="settings-row" id="settings-delete-account">Delete Account <i class="fa-solid fa-chevron-right settings-arrow"></i></div>
 
-  <div class="settings-row" id="settings-forgot-password">Forgot Password</div>
-  <div class="settings-row" id="settings-forgot-username">Forgot Username</div>
-</section>
+        <div class="settings-row" id="settings-forgot-password">Forgot Password <i class="fa-solid fa-chevron-right settings-arrow"></i></div>
+        <div class="settings-row" id="settings-forgot-username">Forgot Username <i class="fa-solid fa-chevron-right settings-arrow"></i></div>
+
+        <div class="settings-toggle">
+            <label>Dark Mode</label>
+            <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider round"></span>
+            </label>
+        </div>
+    </section>
 
 
 </main>
 
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <a data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
-  <a data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
-  <a data-tab="podcast"><i class="fa fa-podcast"></i><span>Podcast</span></a>
-  <a data-tab="upload"><i class="fa fa-plus-circle"></i><span>Upload</span></a>
-  <a data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
-  <a data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
-  <a data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
+    <a data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
+    <a data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
+    <a data-tab="podcast"><i class="fa fa-podcast"></i><span>Podcast</span></a>
+    <a data-tab="upload"><i class="fa-solid fa-circle-plus"></i><span>Upload</span></a> 
+    <a data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
+    <a data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
+    <a data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
 </nav>
 
 
-<!-- AUTH DIALOG -->
 <dialog id="authDialog">
-  <h3>Create account</h3>
-  <input id="signupEmail" type="email" placeholder="Email" />
-  <input id="signupPassword" type="password" placeholder="Password" />
-  <input id="signupUsername" type="text" placeholder="Username" />
-  <label><input id="signupAgeConfirm" type="checkbox"> I am 13+</label>
-  <button id="signupBtn" type="button">Sign Up</button>
+    <h3>Create account</h3>
+    <input id="signupEmail" class="form-input" type="email" placeholder="Email" />
+    <input id="signupPassword" class="form-input" type="password" placeholder="Password" />
+    <input id="signupUsername" class="form-input" type="text" placeholder="Username" />
+    <label><input id="signupAgeConfirm" type="checkbox"> I am 13+</label>
+    <button id="signupBtn" class="primary" type="button">Sign Up</button>
 
-  <hr/>
+    <hr/>
 
-  <h3>Sign in</h3>
-  <input id="loginEmail" type="email" placeholder="Email" />
-  <input id="loginPassword" type="password" placeholder="Password" />
-  <button id="loginBtn" type="button">Login</button>
+    <h3>Sign in</h3>
+    <input id="loginEmail" class="form-input" type="email" placeholder="Email" />
+    <input id="loginPassword" class="form-input" type="password" placeholder="Password" />
+    <button id="loginBtn" class="primary" type="button">Login</button>
 </dialog>
-<div class="auth-secondary-links">
-    <button id="forgot-password-btn" class="forgot-link">Forgot Password?</button>
-    <button id="forgot-username-btn" class="forgot-link">Forgot Username?</button>
-</div>
-<!-- Forgot Username Popup -->
-<dialog id="forgotUserDialog">
-  <h3>Recover Username</h3>
-  <p>Enter the email associated with your account:</p>
-
-  <input id="forgotUserEmail" type="email" placeholder="Email" />
-
-  <button id="recoverUsernameBtn">Find Username</button>
-  <button id="closeForgotUser" class="close-small">Close</button>
-</dialog>
-
-<!-- SCRIPT ORDER (IMPORTANT!) -->
 <script type="module" src="js/firebase-config.js"></script>
 <script type="module" src="js/firebase-init.js"></script>
 <script type="module" src="js/script.js"></script>
