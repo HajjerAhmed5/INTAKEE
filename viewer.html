@@ -1,235 +1,396 @@
+<div id="tab-settings" class="settings-page">
+    <main class="content" style="max-width: 800px; padding-top: 0;">
+
+        <h3 class="settings-section-title">Account</h3>
+        <div class="settings-list">
+            <div class="settings-row" data-action="change-email">
+                <span class="settings-label">Change email</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="change-password">
+                <span class="settings-label">Change password</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="delete-account">
+                <span class="settings-label red-text">Delete account</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="log-out">
+                <span class="settings-label red-text">Log out</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+
+        <h3 class="settings-section-title">Privacy</h3>
+        <div class="settings-list">
+            <div class="settings-toggle">
+                <label>Private account</label>
+                <input type="checkbox" id="toggle-private-account">
+            </div>
+            <div class="settings-row" data-action="blocked-users">
+                <span class="settings-label">Blocked users list</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="follower-visibility">
+                <span class="settings-label">Who can see your followers/following</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="comment-controls">
+                <span class="settings-label">Comment controls (for videos & clips)</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+
+        <h3 class="settings-section-title">Notifications</h3>
+        <div class="settings-list">
+            <div class="settings-toggle">
+                <label>Likes / dislikes on your posts</label>
+                <input type="checkbox" checked>
+            </div>
+            <div class="settings-toggle">
+                <label>New uploads from creators you follow</label>
+                <input type="checkbox" checked>
+            </div>
+        </div>
+        
+        <h3 class="settings-section-title">Appearance</h3>
+        <div class="settings-list">
+            <div class="settings-toggle">
+                <label>Dark mode / Light mode</label>
+                <input type="checkbox" checked>
+            </div>
+            <div class="settings-toggle">
+                <label>System default mode</label>
+                <input type="checkbox">
+            </div>
+        </div>
+        
+        <h3 class="settings-section-title">Content Controls</h3>
+        <div class="settings-list">
+            <div class="settings-row" data-action="manage-saved">
+                <span class="settings-label">Manage saved content</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="manage-playlists">
+                <span class="settings-label">Manage playlists</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+
+        <h3 class="settings-section-title">Safety & Moderation</h3>
+        <div class="settings-list">
+            <div class="settings-row" data-action="report-content">
+                <span class="settings-label">Report content</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="comment-filters">
+                <span class="settings-label">Comment filters (block keywords)</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="block-users">
+                <span class="settings-label">Block users</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+        
+        <h3 class="settings-section-title">Legal & Policies</h3>
+        <div class="settings-list">
+            
+            <div class="accordion">
+                <div class="accordion-header" data-action="toggle-tos">
+                    <span class="settings-label">Terms of Service</span>
+                    <i class="fa fa-chevron-right settings-arrow"></i>
+                </div>
+                <div class="accordion-body">
+                    <p><strong>A. User-Generated Content (UGC) Responsibility:</strong> INTAKEE does not create, endorse, or assume responsibility for any user-generated content. All content posted, uploaded, or shared on INTAKEE is the sole responsibility of the user who created it.</p>
+                    <p><strong>B. DMCA & Copyright Compliance:</strong> Upon receiving a valid DMCA takedown request, INTAKEE will promptly remove or disable access to the allegedly infringing material. INTAKEE is not liable for content uploaded by users, provided that it complies with DMCA safe-harbor requirements.</p>
+                    <p><strong>C. Limitation of Liability:</strong> To the maximum extent permitted by law, INTAKEE shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to the use of the platform. Use of INTAKEE is at the user’s own risk.</p>
+                    <p><strong>D. Mandatory Arbitration Clause:</strong> Any dispute arising from or related to the use of INTAKEE shall be resolved exclusively through binding arbitration. Users waive their right to participate in class-action lawsuits or class-wide arbitration.</p>
+                    <p><strong>E. No Warranty:</strong> INTAKEE is provided on an ‘as-is’ and ‘as-available’ basis. INTAKEE makes no warranties or guarantees regarding availability, reliability, or performance of the platform.</p>
+                </div>
+            </div>
+            
+            <div class="accordion">
+                <div class="accordion-header" data-action="toggle-guidelines">
+                    <span class="settings-label">Community Guidelines</span>
+                    <i class="fa fa-chevron-right settings-arrow"></i>
+                </div>
+                <div class="accordion-body">
+                    <p><strong>A. Prohibited Content:</strong> INTAKEE strictly prohibits the upload or distribution of pornographic, violent, hateful, or illegal content. This includes content promoting terrorism, self-harm, harassment, or materials you do not own.</p>
+                    <p><strong>B. Right to Remove Content:</strong> INTAKEE reserves the right to remove, restrict, or disable any content that violates applicable law, infringes copyrights, or poses a risk to the platform, its users, or the company.</p>
+                    <p><strong>C. User Safety Responsibility:</strong> Users are solely responsible for their interactions with other users. INTAKEE does not conduct background checks and is not responsible for the conduct of any user.</p>
+                </div>
+            </div>
+
+            <div class="settings-row" data-action="privacy-policy">
+                <span class="settings-label">Privacy Policy (Requires Drafting)</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="copyright">
+                <span class="settings-label">Copyright & DMCA</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+
+        <h3 class="settings-section-title">Support</h3>
+        <div class="settings-list">
+            <div class="settings-row" data-action="contact-support">
+                <span class="settings-label">Contact Support (intakee2025@gmail.com)</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+        
+    </main>
+</div>
+<div id="tab-settings" class="settings-page">
+    <main class="content" style="max-width: 800px; padding-top: 0;">
+
+        <h3 class="settings-section-title">Account</h3>
+        <div class="settings-list">
+            <div class="settings-row" data-action="change-email">
+                <span class="settings-label">Change email</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="change-password">
+                <span class="settings-label">Change password</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="delete-account">
+                <span class="settings-label red-text">Delete account</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="log-out">
+                <span class="settings-label red-text">Log out</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+
+        <h3 class="settings-section-title">Privacy</h3>
+        <div class="settings-list">
+            <div class="settings-toggle">
+                <label>Private account</label>
+                <input type="checkbox" id="toggle-private-account">
+            </div>
+            <div class="settings-row" data-action="blocked-users">
+                <span class="settings-label">Blocked users list</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="follower-visibility">
+                <span class="settings-label">Who can see your followers/following</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="comment-controls">
+                <span class="settings-label">Comment controls (for videos & clips)</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+
+        <h3 class="settings-section-title">Notifications</h3>
+        <div class="settings-list">
+            <div class="settings-toggle">
+                <label>Likes / dislikes on your posts</label>
+                <input type="checkbox" checked>
+            </div>
+            <div class="settings-toggle">
+                <label>New uploads from creators you follow</label>
+                <input type="checkbox" checked>
+            </div>
+        </div>
+        
+        <h3 class="settings-section-title">Appearance</h3>
+        <div class="settings-list">
+            <div class="settings-toggle">
+                <label>Dark mode / Light mode</label>
+                <input type="checkbox" checked>
+            </div>
+            <div class="settings-toggle">
+                <label>System default mode</label>
+                <input type="checkbox">
+            </div>
+        </div>
+        
+        <h3 class="settings-section-title">Content Controls</h3>
+        <div class="settings-list">
+            <div class="settings-row" data-action="manage-saved">
+                <span class="settings-label">Manage saved content</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="manage-playlists">
+                <span class="settings-label">Manage playlists</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+
+        <h3 class="settings-section-title">Safety & Moderation</h3>
+        <div class="settings-list">
+            <div class="settings-row" data-action="report-content">
+                <span class="settings-label">Report content</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="comment-filters">
+                <span class="settings-label">Comment filters (block keywords)</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+            <div class="settings-row" data-action="block-users">
+                <span class="settings-label">Block users</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+        
+        <h3 class="settings-section-title">Legal & Policies</h3>
+        <div class="settings-list">
+            
+            <div class="accordion">
+                <div class="accordion-header" data-action="toggle-tos">
+                    <span class="settings-label">Terms of Service</span>
+                    <i class="fa fa-chevron-right settings-arrow"></i>
+                </div>
+                <div class="accordion-body">
+                    <p><strong>A. User-Generated Content (UGC) Responsibility:</strong> INTAKEE does not create, endorse, or assume responsibility for any user-generated content. All content posted, uploaded, or shared on INTAKEE is the sole responsibility of the user who created it.</p>
+                    <p><strong>B. DMCA & Copyright Compliance:</strong> Upon receiving a valid DMCA takedown request, INTAKEE will promptly remove or disable access to the allegedly infringing material. INTAKEE is not liable for content uploaded by users, provided that it complies with DMCA safe-harbor requirements.</p>
+                    <p><strong>C. Limitation of Liability:</strong> To the maximum extent permitted by law, INTAKEE shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to the use of the platform. Use of INTAKEE is at the user’s own risk.</p>
+                    <p><strong>D. Mandatory Arbitration Clause:</strong> Any dispute arising from or related to the use of INTAKEE shall be resolved exclusively through binding arbitration. Users waive their right to participate in class-action lawsuits or class-wide arbitration.</p>
+                    <p><strong>E. No Warranty:</strong> INTAKEE is provided on an ‘as-is’ and ‘as-available’ basis. INTAKEE makes no warranties or guarantees regarding availability, reliability, or performance of the platform.</p>
+                </div>
+            </div>
+            
+            <div class="accordion">
+                <div class="accordion-header" data-action="toggle-guidelines">
+                    <span class="settings-label">Community Guidelines</span>
+                    <i class="fa fa-chevron-right settings-arrow"></i>
+                </div>
+                <div class="accordion-body">
+                    <p><strong>A. Prohibited Content:</strong> INTAKEE strictly prohibits the upload or distribution of pornographic, violent, hateful, or illegal content. This includes content promoting terrorism, self-harm, harassment, or materials you do not own.</p>
+                    <p><strong>B. Right to Remove Content:</strong> INTAKEE reserves the right to remove, restrict, or disable any content that violates applicable law, infringes copyrights, or poses a risk to the platform, its users, or the company.</p>
+                    <p><strong>C. User Safety Responsibility:</strong> Users are solely responsible for their interactions with other users. INTAKEE does not conduct background checks and is not responsible for the conduct of any user.</p>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-header" data-action="toggle-privacy">
+                    <span class="settings-label">Privacy Policy</span>
+                    <i class="fa fa-chevron-right settings-arrow"></i>
+                </div>
+                <div class="accordion-body">
+                    <p><strong>1. Age Restriction:</strong> INTAKEE is for users aged **13 and older**. We do not knowingly collect personal data from anyone under the age of 13. </p>
+                    <p><strong>2. Account Data Collected:</strong> Username, Email, Hashed Password, Profile details, Follower/Following lists.</p>
+                    <p><strong>3. Activity Data Collected:</strong> Uploaded Content (Videos/Podcasts/Clips), Likes, Comments, Views, and Search History.</p>
+                    <p><strong>4. Usage of Data:</strong> Data is used to manage your account, store content, recommend new content, and protect your account from fraud. **We do not sell personal data.**</p>
+                    <p><strong>5. User Rights:</strong> You can access, update, or request deletion of your data via the Account settings.</p>
+                </div>
+            </div>
+
+            <div class="settings-row" data-action="copyright">
+                <span class="settings-label">Copyright & DMCA</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+
+        <h3 class="settings-section-title">Support</h3>
+        <div class="settings-list">
+            <div class="settings-row" data-action="contact-support">
+                <span class="settings-label">Contact Support (intakee2025@gmail.com)</span>
+                <i class="fa fa-chevron-right settings-arrow"></i>
+            </div>
+        </div>
+        
+    </main>
+</div>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>INTAKEE — Viewer</title>
-
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-
-  <style>
-    body {
-      margin: 0;
-      background: #000;
-      color: #fff;
-      font-family: system-ui, Arial, sans-serif;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px;
-      background: #0b0b0b;
-      border-bottom: 1px solid #222;
-    }
-
-    header button {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    #video-container,
-    #audio-container {
-      width: 100%;
-      background: #111;
-    }
-
-    video, audio {
-      width: 100%;
-      max-height: 70vh;
-      background: #000;
-    }
-
-    .content {
-      padding: 16px;
-    }
-
-    h1 {
-      font-size: 20px;
-      margin: 10px 0;
-    }
-
-    .creator-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 15px 0;
-    }
-
-    .creator-row img {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #333;
-    }
-
-    .follow-btn {
-      margin-left: auto;
-      padding: 6px 14px;
-      border-radius: 8px;
-      background: #fff;
-      color: #000;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .stats {
-      display: flex;
-      gap: 20px;
-      color: #bbb;
-      margin: 10px 0;
-      align-items: center;
-    }
-
-    .reaction-buttons {
-      display: flex;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .reaction-buttons button {
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: none;
-      background: #111;
-      color: #fff;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .reaction-buttons button.active {
-      background: #fff;
-      color: #000;
-    }
-
-    .save-btn {
-      padding: 8px 14px;
-      border-radius: 8px;
-      background: #444;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    .description {
-      margin: 15px 0;
-      line-height: 1.5;
-      color: #ccc;
-    }
-
-    .comment-box {
-      margin-top: 20px;
-    }
-
-    .comment-box input {
-      width: 80%;
-      padding: 10px;
-      background: #111;
-      border: 1px solid #333;
-      color: white;
-      border-radius: 8px;
-    }
-
-    .comment-box button {
-      padding: 10px 14px;
-      border-radius: 8px;
-      background: #fff;
-      color: #000;
-      border: none;
-      cursor: pointer;
-    }
-
-    .comments {
-      margin-top: 16px;
-      border-top: 1px solid #222;
-      padding-top: 16px;
-    }
-
-    .comment-item {
-      margin-bottom: 12px;
-      font-size: 14px;
-      color: #ddd;
-    }
-
-    .muted {
-      color: #777;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTAKEE — 404 Not Found</title>
+    <link rel="stylesheet" href="css/style.css"> 
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh; 
+            text-align: center;
+        }
+        .error-code {
+            font-size: 80px;
+            font-weight: bold;
+            color: var(--primary-accent); /* Using your accent color */
+            margin-bottom: 5px;
+        }
+        .error-message {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: var(--text-muted);
+        }
+        /* Uses the global style for the back button */
+        .back-home-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: var(--button-primary); 
+            color: var(--primary-text-dark);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
 </head>
-
 <body>
-
-  <!-- HEADER -->
-  <header>
-    <button onclick="history.back()">
-      <i class="fa fa-arrow-left"></i>
-    </button>
-    <h2 style="margin:0;">Post Viewer</h2>
-  </header>
-
-  <!-- VIDEO PLAYER -->
-  <div id="video-container" style="display:none;">
-    <video id="viewer-video" controls></video>
-  </div>
-
-  <!-- AUDIO PLAYER -->
-  <div id="audio-container" style="display:none;">
-    <audio id="viewer-audio" controls></audio>
-  </div>
-
-  <!-- CONTENT -->
-  <div class="content">
-
-    <!-- TITLE -->
-    <h1 id="viewer-title"></h1>
-
-    <!-- CREATOR -->
-    <div class="creator-row">
-      <img id="viewer-creator-photo" src="">
-      <div>
-        <div id="viewer-creator-name"></div>
-        <div id="viewer-creator-username" class="muted" style="font-size:13px;"></div>
-      </div>
-
-      <button id="viewer-follow-btn" class="follow-btn">Follow</button>
+    <div class="error-container">
+        <img src="img/intakee_logo_large.png" alt="INTAKEE Logo" style="width: 150px; margin-bottom: 20px;"> 
+        
+        <div class="error-code">404</div>
+        <div class="error-message">The page or content you're looking for doesn't exist.</div>
+        
+        <a href="index.html" class="back-home-btn">Go to Home Page</a>
     </div>
-
-    <!-- STATS -->
-    <div class="stats">
-      <span id="viewer-like-count">0 Likes</span>
-      <span id="viewer-comments-count">0 Comments</span>
-      <span id="viewer-views">0 Views</span>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTAKEE — 500 Server Error</title>
+    <link rel="stylesheet" href="css/style.css"> 
+    <style>
+        /* Reusing the same styles as the 404 page for consistency */
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh; 
+            text-align: center;
+        }
+        .error-code {
+            font-size: 80px;
+            font-weight: bold;
+            color: var(--red-alert); /* Using a red/alert color for severity */
+            margin-bottom: 5px;
+        }
+        .error-message {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: var(--text-muted);
+        }
+        .back-home-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: var(--button-primary); 
+            color: var(--primary-text-dark);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <img src="img/intakee_logo_large.png" alt="INTAKEE Logo" style="width: 150px; margin-bottom: 20px;"> 
+        
+        <div class="error-code">500</div>
+        <div class="error-message">We are experiencing technical difficulties. Please try again soon.</div>
+        
+        <a href="index.html" class="back-home-btn">Go to Home Page</a>
     </div>
-
-    <!-- REACTIONS -->
-    <div class="reaction-buttons">
-      <button id="viewer-like-btn"><i class="fa fa-thumbs-up"></i></button>
-      <button id="viewer-dislike-btn"><i class="fa fa-thumbs-down"></i></button>
-      <button id="viewer-save-btn" class="save-btn">💾 Save</button>
-    </div>
-
-    <!-- DESCRIPTION -->
-    <div id="viewer-description" class="description"></div>
-
-    <!-- COMMENTS INPUT -->
-    <div class="comment-box">
-      <input id="viewer-comment-input" placeholder="Add a comment...">
-      <button id="viewer-comment-btn">Post</button>
-    </div>
-
-    <!-- COMMENTS LIST -->
-    <div id="viewer-comments" class="comments"></div>
-
-  </div>
-
-  <!-- JS -->
-  <script type="module" src="js/viewer.js"></script>
-
 </body>
 </html>
