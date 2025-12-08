@@ -262,7 +262,9 @@ $("btnSaveProfile").addEventListener("click", async () => {
   alert("Profile updated!");
   $("bio-edit-wrap").style.display = "none";
 });
-
+document.getElementById("editProfileLink")?.addEventListener("click", () => {
+    document.getElementById("btn-edit-profile").click();
+});
 // ======================================
 // UPLOAD SYSTEM
 // ======================================
