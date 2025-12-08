@@ -216,6 +216,16 @@
     <button id="forgot-password-btn" class="forgot-link">Forgot Password?</button>
     <button id="forgot-username-btn" class="forgot-link">Forgot Username?</button>
 </div>
+<!-- Forgot Username Popup -->
+<dialog id="forgotUserDialog">
+  <h3>Recover Username</h3>
+  <p>Enter the email associated with your account:</p>
+
+  <input id="forgotUserEmail" type="email" placeholder="Email" />
+
+  <button id="recoverUsernameBtn">Find Username</button>
+  <button id="closeForgotUser" class="close-small">Close</button>
+</dialog>
 
 <!-- SCRIPT ORDER (IMPORTANT!) -->
 <script type="module" src="js/firebase-config.js"></script>
