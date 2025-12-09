@@ -642,3 +642,16 @@ dialog#authDialog::backdrop {
         flex-direction:column;
     }
 }
+.upload-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+    padding: 0 20px;
+}
+
+.upload-actions button {
+    flex: 1;
+    max-width: 200px; /* keeps them same size on desktop */
+    text-align: center;
+}
