@@ -453,13 +453,11 @@ dialog#authDialog::backdrop {
 /* ========================================================================= */
 /* PROFILE PAGE — Avatar, Tabs, Grid                                        */
 /* ========================================================================= */
-
 #profile {
-    padding-top: 20px;
-    max-width: 880px;
-    margin: auto;
+    padding: 40px 20px;        /* Adds breathing room */
+    max-width: 900px;          /* Prevents crunching on large screens */
+    margin: 0 auto;            /* Centers profile layout */
 }
-
 .profile-header-section {
     display:flex;
     align-items:center;
