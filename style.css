@@ -64,7 +64,7 @@ header#mainHeader {
 }
 
 header img.app-logo {
-    height: 70px;   /* Bigger logo */
+    height: 100px;   /* Bigger logo */
     width: auto;    /* Keeps the proportions perfect */
 }
 
