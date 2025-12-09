@@ -9,13 +9,21 @@
 // -------------------------------
 // 🔥 FIREBASE IMPORTS
 // -------------------------------
-import {
+// =============================================
+// FIREBASE CDN IMPORTS (WORKS ON VERCEL/GITHUB)
+// =============================================
+
+import { 
+    initializeApp 
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+
+import { 
     getAuth,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
-    onAuthStateChanged,
-} from "firebase/auth";
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
 import {
     getFirestore,
@@ -29,15 +37,14 @@ import {
     getDocs,
     query,
     where
-} from "firebase/firestore";
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 import {
     getStorage,
     ref,
     uploadBytes,
     getDownloadURL
-} from "firebase/storage";
-
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
 
 // -------------------------------
 // 🔥 INITIALIZE FIREBASE SERVICES
