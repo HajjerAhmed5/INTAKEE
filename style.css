@@ -455,25 +455,34 @@ dialog#authDialog::backdrop {
         flex-direction: column;
     }
 }
-.home-filter-text-right {
+/* Home header row: Trending left, filters right */
+.home-header-row {
     display: flex;
-    gap: 20px;             /* Space between items */
-    margin-top: -10px;     /* Moves row closer to Trending */
-    margin-left: 20px;     /* Pulls it left so all buttons fit */
-    flex-wrap: nowrap;     /* Prevents wrapping */
-    overflow-x: auto;      /* Allows scrolling if needed */
-    white-space: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
+/* Filter container */
+.home-filter-text-right {
+    display: flex;
+    gap: 16px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow-x: auto;
+    padding-left: 10px;
+}
+
+/* Filter buttons */
 .filter-text {
     background: transparent;
     border: none;
-    color: #ccc;
+    color: #aaa;
     font-size: 0.9rem;
     cursor: pointer;
 }
 
 .filter-text.active {
     color: #fff;
-    font-weight: 700;
+    font-weight: 600;
 }
