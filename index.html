@@ -126,30 +126,33 @@
 <!-- ⭐ PROFILE TAB -->
 <section id="profile" class="tab-section">
 
-    <div class="profile-header-section">
+    <!-- 🔳 GRID AT TOP -->
+    <div id="profile-top-grid" class="profile-grid"></div>
 
-        <div class="avatar-wrap">
-            <img id="profile-photo" class="profile-avatar" src="default-avatar.png" alt="Profile Avatar" />
-        </div>
-
-        <div class="profile-info">
-            <h3 id="profile-name">Your Name</h3>
-            <p id="profile-handle" class="muted">@username</p>
-            <p id="profile-bio" class="profile-bio muted">This is your bio. (0/200)</p>
-        </div>
-
+    <!-- 🟣 CENTERED AVATAR -->
+    <div class="profile-center-avatar">
+        <img id="profile-photo" class="profile-avatar" src="default-avatar.png" alt="Profile Avatar" />
         <button id="btn-edit-profile" class="primary edit-profile-btn">Edit Profile</button>
     </div>
 
-    <div class="stat-row">
-        <div class="profile-stat"><strong id="stat-posts">0</strong><br><span class="muted small">Posts</span></div>
-        <div class="profile-stat"><strong id="stat-followers">0</strong><br><span class="muted small">Followers</span></div>
-        <div class="profile-stat"><strong id="stat-following">0</strong><br><span class="muted small">Following</span></div>
-        <div class="profile-stat"><strong id="stat-likes">0</strong><br><span class="muted small">Likes</span></div>
+    <!-- 📝 CENTERED USER INFO -->
+    <div class="profile-info-center">
+        <h3 id="profile-name">Your Name</h3>
+        <p id="profile-handle" class="muted">@username</p>
+        <p id="profile-bio" class="profile-bio muted">This is your bio. (0/200)</p>
     </div>
 
-    <div class="profile-tabs-wrap">
-        <div class="profile-tabs">
+    <!-- 📊 CENTERED STATS -->
+    <div class="profile-stats-center">
+        <div><strong id="stat-posts">0</strong><span>Posts</span></div>
+        <div><strong id="stat-followers">0</strong><span>Followers</span></div>
+        <div><strong id="stat-following">0</strong><span>Following</span></div>
+        <div><strong id="stat-likes">0</strong><span>Likes</span></div>
+    </div>
+
+    <!-- 🔘 PILLS UNDER STATS -->
+    <div class="profile-tabs-wrap-center">
+        <div class="profile-tabs-center">
             <button class="pill active" data-profile-tab="uploads">Uploads</button>
             <button class="pill" data-profile-tab="saved">Saved</button>
             <button class="pill" data-profile-tab="likes">Likes</button>
@@ -159,6 +162,7 @@
         </div>
     </div>
 
+    <!-- FEED GRIDS -->
     <div id="profile-uploads-grid" class="feed-grid"></div>
     <div id="profile-saved-grid" class="feed-grid" style="display:none;"></div>
     <div id="profile-likes-grid" class="feed-grid" style="display:none;"></div>
@@ -167,8 +171,6 @@
     <div id="profile-notifications-grid" class="feed-grid" style="display:none;"></div>
 
 </section>
-
-
 <!-- ⭐ SETTINGS TAB -->
 <section id="settings" class="tab-section">
 
