@@ -644,27 +644,6 @@ saveProfileBtn.addEventListener("click", async () => {
     await loadUserProfile(); // refresh display
 });
 
-
-// -------------------------------
-// ⭐ GENERATE FEED CARDS FOR PROFILE
-// -------------------------------
-function generateFeedCard(post) {
-    const div = document.createElement("div");
-    div.className = "placeholder-card";
-
-    // card content
-    div.innerHTML = `
-        <img src="${post.thumbnailURL}" class="feed-thumb" />
-        <div class="feed-title">${post.title}</div>
-        <div class="feed-meta">@${post.username}</div>
-    `;
-
-    div.addEventListener("click", () => {
-        openViewer(post);
-    });
-
-    return div;
-}
 /*  
 ==========================================
    SCRIPT.JS — PART 4
