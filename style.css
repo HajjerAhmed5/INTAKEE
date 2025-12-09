@@ -455,3 +455,27 @@ dialog#authDialog::backdrop {
         flex-direction: column;
     }
 }
+/* HOME FILTER TEXT ROW — EXACT UI MATCH */
+.home-filter-text-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+    margin-top: -30px;  
+    margin-bottom: 20px;
+}
+
+.filter-text {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+.filter-text.active,
+.filter-text:hover {
+    color: #fff;
+    font-weight: 600;
+}
