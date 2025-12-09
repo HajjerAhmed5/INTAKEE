@@ -1,90 +1,226 @@
-// js/auth.js
-import { auth } from "./firebase-init.js";
+/* 
+=====================================
+INTAKEE — AUTHENTICATION SYSTEM
+Handles:
+- Signup
+- Login (email or username)
+- Logout
+- Forgot password
+- Forgot username
+=====================================
+*/
+
+// -------------------------------
+// IMPORT FIREBASE FROM CDN
+// -------------------------------
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile,
-  onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+    onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-// helper to toggle UI
-function setAuthedUI(user) {
-  const authed = !!user;
+import {
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc,
+    collection,
+    query,
+    where,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-  // toggle visibility for logged-in / logged-out UI elements
-  document.querySelectorAll("[data-authed-only]").forEach(el => el.style.display = authed ? "" : "none");
-  document.querySelectorAll("[data-anon-only]").forEach(el => el.style.display = authed ? "none" : "");
-  document.querySelectorAll("[data-user-name]").forEach(el => el.textContent = authed ? (user.displayName || user.email) : "");
 
-  // globally expose the Firebase user
-  window.currentUser = user;
+// -------------------------------
+// INIT
+// -------------------------------
+const auth = getAuth();
+const db = getFirestore();
 
-  // auto-disable any buttons that require auth
-  document.querySelectorAll("[data-require-auth]").forEach(btn => {
-    btn.disabled = !authed;
-  });
-}
 
-// listen for user state changes
-onAuthStateChanged(auth, (user) => {
-  setAuthedUI(user);
+// -------------------------------
+// DOM ELEMENTS
+// -------------------------------
+const authDialog = document.getElementById("authDialog");
+const openAuthBtn = document.getElementById("openAuth");
+const closeAuthDialog = document.getElementById("closeAuthDialog");
+
+const signupBtn = document.getElementById("signupBtn");
+const signupEmail = document.getElementById("signupEmail");
+const signupPassword = document.getElementById("signupPassword");
+const signupUsername = document.getElementById("signupUsername");
+const signupAgeConfirm = document.getElementById("signupAgeConfirm");
+
+const loginBtn = document.getElementById("loginBtn");
+const loginIdentifier = document.getElementById("loginIdentifier");
+const loginPassword = document.getElementById("loginPassword");
+
+const forgotUsernameBtn = document.getElementById("forgotUsernameBtn");
+const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+
+const loginHeaderBtn = document.getElementById("openAuth");
+const headerUsername = document.getElementById("headerUsername");
+
+
+// -------------------------------
+// OPEN/CLOSE AUTH MODAL
+// -------------------------------
+openAuthBtn.addEventListener("click", () => {
+    authDialog.showModal();
 });
 
-// --------------------------- SIGN UP ---------------------------
-document.getElementById("signup-form")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const form = e.currentTarget;
-  const fd = new FormData(form);
-  const name = (fd.get("displayName") || "").toString().trim();
-  const email = (fd.get("email") || "").toString().trim();
-  const password = (fd.get("password") || "").toString();
-  const btn = form.querySelector("button[type=submit]");
-
-  try {
-    if (btn) btn.disabled = true;
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    if (name) await updateProfile(cred.user, { displayName: name });
-
-    form?.reset?.();
-    document.getElementById("auth-modal")?.close?.();
-    alert("Account created! You’re signed in.");
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    if (btn) btn.disabled = false;
-  }
+closeAuthDialog.addEventListener("click", () => {
+    authDialog.close();
 });
 
-// --------------------------- LOGIN ---------------------------
-document.getElementById("login-form")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const form = e.currentTarget;
-  const fd = new FormData(form);
-  const email = (fd.get("email") || "").toString().trim();
-  const password = (fd.get("password") || "").toString();
-  const btn = form.querySelector("button[type=submit]");
 
-  try {
-    if (btn) btn.disabled = true;
-    await signInWithEmailAndPassword(auth, email, password);
+// -------------------------------
+// CREATE ACCOUNT
+// -------------------------------
+signupBtn.addEventListener("click", async () => {
+    const email = signupEmail.value.trim();
+    const password = signupPassword.value.trim();
+    const username = signupUsername.value.trim().toLowerCase();
 
-    form?.reset?.();
-    document.getElementById("auth-modal")?.close?.();
-    alert("Welcome back!");
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    if (btn) btn.disabled = false;
-  }
+    if (!signupAgeConfirm.checked) {
+        alert("You must be 13+ to create an account.");
+        return;
+    }
+
+    if (!email || !password || !username) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = cred.user.uid;
+
+        await setDoc(doc(db, "users", uid), {
+            email,
+            username,
+            createdAt: Date.now(),
+            bio: "",
+            followers: 0,
+            following: 0,
+            posts: 0,
+            likes: 0,
+            saved: [],
+            history: [],
+            notifications: [],
+            privateAccount: false,
+            uploadsPrivate: false,
+            savedPrivate: false,
+            playlistsPrivate: false,
+        });
+
+        alert("Account created!");
+        authDialog.close();
+
+    } catch (err) {
+        alert(err.message);
+    }
 });
 
-// --------------------------- LOGOUT ---------------------------
-document.getElementById("logout-btn")?.addEventListener("click", async () => {
-  try {
-    await signOut(auth);
-    alert("You’ve been signed out.");
-  } catch (err) {
-    alert(err.message);
-  }
+
+// -------------------------------
+// LOG IN (EMAIL OR USERNAME)
+// -------------------------------
+loginBtn.addEventListener("click", async () => {
+    const identifier = loginIdentifier.value.trim();
+    const password = loginPassword.value.trim();
+
+    if (!identifier || !password) {
+        alert("Enter your email/username and password.");
+        return;
+    }
+
+    try {
+        let emailToUse = identifier;
+
+        // If logging in with username
+        if (!identifier.includes("@")) {
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("username", "==", identifier.toLowerCase()));
+            const snap = await getDocs(q);
+
+            if (snap.empty) {
+                alert("No account found with that username.");
+                return;
+            }
+
+            emailToUse = snap.docs[0].data().email;
+        }
+
+        await signInWithEmailAndPassword(auth, emailToUse, password);
+        authDialog.close();
+
+    } catch (err) {
+        alert(err.message);
+    }
+});
+
+
+// -------------------------------
+// FORGOT PASSWORD
+// -------------------------------
+forgotPasswordBtn.addEventListener("click", async () => {
+    const identifier = loginIdentifier.value.trim();
+
+    if (!identifier.includes("@")) {
+        alert("Enter your email first.");
+        return;
+    }
+
+    try {
+        await sendPasswordResetEmail(auth, identifier);
+        alert("Password reset email sent!");
+    } catch (err) {
+        alert(err.message);
+    }
+});
+
+
+// -------------------------------
+// FORGOT USERNAME
+// -------------------------------
+forgotUsernameBtn.addEventListener("click", async () => {
+    const email = loginIdentifier.value.trim();
+
+    if (!email.includes("@")) {
+        alert("Enter your email to recover your username.");
+        return;
+    }
+
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("email", "==", email));
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+        alert("No account found with that email.");
+        return;
+    }
+
+    const username = snap.docs[0].data().username;
+    alert("Your username is: @" + username);
+});
+
+
+// -------------------------------
+// AUTH STATE CHANGE → SHOW USERNAME
+// -------------------------------
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        const data = snap.data();
+
+        loginHeaderBtn.style.display = "none";
+        headerUsername.style.display = "inline";
+        headerUsername.textContent = "@" + data.username;
+    } else {
+        loginHeaderBtn.style.display = "inline";
+        headerUsername.style.display = "none";
+    }
 });
