@@ -64,17 +64,18 @@ header img.app-logo {
     font-weight: 600;
     margin-left: 10px;
 }
-
-/* Login Button (White text on black) */
+/* Login / Sign Up Button */
 .header-login-btn {
     background: #000 !important;
     color: #fff !important;
     border: 1px solid #fff !important;
-    padding: 8px 16px;
+    padding: 6px 12px !important;
     border-radius: 8px;
+    font-size: 0.85rem !important;
+    font-weight: 600;
+    white-space: nowrap;
     cursor: pointer;
 }
-
 /* SEARCH BAR */
 .search-bar {
     flex: 1;
