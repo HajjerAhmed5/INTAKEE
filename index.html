@@ -36,7 +36,21 @@
     <div class="home-header-row">
         <h2>Trending</h2>
 
-        
+         <!-- Trending filter bar (ONLY for Home tab) -->
+    <div class="home-filter-text-right">
+        <button class="filter-text active" data-filter="all">All</button>
+        <button class="filter-text" data-filter="videos">Videos</button>
+        <button class="filter-text" data-filter="podcasts">Podcasts</button>
+        <button class="filter-text" data-filter="clips">Clips</button>
+        <button class="filter-text" data-filter="following">Following</button>
+        <button class="filter-text" data-filter="newest">Newest</button>
+    </div>
+
+    <!-- Feed for home content -->
+    <div id="home-feed" class="feed-grid"></div>
+
+</section>
+
         <!-- JS loads content -->
     </div>
 </section>
@@ -46,27 +60,13 @@
 
     <div id="videos-feed" class="feed-grid"></div>
 </section>
-<div class="home-filter-text-right">
-            <button class="filter-text active" data-filter="all">All</button>
-            <button class="filter-text" data-filter="videos">Videos</button>
-            <button class="filter-text" data-filter="podcasts">Podcasts</button>
-            <button class="filter-text" data-filter="clips">Clips</button>
-            <button class="filter-text" data-filter="following">Following</button>
-            <button class="filter-text" data-filter="newest">Newest</button>
-        </div>
-    </div>
-
-    <div id="home-feed" class="feed-grid"></div>
-</section>
-
 <!-- ⭐ PODCASTS TAB -->
 <section id="podcasts" class="tab-section">
     <h2>Podcasts</h2>
 
     <div id="podcasts-feed" class="feed-grid"></div>
 </section>
-
-
+    
 <!-- ⭐ CLIPS TAB -->
 <section id="clips" class="tab-section">
     <h2>Clips</h2>
