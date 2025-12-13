@@ -22,9 +22,7 @@
         <input id="globalSearch" placeholder="Search for content or creators..." autocomplete="off" />
     </div>
 
-    <!-- Login (Home Only) -->
     <button id="openAuth" class="primary header-login-btn">Login / Sign Up</button>
-    <!-- Username appears here after login -->
     <span id="headerUsername" class="header-username" style="display:none;">@username</span>
 </header>
 
@@ -36,7 +34,6 @@
     <div class="home-header-row">
         <h2>Trending</h2>
 
-        <!-- Trending filter bar -->
         <div class="home-filter-text-right">
             <button class="filter-text active" data-filter="all">All</button>
             <button class="filter-text" data-filter="videos">Videos</button>
@@ -47,37 +44,38 @@
         </div>
     </div>
 
-    <!-- Home Feed -->
     <div id="home-feed" class="feed-grid"></div>
 </section>
+
+
+
 <!-- ⭐ VIDEOS TAB -->
 <section id="videos" class="tab-section">
     <h2>Videos</h2>
-
     <div id="videos-feed" class="feed-grid"></div>
 </section>
+
 <!-- ⭐ PODCASTS TAB -->
 <section id="podcasts" class="tab-section">
     <h2>Podcasts</h2>
-
     <div id="podcasts-feed" class="feed-grid"></div>
 </section>
-    
+
 <!-- ⭐ CLIPS TAB -->
 <section id="clips" class="tab-section">
     <h2>Clips</h2>
-
     <div id="clips-feed" class="feed-grid"></div>
 </section>
 
-<!-- ⭐ UPLOAD TAB (CLEAN & UPDATED) -->
+
+
+<!-- ⭐ UPLOAD TAB -->
 <section id="upload" class="tab-section" style="display:none;">
 
     <h2 class="muted" style="margin-bottom:20px;">Upload Content</h2>
 
     <div class="upload-container">
 
-        <!-- Content Category -->
         <label class="form-label">Content Category</label>
         <select id="uploadTypeSelect" class="form-input">
             <option value="video">Video</option>
@@ -86,23 +84,18 @@
             <option value="podcast-video">Podcast — Video</option>
         </select>
 
-        <!-- Title -->
         <label class="form-label">Title</label>
         <input id="uploadTitleInput" class="form-input" placeholder="Give your post a title" maxlength="70" />
 
-        <!-- Description -->
         <label class="form-label">Description (Optional)</label>
         <textarea id="uploadDescInput" class="form-input" maxlength="2000" placeholder="Describe your content..."></textarea>
 
-        <!-- Thumbnail -->
-        <label class="form-label">Thumbnail Image (Only required for audio podcasts)</label>
+        <label class="form-label">Thumbnail Image (Required for audio podcasts)</label>
         <input id="uploadThumbInput" type="file" class="form-input" accept="image/*" />
 
-        <!-- File Upload -->
         <label class="form-label">Main Content File</label>
         <input id="uploadFileInput" type="file" class="form-input" accept="video/*,audio/*" />
 
-        <!-- Age Restriction -->
         <div class="settings-toggle" style="margin: 20px 0;">
             <span>Is this restricted to 18+?</span>
             <label class="switch">
@@ -113,13 +106,17 @@
 
     </div>
 
-    <!-- ⭐ UPLOAD + GO LIVE BUTTONS -->
-  <div class="upload-actions">
-    <button id="btnUpload" class="primary-outline">Upload</button>
-    <button id="btnGoLive" class="primary-outline">Go Live</button>
-</div>
+    <div class="upload-actions">
+        <button id="btnUpload" class="primary-outline">Upload</button>
+        <button id="btnGoLive" class="primary-outline">Go Live</button>
+    </div>
 </section>
-<!-- ⭐ PROFILE TAB -->
+
+
+
+
+
+<!-- ⭐ FINAL — CLEAN PROFILE TAB -->
 <section id="profile" class="tab-section">
 
     <!-- 🔳 GRID AT TOP -->
@@ -146,7 +143,7 @@
         <div><strong id="stat-likes">0</strong><span>Likes</span></div>
     </div>
 
-    <!-- 🔘 PILLS UNDER STATS -->
+    <!-- 🔘 TABS -->
     <div class="profile-tabs-wrap-center">
         <div class="profile-tabs-center">
             <button class="pill active" data-profile-tab="uploads">Uploads</button>
@@ -167,6 +164,10 @@
     <div id="profile-notifications-grid" class="feed-grid" style="display:none;"></div>
 
 </section>
+
+
+
+
 <!-- ⭐ SETTINGS TAB -->
 <section id="settings" class="tab-section">
 
@@ -251,7 +252,6 @@
 
 </section>
 
-
 </main>
 
 
@@ -300,21 +300,14 @@
 <!-- ⭐ SCRIPTS -->
 <script type="module" src="js/firebase-config.js"></script>
 <script type="module" src="js/firebase-init.js"></script>
-<script type="module" src="js/script.js"></script>
 
-</body>
-</html>
-<!-- Firebase Core -->
-<script type="module" src="js/firebase-config.js"></script>
-<script type="module" src="js/firebase-init.js"></script>
-
-<!-- Core App Logic -->
 <script type="module" src="js/tabs.js"></script>
 <script type="module" src="js/auth.js"></script>
 <script type="module" src="js/profile.js"></script>
 <script type="module" src="js/feed.js"></script>
 <script type="module" src="js/upload.js"></script>
 <script type="module" src="js/settings.js"></script>
-
-<!-- Viewer / Player -->
 <script type="module" src="js/viewer.js"></script>
+
+</body>
+</html>
