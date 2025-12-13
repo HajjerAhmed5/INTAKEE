@@ -484,3 +484,123 @@ dialog#authDialog::backdrop {
     color: #fff;
     font-weight: 600;
 }
+/* ================================
+   INTAKEE — FINAL PROFILE STYLE
+================================ */
+
+/* TOP GRID */
+.profile-grid {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    aspect-ratio: 1 / 1;
+    background: #111;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+/* Example cells (empty for now) */
+.profile-grid div {
+    background: #1a1a1a;
+}
+
+/* CENTER AVATAR */
+.profile-center-avatar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -60px;  /* pulls avatar INTO the grid */
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #000;
+    object-fit: cover;
+}
+
+.edit-profile-btn {
+    margin-top: 14px;
+    background: #fff !important;
+    color: #000 !important;
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
+/* CENTERED USER INFO */
+.profile-info-center {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.profile-info-center h3 {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+}
+
+.profile-bio {
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+/* STATS ROW CENTERED */
+.profile-stats-center {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.profile-stats-center span {
+    display: block;
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+/* TABS */
+.profile-tabs-wrap-center {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.profile-tabs-center {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.pill {
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid #fff;
+    color: #fff;
+    background: #000;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.pill.active {
+    background: #fff;
+    color: #000;
+}
+
+/* GRID BELOW PROFILE */
+#profile-uploads-grid,
+#profile-saved-grid,
+#profile-likes-grid,
+#profile-playlists-grid,
+#profile-history-grid,
+#profile-notifications-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    padding-bottom: 80px;
+}
