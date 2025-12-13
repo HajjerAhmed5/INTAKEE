@@ -1,5 +1,5 @@
 /* ========================================================================= */
-/* INTAKEE — FINAL STYLE.CSS (Monochrome Dark Mode, Full App Support)        */
+/* INTAKEE — FINAL STYLE.CSS (Clean + Fixed Profile Grid Version)           */
 /* ========================================================================= */
 
 :root {
@@ -18,14 +18,10 @@
 }
 
 /* ========================================================================= */
-/* RESET                                                                     */
+/* RESET */
 /* ========================================================================= */
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     background: var(--bg);
@@ -34,12 +30,8 @@ body {
     padding-bottom: 90px;
 }
 
-/* Smooth fade in */
-[data-reveal] { opacity: 0; transform: translateY(8px); animation: reveal .35s forwards; }
-@keyframes reveal { to { opacity: 1; transform: none; } }
-
 /* ========================================================================= */
-/* HEADER                                                                    */
+/* HEADER */
 /* ========================================================================= */
 
 header#mainHeader {
@@ -59,12 +51,6 @@ header img.app-logo {
     width: auto;
 }
 
-.header-username {
-    color: var(--primary-accent);
-    font-weight: 600;
-    margin-left: 10px;
-}
-
 .header-login-btn {
     background: #000 !important;
     color: #fff !important;
@@ -72,12 +58,9 @@ header img.app-logo {
     padding: 6px 12px !important;
     border-radius: 8px;
     font-size: 0.85rem !important;
-    font-weight: 600;
-    white-space: nowrap;
     cursor: pointer;
 }
 
-/* SEARCH BAR */
 .search-bar {
     flex: 1;
     display: flex;
@@ -94,11 +77,10 @@ header img.app-logo {
     background: transparent;
     color: var(--text);
     margin-left: 8px;
-    font-size: 0.95rem;
 }
 
 /* ========================================================================= */
-/* BUTTONS                                                                   */
+/* BUTTON STYLES */
 /* ========================================================================= */
 
 .primary {
@@ -107,7 +89,6 @@ header img.app-logo {
     border-radius: 8px;
     padding: 14px;
     font-weight: 600;
-    border: none;
 }
 
 .primary-outline {
@@ -122,7 +103,7 @@ header img.app-logo {
 button:hover { opacity: 0.8; }
 
 /* ========================================================================= */
-/* AUTH MODAL                                                                */
+/* AUTH MODAL */
 /* ========================================================================= */
 
 dialog#authDialog {
@@ -131,17 +112,10 @@ dialog#authDialog {
     background: #000;
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    color: #fff;
     padding: 25px 28px;
 }
 
 dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
-
-#authDialog h2 {
-    margin: 10px 0 15px;
-    font-size: 1.4rem;
-    font-weight: 700;
-}
 
 #authDialog .form-input {
     width: 100%;
@@ -159,28 +133,10 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     color: white;
     font-size: 28px;
     cursor: pointer;
-    float: right;
-    margin-top: -10px;
 }
-
-.auth-btn { width: 100%; margin-top: 8px; }
-.auth-links {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-.small-btn {
-    background: none !important;
-    border: none !important;
-    color: #999 !important;
-    font-size: 0.85rem;
-    cursor: pointer;
-}
-.small-btn:hover { color: #fff !important; }
 
 /* ========================================================================= */
-/* BOTTOM NAV                                                                */
+/* BOTTOM NAV */
 /* ========================================================================= */
 
 .bottom-nav {
@@ -201,8 +157,6 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 6px 2px;
-    transition: 0.25s;
 }
 
 .bottom-nav a.active,
@@ -211,7 +165,7 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
 }
 
 /* ========================================================================= */
-/* FEED SYSTEM                                                               */
+/* FEED SYSTEM */
 /* ========================================================================= */
 
 .feed-grid {
@@ -222,7 +176,34 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
 }
 
 /* ========================================================================= */
-/* UPLOAD PAGE                                                               */
+/* HOME FILTER BAR */
+/* ========================================================================= */
+
+.home-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.home-filter-text-right {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.filter-text {
+    background: transparent;
+    border: none;
+    color: #aaa;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+.filter-text.active { color: #fff; font-weight: 600; }
+
+/* ========================================================================= */
+/* UPLOAD PAGE */
 /* ========================================================================= */
 
 .upload-container {
@@ -230,12 +211,6 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     padding: 20px;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-}
-
-.upload-container .form-label {
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-bottom: 6px;
 }
 
 .upload-container .form-input {
@@ -252,18 +227,10 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     display: flex;
     justify-content: center;
     gap: 20px;
-    margin-top: 30px;
-    padding: 0 20px;
-}
-
-.upload-actions button {
-    flex: 1;
-    max-width: 200px;
-    text-align: center;
 }
 
 /* ========================================================================= */
-/* SETTINGS PAGE                                                             */
+/* SETTINGS */
 /* ========================================================================= */
 
 #settings {
@@ -271,75 +238,21 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     margin: auto;
 }
 
-.settings-section-title {
-    font-size: .85rem;
-    text-transform: uppercase;
-    color: #777;
-    margin: 22px 0 8px;
-}
-
 .settings-list {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    overflow: hidden;
-}
-
-.settings-row,
-.settings-toggle {
-    padding: 14px 18px;
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-}
-
-.settings-row:last-child { border-bottom: none; }
-
-.settings-toggle input[type="checkbox"] {
-    appearance: none;
-    width: 44px;
-    height: 24px;
-    background: #333;
-    border-radius: 20px;
-    position: relative;
-    cursor: pointer;
-}
-
-.settings-toggle input[type="checkbox"]::before {
-    content: "";
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    background: white;
-    border-radius: 50%;
-    top: 3px;
-    left: 3px;
-    transition: .2s;
-}
-
-.settings-toggle input:checked { background: white; }
-.settings-toggle input:checked::before {
-    background: black;
-    transform: translateX(20px);
-}
-
-.accordion-body {
-    padding: 12px 18px;
-    display: none;
-    border-top: 1px solid var(--border);
-    color: #ccc;
 }
 
 /* ========================================================================= */
-/* PROFILE PAGE — FINAL CLEAN VERSION                                        */
+/* PROFILE PAGE — FINAL FIXED VERSION */
 /* ========================================================================= */
 
-/* TOP 2×2 GRID */
+/* EXACT SMALL CLEAN GRID */
 .profile-grid {
     width: 100%;
     max-width: 320px;
-    height: 320px;                /* perfect square */
+    height: 320px;               /* prevents stretching */
     margin: 0 auto 40px auto;
     border-radius: 18px;
     overflow: hidden;
@@ -349,21 +262,17 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     grid-template-rows: repeat(2, 1fr);
     gap: 4px;
 
-    background: #111 !important;
+    background: #111;
 }
 
-/* cells */
-.grid-cell {
-    background: #1a1a1a;
-}
+.grid-cell { background: #1a1a1a; }
 
 /* CENTER AVATAR */
 .profile-center-avatar {
-    width: 100%;
+    margin-top: -60px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: -60px;
 }
 
 .profile-avatar {
@@ -388,17 +297,9 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     margin-top: 15px;
 }
 
-.profile-info-center h3 {
-    font-size: 1.4rem;
-    margin-bottom: 4px;
-}
+.profile-bio { color: #ccc; }
 
-.profile-bio {
-    font-size: 0.9rem;
-    color: #ccc;
-}
-
-/* STATS ROW */
+/* STATS */
 .profile-stats-center {
     display: flex;
     justify-content: center;
@@ -408,41 +309,33 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
 }
 
 .profile-stats-center span {
-    display: block;
     font-size: 0.8rem;
     color: #aaa;
 }
 
-/* TABS */
-.profile-tabs-wrap-center {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
+/* PILLS */
 .profile-tabs-center {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
+    margin-bottom: 20px;
 }
 
 .pill {
     padding: 8px 14px;
     border-radius: 20px;
     border: 1px solid #fff;
-    color: #fff;
     background: #000;
-    font-size: 0.85rem;
+    color: #fff;
     cursor: pointer;
 }
-
 .pill.active {
     background: #fff;
     color: #000;
 }
 
-/* PROFILE FEED GRIDS */
+/* PROFILE FEED below tabs */
 #profile-uploads-grid,
 #profile-saved-grid,
 #profile-likes-grid,
