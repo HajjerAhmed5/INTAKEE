@@ -67,6 +67,8 @@
     <div id="clips-feed" class="feed-grid"></div>
 </section>
 
+
+
 <!-- ⭐ UPLOAD TAB -->
 <section id="upload" class="tab-section" style="display:none;">
 
@@ -110,9 +112,12 @@
     </div>
 </section>
 
+
+
+<!-- ⭐ PROFILE TAB — FINAL MATCH TO CSS -->
 <section id="profile" class="tab-section">
 
-    <!-- 🔳 INTAKEE CUSTOM 2×2 TOP GRID -->
+    <!-- 🔳 PERFECT 2×2 GRID MATCHING CSS -->
     <div id="profile-top-grid" class="profile-grid">
         <div class="grid-cell"></div>
         <div class="grid-cell"></div>
@@ -120,20 +125,20 @@
         <div class="grid-cell"></div>
     </div>
 
-    <!-- 🟣 CENTERED AVATAR -->
+    <!-- 🟣 AVATAR OVERLAY -->
     <div class="profile-center-avatar">
         <img id="profile-photo" class="profile-avatar" src="default-avatar.png" alt="Profile Avatar" />
         <button id="btn-edit-profile" class="primary edit-profile-btn">Edit Profile</button>
     </div>
 
-    <!-- 📝 CENTERED USER INFO -->
+    <!-- 📝 USER INFO -->
     <div class="profile-info-center">
         <h3 id="profile-name">Guest</h3>
         <p id="profile-handle" class="muted">@guest</p>
         <p id="profile-bio" class="profile-bio muted">Sign in to personalize your profile.</p>
     </div>
 
-    <!-- 📊 CENTERED STATS -->
+    <!-- 📊 STATS -->
     <div class="profile-stats-center">
         <div><strong id="stat-posts">0</strong><span>Posts</span></div>
         <div><strong id="stat-followers">0</strong><span>Followers</span></div>
@@ -153,7 +158,7 @@
         </div>
     </div>
 
-    <!-- 📁 PROFILE FEED GRIDS -->
+    <!-- 📁 FEED GRIDS -->
     <div id="profile-uploads-grid" class="feed-grid"></div>
     <div id="profile-saved-grid" class="feed-grid" style="display:none;"></div>
     <div id="profile-likes-grid" class="feed-grid" style="display:none;"></div>
@@ -163,12 +168,13 @@
 
 </section>
 
+
+
 <!-- ⭐ SETTINGS TAB -->
 <section id="settings" class="tab-section">
 
     <h1>Settings</h1>
 
-    <!-- Account -->
     <h3 class="settings-section-title">Account</h3>
     <div class="settings-list card">
         <div class="settings-row" id="settings-edit-profile"><span>Edit Account</span><i class="fa-solid fa-chevron-right settings-arrow"></i></div>
@@ -179,7 +185,6 @@
         <div class="settings-row red-text" id="settings-delete-account"><span>Delete Account</span><i class="fa-solid fa-chevron-right settings-arrow"></i></div>
     </div>
 
-    <!-- Privacy -->
     <h3 class="settings-section-title">Privacy</h3>
     <div class="settings-list card">
         <div class="settings-toggle"><span>Private Account</span><label class="switch"><input type="checkbox" id="togglePrivateAccount"/><span class="slider round"></span></label></div>
@@ -188,7 +193,6 @@
         <div class="settings-toggle"><span>Playlists Private</span><label class="switch"><input type="checkbox" id="togglePrivatePlaylists"/><span class="slider round"></span></label></div>
     </div>
 
-    <!-- Notifications -->
     <h3 class="settings-section-title">Notifications</h3>
     <div class="settings-list card">
         <div class="settings-toggle"><span>New Followers</span><label class="switch"><input type="checkbox" id="notifFollowers"/><span class="slider round"></span></label></div>
@@ -198,7 +202,6 @@
         <div class="settings-toggle"><span>Content Review Updates</span><label class="switch"><input type="checkbox" id="notifModeration"/><span class="slider round"></span></label></div>
     </div>
 
-    <!-- Playback -->
     <h3 class="settings-section-title">Playback</h3>
     <div class="settings-list card">
         <div class="settings-toggle"><span>Auto-play</span><label class="switch"><input type="checkbox" id="toggleAutoplay"/><span class="slider round"></span></label></div>
@@ -207,7 +210,6 @@
         <div class="settings-toggle"><span>Background Play (Podcasts)</span><label class="switch"><input type="checkbox" id="toggleBGPlay"/><span class="slider round"></span></label></div>
     </div>
 
-    <!-- Moderation -->
     <h3 class="settings-section-title">Moderation</h3>
     <div class="settings-list card">
         <div class="settings-row" id="settings-blocked-users"><span>Blocked Users</span><i class="fa-solid fa-chevron-right settings-arrow"></i></div>
@@ -215,7 +217,6 @@
         <div class="settings-row" id="settings-comment-filtering"><span>Comment Filtering</span><i class="fa-solid fa-chevron-right settings-arrow"></i></div>
     </div>
 
-    <!-- Data & App -->
     <h3 class="settings-section-title">Data & App</h3>
     <div class="settings-list card">
         <div class="settings-row" id="clearCache"><span>Clear Cache</span><i class="fa-solid fa-chevron-right settings-arrow"></i></div>
@@ -223,7 +224,6 @@
         <div class="settings-row" id="appVersion"><span>App Version</span><span class="muted small">INTAKEE v1.0.0</span></div>
     </div>
 
-    <!-- Help -->
     <h3 class="settings-section-title">Help & Support</h3>
     <div class="settings-list card">
         <div class="settings-row" id="settings-report-bug"><span>Report a Bug</span><i class="fa-solid fa-chevron-right settings-arrow"></i></div>
@@ -232,7 +232,6 @@
         <div class="settings-row"><span>Contact Support</span><span class="muted small">intakee2025@gmail.com</span></div>
     </div>
 
-    <!-- Legal -->
     <h3 class="settings-section-title">Legal</h3>
     <div class="settings-list card">
         <div class="settings-row accordion" data-accordion-id="privacy"><span>Privacy Policy</span><i class="fa-solid fa-chevron-right settings-arrow"></i></div>
