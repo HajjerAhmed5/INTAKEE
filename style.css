@@ -524,3 +524,27 @@ dialog#authDialog::backdrop {
 .grid-cell {
     background: #111;
 }
+/* =============================== */
+/*   FIX THE PROFILE TOP GRID      */
+/* =============================== */
+
+.profile-grid {
+    width: 100%;
+    max-width: 320px;           /* make it smaller and clean */
+    height: 320px;              /* perfect square */
+    margin: 0 auto 40px auto;
+    border-radius: 18px;
+    overflow: hidden;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 4px;
+
+    background: #111 !important;
+}
+
+/* individual cells */
+.profile-grid .grid-cell {
+    background: #1a1a1a;
+}
