@@ -10,8 +10,8 @@
     --text: #fff;
     --muted: #aaa;
 
-    --primary-accent: #fff;     /* White accents */
-    --primary-text-dark: #000;  /* Black text for white buttons */
+    --primary-accent: #fff;
+    --primary-text-dark: #000;
 
     --radius: 12px;
     --radius-lg: 18px;
@@ -64,7 +64,7 @@ header img.app-logo {
     font-weight: 600;
     margin-left: 10px;
 }
-/* Login / Sign Up Button */
+
 .header-login-btn {
     background: #000 !important;
     color: #fff !important;
@@ -76,6 +76,7 @@ header img.app-logo {
     white-space: nowrap;
     cursor: pointer;
 }
+
 /* SEARCH BAR */
 .search-bar {
     flex: 1;
@@ -134,9 +135,7 @@ dialog#authDialog {
     padding: 25px 28px;
 }
 
-dialog#authDialog::backdrop {
-    background: rgba(0,0,0,0.7);
-}
+dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
 
 #authDialog h2 {
     margin: 10px 0 15px;
@@ -249,8 +248,6 @@ dialog#authDialog::backdrop {
     margin-bottom: 14px;
 }
 
-/* Upload buttons */
-
 .upload-actions {
     display: flex;
     justify-content: center;
@@ -321,10 +318,7 @@ dialog#authDialog::backdrop {
     transition: .2s;
 }
 
-.settings-toggle input:checked {
-    background: white;
-}
-
+.settings-toggle input:checked { background: white; }
 .settings-toggle input:checked::before {
     background: black;
     transform: translateX(20px);
@@ -338,76 +332,28 @@ dialog#authDialog::backdrop {
 }
 
 /* ========================================================================= */
-/* RESPONSIVE                                                                */
+/* PROFILE PAGE — FINAL CLEAN VERSION                                        */
 /* ========================================================================= */
 
-@media (max-width: 540px) {
-
-    .profile-header-section {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .stat-row {
-        justify-content: center;
-        gap: 20px;
-    }
-
-    .upload-actions {
-        flex-direction: column;
-    }
-}
-/* Home header row: Trending left, filters right */
-.home-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-/* Filter container */
-.home-filter-text-right {
-    display: flex;
-    gap: 16px;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    overflow-x: auto;
-    padding-left: 10px;
-}
-
-/* Filter buttons */
-.filter-text {
-    background: transparent;
-    border: none;
-    color: #aaa;
-    font-size: 0.9rem;
-    cursor: pointer;
-}
-
-.filter-text.active {
-    color: #fff;
-    font-weight: 600;
-}
-/* ================================
-   INTAKEE — FINAL PROFILE STYLE
-================================ */
-
-/* TOP GRID */
+/* TOP 2×2 GRID */
 .profile-grid {
     width: 100%;
-    max-width: 900px;
-    margin: 0 auto;
+    max-width: 320px;
+    height: 320px;                /* perfect square */
+    margin: 0 auto 40px auto;
+    border-radius: 18px;
+    overflow: hidden;
+
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-    aspect-ratio: 1 / 1;
-    background: #111;
-    border-radius: 14px;
-    overflow: hidden;
+    grid-template-rows: repeat(2, 1fr);
+    gap: 4px;
+
+    background: #111 !important;
 }
 
-/* Example cells (empty for now) */
-.profile-grid div {
+/* cells */
+.grid-cell {
     background: #1a1a1a;
 }
 
@@ -417,7 +363,7 @@ dialog#authDialog::backdrop {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: -60px;  /* pulls avatar INTO the grid */
+    margin-top: -60px;
 }
 
 .profile-avatar {
@@ -436,7 +382,7 @@ dialog#authDialog::backdrop {
     border-radius: 20px;
 }
 
-/* CENTERED USER INFO */
+/* USER INFO */
 .profile-info-center {
     text-align: center;
     margin-top: 15px;
@@ -452,7 +398,7 @@ dialog#authDialog::backdrop {
     color: #ccc;
 }
 
-/* STATS ROW CENTERED */
+/* STATS ROW */
 .profile-stats-center {
     display: flex;
     justify-content: center;
@@ -496,7 +442,7 @@ dialog#authDialog::backdrop {
     color: #000;
 }
 
-/* GRID BELOW PROFILE */
+/* PROFILE FEED GRIDS */
 #profile-uploads-grid,
 #profile-saved-grid,
 #profile-likes-grid,
@@ -507,44 +453,4 @@ dialog#authDialog::backdrop {
     gap: 14px;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     padding-bottom: 80px;
-}
-/* Fix giant profile grid */
-.profile-grid {
-    width: 100%;
-    max-width: 360px;     /* <-- controls size */
-    height: 360px;        /* <-- perfect square */
-    margin: 0 auto 30px auto;
-    border-radius: 14px;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-}
-
-.grid-cell {
-    background: #111;
-}
-/* =============================== */
-/*   FIX THE PROFILE TOP GRID      */
-/* =============================== */
-
-.profile-grid {
-    width: 100%;
-    max-width: 320px;           /* make it smaller and clean */
-    height: 320px;              /* perfect square */
-    margin: 0 auto 40px auto;
-    border-radius: 18px;
-    overflow: hidden;
-
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 4px;
-
-    background: #111 !important;
-}
-
-/* individual cells */
-.profile-grid .grid-cell {
-    background: #1a1a1a;
 }
