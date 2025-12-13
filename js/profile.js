@@ -1,96 +1,105 @@
-/* Top banner */
-.profile-banner {
+/* ===================================== */
+/*          NEW PROFILE LAYOUT           */
+/* ===================================== */
+
+/* ---- 2x2 PROFILE GRID AT TOP ---- */
+.profile-grid {
     width: 100%;
-    height: 180px;
+    max-width: 900px;
+    margin: 0 auto 30px auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    aspect-ratio: 1 / 1;
     background: #111;
-    border-radius: 14px;
-    margin-bottom: 20px;
+    border-radius: 12px;
 }
 
-/* Profile card */
-.profile-card {
-    background: #0d0d0d;
-    padding: 20px;
-    border-radius: 14px;
-    margin-bottom: 16px;
-}
-
-.profile-card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+/* ---- CENTER AVATAR ---- */
+.profile-center-avatar {
+    text-align: center;
+    margin-top: -50px; /* Pull avatar into the grid */
+    position: relative;
 }
 
 .profile-avatar {
-    width: 90px;
-    height: 90px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
+    border: 4px solid #000;
     object-fit: cover;
-    border: 3px solid #222;
 }
 
-.profile-info {
-    flex-grow: 1;
-    margin-left: 15px;
+.edit-profile-btn {
+    margin-top: 14px;
+    background: #fff !important;
+    color: #000 !important;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-weight: 600;
 }
 
-.profile-info h3 {
-    font-size: 1.3rem;
-    margin: 0;
+/* ---- CENTERED USER INFO ---- */
+.profile-info-center {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.profile-info-center h3 {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
 }
 
 .profile-bio {
-    margin-top: 6px;
+    color: #ccc;
     font-size: 0.9rem;
+}
+
+/* ---- CENTERED STATS ---- */
+.profile-stats-center {
+    display: flex;
+    justify-content: center;
+    gap: 45px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.profile-stats-center div span {
+    display: block;
+    font-size: 0.8rem;
     color: #aaa;
 }
 
-.stat-row {
+/* ---- PILLS ---- */
+.profile-tabs-wrap-center {
     display: flex;
-    gap: 14px;
-    margin-top: 10px;
-    font-size: 0.9rem;
-}
-
-.profile-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.small-btn {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    border-radius: 10px;
-}
-
-/* Tabs */
-.profile-tabs-container {
-    display: flex;
-    gap: 10px;
-    background: #0d0d0d;
-    padding: 16px;
-    border-radius: 14px;
     justify-content: center;
-    margin-bottom: 14px;
+    margin-bottom: 20px;
 }
 
-.profile-tab {
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    border: 1px solid #555;
+.profile-tabs-center {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.pill {
+    padding: 8px 14px;
+    border: 1px solid #fff;
     background: #000;
     color: #fff;
+    border-radius: 20px;
     cursor: pointer;
+    transition: 0.2s;
 }
 
-.profile-tab.active {
+.pill.active {
     background: #fff;
     color: #000;
 }
 
-/* Grid */
+/* ---- PROFILE GRID FEED ---- */
 .feed-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
