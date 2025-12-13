@@ -508,3 +508,19 @@ dialog#authDialog::backdrop {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     padding-bottom: 80px;
 }
+/* Fix giant profile grid */
+.profile-grid {
+    width: 100%;
+    max-width: 360px;     /* <-- controls size */
+    height: 360px;        /* <-- perfect square */
+    margin: 0 auto 30px auto;
+    border-radius: 14px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.grid-cell {
+    background: #111;
+}
