@@ -1,121 +1,21 @@
 /* ========================================================================= */
-/* INSTAGRAM-STYLE SETTINGS — CLEAN, MODERN, MATCHES THE iOS SWITCH LOOK    */
+/* INTAKEE — FINAL STYLE.CSS (Dark Mode, Polished, Instagram-Style Settings) */
 /* ========================================================================= */
 
-#settings {
-    max-width: 850px;
-    margin: 20px auto;
-    padding: 0 20px;
+:root {
+    --bg: #000;
+    --panel: #0f0f0f;
+    --panel-2: #0a0a0a;
+    --border: #222;
+    --text: #fff;
+    --muted: #aaa;
+
+    --primary-accent: #fff;
+    --primary-text-dark: #000;
+
+    --radius: 12px;
+    --radius-lg: 18px;
 }
-
-/* Section titles */
-.settings-section-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #fff;
-    margin: 28px 0 12px;
-}
-
-/* Settings card container */
-.settings-list {
-    background: #111;
-    border: 1px solid #222;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 24px;
-}
-
-/* Rows inside cards */
-.settings-row,
-.settings-toggle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 18px;
-    border-bottom: 1px solid #222;
-    color: #fff;
-    font-size: 0.95rem;
-}
-
-.settings-row:last-child,
-.settings-toggle:last-child {
-    border-bottom: none;
-}
-
-/* Arrow icon */
-.settings-arrow {
-    color: #777;
-    font-size: 1rem;
-}
-
-/* Toggle label text */
-.settings-toggle span {
-    color: #ddd;
-}
-
-/* ========================================================================= */
-/* iOS / Instagram STYLE TOGGLE SWITCH                                       */
-/* ========================================================================= */
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 48px;
-    height: 26px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-/* Slider track */
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #444;
-    transition: .3s;
-    border-radius: 26px;
-}
-
-/* Slider knob */
-.slider::before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 3px;
-    bottom: 3px;
-    background-color: #fff;
-    transition: .3s;
-    border-radius: 50%;
-}
-
-/* When ON */
-input:checked + .slider {
-    background-color: #4cd964; /* iOS green */
-}
-
-/* Move the knob to the right */
-input:checked + .slider:before {
-    transform: translateX(22px);
-}
-
-/* Make slider rounded */
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
-}
-
-/* ========================================================================= */
-/* END INSTAGRAM SETTINGS                                                    */
-/* ========================================================================= */
-
 
 /* ========================================================================= */
 /* RESET */
@@ -330,54 +230,46 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
 }
 
 /* ========================================================================= */
-/* CLEAN MODERN SETTINGS PAGE */
+/* INSTAGRAM-STYLE SETTINGS PAGE */
 /* ========================================================================= */
 
 #settings {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 20px;
+    max-width: 850px;
+    margin: 20px auto;
+    padding: 0 20px;
 }
 
 .settings-section-title {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 700;
-    margin: 28px 0 12px 4px;
     color: #fff;
+    margin: 28px 0 12px;
 }
 
-/* The card container */
+/* Settings card container */
 .settings-list {
-    background: #0f0f0f;
+    background: #111;
     border: 1px solid #222;
-    border-radius: 14px;
-    padding: 0;
+    border-radius: 12px;
     overflow: hidden;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
-/* Each row (item) */
+/* Rows inside cards */
 .settings-row,
 .settings-toggle {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 16px 18px;
-    border-bottom: 1px solid #1c1c1c;
-    font-size: 1rem;
-    color: #f1f1f1;
+    border-bottom: 1px solid #222;
+    color: #fff;
+    font-size: 0.95rem;
 }
 
-/* Remove the last row border */
 .settings-row:last-child,
 .settings-toggle:last-child {
     border-bottom: none;
-}
-
-/* Row text */
-.settings-row span {
-    font-size: 1rem;
-    color: #fff;
 }
 
 /* Arrow icon */
@@ -386,48 +278,62 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     font-size: 1rem;
 }
 
-/* Toggle switches */
+/* Toggle label */
 .settings-toggle span {
-    color: #fff;
-    font-size: 1rem;
+    color: #ddd;
 }
 
-/* Better switch alignment */
-.settings-toggle label.switch {
-    margin-left: 16px;
+/* Instagram / iOS toggle switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
 }
 
-/* Red text for dangerous actions */
-.red-text span {
-    color: #ff4f4f !important;
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
-/* Accordion body fix (legal section) */
-.accordion-body {
-    background: #111;
-    padding: 18px;
-    color: #ccc;
-    font-size: 0.95rem;
-    line-height: 1.4rem;
-    display: none;
-    border-top: 1px solid #1b1b1b;
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #444;
+    transition: .3s;
+    border-radius: 26px;
 }
 
-/* Show accordion on open */
-.accordion-body.open {
-    display: block !important;
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    transition: .3s;
+    border-radius: 50%;
 }
 
-/* Contact email style */
-.settings-list .small {
-    color: #aaa;
-    font-size: 0.85rem;
+input:checked + .slider {
+    background-color: #4cd964; /* iOS green */
 }
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
 /* ========================================================================= */
 /* PROFILE PAGE — CLEAN MODERN VERSION */
 /* ========================================================================= */
 
-/* White banner background */
 .profile-banner {
     width: 100%;
     height: 180px;
@@ -435,7 +341,6 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     border-bottom: 1px solid #222;
 }
 
-/* Row with avatar on left + edit button on right */
 .profile-header-row {
     display: flex;
     justify-content: space-between;
@@ -445,7 +350,6 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     padding: 0 20px;
 }
 
-/* Avatar */
 .profile-avatar {
     width: 120px;
     height: 120px;
@@ -454,7 +358,6 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     object-fit: cover;
 }
 
-/* Edit Profile Button */
 .edit-profile-btn {
     background: #fff;
     color: #000;
@@ -465,7 +368,6 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     border: none;
 }
 
-/* Centered user info */
 .profile-info-center {
     text-align: center;
     margin-top: 10px;
@@ -481,7 +383,6 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     color: #ccc;
 }
 
-/* Stats row */
 .profile-stats-center {
     display: flex;
     justify-content: center;
@@ -496,7 +397,7 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     color: #aaa;
 }
 
-/* Pills (tabs) */
+/* Tabs */
 .profile-tabs-center {
     display: flex;
     justify-content: center;
@@ -533,132 +434,4 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     max-width: 900px;
     margin: auto;
     padding-bottom: 80px;
-}
-/* CLEAN INSTAGRAM-STYLE SETTINGS */
-#settings {
-    max-width: 850px;
-    margin: 20px auto;
-    padding: 0 16px;
-}
-
-.settings-section-title {
-    font-size: 1rem;
-    font-weight: 700;
-    margin: 24px 0 10px;
-    color: #fff;
-}
-
-/* Settings card container */
-.settings-list {
-    background: #111;
-    border: 1px solid #222;
-    border-radius: 14px;
-    padding: 0;
-    overflow: hidden;
-}
-
-/* Each row (chevron rows & toggles) */
-.settings-row,
-.settings-toggle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 16px;
-    border-bottom: 1px solid #222;
-    font-size: 0.95rem;
-    color: #fff;
-}
-
-.settings-row:last-child,
-.settings-toggle:last-child {
-    border-bottom: none;
-}
-
-/* Chevron icon */
-.settings-arrow {
-    font-size: 0.9rem;
-    color: #777;
-}
-
-/* Toggle text */
-.settings-toggle span {
-    color: #ddd;
-    font-size: 0.95rem;
-}
-
-/* Align toggle switches perfectly */
-.settings-toggle label.switch {
-    margin-left: 12px;
-}
-
-/* Space between cards */
-.settings-list + .settings-section-title {
-    margin-top: 32px;
-}
-/* FINAL FIX – FORCE INSTAGRAM STYLE SETTINGS */
-
-#settings {
-    max-width: 850px;
-    margin: 20px auto;
-    padding: 0 20px;
-}
-
-.settings-section-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #fff;
-    margin: 28px 0 12px;
-}
-
-/* Card container */
-.settings-list {
-    background: #111;
-    border: 1px solid #222;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 20px;
-}
-
-/* Row style (for arrow rows) */
-.settings-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 18px;
-    color: #fff;
-    font-size: 0.95rem;
-    border-bottom: 1px solid #222;
-}
-
-.settings-row:last-child {
-    border-bottom: none;
-}
-
-/* Arrow icon */
-.settings-arrow {
-    color: #777;
-    font-size: 1rem;
-}
-
-/* Toggle rows */
-.settings-toggle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 18px;
-    border-bottom: 1px solid #222;
-    font-size: 0.95rem;
-}
-
-.settings-toggle span {
-    color: #ccc;
-}
-
-.settings-toggle:last-child {
-    border-bottom: none;
-}
-
-/* Switch alignment fix */
-.settings-toggle .switch {
-    transform: scale(0.9);
 }
