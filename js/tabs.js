@@ -68,3 +68,32 @@ window.addEventListener("hashchange", () => {
     const tab = location.hash.replace("#", "");
     if (TABS.includes(tab)) showTab(tab);
 });
+/* ================================
+   LOGIN BUTTON VISIBILITY CONTROL
+   ================================ */
+
+function updateLoginVisibility(activeTab) {
+    const body = document.body;
+
+    // Remove "show login" state by default
+    body.classList.remove("show-login-home");
+
+    // User is NOT logged in
+    const userNotLoggedIn = !localStorage.getItem("loggedInUser");
+
+    // If HOME tab + user NOT logged in → show login button
+    if (activeTab === "home" && userNotLoggedIn) {
+        body.classList.add("show-login-home");
+    }
+}
+
+// Run when switching tabs
+document.querySelectorAll("[data-tab]").forEach(tab => {
+    tab.addEventListener("click", () => {
+        const tabName = tab.getAttribute("data-tab");
+        updateLoginVisibility(tabName);
+    });
+});
+
+// Run on page load (default tab = home)
+updateLoginVisibility("home");
