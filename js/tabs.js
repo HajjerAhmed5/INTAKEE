@@ -97,3 +97,38 @@ document.querySelectorAll("[data-tab]").forEach(tab => {
 
 // Run on page load (default tab = home)
 updateLoginVisibility("home");
+// HOME TAB LOGIN/USERNAME LOGIC
+import { auth } from "./firebase-init.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const loginBtn = document.getElementById("openAuth");
+const headerUsername = document.getElementById("headerUsername");
+
+// Hide username + login everywhere except Home
+function updateHeaderForTab(activeTab) {
+    const onHome = activeTab === "home";
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Logged in
+            loginBtn.style.display = onHome ? "none" : "none"; 
+            headerUsername.textContent = "@" + (user.displayName || "user");
+            headerUsername.style.display = onHome ? "inline-block" : "none";
+        } else {
+            // Logged out
+            loginBtn.style.display = onHome ? "inline-block" : "none";
+            headerUsername.style.display = "none";
+        }
+    });
+}
+
+// When switching tabs
+document.querySelectorAll(".bottom-nav a").forEach(tab => {
+    tab.addEventListener("click", () => {
+        const tabName = tab.getAttribute("data-tab");
+        updateHeaderForTab(tabName);
+    });
+});
+
+// Run once on page load:
+updateHeaderForTab("home");
