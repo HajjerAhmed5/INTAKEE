@@ -138,19 +138,43 @@
         <div><strong id="stat-likes">0</strong><span>Likes</span></div>
     </div>
 
-    <!-- ⭐ PROFILE TABS -->
-    <div class="profile-tabs-wrap-center">
-        <div class="profile-tabs-center">
-            <button class="pill active" data-profile-tab="uploads">Uploads</button>
-            <button class="pill" data-profile-tab="saved">Saved</button>
-            <button class="pill" data-profile-tab="likes">Likes</button>
-            <button class="pill" data-profile-tab="playlists">Playlists</button>
-            <button class="pill" data-profile-tab="history">History</button>
-            <button class="pill" data-profile-tab="notifications">Notifications</button>
-        </div>
+    <section id="profile" class="tab-section">
+
+    <!-- ⭐ BANNER -->
+    <div class="profile-banner"></div>
+
+    <!-- ⭐ AVATAR + EDIT BUTTON ROW -->
+    <div class="profile-header-row">
+        <img id="profile-photo" class="profile-avatar" src="default-avatar.png" alt="Profile Avatar">
+        <button id="btn-edit-profile" class="edit-profile-btn">Edit Profile</button>
     </div>
 
-    <!-- ⭐ FEED GRIDS -->
+    <!-- ⭐ USER INFO CENTERED -->
+    <div class="profile-info-center">
+        <h3 id="profile-name">Guest</h3>
+        <p id="profile-handle" class="muted">@guest</p>
+        <p id="profile-bio" class="profile-bio muted">Sign in to personalize your profile.</p>
+    </div>
+
+    <!-- ⭐ STATS -->
+    <div class="profile-stats-center">
+        <div><strong id="stat-posts">0</strong><span>Posts</span></div>
+        <div><strong id="stat-followers">0</strong><span>Followers</span></div>
+        <div><strong id="stat-following">0</strong><span>Following</span></div>
+        <div><strong id="stat-likes">0</strong><span>Likes</span></div>
+    </div>
+
+    <!-- ⭐ PROFILE TABS -->
+    <div class="profile-tabs-center">
+        <button class="pill active" data-profile-tab="uploads">Uploads</button>
+        <button class="pill" data-profile-tab="saved">Saved</button>
+        <button class="pill" data-profile-tab="likes">Likes</button>
+        <button class="pill" data-profile-tab="playlists">Playlists</button>
+        <button class="pill" data-profile-tab="history">History</button>
+        <button class="pill" data-profile-tab="notifications">Notifications</button>
+    </div>
+
+    <!-- ⭐ PROFILE GRIDS -->
     <div id="profile-uploads-grid" class="feed-grid"></div>
     <div id="profile-saved-grid" class="feed-grid" style="display:none;"></div>
     <div id="profile-likes-grid" class="feed-grid" style="display:none;"></div>
@@ -159,7 +183,7 @@
     <div id="profile-notifications-grid" class="feed-grid" style="display:none;"></div>
 
 </section>
-
+  
 <!-- ⭐ SETTINGS TAB -->
 <section id="settings" class="tab-section">
 
