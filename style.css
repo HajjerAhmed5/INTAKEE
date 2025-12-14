@@ -1,21 +1,121 @@
 /* ========================================================================= */
-/* INTAKEE — FINAL STYLE.CSS (Clean + Fixed Profile Grid Version)           */
+/* INSTAGRAM-STYLE SETTINGS — CLEAN, MODERN, MATCHES THE iOS SWITCH LOOK    */
 /* ========================================================================= */
 
-:root {
-    --bg: #000;
-    --panel: #0f0f0f;
-    --panel-2: #0a0a0a;
-    --border: #222;
-    --text: #fff;
-    --muted: #aaa;
-
-    --primary-accent: #fff;
-    --primary-text-dark: #000;
-
-    --radius: 12px;
-    --radius-lg: 18px;
+#settings {
+    max-width: 850px;
+    margin: 20px auto;
+    padding: 0 20px;
 }
+
+/* Section titles */
+.settings-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 28px 0 12px;
+}
+
+/* Settings card container */
+.settings-list {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+/* Rows inside cards */
+.settings-row,
+.settings-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 18px;
+    border-bottom: 1px solid #222;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.settings-row:last-child,
+.settings-toggle:last-child {
+    border-bottom: none;
+}
+
+/* Arrow icon */
+.settings-arrow {
+    color: #777;
+    font-size: 1rem;
+}
+
+/* Toggle label text */
+.settings-toggle span {
+    color: #ddd;
+}
+
+/* ========================================================================= */
+/* iOS / Instagram STYLE TOGGLE SWITCH                                       */
+/* ========================================================================= */
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Slider track */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #444;
+    transition: .3s;
+    border-radius: 26px;
+}
+
+/* Slider knob */
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+/* When ON */
+input:checked + .slider {
+    background-color: #4cd964; /* iOS green */
+}
+
+/* Move the knob to the right */
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+/* Make slider rounded */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* ========================================================================= */
+/* END INSTAGRAM SETTINGS                                                    */
+/* ========================================================================= */
+
 
 /* ========================================================================= */
 /* RESET */
