@@ -435,3 +435,23 @@ input:checked + .slider:before {
     margin: auto;
     padding-bottom: 80px;
 }
+/* Show login only on Home tab */
+#openAuth {
+    display: none; /* default hidden */
+}
+
+body.show-login-home #openAuth {
+    display: inline-block;
+}
+
+body.show-login-home #headerUsername {
+    display: none;
+}
+
+body.logged-in #openAuth {
+    display: none !important;
+}
+
+body.logged-in #headerUsername {
+    display: inline-block !important;
+}
