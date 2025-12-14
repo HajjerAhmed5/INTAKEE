@@ -495,3 +495,70 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
 .settings-list + .settings-section-title {
     margin-top: 32px;
 }
+/* FINAL FIX – FORCE INSTAGRAM STYLE SETTINGS */
+
+#settings {
+    max-width: 850px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.settings-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 28px 0 12px;
+}
+
+/* Card container */
+.settings-list {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+/* Row style (for arrow rows) */
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 18px;
+    color: #fff;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #222;
+}
+
+.settings-row:last-child {
+    border-bottom: none;
+}
+
+/* Arrow icon */
+.settings-arrow {
+    color: #777;
+    font-size: 1rem;
+}
+
+/* Toggle rows */
+.settings-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 18px;
+    border-bottom: 1px solid #222;
+    font-size: 0.95rem;
+}
+
+.settings-toggle span {
+    color: #ccc;
+}
+
+.settings-toggle:last-child {
+    border-bottom: none;
+}
+
+/* Switch alignment fix */
+.settings-toggle .switch {
+    transform: scale(0.9);
+}
