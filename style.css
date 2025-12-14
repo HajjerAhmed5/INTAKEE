@@ -434,3 +434,64 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     margin: auto;
     padding-bottom: 80px;
 }
+/* CLEAN INSTAGRAM-STYLE SETTINGS */
+#settings {
+    max-width: 850px;
+    margin: 20px auto;
+    padding: 0 16px;
+}
+
+.settings-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 24px 0 10px;
+    color: #fff;
+}
+
+/* Settings card container */
+.settings-list {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 14px;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Each row (chevron rows & toggles) */
+.settings-row,
+.settings-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #222;
+    font-size: 0.95rem;
+    color: #fff;
+}
+
+.settings-row:last-child,
+.settings-toggle:last-child {
+    border-bottom: none;
+}
+
+/* Chevron icon */
+.settings-arrow {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+/* Toggle text */
+.settings-toggle span {
+    color: #ddd;
+    font-size: 0.95rem;
+}
+
+/* Align toggle switches perfectly */
+.settings-toggle label.switch {
+    margin-left: 12px;
+}
+
+/* Space between cards */
+.settings-list + .settings-section-title {
+    margin-top: 32px;
+}
