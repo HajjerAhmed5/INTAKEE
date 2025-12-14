@@ -1,6 +1,6 @@
 /* ============================
-   PROFILE SYSTEM JS
-   Loads profile info, bio, avatar, stats, and tabs
+   PROFILE SYSTEM JS — CLEAN VERSION
+   Matches NEW Profile Layout (Banner + Avatar + Edit Button)
 ============================ */
 
 import { auth } from "./firebase-init.js";
@@ -12,28 +12,10 @@ const profileHandle = document.getElementById("profile-handle");
 const profileBio = document.getElementById("profile-bio");
 const profilePhoto = document.getElementById("profile-photo");
 
-const profileTopGrid = document.getElementById("profile-top-grid");
-
-/* -----------------------------
-   FIX THE 2×2 TOP GRID
-   Ensures four cells always exist
------------------------------ */
-function buildProfileGrid() {
-    if (!profileTopGrid) return;
-
-    profileTopGrid.innerHTML = `
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-        <div class="grid-cell"></div>
-    `;
-}
-buildProfileGrid();
-
-
 /* -----------------------------
    PROFILE TABS + FEEDS
 ----------------------------- */
+
 const tabs = document.querySelectorAll(".pill");
 
 const grids = {
@@ -45,10 +27,10 @@ const grids = {
     notifications: document.getElementById("profile-notifications-grid")
 };
 
-
 /* -----------------------------
    AUTH — LOAD USER PROFILE
 ----------------------------- */
+
 onAuthStateChanged(auth, (user) => {
     if (!user) {
         profileName.textContent = "Guest";
@@ -64,22 +46,22 @@ onAuthStateChanged(auth, (user) => {
     profilePhoto.src = user.photoURL || "default-avatar.png";
 });
 
-
 /* -----------------------------
    TAB SWITCHING SYSTEM
 ----------------------------- */
+
 function showTab(tabName) {
-    // hide all grids
+    // Hide all grids
     Object.values(grids).forEach((grid) => {
         grid.style.display = "none";
     });
 
-    // show selected tab
+    // Show the selected one
     if (grids[tabName]) {
         grids[tabName].style.display = "grid";
     }
 
-    // activate pill
+    // Activate correct pill
     tabs.forEach((btn) => btn.classList.remove("active"));
     const activeBtn = document.querySelector(`[data-profile-tab="${tabName}"]`);
     if (activeBtn) activeBtn.classList.add("active");
@@ -92,5 +74,5 @@ tabs.forEach((btn) => {
     });
 });
 
-// DEFAULT TAB ON LOAD
+// DEFAULT TAB
 showTab("uploads");
