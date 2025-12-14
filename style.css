@@ -243,38 +243,29 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     border: 1px solid var(--border);
     border-radius: var(--radius);
 }
-
 /* ========================================================================= */
-/* PROFILE PAGE — FINAL FIXED VERSION */
+/* PROFILE PAGE — CLEAN MODERN VERSION */
 /* ========================================================================= */
 
-/* EXACT SMALL CLEAN GRID */
-.profile-grid {
+/* White banner background */
+.profile-banner {
     width: 100%;
-    max-width: 320px;
-    height: 320px;               /* prevents stretching */
-    margin: 0 auto 40px auto;
-    border-radius: 18px;
-    overflow: hidden;
-
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 4px;
-
+    height: 180px;
     background: #111;
+    border-bottom: 1px solid #222;
 }
 
-.grid-cell { background: #1a1a1a; }
-
-/* CENTER AVATAR */
-.profile-center-avatar {
-    margin-top: -60px;
+/* Row with avatar on left + edit button on right */
+.profile-header-row {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
+    max-width: 780px;
+    margin: -60px auto 20px auto;
+    padding: 0 20px;
 }
 
+/* Avatar */
 .profile-avatar {
     width: 120px;
     height: 120px;
@@ -283,23 +274,34 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     object-fit: cover;
 }
 
+/* Edit Profile Button */
 .edit-profile-btn {
-    margin-top: 14px;
-    background: #fff !important;
-    color: #000 !important;
-    padding: 8px 16px;
-    border-radius: 20px;
+    background: #fff;
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
 }
 
-/* USER INFO */
+/* Centered user info */
 .profile-info-center {
     text-align: center;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
-.profile-bio { color: #ccc; }
+.profile-info-center h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
 
-/* STATS */
+.profile-bio {
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+/* Stats row */
 .profile-stats-center {
     display: flex;
     justify-content: center;
@@ -309,16 +311,17 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
 }
 
 .profile-stats-center span {
+    display: block;
     font-size: 0.8rem;
     color: #aaa;
 }
 
-/* PILLS */
+/* Pills (tabs) */
 .profile-tabs-center {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
     justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
     margin-bottom: 20px;
 }
 
@@ -329,13 +332,15 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     background: #000;
     color: #fff;
     cursor: pointer;
+    font-size: 0.9rem;
 }
+
 .pill.active {
     background: #fff;
     color: #000;
 }
 
-/* PROFILE FEED below tabs */
+/* Profile grids */
 #profile-uploads-grid,
 #profile-saved-grid,
 #profile-likes-grid,
@@ -345,5 +350,7 @@ dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
     display: grid;
     gap: 14px;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    max-width: 900px;
+    margin: auto;
     padding-bottom: 80px;
 }
