@@ -455,3 +455,61 @@ body.logged-in #openAuth {
 body.logged-in #headerUsername {
     display: inline-block !important;
 }
+/* Legal Modal */
+.legal-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legal-modal.hidden {
+  display: none;
+}
+
+.legal-content {
+  background: #111;
+  width: 92%;
+  max-width: 700px;
+  max-height: 85vh;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 40px rgba(0,0,0,0.6);
+}
+
+.legal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+  border-bottom: 1px solid #222;
+}
+
+.legal-header h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #fff;
+}
+
+.legal-body {
+  padding: 18px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #ddd;
+}
