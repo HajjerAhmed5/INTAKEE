@@ -1,50 +1,87 @@
-<!-- ⭐ UPLOAD TAB (CLEAN VERSION) -->
-<section id="upload" class="tab-section" style="display:none;">
+/* =====================================
+   INTAKEE — REAL UPLOAD SYSTEM
+   Handles:
+   - Auth check
+   - File upload (placeholder for Firebase Storage)
+   - Save post metadata to Firestore
+===================================== */
 
-    <h2 class="muted" style="margin-bottom:20px;">Upload Content</h2>
+import { auth, db } from "./firebase-init.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  updateDoc,
+  increment
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-    <div class="upload-container">
+/* DOM */
+const uploadBtn = document.getElementById("btnUpload");
+const uploadType = document.getElementById("uploadTypeSelect");
+const uploadTitle = document.getElementById("uploadTitleInput");
+const uploadDesc = document.getElementById("uploadDescInput");
+const uploadFile = document.getElementById("uploadFileInput");
+const uploadThumb = document.getElementById("uploadThumbInput");
+const ageToggle = document.getElementById("ageRestrictionToggle");
 
-        <!-- Content Category -->
-        <label class="form-label">Content Category</label>
-        <select id="uploadTypeSelect" class="form-input">
-            <option value="video">Video</option>
-            <option value="clip">Clip</option>
-            <option value="podcast-audio">Podcast — Audio Only</option>
-            <option value="podcast-video">Podcast — Video</option>
-        </select>
+let currentUser = null;
 
-        <!-- Title -->
-        <label class="form-label">Title</label>
-        <input id="uploadTitleInput" class="form-input" placeholder="Give your post a title" maxlength="70" />
+/* AUTH CHECK */
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+});
 
-        <!-- Description -->
-        <label class="form-label">Description (Optional)</label>
-        <textarea id="uploadDescInput" class="form-input" maxlength="2000" placeholder="Describe your content..."></textarea>
+/* UPLOAD HANDLER */
+uploadBtn.addEventListener("click", async () => {
+  if (!currentUser) {
+    alert("You must be logged in to upload.");
+    return;
+  }
 
-        <!-- Thumbnail -->
-        <label class="form-label">Thumbnail Image (Only required for audio podcasts)</label>
-        <input id="uploadThumbInput" type="file" class="form-input" accept="image/*" />
+  if (!uploadTitle.value || !uploadFile.files.length) {
+    alert("Title and file are required.");
+    return;
+  }
 
-        <!-- File Upload -->
-        <label class="form-label">Main Content File</label>
-        <input id="uploadFileInput" type="file" class="form-input" accept="video/*,audio/*" />
+  try {
+    // 🔹 TEMP: no Firebase Storage yet (next step)
+    const fakeFileURL = "pending-upload";
 
-        <!-- Age Restriction -->
-        <div class="settings-toggle" style="margin: 20px 0;">
-            <span>Is this restricted to 18+?</span>
-            <label class="switch">
-                <input type="checkbox" id="ageRestrictionToggle" />
-                <span class="slider round"></span>
-            </label>
-        </div>
+    const post = {
+      uid: currentUser.uid,
+      type: uploadType.value,
+      title: uploadTitle.value.trim(),
+      description: uploadDesc.value.trim(),
+      fileURL: fakeFileURL,
+      thumbnail: uploadThumb.files[0]?.name || null,
+      ageRestricted: ageToggle.checked,
+      createdAt: serverTimestamp(),
+      likes: 0,
+      comments: 0
+    };
 
-    </div>
+    // Save post
+    await addDoc(collection(db, "posts"), post);
 
-    <!-- ⭐ UPLOAD + GO LIVE BUTTONS AT BOTTOM -->
-    <div class="upload-bottom-actions" style="display:flex; gap:12px; margin-top:25px;">
-        <button id="btnUpload" class="primary" style="flex:1;">Upload</button>
-        <button id="btnGoLive" class="primary ghost" style="flex:1;">Go Live</button>
-    </div>
+    // Increment user post count
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      posts: increment(1)
+    });
 
-</section>
+    alert("Upload successful (metadata saved).");
+
+    // Reset form
+    uploadTitle.value = "";
+    uploadDesc.value = "";
+    uploadFile.value = "";
+    uploadThumb.value = "";
+    ageToggle.checked = false;
+
+  } catch (err) {
+    console.error(err);
+    alert("Upload failed.");
+  }
+});
+
