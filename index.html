@@ -14,19 +14,17 @@
 <!-- ⭐ UNIVERSAL HEADER -->
 <header id="mainHeader">
   <img src="logo.png" class="app-logo" alt="INTAKEE Logo" />
-
   <div class="search-bar" id="globalSearchBar">
     <i class="fa fa-search"></i>
     <input id="globalSearch" placeholder="Search for content or creators..." autocomplete="off" />
   </div>
-
   <button id="openAuth" class="primary header-login-btn">Login / Sign Up</button>
   <span id="headerUsername" class="header-username" style="display:none;">@username</span>
 </header>
 
 <main>
 
-<!-- ⭐ HOME -->
+<!-- HOME -->
 <section id="home" class="tab-section">
   <div class="home-header-row">
     <h2>Trending</h2>
@@ -42,27 +40,27 @@
   <div id="home-feed" class="feed-grid"></div>
 </section>
 
-<!-- ⭐ VIDEOS -->
+<!-- VIDEOS -->
 <section id="videos" class="tab-section">
   <h2>Videos</h2>
   <div id="videos-feed" class="feed-grid"></div>
 </section>
 
-<!-- ⭐ PODCASTS -->
+<!-- PODCASTS -->
 <section id="podcasts" class="tab-section">
   <h2>Podcasts</h2>
   <div id="podcasts-feed" class="feed-grid"></div>
 </section>
 
-<!-- ⭐ CLIPS -->
+<!-- CLIPS -->
 <section id="clips" class="tab-section">
   <h2>Clips</h2>
   <div id="clips-feed" class="feed-grid"></div>
 </section>
 
-<!-- ⭐ UPLOAD -->
+<!-- UPLOAD -->
 <section id="upload" class="tab-section" style="display:none;">
-  <h2 class="muted" style="margin-bottom:20px;">Upload Content</h2>
+  <h2 class="muted">Upload Content</h2>
   <div class="upload-container">
     <label class="form-label">Content Category</label>
     <select id="uploadTypeSelect" class="form-input">
@@ -99,7 +97,7 @@
   </div>
 </section>
 
-<!-- ⭐ PROFILE (UNCHANGED) -->
+<!-- PROFILE -->
 <section id="profile" class="tab-section">
   <div class="profile-banner"></div>
 
@@ -120,57 +118,42 @@
     <div><strong id="stat-following">0</strong><span>Following</span></div>
     <div><strong id="stat-likes">0</strong><span>Likes</span></div>
   </div>
-
-  <div class="profile-tabs-center">
-    <button class="pill active" data-profile-tab="uploads">Uploads</button>
-    <button class="pill" data-profile-tab="saved">Saved</button>
-    <button class="pill" data-profile-tab="likes">Likes</button>
-    <button class="pill" data-profile-tab="playlists">Playlists</button>
-    <button class="pill" data-profile-tab="history">History</button>
-    <button class="pill" data-profile-tab="notifications">Notifications</button>
-  </div>
-
-  <div id="profile-uploads-grid" class="feed-grid"></div>
-  <div id="profile-saved-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-likes-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-playlists-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-history-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-notifications-grid" class="feed-grid" style="display:none;"></div>
 </section>
 
-<!-- ⭐ SETTINGS (LEGAL FIXED ONLY) -->
+<!-- SETTINGS -->
 <section id="settings" class="tab-section">
   <h1>Settings</h1>
 
-  <!-- all previous settings sections unchanged -->
-<h3 class="settings-section-title">Legal</h3>
-<div class="settings-list card">
-  <div class="settings-row" onclick="openLegal('privacy')">
-    <span>Privacy Policy</span>
-    <i class="fa-solid fa-chevron-right settings-arrow"></i>
+  <h3 class="settings-section-title">Account</h3>
+  <div class="settings-list card">
+    <div class="settings-row">Edit Account</div>
+    <div class="settings-row">Change Email</div>
+    <div class="settings-row">Change Password</div>
+    <div class="settings-row">Active Sessions</div>
+    <div class="settings-row">Logout</div>
+    <div class="settings-row red-text">Delete Account</div>
   </div>
 
-  <div class="settings-row" onclick="openLegal('terms')">
-    <span>Terms of Service</span>
-    <i class="fa-solid fa-chevron-right settings-arrow"></i>
-  </div>
-
-  <div class="settings-row" onclick="openLegal('guidelines')">
-    <span>Community Guidelines</span>
-    <i class="fa-solid fa-chevron-right settings-arrow"></i>
-  </div>
-</div>
-<div id="legalModal" class="legal-modal hidden">
-  <div class="legal-content">
-    <div class="legal-header">
-      <h2 id="legalTitle"></h2>
-      <button class="close-btn" onclick="closeLegal()">✕</button>
+  <h3 class="settings-section-title">Legal</h3>
+  <div class="settings-list card">
+    <div class="settings-row" onclick="openLegal('privacy')">
+      <span>Privacy Policy</span>
+      <i class="fa-solid fa-chevron-right"></i>
     </div>
-    <div id="legalBody" class="legal-body"></div>
+    <div class="settings-row" onclick="openLegal('terms')">
+      <span>Terms of Service</span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </div>
+    <div class="settings-row" onclick="openLegal('guidelines')">
+      <span>Community Guidelines</span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </div>
   </div>
-</div>
-  
-<!-- ⭐ BOTTOM NAV -->
+</section>
+
+</main>
+
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
   <a data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
@@ -181,7 +164,7 @@
   <a data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
 </nav>
 
-<!-- ⭐ LEGAL MODAL -->
+<!-- LEGAL MODAL (ONLY ONE) -->
 <div id="legalModal" class="legal-modal hidden">
   <div class="legal-content">
     <div class="legal-header">
@@ -192,7 +175,7 @@
   </div>
 </div>
 
-<!-- ⭐ SCRIPTS -->
+<!-- SCRIPTS -->
 <script type="module" src="js/firebase-config.js"></script>
 <script type="module" src="js/firebase-init.js"></script>
 <script type="module" src="js/tabs.js"></script>
