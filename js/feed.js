@@ -1,16 +1,18 @@
 /*
 ==========================================
-INTAKEE — FEED SYSTEM (REAL APP)
-Includes:
+INTAKEE — FEED SYSTEM (CLEAN FINAL)
+Features:
+- Infinite scroll
 - Likes
 - Saves
 - Follows
-- Infinite Scroll
+- Auth-safe
 ==========================================
 */
 
+import { auth, db } from "./firebase-init.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import {
-  getFirestore,
   collection,
   query,
   orderBy,
@@ -24,25 +26,12 @@ import {
   increment
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-
-const db = getFirestore();
-const auth = getAuth();
-
 /* ================= DOM ================= */
-const feeds = {
-  home: document.getElementById("home-feed"),
-  videos: document.getElementById("videos-feed"),
-  clips: document.getElementById("clips-feed"),
-  podcasts: document.getElementById("podcasts-feed")
-};
+const homeFeed = document.getElementById("home-feed");
 
 /* ================= STATE ================= */
 let currentUser = null;
-let lastVisiblePost = null;
+let lastVisible = null;
 let loading = false;
 const PAGE_SIZE = 6;
 
@@ -58,15 +47,15 @@ async function fetchPosts() {
 
   let q = query(
     collection(db, "posts"),
-    orderBy("timestamp", "desc"),
+    orderBy("createdAt", "desc"),
     limit(PAGE_SIZE)
   );
 
-  if (lastVisiblePost) {
+  if (lastVisible) {
     q = query(
       collection(db, "posts"),
-      orderBy("timestamp", "desc"),
-      startAfter(lastVisiblePost),
+      orderBy("createdAt", "desc"),
+      startAfter(lastVisible),
       limit(PAGE_SIZE)
     );
   }
@@ -74,7 +63,7 @@ async function fetchPosts() {
   const snap = await getDocs(q);
 
   if (!snap.empty) {
-    lastVisiblePost = snap.docs[snap.docs.length - 1];
+    lastVisible = snap.docs[snap.docs.length - 1];
   }
 
   snap.forEach((docSnap) => {
@@ -87,58 +76,120 @@ async function fetchPosts() {
 
 /* ================= RENDER POST ================= */
 function renderPost(post) {
+  // AGE RESTRICTION
+  if (post.ageRestricted && !currentUser) return;
+
   const card = document.createElement("div");
   card.className = "post-card";
 
   const liked =
-    currentUser &&
-    post.likedBy &&
-    post.likedBy.includes(currentUser.uid);
+    currentUser && post.likedBy?.includes(currentUser.uid);
 
   const saved =
-    currentUser &&
-    post.savedBy &&
-    post.savedBy.includes(currentUser.uid);
+    currentUser && post.savedBy?.includes(currentUser.uid);
+
+  const date = post.createdAt?.toDate
+    ? post.createdAt.toDate().toLocaleString()
+    : "";
 
   card.innerHTML = `
     <div class="post-header">
-      <strong>@${post.username || "user"}</strong>
-      <span class="muted">${new Date(post.timestamp).toLocaleString()}</span>
+      <div>
+        <strong>@${post.username || "user"}</strong>
+        <div class="muted small">${date}</div>
+      </div>
+      ${
+        currentUser && post.uid !== currentUser.uid
+          ? `<button class="follow-btn">Follow</button>`
+          : ""
+      }
     </div>
 
     ${renderMedia(post)}
 
-    <h3>${post.title || ""}</h3>
+    <h3>${post.title || "Untitled"}</h3>
     <p>${post.description || ""}</p>
 
     <div class="post-actions">
-      <button class="like-btn ${liked ? "active" : ""}">❤️ ${post.likes || 0}</button>
-      <button class="save-btn ${saved ? "active" : ""}">🔖</button>
-      <button class="follow-btn">➕ Follow</button>
+      <button class="like-btn ${liked ? "active" : ""}">
+        ❤️ ${post.likes || 0}
+      </button>
+      <button class="save-btn ${saved ? "active" : ""}">
+        🔖
+      </button>
     </div>
   `;
 
-  card.querySelector(".like-btn").onclick = () =>
-    toggleLike(post, card);
+  /* LIKE */
+  card.querySelector(".like-btn").onclick = async () => {
+    if (!currentUser) return alert("Login required");
 
-  card.querySelector(".save-btn").onclick = () =>
-    toggleSave(post, card);
+    const ref = doc(db, "posts", post.id);
+    const isLiked = post.likedBy?.includes(currentUser.uid);
 
-  card.querySelector(".follow-btn").onclick = () =>
-    followCreator(post.creatorId);
+    await updateDoc(ref, {
+      likes: increment(isLiked ? -1 : 1),
+      likedBy: isLiked
+        ? arrayRemove(currentUser.uid)
+        : arrayUnion(currentUser.uid)
+    });
 
-  feeds.home.appendChild(card);
+    post.likes += isLiked ? -1 : 1;
+    post.likedBy = isLiked
+      ? post.likedBy.filter((id) => id !== currentUser.uid)
+      : [...(post.likedBy || []), currentUser.uid];
 
-  if (post.type === "video") feeds.videos.appendChild(card.cloneNode(true));
-  if (post.type === "clip") feeds.clips.appendChild(card.cloneNode(true));
-  if (post.type.includes("podcast")) feeds.podcasts.appendChild(card.cloneNode(true));
+    card.querySelector(".like-btn").textContent = `❤️ ${post.likes}`;
+    card.querySelector(".like-btn").classList.toggle("active");
+  };
+
+  /* SAVE */
+  card.querySelector(".save-btn").onclick = async () => {
+    if (!currentUser) return alert("Login required");
+
+    const ref = doc(db, "posts", post.id);
+    const isSaved = post.savedBy?.includes(currentUser.uid);
+
+    await updateDoc(ref, {
+      savedBy: isSaved
+        ? arrayRemove(currentUser.uid)
+        : arrayUnion(currentUser.uid)
+    });
+
+    post.savedBy = isSaved
+      ? post.savedBy.filter((id) => id !== currentUser.uid)
+      : [...(post.savedBy || []), currentUser.uid];
+
+    card.querySelector(".save-btn").classList.toggle("active");
+  };
+
+  /* FOLLOW */
+  const followBtn = card.querySelector(".follow-btn");
+  if (followBtn) {
+    followBtn.onclick = async () => {
+      if (!currentUser) return alert("Login required");
+
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        following: arrayUnion(post.uid)
+      });
+
+      await updateDoc(doc(db, "users", post.uid), {
+        followers: arrayUnion(currentUser.uid)
+      });
+
+      followBtn.textContent = "Following";
+      followBtn.disabled = true;
+    };
+  }
+
+  homeFeed.appendChild(card);
 }
 
 /* ================= MEDIA ================= */
 function renderMedia(post) {
   if (post.type === "podcast-audio") {
     return `
-      <img src="${post.thumbnail}" class="post-thumb">
+      <img src="${post.thumbnail || ""}" class="post-audio-thumb">
       <audio controls src="${post.fileURL}"></audio>
     `;
   }
@@ -148,52 +199,6 @@ function renderMedia(post) {
       <source src="${post.fileURL}">
     </video>
   `;
-}
-
-/* ================= LIKES ================= */
-async function toggleLike(post, card) {
-  if (!currentUser) return alert("Login required");
-
-  const ref = doc(db, "posts", post.id);
-  const liked = post.likedBy?.includes(currentUser.uid);
-
-  await updateDoc(ref, {
-    likes: increment(liked ? -1 : 1),
-    likedBy: liked
-      ? arrayRemove(currentUser.uid)
-      : arrayUnion(currentUser.uid)
-  });
-
-  location.reload();
-}
-
-/* ================= SAVES ================= */
-async function toggleSave(post) {
-  if (!currentUser) return alert("Login required");
-
-  const ref = doc(db, "posts", post.id);
-  const saved = post.savedBy?.includes(currentUser.uid);
-
-  await updateDoc(ref, {
-    savedBy: saved
-      ? arrayRemove(currentUser.uid)
-      : arrayUnion(currentUser.uid)
-  });
-
-  location.reload();
-}
-
-/* ================= FOLLOWS ================= */
-async function followCreator(creatorId) {
-  if (!currentUser) return alert("Login required");
-  if (creatorId === currentUser.uid) return;
-
-  const userRef = doc(db, "users", currentUser.uid);
-  await updateDoc(userRef, {
-    following: arrayUnion(creatorId)
-  });
-
-  alert("Followed!");
 }
 
 /* ================= INFINITE SCROLL ================= */
@@ -208,4 +213,3 @@ window.addEventListener("scroll", () => {
 
 /* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", fetchPosts);
-
