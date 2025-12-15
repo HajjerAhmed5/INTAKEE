@@ -1,209 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>INTAKEE — Videos, Podcasts & Clips</title>
-  <meta name="description" content="INTAKEE — freedom to create, simple to share." />
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
-</head>
+/* ===============================
+   INTAKEE — SETTINGS SYSTEM
+   Saves & loads user preferences
+================================ */
 
-<body>
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-<!-- ================= HEADER ================= -->
-<header id="mainHeader">
-  <img src="logo.png" class="app-logo" alt="INTAKEE Logo" />
-  <div class="search-bar" id="globalSearchBar">
-    <i class="fa fa-search"></i>
-    <input id="globalSearch" placeholder="Search for content or creators..." autocomplete="off" />
-  </div>
-  <button id="openAuth" class="primary header-login-btn">Login / Sign Up</button>
-  <span id="headerUsername" class="header-username" style="display:none;">@username</span>
-</header>
+const auth = getAuth();
+const db = getFirestore();
 
-<main>
+/* ===============================
+   DOM ELEMENTS
+================================ */
+const toggles = {
+  privateAccount: document.getElementById("togglePrivateAccount"),
+  uploadsPrivate: document.getElementById("togglePrivateUploads"),
+  savedPrivate: document.getElementById("togglePrivateSaved"),
+  playlistsPrivate: document.getElementById("togglePrivatePlaylists"),
+};
 
-<!-- ================= HOME ================= -->
-<section id="home" class="tab-section">
-  <div class="home-header-row">
-    <h2>Trending</h2>
-    <div class="home-filter-text-right">
-      <button class="filter-text active" data-filter="all">All</button>
-      <button class="filter-text" data-filter="videos">Videos</button>
-      <button class="filter-text" data-filter="podcasts">Podcasts</button>
-      <button class="filter-text" data-filter="clips">Clips</button>
-      <button class="filter-text" data-filter="following">Following</button>
-      <button class="filter-text" data-filter="newest">Newest</button>
-    </div>
-  </div>
-  <div id="home-feed" class="feed-grid"></div>
-</section>
+/* ===============================
+   LOAD SETTINGS
+================================ */
+auth.onAuthStateChanged(async (user) => {
+  if (!user) return;
 
-<!-- ================= VIDEOS ================= -->
-<section id="videos" class="tab-section">
-  <h2>Videos</h2>
-  <div id="videos-feed" class="feed-grid"></div>
-</section>
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
 
-<!-- ================= PODCASTS ================= -->
-<section id="podcasts" class="tab-section">
-  <h2>Podcasts</h2>
-  <div id="podcasts-feed" class="feed-grid"></div>
-</section>
+  const data = snap.data();
 
-<!-- ================= CLIPS ================= -->
-<section id="clips" class="tab-section">
-  <h2>Clips</h2>
-  <div id="clips-feed" class="feed-grid"></div>
-</section>
+  if (toggles.privateAccount) toggles.privateAccount.checked = data.privateAccount || false;
+  if (toggles.uploadsPrivate) toggles.uploadsPrivate.checked = data.uploadsPrivate || false;
+  if (toggles.savedPrivate) toggles.savedPrivate.checked = data.savedPrivate || false;
+  if (toggles.playlistsPrivate) toggles.playlistsPrivate.checked = data.playlistsPrivate || false;
+});
 
-<!-- ================= UPLOAD ================= -->
-<section id="upload" class="tab-section" style="display:none;">
-  <h2 class="muted">Upload Content</h2>
-  <div class="upload-container">
-    <label class="form-label">Content Category</label>
-    <select id="uploadTypeSelect" class="form-input">
-      <option value="video">Video</option>
-      <option value="clip">Clip</option>
-      <option value="podcast-audio">Podcast — Audio Only</option>
-      <option value="podcast-video">Podcast — Video</option>
-    </select>
+/* ===============================
+   SAVE SETTINGS
+================================ */
+Object.entries(toggles).forEach(([key, el]) => {
+  if (!el) return;
 
-    <label class="form-label">Title</label>
-    <input id="uploadTitleInput" class="form-input" maxlength="70" />
+  el.addEventListener("change", async () => {
+    const user = auth.currentUser;
+    if (!user) return;
 
-    <label class="form-label">Description (Optional)</label>
-    <textarea id="uploadDescInput" class="form-input" maxlength="2000"></textarea>
+    await updateDoc(doc(db, "users", user.uid), {
+      [key]: el.checked
+    });
+  });
+});
 
-    <label class="form-label">Thumbnail Image</label>
-    <input id="uploadThumbInput" type="file" class="form-input" accept="image/*" />
+/* ===============================
+   LOGOUT
+================================ */
+document.querySelectorAll(".settings-row").forEach(row => {
+  if (row.textContent.trim() === "Logout") {
+    row.addEventListener("click", async () => {
+      await signOut(auth);
+      location.reload();
+    });
+  }
+});
 
-    <label class="form-label">Main Content File</label>
-    <input id="uploadFileInput" type="file" class="form-input" accept="video/*,audio/*" />
-
-    <div class="settings-toggle">
-      <span>Is this restricted to 18+?</span>
-      <label class="switch">
-        <input type="checkbox" id="ageRestrictionToggle" />
-        <span class="slider round"></span>
-      </label>
-    </div>
-  </div>
-
-  <div class="upload-actions">
-    <button id="btnUpload" class="primary-outline">Upload</button>
-    <button id="btnGoLive" class="primary-outline">Go Live</button>
-  </div>
-</section>
-
-<!-- ================= PROFILE ================= -->
-<section id="profile" class="tab-section">
-  <div class="profile-banner"></div>
-
-  <div class="profile-header-row">
-    <img id="profile-photo" class="profile-avatar" src="default-avatar.png">
-    <button id="btn-edit-profile" class="edit-profile-btn">Edit Profile</button>
-  </div>
-
-  <div class="profile-info-center">
-    <h3 id="profile-name">Guest</h3>
-    <p id="profile-handle" class="muted">@guest</p>
-    <p id="profile-bio" class="muted">Sign in to personalize your profile.</p>
-  </div>
-
-  <div class="profile-stats-center">
-    <div><strong id="stat-posts">0</strong><span>Posts</span></div>
-    <div><strong id="stat-followers">0</strong><span>Followers</span></div>
-    <div><strong id="stat-following">0</strong><span>Following</span></div>
-    <div><strong id="stat-likes">0</strong><span>Likes</span></div>
-  </div>
-
-  <!-- PROFILE TABS (RESTORED) -->
-  <div class="profile-tabs-center">
-    <button class="pill active" data-profile-tab="uploads">Uploads</button>
-    <button class="pill" data-profile-tab="saved">Saved</button>
-    <button class="pill" data-profile-tab="likes">Likes</button>
-    <button class="pill" data-profile-tab="playlists">Playlists</button>
-    <button class="pill" data-profile-tab="history">History</button>
-    <button class="pill" data-profile-tab="notifications">Notifications</button>
-  </div>
-
-  <!-- PROFILE GRIDS (RESTORED) -->
-  <div id="profile-uploads-grid" class="feed-grid"></div>
-  <div id="profile-saved-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-likes-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-playlists-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-history-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-notifications-grid" class="feed-grid" style="display:none;"></div>
-</section>
-
-<!-- ================= SETTINGS ================= -->
-<section id="settings" class="tab-section">
-  <h1>Settings</h1>
-
-  <h3 class="settings-section-title">Account</h3>
-  <div class="settings-list card">
-    <div class="settings-row">Edit Account</div>
-    <div class="settings-row">Change Email</div>
-    <div class="settings-row">Change Password</div>
-    <div class="settings-row">Active Sessions</div>
-    <div class="settings-row">Logout</div>
-    <div class="settings-row red-text">Delete Account</div>
-  </div>
-
-  <!-- LEGAL (FIXED ONLY) -->
-  <h3 class="settings-section-title">Legal</h3>
-  <div class="settings-list card">
-    <div class="settings-row" onclick="openLegal('privacy')">
-      <span>Privacy Policy</span>
-      <i class="fa-solid fa-chevron-right"></i>
-    </div>
-    <div class="settings-row" onclick="openLegal('terms')">
-      <span>Terms of Service</span>
-      <i class="fa-solid fa-chevron-right"></i>
-    </div>
-    <div class="settings-row" onclick="openLegal('guidelines')">
-      <span>Community Guidelines</span>
-      <i class="fa-solid fa-chevron-right"></i>
-    </div>
-  </div>
-</section>
-
-</main>
-
-<!-- ================= BOTTOM NAV ================= -->
-<nav class="bottom-nav">
-  <a data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
-  <a data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
-  <a data-tab="podcasts"><i class="fa fa-podcast"></i><span>Podcasts</span></a>
-  <a data-tab="upload"><i class="fa-solid fa-circle-plus"></i><span>Upload</span></a>
-  <a data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
-  <a data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
-  <a data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
-</nav>
-
-<!-- ================= LEGAL MODAL ================= -->
-<div id="legalModal" class="legal-modal hidden">
-  <div class="legal-content">
-    <div class="legal-header">
-      <h2 id="legalTitle"></h2>
-      <button class="close-btn" onclick="closeLegal()">✕</button>
-    </div>
-    <div id="legalBody" class="legal-body"></div>
-  </div>
-</div>
-
-<!-- ================= SCRIPTS ================= -->
-<script type="module" src="js/firebase-config.js"></script>
-<script type="module" src="js/firebase-init.js"></script>
-<script type="module" src="js/tabs.js"></script>
-<script type="module" src="js/auth.js"></script>
-<script type="module" src="js/profile.js"></script>
-<script type="module" src="js/feed.js"></script>
-<script type="module" src="js/upload.js"></script>
-<script type="module" src="js/settings.js"></script>
-<script type="module" src="js/viewer.js"></script>
-
-</body>
-</html>
+/* ===============================
+   DELETE ACCOUNT (UI ONLY)
+================================ */
+document.querySelectorAll(".settings-row").forEach(row => {
+  if (row.textContent.trim() === "Delete Account") {
+    row.addEventListener("click", () => {
+      alert("Account deletion will be enabled later.");
+    });
+  }
+});
