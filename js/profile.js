@@ -1,17 +1,17 @@
 /* ===============================
-   INTAKEE — PROFILE SYSTEM
-   REAL APP VERSION
+   INTAKEE — PROFILE SYSTEM (FINAL)
 ================================ */
 
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { auth, db } from "./firebase-init.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import {
-  getFirestore,
   doc,
-  getDoc
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-
-const auth = getAuth();
-const db = getFirestore();
 
 /* ===============================
    DOM ELEMENTS
@@ -57,26 +57,82 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
+  if (!userSnap.exists()) return;
 
-  if (!snap.exists()) return;
+  const data = userSnap.data();
 
-  const data = snap.data();
-
+  /* BASIC INFO */
   profileName.textContent = data.username || "User";
   profileHandle.textContent = "@" + (data.username || "user");
   profileBio.textContent = data.bio || "No bio yet.";
   profilePhoto.src = data.photoURL || "default-avatar.png";
 
+  /* STATS */
   statPosts.textContent = data.posts || 0;
-  statFollowers.textContent = data.followers || 0;
-  statFollowing.textContent = data.following || 0;
+  statFollowers.textContent = data.followers?.length || 0;
+  statFollowing.textContent = data.following?.length || 0;
   statLikes.textContent = data.likes || 0;
+
+  /* LOAD CONTENT */
+  loadUserUploads(user.uid);
+  loadSavedPosts(data);
 });
 
 /* ===============================
-   PROFILE TAB SWITCHING
+   LOAD USER UPLOADS
+================================ */
+async function loadUserUploads(uid) {
+  grids.uploads.innerHTML = "";
+
+  const q = query(
+    collection(db, "posts"),
+    where("uid", "==", uid)
+  );
+
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    grids.uploads.innerHTML = "<p class='muted'>No uploads yet.</p>";
+    return;
+  }
+
+  snap.forEach(docSnap => {
+    const post = docSnap.data();
+    const div = document.createElement("div");
+    div.className = "post-card";
+    div.innerHTML = `<h4>${post.title || "Untitled"}</h4>`;
+    grids.uploads.appendChild(div);
+  });
+}
+
+/* ===============================
+   LOAD SAVED POSTS
+================================ */
+async function loadSavedPosts(userData) {
+  grids.saved.innerHTML = "";
+
+  if (!userData.saved?.length) {
+    grids.saved.innerHTML = "<p class='muted'>No saved posts.</p>";
+    return;
+  }
+
+  for (const postId of userData.saved) {
+    const postRef = doc(db, "posts", postId);
+    const postSnap = await getDoc(postRef);
+    if (!postSnap.exists()) continue;
+
+    const post = postSnap.data();
+    const div = document.createElement("div");
+    div.className = "post-card";
+    div.innerHTML = `<h4>${post.title || "Untitled"}</h4>`;
+    grids.saved.appendChild(div);
+  }
+}
+
+/* ===============================
+   TAB SWITCHING
 ================================ */
 function showTab(tabName) {
   Object.values(grids).forEach(grid => {
@@ -98,5 +154,6 @@ tabs.forEach(btn => {
   });
 });
 
-// Default tab
+/* DEFAULT TAB */
 showTab("uploads");
+
