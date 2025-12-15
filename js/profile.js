@@ -1,78 +1,102 @@
-/* ============================
-   PROFILE SYSTEM JS — CLEAN VERSION
-   Matches NEW Profile Layout (Banner + Avatar + Edit Button)
-============================ */
+/* ===============================
+   INTAKEE — PROFILE SYSTEM
+   REAL APP VERSION
+================================ */
 
-import { auth } from "./firebase-init.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-/* DOM Elements */
+const auth = getAuth();
+const db = getFirestore();
+
+/* ===============================
+   DOM ELEMENTS
+================================ */
 const profileName = document.getElementById("profile-name");
 const profileHandle = document.getElementById("profile-handle");
 const profileBio = document.getElementById("profile-bio");
 const profilePhoto = document.getElementById("profile-photo");
 
-/* -----------------------------
-   PROFILE TABS + FEEDS
------------------------------ */
+const statPosts = document.getElementById("stat-posts");
+const statFollowers = document.getElementById("stat-followers");
+const statFollowing = document.getElementById("stat-following");
+const statLikes = document.getElementById("stat-likes");
 
+/* ===============================
+   PROFILE TABS
+================================ */
 const tabs = document.querySelectorAll(".pill");
 
 const grids = {
-    uploads: document.getElementById("profile-uploads-grid"),
-    saved: document.getElementById("profile-saved-grid"),
-    likes: document.getElementById("profile-likes-grid"),
-    playlists: document.getElementById("profile-playlists-grid"),
-    history: document.getElementById("profile-history-grid"),
-    notifications: document.getElementById("profile-notifications-grid")
+  uploads: document.getElementById("profile-uploads-grid"),
+  saved: document.getElementById("profile-saved-grid"),
+  likes: document.getElementById("profile-likes-grid"),
+  playlists: document.getElementById("profile-playlists-grid"),
+  history: document.getElementById("profile-history-grid"),
+  notifications: document.getElementById("profile-notifications-grid")
 };
 
-/* -----------------------------
-   AUTH — LOAD USER PROFILE
------------------------------ */
+/* ===============================
+   AUTH → LOAD PROFILE
+================================ */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    profileName.textContent = "Guest";
+    profileHandle.textContent = "@guest";
+    profileBio.textContent = "Sign in to personalize your profile.";
+    profilePhoto.src = "default-avatar.png";
 
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        profileName.textContent = "Guest";
-        profileHandle.textContent = "@guest";
-        profileBio.textContent = "Sign in to personalize your profile.";
-        profilePhoto.src = "default-avatar.png";
-        return;
-    }
+    statPosts.textContent = "0";
+    statFollowers.textContent = "0";
+    statFollowing.textContent = "0";
+    statLikes.textContent = "0";
+    return;
+  }
 
-    profileName.textContent = user.displayName || "No Name";
-    profileHandle.textContent = "@" + (user.displayName || "username");
-    profileBio.textContent = user.bio || "No bio yet.";
-    profilePhoto.src = user.photoURL || "default-avatar.png";
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+
+  profileName.textContent = data.username || "User";
+  profileHandle.textContent = "@" + (data.username || "user");
+  profileBio.textContent = data.bio || "No bio yet.";
+  profilePhoto.src = data.photoURL || "default-avatar.png";
+
+  statPosts.textContent = data.posts || 0;
+  statFollowers.textContent = data.followers || 0;
+  statFollowing.textContent = data.following || 0;
+  statLikes.textContent = data.likes || 0;
 });
 
-/* -----------------------------
-   TAB SWITCHING SYSTEM
------------------------------ */
-
+/* ===============================
+   PROFILE TAB SWITCHING
+================================ */
 function showTab(tabName) {
-    // Hide all grids
-    Object.values(grids).forEach((grid) => {
-        grid.style.display = "none";
-    });
+  Object.values(grids).forEach(grid => {
+    if (grid) grid.style.display = "none";
+  });
 
-    // Show the selected one
-    if (grids[tabName]) {
-        grids[tabName].style.display = "grid";
-    }
+  if (grids[tabName]) {
+    grids[tabName].style.display = "grid";
+  }
 
-    // Activate correct pill
-    tabs.forEach((btn) => btn.classList.remove("active"));
-    const activeBtn = document.querySelector(`[data-profile-tab="${tabName}"]`);
-    if (activeBtn) activeBtn.classList.add("active");
+  tabs.forEach(btn => btn.classList.remove("active"));
+  const activeBtn = document.querySelector(`[data-profile-tab="${tabName}"]`);
+  if (activeBtn) activeBtn.classList.add("active");
 }
 
-tabs.forEach((btn) => {
-    btn.addEventListener("click", () => {
-        const tab = btn.getAttribute("data-profile-tab");
-        showTab(tab);
-    });
+tabs.forEach(btn => {
+  btn.addEventListener("click", () => {
+    showTab(btn.dataset.profileTab);
+  });
 });
 
-// DEFAULT TAB
+// Default tab
 showTab("uploads");
