@@ -143,28 +143,33 @@
   <h1>Settings</h1>
 
   <!-- all previous settings sections unchanged -->
-
-  <h3 class="settings-section-title">Legal</h3>
-  <div class="settings-list card">
-    <div class="settings-row" onclick="openLegal('privacy')">
-      <span>Privacy Policy</span>
-      <i class="fa-solid fa-chevron-right settings-arrow"></i>
-    </div>
-
-    <div class="settings-row" onclick="openLegal('terms')">
-      <span>Terms of Service</span>
-      <i class="fa-solid fa-chevron-right settings-arrow"></i>
-    </div>
-
-    <div class="settings-row" onclick="openLegal('guidelines')">
-      <span>Community Guidelines</span>
-      <i class="fa-solid fa-chevron-right settings-arrow"></i>
-    </div>
+<h3 class="settings-section-title">Legal</h3>
+<div class="settings-list card">
+  <div class="settings-row" onclick="openLegal('privacy')">
+    <span>Privacy Policy</span>
+    <i class="fa-solid fa-chevron-right settings-arrow"></i>
   </div>
-</section>
 
-</main>
+  <div class="settings-row" onclick="openLegal('terms')">
+    <span>Terms of Service</span>
+    <i class="fa-solid fa-chevron-right settings-arrow"></i>
+  </div>
 
+  <div class="settings-row" onclick="openLegal('guidelines')">
+    <span>Community Guidelines</span>
+    <i class="fa-solid fa-chevron-right settings-arrow"></i>
+  </div>
+</div>
+<div id="legalModal" class="legal-modal hidden">
+  <div class="legal-content">
+    <div class="legal-header">
+      <h2 id="legalTitle"></h2>
+      <button class="close-btn" onclick="closeLegal()">✕</button>
+    </div>
+    <div id="legalBody" class="legal-body"></div>
+  </div>
+</div>
+  
 <!-- ⭐ BOTTOM NAV -->
 <nav class="bottom-nav">
   <a data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
