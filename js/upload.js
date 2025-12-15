@@ -1,12 +1,11 @@
-/* =====================================
-   INTAKEE — REAL UPLOAD SYSTEM
-   Handles:
-   - Auth check
-   - File upload (placeholder for Firebase Storage)
-   - Save post metadata to Firestore
+ /* =====================================
+   INTAKEE — REAL UPLOAD SYSTEM (FINAL)
+   - Auth protected
+   - Firebase Storage upload
+   - Firestore post creation
 ===================================== */
 
-import { auth, db } from "./firebase-init.js";
+import { auth, db, storage } from "./firebase-init.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import {
   collection,
@@ -16,8 +15,13 @@ import {
   updateDoc,
   increment
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
 
-/* DOM */
+/* ================= DOM ================= */
 const uploadBtn = document.getElementById("btnUpload");
 const uploadType = document.getElementById("uploadTypeSelect");
 const uploadTitle = document.getElementById("uploadTitleInput");
@@ -28,12 +32,12 @@ const ageToggle = document.getElementById("ageRestrictionToggle");
 
 let currentUser = null;
 
-/* AUTH CHECK */
+/* ================= AUTH ================= */
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
 });
 
-/* UPLOAD HANDLER */
+/* ================= UPLOAD ================= */
 uploadBtn.addEventListener("click", async () => {
   if (!currentUser) {
     alert("You must be logged in to upload.");
@@ -41,38 +45,64 @@ uploadBtn.addEventListener("click", async () => {
   }
 
   if (!uploadTitle.value || !uploadFile.files.length) {
-    alert("Title and file are required.");
+    alert("Title and main file are required.");
     return;
   }
 
-  try {
-    // 🔹 TEMP: no Firebase Storage yet (next step)
-    const fakeFileURL = "pending-upload";
+  uploadBtn.disabled = true;
+  uploadBtn.textContent = "Uploading...";
 
+  try {
+    /* ---------- FILE UPLOAD ---------- */
+    const file = uploadFile.files[0];
+    const fileRef = ref(
+      storage,
+      `posts/${currentUser.uid}/${Date.now()}_${file.name}`
+    );
+
+    await uploadBytes(fileRef, file);
+    const fileURL = await getDownloadURL(fileRef);
+
+    /* ---------- THUMBNAIL UPLOAD (OPTIONAL) ---------- */
+    let thumbnailURL = null;
+
+    if (uploadThumb.files.length) {
+      const thumb = uploadThumb.files[0];
+      const thumbRef = ref(
+        storage,
+        `thumbnails/${currentUser.uid}/${Date.now()}_${thumb.name}`
+      );
+
+      await uploadBytes(thumbRef, thumb);
+      thumbnailURL = await getDownloadURL(thumbRef);
+    }
+
+    /* ---------- SAVE POST ---------- */
     const post = {
       uid: currentUser.uid,
+      username: currentUser.displayName || "user",
       type: uploadType.value,
       title: uploadTitle.value.trim(),
       description: uploadDesc.value.trim(),
-      fileURL: fakeFileURL,
-      thumbnail: uploadThumb.files[0]?.name || null,
+      fileURL,
+      thumbnail: thumbnailURL,
       ageRestricted: ageToggle.checked,
       createdAt: serverTimestamp(),
       likes: 0,
+      likedBy: [],
+      savedBy: [],
       comments: 0
     };
 
-    // Save post
     await addDoc(collection(db, "posts"), post);
 
-    // Increment user post count
     await updateDoc(doc(db, "users", currentUser.uid), {
       posts: increment(1)
     });
 
-    alert("Upload successful (metadata saved).");
+    alert("Upload successful!");
 
-    // Reset form
+    /* ---------- RESET FORM ---------- */
     uploadTitle.value = "";
     uploadDesc.value = "";
     uploadFile.value = "";
@@ -81,7 +111,9 @@ uploadBtn.addEventListener("click", async () => {
 
   } catch (err) {
     console.error(err);
-    alert("Upload failed.");
+    alert("Upload failed. Try again.");
   }
-});
 
+  uploadBtn.disabled = false;
+  uploadBtn.textContent = "Upload";
+});
