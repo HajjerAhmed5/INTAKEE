@@ -11,7 +11,7 @@
 
 <body>
 
-<!-- ⭐ UNIVERSAL HEADER -->
+<!-- ================= HEADER ================= -->
 <header id="mainHeader">
   <img src="logo.png" class="app-logo" alt="INTAKEE Logo" />
   <div class="search-bar" id="globalSearchBar">
@@ -24,7 +24,7 @@
 
 <main>
 
-<!-- HOME -->
+<!-- ================= HOME ================= -->
 <section id="home" class="tab-section">
   <div class="home-header-row">
     <h2>Trending</h2>
@@ -40,25 +40,25 @@
   <div id="home-feed" class="feed-grid"></div>
 </section>
 
-<!-- VIDEOS -->
+<!-- ================= VIDEOS ================= -->
 <section id="videos" class="tab-section">
   <h2>Videos</h2>
   <div id="videos-feed" class="feed-grid"></div>
 </section>
 
-<!-- PODCASTS -->
+<!-- ================= PODCASTS ================= -->
 <section id="podcasts" class="tab-section">
   <h2>Podcasts</h2>
   <div id="podcasts-feed" class="feed-grid"></div>
 </section>
 
-<!-- CLIPS -->
+<!-- ================= CLIPS ================= -->
 <section id="clips" class="tab-section">
   <h2>Clips</h2>
   <div id="clips-feed" class="feed-grid"></div>
 </section>
 
-<!-- UPLOAD -->
+<!-- ================= UPLOAD ================= -->
 <section id="upload" class="tab-section" style="display:none;">
   <h2 class="muted">Upload Content</h2>
   <div class="upload-container">
@@ -97,7 +97,7 @@
   </div>
 </section>
 
-<!-- PROFILE -->
+<!-- ================= PROFILE ================= -->
 <section id="profile" class="tab-section">
   <div class="profile-banner"></div>
 
@@ -118,9 +118,27 @@
     <div><strong id="stat-following">0</strong><span>Following</span></div>
     <div><strong id="stat-likes">0</strong><span>Likes</span></div>
   </div>
+
+  <!-- PROFILE TABS (RESTORED) -->
+  <div class="profile-tabs-center">
+    <button class="pill active" data-profile-tab="uploads">Uploads</button>
+    <button class="pill" data-profile-tab="saved">Saved</button>
+    <button class="pill" data-profile-tab="likes">Likes</button>
+    <button class="pill" data-profile-tab="playlists">Playlists</button>
+    <button class="pill" data-profile-tab="history">History</button>
+    <button class="pill" data-profile-tab="notifications">Notifications</button>
+  </div>
+
+  <!-- PROFILE GRIDS (RESTORED) -->
+  <div id="profile-uploads-grid" class="feed-grid"></div>
+  <div id="profile-saved-grid" class="feed-grid" style="display:none;"></div>
+  <div id="profile-likes-grid" class="feed-grid" style="display:none;"></div>
+  <div id="profile-playlists-grid" class="feed-grid" style="display:none;"></div>
+  <div id="profile-history-grid" class="feed-grid" style="display:none;"></div>
+  <div id="profile-notifications-grid" class="feed-grid" style="display:none;"></div>
 </section>
 
-<!-- SETTINGS -->
+<!-- ================= SETTINGS ================= -->
 <section id="settings" class="tab-section">
   <h1>Settings</h1>
 
@@ -134,6 +152,7 @@
     <div class="settings-row red-text">Delete Account</div>
   </div>
 
+  <!-- LEGAL (FIXED ONLY) -->
   <h3 class="settings-section-title">Legal</h3>
   <div class="settings-list card">
     <div class="settings-row" onclick="openLegal('privacy')">
@@ -153,7 +172,7 @@
 
 </main>
 
-<!-- BOTTOM NAV -->
+<!-- ================= BOTTOM NAV ================= -->
 <nav class="bottom-nav">
   <a data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
   <a data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
@@ -164,7 +183,7 @@
   <a data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
 </nav>
 
-<!-- LEGAL MODAL (ONLY ONE) -->
+<!-- ================= LEGAL MODAL ================= -->
 <div id="legalModal" class="legal-modal hidden">
   <div class="legal-content">
     <div class="legal-header">
@@ -175,7 +194,7 @@
   </div>
 </div>
 
-<!-- SCRIPTS -->
+<!-- ================= SCRIPTS ================= -->
 <script type="module" src="js/firebase-config.js"></script>
 <script type="module" src="js/firebase-init.js"></script>
 <script type="module" src="js/tabs.js"></script>
