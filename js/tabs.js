@@ -1,33 +1,53 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const tabs = document.querySelectorAll(".bottom-nav a");
-  const sections = document.querySelectorAll(".tab-section");
+/* ===============================
+   INTAKEE — TAB SYSTEM (FINAL)
+================================ */
 
-  function showTab(tabId) {
-    sections.forEach(section => {
-      section.style.display =
-        section.id === tabId ? "block" : "none";
-    });
+const tabs = document.querySelectorAll(".bottom-nav a");
+const sections = document.querySelectorAll(".tab-section");
 
-    tabs.forEach(tab => {
-      tab.classList.toggle(
-        "active",
-        tab.dataset.tab === tabId
-      );
-    });
-  }
-
-  tabs.forEach(tab => {
-    tab.addEventListener("click", e => {
-      e.preventDefault();
-      const tabId = tab.dataset.tab;
-      window.location.hash = tabId;
-      showTab(tabId);
-    });
+function showTab(tabId) {
+  // Hide all sections
+  sections.forEach(section => {
+    section.style.display = "none";
+    section.classList.remove("active");
   });
 
-  // Load tab from URL hash
-  const initialTab =
-    window.location.hash.replace("#", "") || "home";
+  // Deactivate all tabs
+  tabs.forEach(tab => tab.classList.remove("active"));
 
-  showTab(initialTab);
+  // Show selected section
+  const activeSection = document.getElementById(tabId);
+  const activeTab = document.querySelector(`.bottom-nav a[data-tab="${tabId}"]`);
+
+  if (activeSection) {
+    activeSection.style.display = "block";
+    activeSection.classList.add("active");
+  }
+
+  if (activeTab) {
+    activeTab.classList.add("active");
+  }
+
+  // Update URL hash
+  history.replaceState(null, "", `#${tabId}`);
+}
+
+/* ===============================
+   CLICK HANDLERS
+================================ */
+tabs.forEach(tab => {
+  tab.addEventListener("click", e => {
+    e.preventDefault();
+    const tabId = tab.dataset.tab;
+    showTab(tabId);
+  });
+});
+
+/* ===============================
+   LOAD FROM HASH (REFRESH SAFE)
+================================ */
+window.addEventListener("load", () => {
+  const hash = window.location.hash.replace("#", "");
+  const validTab = document.getElementById(hash) ? hash : "home";
+  showTab(validTab);
 });
