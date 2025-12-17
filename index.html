@@ -14,10 +14,12 @@
 <!-- ================= HEADER ================= -->
 <header id="mainHeader">
   <img src="logo.png" class="app-logo" alt="INTAKEE Logo" />
+
   <div class="search-bar" id="globalSearchBar">
     <i class="fa fa-search"></i>
     <input id="globalSearch" placeholder="Search for content or creators..." autocomplete="off" />
   </div>
+
   <button id="openAuth" class="primary header-login-btn">Login / Sign Up</button>
   <span id="headerUsername" class="header-username" style="display:none;">@username</span>
 </header>
@@ -49,68 +51,78 @@
 </section>
 
 <!-- ================= UPLOAD ================= -->
-<section id="upload" class="tab-section">
-  <h2 class="muted">Upload Content</h2>
+<section id="upload" class="tab-section" style="display:none;">
+  <h2>Upload Content</h2>
+
+  <label>Type</label>
+  <select id="uploadTypeSelect">
+    <option value="video">Video</option>
+    <option value="clip">Clip</option>
+    <option value="podcast-audio">Podcast (Audio)</option>
+    <option value="podcast-video">Podcast (Video)</option>
+  </select>
+
+  <input id="uploadTitleInput" placeholder="Title" />
+  <textarea id="uploadDescInput" placeholder="Description"></textarea>
+  <input id="uploadThumbInput" type="file" accept="image/*" />
+  <input id="uploadFileInput" type="file" accept="video/*,audio/*" />
+
+  <label>
+    <input type="checkbox" id="ageRestrictionToggle" />
+    18+ Content
+  </label>
+
+  <button id="btnUpload">Upload</button>
 </section>
 
 <!-- ================= PROFILE ================= -->
 <section id="profile" class="tab-section">
-  <h2>Profile</h2>
+  <img id="profile-photo" src="default-avatar.png" class="profile-avatar" />
+  <h3 id="profile-name">Guest</h3>
+  <p id="profile-handle">@guest</p>
+  <p id="profile-bio">Sign in to personalize your profile.</p>
+
+  <div class="profile-stats">
+    <span><strong id="stat-posts">0</strong> Posts</span>
+    <span><strong id="stat-followers">0</strong> Followers</span>
+    <span><strong id="stat-following">0</strong> Following</span>
+    <span><strong id="stat-likes">0</strong> Likes</span>
+  </div>
+
+  <div class="profile-tabs-center">
+    <button class="pill active" data-profile-tab="uploads">Uploads</button>
+    <button class="pill" data-profile-tab="saved">Saved</button>
+    <button class="pill" data-profile-tab="likes">Likes</button>
+  </div>
+
+  <div id="profile-uploads-grid" class="feed-grid"></div>
+  <div id="profile-saved-grid" class="feed-grid" style="display:none;"></div>
+  <div id="profile-likes-grid" class="feed-grid" style="display:none;"></div>
 </section>
 
 <!-- ================= SETTINGS ================= -->
 <section id="settings" class="tab-section">
   <h1>Settings</h1>
 
-  <!-- ACCOUNT -->
+  <h3 class="settings-section-title">Privacy</h3>
+  <div class="settings-list card">
+    <label><input type="checkbox" id="togglePrivateAccount"> Private Account</label>
+    <label><input type="checkbox" id="togglePrivateUploads"> Uploads Private</label>
+    <label><input type="checkbox" id="togglePrivateSaved"> Saved Private</label>
+    <label><input type="checkbox" id="togglePrivatePlaylists"> Playlists Private</label>
+  </div>
+
   <h3 class="settings-section-title">Account</h3>
   <div class="settings-list card">
-    <div class="settings-toggle">
-      <span>Private Account</span>
-      <label class="switch">
-        <input type="checkbox" id="togglePrivateAccount">
-        <span class="slider round"></span>
-      </label>
-    </div>
+    <div class="settings-row">Logout</div>
+    <div class="settings-row red-text">Delete Account</div>
   </div>
 
-  <!-- DATA & APP -->
-  <h3 class="settings-section-title">Data & App</h3>
-  <div class="settings-list card">
-    <div class="settings-row" id="clearCache">Clear Cache</div>
-    <div class="settings-row" id="downloadData">Download My Data</div>
-    <div class="settings-row">
-      <span>App Version</span>
-      <span class="muted small">INTAKEE v1.0.0</span>
-    </div>
-  </div>
-
-  <!-- HELP -->
-  <h3 class="settings-section-title">Help & Support</h3>
-  <div class="settings-list card">
-    <div class="settings-row">Report a Bug</div>
-    <div class="settings-row">Learn About INTAKEE</div>
-    <div class="settings-row">
-      <span>Contact Support</span>
-      <span class="muted small">intakee2025@gmail.com</span>
-    </div>
-  </div>
-
-  <!-- ✅ LEGAL (ONLY PLACE IT EXISTS) -->
   <h3 class="settings-section-title">Legal</h3>
   <div class="settings-list card">
-    <div class="settings-row" data-legal="privacy">
-      <span>Privacy Policy</span>
-      <i class="fa-solid fa-chevron-right"></i>
-    </div>
-    <div class="settings-row" data-legal="terms">
-      <span>Terms of Service</span>
-      <i class="fa-solid fa-chevron-right"></i>
-    </div>
-    <div class="settings-row" data-legal="guidelines">
-      <span>Community Guidelines</span>
-      <i class="fa-solid fa-chevron-right"></i>
-    </div>
+    <div class="settings-row" data-legal="privacy">Privacy Policy</div>
+    <div class="settings-row" data-legal="terms">Terms of Service</div>
+    <div class="settings-row" data-legal="guidelines">Community Guidelines</div>
   </div>
 </section>
 
@@ -118,16 +130,16 @@
 
 <!-- ================= BOTTOM NAV ================= -->
 <nav class="bottom-nav">
-  <a data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
-  <a data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
-  <a data-tab="podcasts"><i class="fa fa-podcast"></i><span>Podcasts</span></a>
-  <a data-tab="upload"><i class="fa fa-circle-plus"></i><span>Upload</span></a>
-  <a data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
-  <a data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
-  <a data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
+  <a data-tab="home">Home</a>
+  <a data-tab="videos">Videos</a>
+  <a data-tab="podcasts">Podcasts</a>
+  <a data-tab="upload">Upload</a>
+  <a data-tab="clips">Clips</a>
+  <a data-tab="profile">Profile</a>
+  <a data-tab="settings">Settings</a>
 </nav>
 
-<!-- ================= LEGAL MODAL (GLOBAL) ================= -->
+<!-- ================= LEGAL MODAL (GLOBAL, ONE) ================= -->
 <div id="legalModal" class="legal-modal hidden">
   <div class="legal-content">
     <div class="legal-header">
@@ -147,7 +159,6 @@
 <script type="module" src="js/feed.js"></script>
 <script type="module" src="js/upload.js"></script>
 <script type="module" src="js/settings.js"></script>
-<script type="module" src="js/viewer.js"></script>
 
 </body>
 </html>
