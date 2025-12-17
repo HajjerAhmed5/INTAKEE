@@ -1,9 +1,9 @@
 /* ===============================
    INTAKEE — SETTINGS SYSTEM
-   Saves & loads user preferences
+   Final Production Version
 ================================ */
 
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 import {
   getFirestore,
   doc,
@@ -15,7 +15,7 @@ const auth = getAuth();
 const db = getFirestore();
 
 /* ===============================
-   DOM ELEMENTS
+   PRIVACY TOGGLES
 ================================ */
 const toggles = {
   privateAccount: document.getElementById("togglePrivateAccount"),
@@ -25,9 +25,9 @@ const toggles = {
 };
 
 /* ===============================
-   LOAD SETTINGS
+   LOAD USER SETTINGS
 ================================ */
-auth.onAuthStateChanged(async (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (!user) return;
 
   const ref = doc(db, "users", user.uid);
@@ -36,10 +36,10 @@ auth.onAuthStateChanged(async (user) => {
 
   const data = snap.data();
 
-  if (toggles.privateAccount) toggles.privateAccount.checked = data.privateAccount || false;
-  if (toggles.uploadsPrivate) toggles.uploadsPrivate.checked = data.uploadsPrivate || false;
-  if (toggles.savedPrivate) toggles.savedPrivate.checked = data.savedPrivate || false;
-  if (toggles.playlistsPrivate) toggles.playlistsPrivate.checked = data.playlistsPrivate || false;
+  if (toggles.privateAccount) toggles.privateAccount.checked = !!data.privateAccount;
+  if (toggles.uploadsPrivate) toggles.uploadsPrivate.checked = !!data.uploadsPrivate;
+  if (toggles.savedPrivate) toggles.savedPrivate.checked = !!data.savedPrivate;
+  if (toggles.playlistsPrivate) toggles.playlistsPrivate.checked = !!data.playlistsPrivate;
 });
 
 /* ===============================
@@ -76,17 +76,18 @@ document.querySelectorAll(".settings-row").forEach(row => {
 document.querySelectorAll(".settings-row").forEach(row => {
   if (row.textContent.trim() === "Delete Account") {
     row.addEventListener("click", () => {
-      alert("Account deletion will be enabled later.");
+      alert("Account deletion will be enabled soon.");
     });
   }
 });
-/* ===============================
-   LEGAL MODALS — FIXED
-=============================== */
 
+/* ===============================
+   LEGAL MODAL SYSTEM (FINAL)
+================================ */
 const legalModal = document.getElementById("legalModal");
 const legalTitle = document.getElementById("legalTitle");
 const legalBody = document.getElementById("legalBody");
+const closeBtn = document.querySelector(".close-btn");
 
 const legalContent = {
   privacy: {
@@ -94,16 +95,15 @@ const legalContent = {
     body: `
       <p><strong>INTAKEE Privacy Policy</strong></p>
       <p>
-        INTAKEE respects your privacy. We collect only the information
-        necessary to operate the platform, including account information,
-        uploaded content, and usage data.
+        INTAKEE collects only the information necessary to operate the platform,
+        including account data, uploaded content, and basic usage analytics.
       </p>
       <p>
-        We do not sell your personal data. Content you upload is public
-        by default unless otherwise stated.
+        We do not sell personal data. Public content is visible by default unless
+        a creator chooses otherwise.
       </p>
       <p>
-        By using INTAKEE, you consent to this Privacy Policy.
+        By using INTAKEE, you agree to this Privacy Policy.
       </p>
     `
   },
@@ -113,14 +113,14 @@ const legalContent = {
     body: `
       <p><strong>INTAKEE Terms of Service</strong></p>
       <p>
-        By using INTAKEE, you agree that you are solely responsible for
-        any content you upload or share.
+        You are solely responsible for the content you upload.
       </p>
       <p>
-        INTAKEE is not liable for user-generated content.
+        INTAKEE is not liable for user-generated content but reserves the right
+        to remove content that violates the law or our guidelines.
       </p>
       <p>
-        Use of the platform constitutes acceptance of these terms.
+        Continued use of the platform constitutes acceptance of these terms.
       </p>
     `
   },
@@ -130,20 +130,22 @@ const legalContent = {
     body: `
       <p><strong>INTAKEE Community Guidelines</strong></p>
       <ul>
-        <li>No illegal content</li>
+        <li>No illegal activity</li>
         <li>No sexual exploitation</li>
         <li>No severe harassment or threats</li>
       </ul>
       <p>
-        Violations may result in removal or suspension.
+        Violations may result in content removal or account suspension.
       </p>
     `
   }
 };
 
-/* Attach click handlers AFTER DOM loads */
+/* ===============================
+   LEGAL CLICK HANDLERS
+================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll("[data-legal]").forEach(row => {
+  document.querySelectorAll(".settings-row[data-legal]").forEach(row => {
     row.addEventListener("click", () => {
       const type = row.dataset.legal;
       const content = legalContent[type];
@@ -155,21 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document.querySelector(".close-btn")?.addEventListener("click", () => {
+  closeBtn?.addEventListener("click", () => {
     legalModal.classList.add("hidden");
-  });
-});
-/* ===============================
-   LEGAL ROW CLICK HANDLERS
-================================ */
-
-document.querySelectorAll(".settings-row[data-legal]").forEach(row => {
-  row.addEventListener("click", () => {
-    const type = row.dataset.legal;
-    if (!legalContent[type]) return;
-
-    legalTitle.textContent = legalContent[type].title;
-    legalBody.innerHTML = legalContent[type].body;
-    legalModal.classList.remove("hidden");
   });
 });
