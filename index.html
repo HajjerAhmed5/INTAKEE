@@ -293,19 +293,36 @@
 </nav>
 
 <!-- ================= LEGAL MODAL ================= -->
-<div class="settings-row" data-legal="privacy">
-  <span>Privacy Policy</span>
-  <i class="fa-solid fa-chevron-right"></i>
-</div>
+<section id="settings" class="tab-section">
 
-<div class="settings-row" data-legal="terms">
-  <span>Terms of Service</span>
-  <i class="fa-solid fa-chevron-right"></i>
-</div>
+  <h3 class="settings-section-title">Legal</h3>
 
-<div class="settings-row" data-legal="guidelines">
-  <span>Community Guidelines</span>
-  <i class="fa-solid fa-chevron-right"></i>
+  <div class="settings-list card">
+    <div class="settings-row" data-legal="privacy">
+      <span>Privacy Policy</span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </div>
+
+    <div class="settings-row" data-legal="terms">
+      <span>Terms of Service</span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </div>
+
+    <div class="settings-row" data-legal="guidelines">
+      <span>Community Guidelines</span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </div>
+  </div>
+
+</section>
+<div id="legalModal" class="legal-modal hidden">
+  <div class="legal-content">
+    <div class="legal-header">
+      <h2 id="legalTitle"></h2>
+      <button class="close-btn">✕</button>
+    </div>
+    <div id="legalBody" class="legal-body"></div>
+  </div>
 </div>
 
 <!-- ================= SCRIPTS ================= -->
