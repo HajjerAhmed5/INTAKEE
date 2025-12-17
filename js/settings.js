@@ -81,7 +81,7 @@ document.querySelectorAll(".settings-row").forEach(row => {
   }
 });
 /* ===============================
-   LEGAL MODALS
+   LEGAL MODALS — FIXED
 =============================== */
 
 const legalModal = document.getElementById("legalModal");
@@ -117,8 +117,7 @@ const legalContent = {
         any content you upload or share.
       </p>
       <p>
-        INTAKEE is not liable for user-generated content. We reserve the
-        right to remove content that violates our guidelines or the law.
+        INTAKEE is not liable for user-generated content.
       </p>
       <p>
         Use of the platform constitutes acceptance of these terms.
@@ -130,30 +129,33 @@ const legalContent = {
     title: "Community Guidelines",
     body: `
       <p><strong>INTAKEE Community Guidelines</strong></p>
-      <p>
-        We support freedom of expression, but the following content is not allowed:
-      </p>
       <ul>
-        <li>Illegal content</li>
-        <li>Sexual exploitation</li>
-        <li>Severe harassment or threats</li>
+        <li>No illegal content</li>
+        <li>No sexual exploitation</li>
+        <li>No severe harassment or threats</li>
       </ul>
       <p>
-        Violations may result in content removal or account suspension.
+        Violations may result in removal or suspension.
       </p>
     `
   }
 };
 
-window.openLegal = function (type) {
-  if (!legalContent[type]) return;
+/* Attach click handlers AFTER DOM loads */
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("[data-legal]").forEach(row => {
+    row.addEventListener("click", () => {
+      const type = row.dataset.legal;
+      const content = legalContent[type];
+      if (!content) return;
 
-  legalTitle.textContent = legalContent[type].title;
-  legalBody.innerHTML = legalContent[type].body;
+      legalTitle.textContent = content.title;
+      legalBody.innerHTML = content.body;
+      legalModal.classList.remove("hidden");
+    });
+  });
 
-  legalModal.classList.remove("hidden");
-};
-
-window.closeLegal = function () {
-  legalModal.classList.add("hidden");
-};
+  document.querySelector(".close-btn")?.addEventListener("click", () => {
+    legalModal.classList.add("hidden");
+  });
+});
