@@ -1,5 +1,5 @@
 /* ===============================
-   INTAKEE — SETTINGS SYSTEM (FINAL)
+   INTAKEE — SETTINGS SYSTEM
 ================================ */
 
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
@@ -14,7 +14,7 @@ const auth = getAuth();
 const db = getFirestore();
 
 /* ===============================
-   USER PRIVACY TOGGLES
+   PRIVACY TOGGLES
 ================================ */
 const toggles = {
   privateAccount: document.getElementById("togglePrivateAccount"),
@@ -33,7 +33,7 @@ auth.onAuthStateChanged(async (user) => {
   const data = snap.data();
 
   Object.entries(toggles).forEach(([key, el]) => {
-    if (el) el.checked = !!data[key];
+    if (el) el.checked = data[key] || false;
   });
 });
 
@@ -41,8 +41,10 @@ Object.entries(toggles).forEach(([key, el]) => {
   if (!el) return;
 
   el.addEventListener("change", async () => {
-    if (!auth.currentUser) return;
-    await updateDoc(doc(db, "users", auth.currentUser.uid), {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    await updateDoc(doc(db, "users", user.uid), {
       [key]: el.checked
     });
   });
@@ -61,20 +63,18 @@ document.querySelectorAll(".settings-row").forEach(row => {
 });
 
 /* ===============================
-   LEGAL MODAL SYSTEM (FINAL)
+   LEGAL MODAL SYSTEM
 ================================ */
-
 const legalModal = document.getElementById("legalModal");
 const legalTitle = document.getElementById("legalTitle");
 const legalBody = document.getElementById("legalBody");
-const closeBtn = legalModal?.querySelector(".close-btn");
 
 const legalContent = {
   privacy: {
     title: "Privacy Policy",
     body: `
       <p><strong>INTAKEE Privacy Policy</strong></p>
-      <p>We collect only information required to operate the platform.</p>
+      <p>We collect only the data required to operate the platform.</p>
       <p>We do not sell personal data.</p>
       <p>Uploaded content is public unless stated otherwise.</p>
     `
@@ -83,31 +83,27 @@ const legalContent = {
     title: "Terms of Service",
     body: `
       <p><strong>INTAKEE Terms of Service</strong></p>
-      <p>You are solely responsible for your content.</p>
+      <p>You are solely responsible for the content you upload.</p>
       <p>INTAKEE is not liable for user-generated content.</p>
-      <p>Use of the platform means acceptance of these terms.</p>
+      <p>Use of the platform constitutes acceptance of these terms.</p>
     `
   },
   guidelines: {
     title: "Community Guidelines",
     body: `
-      <p><strong>Community Guidelines</strong></p>
+      <p><strong>INTAKEE Community Guidelines</strong></p>
       <ul>
         <li>No illegal content</li>
         <li>No sexual exploitation</li>
-        <li>No extreme harassment</li>
+        <li>No threats or extreme harassment</li>
       </ul>
       <p>Violations may result in removal or suspension.</p>
     `
   }
 };
 
-/* Only bind when Settings tab exists */
 document.addEventListener("DOMContentLoaded", () => {
-  const settingsTab = document.getElementById("settings");
-  if (!settingsTab) return;
-
-  settingsTab.querySelectorAll("[data-legal]").forEach(row => {
+  document.querySelectorAll(".settings-row[data-legal]").forEach(row => {
     row.addEventListener("click", () => {
       const type = row.dataset.legal;
       if (!legalContent[type]) return;
@@ -118,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  closeBtn?.addEventListener("click", () => {
+  document.querySelector(".close-btn")?.addEventListener("click", () => {
     legalModal.classList.add("hidden");
   });
 });
