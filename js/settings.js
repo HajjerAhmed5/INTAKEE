@@ -1,5 +1,8 @@
 /* ===============================
-   INTAKEE — SETTINGS SYSTEM
+   INTAKEE — SETTINGS SYSTEM (FINAL)
+   ✔ Privacy toggles
+   ✔ Logout
+   ✔ Legal modals (FIXED)
 ================================ */
 
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
@@ -26,14 +29,13 @@ const toggles = {
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
 
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
+  const snap = await getDoc(doc(db, "users", user.uid));
   if (!snap.exists()) return;
 
   const data = snap.data();
 
   Object.entries(toggles).forEach(([key, el]) => {
-    if (el) el.checked = data[key] || false;
+    if (el) el.checked = Boolean(data[key]);
   });
 });
 
@@ -51,32 +53,35 @@ Object.entries(toggles).forEach(([key, el]) => {
 });
 
 /* ===============================
-   LOGOUT
+   LOGOUT (SAFE)
 ================================ */
-document.querySelectorAll(".settings-row").forEach(row => {
-  if (row.textContent.trim() === "Logout") {
-    row.addEventListener("click", async () => {
-      await signOut(auth);
-      location.reload();
-    });
+document.addEventListener("click", async (e) => {
+  const target = e.target.closest(".settings-row");
+  if (!target) return;
+
+  if (target.textContent.trim() === "Logout") {
+    await signOut(auth);
+    location.reload();
   }
 });
 
 /* ===============================
-   LEGAL MODAL SYSTEM
+   LEGAL MODAL SYSTEM (FIXED)
 ================================ */
 const legalModal = document.getElementById("legalModal");
 const legalTitle = document.getElementById("legalTitle");
 const legalBody = document.getElementById("legalBody");
+const closeBtn = legalModal?.querySelector(".close-btn");
 
 const legalContent = {
   privacy: {
     title: "Privacy Policy",
     body: `
       <p><strong>INTAKEE Privacy Policy</strong></p>
-      <p>We collect only the data required to operate the platform.</p>
+      <p>INTAKEE collects only the information required to operate the platform.</p>
       <p>We do not sell personal data.</p>
-      <p>Uploaded content is public unless stated otherwise.</p>
+      <p>Uploaded content is public unless you choose privacy options.</p>
+      <p>By using INTAKEE, you agree to this policy.</p>
     `
   },
   terms: {
@@ -85,7 +90,8 @@ const legalContent = {
       <p><strong>INTAKEE Terms of Service</strong></p>
       <p>You are solely responsible for the content you upload.</p>
       <p>INTAKEE is not liable for user-generated content.</p>
-      <p>Use of the platform constitutes acceptance of these terms.</p>
+      <p>We reserve the right to remove content that violates the law.</p>
+      <p>Using INTAKEE means you accept these terms.</p>
     `
   },
   guidelines: {
@@ -95,26 +101,35 @@ const legalContent = {
       <ul>
         <li>No illegal content</li>
         <li>No sexual exploitation</li>
-        <li>No threats or extreme harassment</li>
+        <li>No severe harassment or threats</li>
       </ul>
-      <p>Violations may result in removal or suspension.</p>
+      <p>Violations may result in removal or account suspension.</p>
     `
   }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".settings-row[data-legal]").forEach(row => {
-    row.addEventListener("click", () => {
-      const type = row.dataset.legal;
-      if (!legalContent[type]) return;
+/* LEGAL ROW CLICK HANDLING — ISOLATED */
+document.addEventListener("click", (e) => {
+  const row = e.target.closest(".settings-row[data-legal]");
+  if (!row) return;
 
-      legalTitle.textContent = legalContent[type].title;
-      legalBody.innerHTML = legalContent[type].body;
-      legalModal.classList.remove("hidden");
-    });
-  });
+  const type = row.dataset.legal;
+  const content = legalContent[type];
+  if (!content) return;
 
-  document.querySelector(".close-btn")?.addEventListener("click", () => {
+  legalTitle.textContent = content.title;
+  legalBody.innerHTML = content.body;
+  legalModal.classList.remove("hidden");
+});
+
+/* CLOSE MODAL */
+closeBtn?.addEventListener("click", () => {
+  legalModal.classList.add("hidden");
+});
+
+/* CLICK OUTSIDE TO CLOSE */
+legalModal?.addEventListener("click", (e) => {
+  if (e.target === legalModal) {
     legalModal.classList.add("hidden");
-  });
+  }
 });
