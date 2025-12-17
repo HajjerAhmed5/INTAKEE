@@ -159,3 +159,17 @@ document.addEventListener("DOMContentLoaded", () => {
     legalModal.classList.add("hidden");
   });
 });
+/* ===============================
+   LEGAL ROW CLICK HANDLERS
+================================ */
+
+document.querySelectorAll(".settings-row[data-legal]").forEach(row => {
+  row.addEventListener("click", () => {
+    const type = row.dataset.legal;
+    if (!legalContent[type]) return;
+
+    legalTitle.textContent = legalContent[type].title;
+    legalBody.innerHTML = legalContent[type].body;
+    legalModal.classList.remove("hidden");
+  });
+});
