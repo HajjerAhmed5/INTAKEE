@@ -26,17 +26,7 @@
 
 <!-- ================= HOME ================= -->
 <section id="home" class="tab-section">
-  <div class="home-header-row">
-    <h2>Trending</h2>
-    <div class="home-filter-text-right">
-      <button class="filter-text active" data-filter="all">All</button>
-      <button class="filter-text" data-filter="videos">Videos</button>
-      <button class="filter-text" data-filter="podcasts">Podcasts</button>
-      <button class="filter-text" data-filter="clips">Clips</button>
-      <button class="filter-text" data-filter="following">Following</button>
-      <button class="filter-text" data-filter="newest">Newest</button>
-    </div>
-  </div>
+  <h2>Trending</h2>
   <div id="home-feed" class="feed-grid"></div>
 </section>
 
@@ -59,220 +49,65 @@
 </section>
 
 <!-- ================= UPLOAD ================= -->
-<section id="upload" class="tab-section" style="display:none;">
+<section id="upload" class="tab-section">
   <h2 class="muted">Upload Content</h2>
-  <div class="upload-container">
-    <label class="form-label">Content Category</label>
-    <select id="uploadTypeSelect" class="form-input">
-      <option value="video">Video</option>
-      <option value="clip">Clip</option>
-      <option value="podcast-audio">Podcast — Audio Only</option>
-      <option value="podcast-video">Podcast — Video</option>
-    </select>
-
-    <label class="form-label">Title</label>
-    <input id="uploadTitleInput" class="form-input" maxlength="70" />
-
-    <label class="form-label">Description (Optional)</label>
-    <textarea id="uploadDescInput" class="form-input" maxlength="2000"></textarea>
-
-    <label class="form-label">Thumbnail Image</label>
-    <input id="uploadThumbInput" type="file" class="form-input" accept="image/*" />
-
-    <label class="form-label">Main Content File</label>
-    <input id="uploadFileInput" type="file" class="form-input" accept="video/*,audio/*" />
-
-    <div class="settings-toggle">
-      <span>Is this restricted to 18+?</span>
-      <label class="switch">
-        <input type="checkbox" id="ageRestrictionToggle" />
-        <span class="slider round"></span>
-      </label>
-    </div>
-  </div>
-
-  <div class="upload-actions">
-    <button id="btnUpload" class="primary-outline">Upload</button>
-    <button id="btnGoLive" class="primary-outline">Go Live</button>
-  </div>
 </section>
 
 <!-- ================= PROFILE ================= -->
 <section id="profile" class="tab-section">
-  <div class="profile-banner"></div>
-
-  <div class="profile-header-row">
-    <img id="profile-photo" class="profile-avatar" src="default-avatar.png">
-    <button id="btn-edit-profile" class="edit-profile-btn">Edit Profile</button>
-  </div>
-
-  <div class="profile-info-center">
-    <h3 id="profile-name">Guest</h3>
-    <p id="profile-handle" class="muted">@guest</p>
-    <p id="profile-bio" class="muted">Sign in to personalize your profile.</p>
-  </div>
-
-  <div class="profile-stats-center">
-    <div><strong id="stat-posts">0</strong><span>Posts</span></div>
-    <div><strong id="stat-followers">0</strong><span>Followers</span></div>
-    <div><strong id="stat-following">0</strong><span>Following</span></div>
-    <div><strong id="stat-likes">0</strong><span>Likes</span></div>
-  </div>
-
-  <!-- PROFILE TABS (RESTORED) -->
-  <div class="profile-tabs-center">
-    <button class="pill active" data-profile-tab="uploads">Uploads</button>
-    <button class="pill" data-profile-tab="saved">Saved</button>
-    <button class="pill" data-profile-tab="likes">Likes</button>
-    <button class="pill" data-profile-tab="playlists">Playlists</button>
-    <button class="pill" data-profile-tab="history">History</button>
-    <button class="pill" data-profile-tab="notifications">Notifications</button>
-  </div>
-
-  <!-- PROFILE GRIDS (RESTORED) -->
-  <div id="profile-uploads-grid" class="feed-grid"></div>
-  <div id="profile-saved-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-likes-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-playlists-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-history-grid" class="feed-grid" style="display:none;"></div>
-  <div id="profile-notifications-grid" class="feed-grid" style="display:none;"></div>
+  <h2>Profile</h2>
 </section>
 
 <!-- ================= SETTINGS ================= -->
 <section id="settings" class="tab-section">
   <h1>Settings</h1>
 
+  <!-- ACCOUNT -->
   <h3 class="settings-section-title">Account</h3>
   <div class="settings-list card">
-    <h3 class="settings-section-title">Privacy</h3>
-<div class="settings-list card">
-  <div class="settings-toggle">
-    <span>Private Account</span>
-    <label class="switch">
-      <input type="checkbox" id="togglePrivateAccount">
-      <span class="slider round"></span>
-    </label>
-  </div>
-  <div class="settings-toggle">
-    <span>Uploads Private</span>
-    <label class="switch">
-      <input type="checkbox" id="togglePrivateUploads">
-      <span class="slider round"></span>
-    </label>
-  </div>
-  <div class="settings-toggle">
-    <span>Saved Videos Private</span>
-    <label class="switch">
-      <input type="checkbox" id="togglePrivateSaved">
-      <span class="slider round"></span>
-    </label>
-  </div>
-  <div class="settings-toggle">
-    <span>Playlists Private</span>
-    <label class="switch">
-      <input type="checkbox" id="togglePrivatePlaylists">
-      <span class="slider round"></span>
-    </label>
-  </div>
-</div>
-
-<h3 class="settings-section-title">Notifications</h3>
-<div class="settings-list card">
-  <div class="settings-toggle">
-    <span>New Followers</span>
-    <label class="switch">
-      <input type="checkbox" id="notifFollowers">
-      <span class="slider round"></span>
-    </label>
-  </div>
-  <div class="settings-toggle">
-    <span>New Likes</span>
-    <label class="switch">
-      <input type="checkbox" id="notifLikes">
-      <span class="slider round"></span>
-    </label>
-  </div>
-  <div class="settings-toggle">
-    <span>Comments</span>
-    <label class="switch">
-      <input type="checkbox" id="notifComments">
-      <span class="slider round"></span>
-    </label>
-  </div>
-  <div class="settings-toggle">
-    <span>Creator Uploads</span>
-    <label class="switch">
-      <input type="checkbox" id="notifCreatorUploads">
-      <span class="slider round"></span>
-    </label>
-  </div>
-</div>
-
-<h3 class="settings-section-title">Playback</h3>
-<div class="settings-list card">
-  <div class="settings-toggle">
-    <span>Auto-play</span>
-    <label class="switch">
-      <input type="checkbox" id="toggleAutoplay">
-      <span class="slider round"></span>
-    </label>
-  </div>
-  <div class="settings-toggle">
-    <span>Auto-loop Clips</span>
-    <label class="switch">
-      <input type="checkbox" id="toggleAutoloop">
-      <span class="slider round"></span>
-    </label>
-  </div>
-  <div class="settings-toggle">
-    <span>Picture-in-Picture</span>
-    <label class="switch">
-      <input type="checkbox" id="togglePiP">
-      <span class="slider round"></span>
-    </label>
-  </div>
-  <div class="settings-toggle">
-    <span>Background Play (Podcasts)</span>
-    <label class="switch">
-      <input type="checkbox" id="toggleBGPlay">
-      <span class="slider round"></span>
-    </label>
-  </div>
-</div>
-
-<h3 class="settings-section-title">Data & App</h3>
-<div class="settings-list card">
-  <div class="settings-row" id="clearCache">Clear Cache</div>
-  <div class="settings-row" id="downloadData">Download My Data</div>
-  <div class="settings-row">
-    <span>App Version</span>
-    <span class="muted small">INTAKEE v1.0.0</span>
-  </div>
-</div>
-
-<h3 class="settings-section-title">Help & Support</h3>
-<div class="settings-list card">
-  <div class="settings-row">Report a Bug</div>
-  <div class="settings-row">Learn About INTAKEE</div>
-  <div class="settings-row">Our Mission</div>
-  <div class="settings-row">
-    <span>Contact Support</span>
-    <span class="muted small">intakee2025@gmail.com</span>
-  </div>
-</div>
+    <div class="settings-toggle">
+      <span>Private Account</span>
+      <label class="switch">
+        <input type="checkbox" id="togglePrivateAccount">
+        <span class="slider round"></span>
+      </label>
+    </div>
   </div>
 
+  <!-- DATA & APP -->
+  <h3 class="settings-section-title">Data & App</h3>
+  <div class="settings-list card">
+    <div class="settings-row" id="clearCache">Clear Cache</div>
+    <div class="settings-row" id="downloadData">Download My Data</div>
+    <div class="settings-row">
+      <span>App Version</span>
+      <span class="muted small">INTAKEE v1.0.0</span>
+    </div>
+  </div>
+
+  <!-- HELP -->
+  <h3 class="settings-section-title">Help & Support</h3>
+  <div class="settings-list card">
+    <div class="settings-row">Report a Bug</div>
+    <div class="settings-row">Learn About INTAKEE</div>
+    <div class="settings-row">
+      <span>Contact Support</span>
+      <span class="muted small">intakee2025@gmail.com</span>
+    </div>
+  </div>
+
+  <!-- ✅ LEGAL (ONLY PLACE IT EXISTS) -->
   <h3 class="settings-section-title">Legal</h3>
   <div class="settings-list card">
-    <div class="settings-row" onclick="openLegal('privacy')">
+    <div class="settings-row" data-legal="privacy">
       <span>Privacy Policy</span>
       <i class="fa-solid fa-chevron-right"></i>
     </div>
-    <div class="settings-row" onclick="openLegal('terms')">
+    <div class="settings-row" data-legal="terms">
       <span>Terms of Service</span>
       <i class="fa-solid fa-chevron-right"></i>
     </div>
-    <div class="settings-row" onclick="openLegal('guidelines')">
+    <div class="settings-row" data-legal="guidelines">
       <span>Community Guidelines</span>
       <i class="fa-solid fa-chevron-right"></i>
     </div>
@@ -280,31 +115,13 @@
 </section>
 
 </main>
-<h3 class="settings-section-title">Legal</h3>
-
-<div class="settings-list card">
-  <div class="settings-row" data-legal="privacy">
-    <span>Privacy Policy</span>
-    <i class="fa-solid fa-chevron-right"></i>
-  </div>
-
-  <div class="settings-row" data-legal="terms">
-    <span>Terms of Service</span>
-    <i class="fa-solid fa-chevron-right"></i>
-  </div>
-
-  <div class="settings-row" data-legal="guidelines">
-    <span>Community Guidelines</span>
-    <i class="fa-solid fa-chevron-right"></i>
-  </div>
-</div>
 
 <!-- ================= BOTTOM NAV ================= -->
 <nav class="bottom-nav">
   <a data-tab="home" class="active"><i class="fa fa-home"></i><span>Home</span></a>
   <a data-tab="videos"><i class="fa fa-video"></i><span>Videos</span></a>
   <a data-tab="podcasts"><i class="fa fa-podcast"></i><span>Podcasts</span></a>
-  <a data-tab="upload"><i class="fa-solid fa-circle-plus"></i><span>Upload</span></a>
+  <a data-tab="upload"><i class="fa fa-circle-plus"></i><span>Upload</span></a>
   <a data-tab="clips"><i class="fa fa-bolt"></i><span>Clips</span></a>
   <a data-tab="profile"><i class="fa fa-user"></i><span>Profile</span></a>
   <a data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
@@ -319,8 +136,7 @@
     </div>
     <div id="legalBody" class="legal-body"></div>
   </div>
-</div> 
- 
+</div>
 
 <!-- ================= SCRIPTS ================= -->
 <script type="module" src="js/firebase-config.js"></script>
