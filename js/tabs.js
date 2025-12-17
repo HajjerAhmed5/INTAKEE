@@ -1,26 +1,24 @@
 /* ===============================
-   INTAKEE — TAB SYSTEM (FINAL)
+   INTAKEE — TAB SYSTEM (SAFE FINAL)
 ================================ */
 
 const tabs = document.querySelectorAll(".bottom-nav a");
 const sections = document.querySelectorAll(".tab-section");
 
 function showTab(tabId) {
-  // Hide all sections
+  // Hide all sections via class
   sections.forEach(section => {
-    section.style.display = "none";
     section.classList.remove("active");
   });
 
   // Deactivate all tabs
   tabs.forEach(tab => tab.classList.remove("active"));
 
-  // Show selected section
+  // Activate selected section
   const activeSection = document.getElementById(tabId);
   const activeTab = document.querySelector(`.bottom-nav a[data-tab="${tabId}"]`);
 
   if (activeSection) {
-    activeSection.style.display = "block";
     activeSection.classList.add("active");
   }
 
@@ -28,7 +26,6 @@ function showTab(tabId) {
     activeTab.classList.add("active");
   }
 
-  // Update URL hash
   history.replaceState(null, "", `#${tabId}`);
 }
 
@@ -38,16 +35,14 @@ function showTab(tabId) {
 tabs.forEach(tab => {
   tab.addEventListener("click", e => {
     e.preventDefault();
-    const tabId = tab.dataset.tab;
-    showTab(tabId);
+    showTab(tab.dataset.tab);
   });
 });
 
 /* ===============================
-   LOAD FROM HASH (REFRESH SAFE)
+   LOAD FROM HASH
 ================================ */
-window.addEventListener("load", () => {
+window.addEventListener("DOMContentLoaded", () => {
   const hash = window.location.hash.replace("#", "");
-  const validTab = document.getElementById(hash) ? hash : "home";
-  showTab(validTab);
+  showTab(document.getElementById(hash) ? hash : "home");
 });
