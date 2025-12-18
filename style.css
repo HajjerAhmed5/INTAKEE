@@ -245,3 +245,23 @@ body[data-tab="upload"] #openAuth,
 body[data-tab="settings"] #openAuth {
   display: none;
 }
+/* ================= HEADER VISIBILITY LOGIC ================= */
+
+/* Hide by default */
+.search-bar,
+#openAuth {
+  display: none;
+}
+
+/* Search bar visible on content tabs */
+body[data-tab="home"] .search-bar,
+body[data-tab="videos"] .search-bar,
+body[data-tab="podcasts"] .search-bar,
+body[data-tab="clips"] .search-bar {
+  display: flex;
+}
+
+/* Login button ONLY on home */
+body[data-tab="home"] #openAuth {
+  display: inline-block;
+}
