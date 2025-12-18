@@ -1,469 +1,159 @@
 /* ========================================================================= */
-/* INTAKEE — FINAL STYLE.CSS (Dark Mode, Polished, Instagram-Style Settings) */
+/* INTAKEE — FINAL STYLE.CSS (Dark Mode, Stable, Original Layout Preserved) */
 /* ========================================================================= */
 
 :root {
-    --bg: #000;
-    --panel: #0f0f0f;
-    --panel-2: #0a0a0a;
-    --border: #222;
-    --text: #fff;
-    --muted: #aaa;
-
-    --primary-accent: #fff;
-    --primary-text-dark: #000;
-
-    --radius: 12px;
-    --radius-lg: 18px;
+  --bg: #000;
+  --panel: #0f0f0f;
+  --panel-2: #0a0a0a;
+  --border: #222;
+  --text: #fff;
+  --muted: #aaa;
+  --radius: 12px;
 }
 
-/* ========================================================================= */
-/* RESET */
-/* ========================================================================= */
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* ================= RESET ================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: system-ui, Arial, sans-serif;
-    padding-bottom: 90px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, Arial, sans-serif;
+  padding-bottom: 90px;
 }
 
-/* ========================================================================= */
-/* HEADER */
-/* ========================================================================= */
-
-header#mainHeader {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
-    background: var(--panel-2);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 999;
+/* ================= TAB VISIBILITY (FIX) ================= */
+.tab-section {
+  display: none;
 }
 
-header img.app-logo {
-    height: 115px;
-    width: auto;
+.tab-section.active {
+  display: block;
 }
 
-.header-login-btn {
-    background: #000 !important;
-    color: #fff !important;
-    border: 1px solid #fff !important;
-    padding: 6px 12px !important;
-    border-radius: 8px;
-    font-size: 0.85rem !important;
-    cursor: pointer;
+/* ================= HEADER ================= */
+#mainHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.app-logo {
+  height: 115px;
 }
 
 .search-bar {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    background: #111;
-    padding: 10px 14px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-}
-.search-bar i { color: #777; }
-.search-bar input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    margin-left: 8px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #111;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
 }
 
-/* ========================================================================= */
-/* BUTTON STYLES */
-/* ========================================================================= */
+.search-bar i {
+  color: #777;
+}
+
+.search-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  margin-left: 8px;
+}
+
+/* ================= BUTTONS ================= */
+button {
+  cursor: pointer;
+}
 
 .primary {
-    background: #000 !important;
-    color: #fff !important;
-    border-radius: 8px;
-    padding: 14px;
-    font-weight: 600;
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
 }
 
-.primary-outline {
-    background: transparent !important;
-    color: #fff !important;
-    border: 2px solid #fff !important;
-    border-radius: 10px;
-    padding: 12px 20px;
-    font-weight: 600;
-}
-
-button:hover { opacity: 0.8; }
-
-/* ========================================================================= */
-/* AUTH MODAL */
-/* ========================================================================= */
-
-dialog#authDialog {
-    width: 90%;
-    max-width: 420px;
-    background: #000;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 25px 28px;
-}
-
-dialog#authDialog::backdrop { background: rgba(0,0,0,0.7); }
-
-#authDialog .form-input {
-    width: 100%;
-    background: #111;
-    border: 1px solid #333;
-    padding: 12px;
-    border-radius: 8px;
-    color: white;
-    margin-bottom: 14px;
-}
-
-.modal-close-btn {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 28px;
-    cursor: pointer;
-}
-
-/* ========================================================================= */
-/* BOTTOM NAV */
-/* ========================================================================= */
-
-.bottom-nav {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: var(--panel-2);
-    border-top: 1px solid var(--border);
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    padding: 7px 0;
-    z-index: 999;
-}
-
-.bottom-nav a {
-    text-decoration: none;
-    color: #888;
-    font-size: 0.75rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.bottom-nav a.active,
-.bottom-nav a:hover {
-    color: var(--primary-accent);
-}
-
-/* ========================================================================= */
-/* FEED SYSTEM */
-/* ========================================================================= */
-
+/* ================= FEED ================= */
 .feed-grid {
-    display: grid;
-    gap: 16px;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    margin-top: 14px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  margin-top: 14px;
 }
 
-/* ========================================================================= */
-/* HOME FILTER BAR */
-/* ========================================================================= */
-
+/* ================= HOME FILTER ================= */
 .home-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.home-filter-text-right {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    white-space: nowrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .filter-text {
-    background: transparent;
-    border: none;
-    color: #aaa;
-    font-size: 0.9rem;
-    cursor: pointer;
+  background: none;
+  border: none;
+  color: #aaa;
+  margin-left: 12px;
 }
-.filter-text.active { color: #fff; font-weight: 600; }
 
-/* ========================================================================= */
-/* UPLOAD PAGE */
-/* ========================================================================= */
+.filter-text.active {
+  color: #fff;
+  font-weight: 600;
+}
 
+/* ================= UPLOAD ================= */
 .upload-container {
-    background: #000;
-    padding: 20px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
 }
 
-.upload-container .form-input {
-    background: #111;
-    border: 1px solid #333;
-    padding: 12px;
-    border-radius: var(--radius);
-    color: #fff;
-    width: 100%;
-    margin-bottom: 14px;
+/* ================= PROFILE ================= */
+.profile-tabs button {
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 6px 12px;
+  margin-right: 8px;
+  border-radius: 20px;
 }
 
-.upload-actions {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-/* ========================================================================= */
-/* INSTAGRAM-STYLE SETTINGS PAGE */
-/* ========================================================================= */
-
+/* ================= SETTINGS ================= */
 #settings {
-    max-width: 850px;
-    margin: 20px auto;
-    padding: 0 20px;
+  max-width: 850px;
+  margin: 20px auto;
+  padding: 0 20px;
 }
 
-.settings-section-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #fff;
-    margin: 28px 0 12px;
+.settings-row {
+  padding: 14px 0;
+  border-bottom: 1px solid #222;
+  cursor: pointer;
 }
 
-/* Settings card container */
-.settings-list {
-    background: #111;
-    border: 1px solid #222;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 24px;
-}
-
-/* Rows inside cards */
-.settings-row,
-.settings-toggle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 18px;
-    border-bottom: 1px solid #222;
-    color: #fff;
-    font-size: 0.95rem;
-}
-
-.settings-row:last-child,
-.settings-toggle:last-child {
-    border-bottom: none;
-}
-
-/* Arrow icon */
-.settings-arrow {
-    color: #777;
-    font-size: 1rem;
-}
-
-/* Toggle label */
-.settings-toggle span {
-    color: #ddd;
-}
-
-/* Instagram / iOS toggle switch */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 48px;
-    height: 26px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #444;
-    transition: .3s;
-    border-radius: 26px;
-}
-
-.slider::before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 3px;
-    bottom: 3px;
-    background-color: #fff;
-    transition: .3s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #4cd964; /* iOS green */
-}
-
-input:checked + .slider:before {
-    transform: translateX(22px);
-}
-
-.slider.round {
-    border-radius: 34px;
-}
-
-/* ========================================================================= */
-/* PROFILE PAGE — CLEAN MODERN VERSION */
-/* ========================================================================= */
-
-.profile-banner {
-    width: 100%;
-    height: 180px;
-    background: #111;
-    border-bottom: 1px solid #222;
-}
-
-.profile-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 780px;
-    margin: -60px auto 20px auto;
-    padding: 0 20px;
-}
-
-.profile-avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 4px solid #000;
-    object-fit: cover;
-}
-
-.edit-profile-btn {
-    background: #fff;
-    color: #000;
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-}
-
-.profile-info-center {
-    text-align: center;
-    margin-top: 10px;
-}
-
-.profile-info-center h3 {
-    font-size: 1.4rem;
-    font-weight: 700;
-}
-
-.profile-bio {
-    font-size: 0.9rem;
-    color: #ccc;
-}
-
-.profile-stats-center {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin: 20px 0;
-    text-align: center;
-}
-
-.profile-stats-center span {
-    display: block;
-    font-size: 0.8rem;
-    color: #aaa;
-}
-
-/* Tabs */
-.profile-tabs-center {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-}
-
-.pill {
-    padding: 8px 14px;
-    border-radius: 20px;
-    border: 1px solid #fff;
-    background: #000;
-    color: #fff;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.pill.active {
-    background: #fff;
-    color: #000;
-}
-
-/* Profile grids */
-#profile-uploads-grid,
-#profile-saved-grid,
-#profile-likes-grid,
-#profile-playlists-grid,
-#profile-history-grid,
-#profile-notifications-grid {
-    display: grid;
-    gap: 14px;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    max-width: 900px;
-    margin: auto;
-    padding-bottom: 80px;
-}
-/* Show login only on Home tab */
-#openAuth {
-    display: none; /* default hidden */
-}
-
-body.show-login-home #openAuth {
-    display: inline-block;
-}
-
-body.show-login-home #headerUsername {
-    display: none;
-}
-
-body.logged-in #openAuth {
-    display: none !important;
-}
-
-body.logged-in #headerUsername {
-    display: inline-block !important;
-}
-/* Legal Modal */
+/* ================= LEGAL MODAL ================= */
 .legal-modal {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.75);
-  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 9999;
 }
 
 .legal-modal.hidden {
@@ -478,20 +168,13 @@ body.logged-in #headerUsername {
   border-radius: 14px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 40px rgba(0,0,0,0.6);
 }
 
 .legal-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 16px 18px;
+  padding: 16px;
   border-bottom: 1px solid #222;
-}
-
-.legal-header h2 {
-  font-size: 18px;
-  margin: 0;
 }
 
 .close-btn {
@@ -499,17 +182,28 @@ body.logged-in #headerUsername {
   border: none;
   color: #aaa;
   font-size: 20px;
-  cursor: pointer;
 }
 
-.close-btn:hover {
+/* ================= BOTTOM NAV ================= */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel-2);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 7px 0;
+}
+
+.bottom-nav a {
+  text-align: center;
+  color: #888;
+  font-size: 0.75rem;
+  text-decoration: none;
+}
+
+.bottom-nav a.active {
   color: #fff;
-}
-
-.legal-body {
-  padding: 18px;
-  overflow-y: auto;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #ddd;
 }
