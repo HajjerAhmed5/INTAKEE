@@ -1,5 +1,5 @@
 /* ===============================
-   INTAKEE — TAB SYSTEM (RESTORED)
+   INTAKEE — TAB SYSTEM (FINAL FIXED)
 ================================ */
 
 const tabs = document.querySelectorAll(".bottom-nav a");
@@ -27,6 +27,9 @@ function showTab(tabId) {
   if (activeTab) {
     activeTab.classList.add("active");
   }
+
+ 
+  document.body.setAttribute("data-tab", tabId);
 
   history.replaceState(null, "", `#${tabId}`);
 }
