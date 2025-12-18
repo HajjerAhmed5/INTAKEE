@@ -1,24 +1,26 @@
 /* ===============================
-   INTAKEE — TAB SYSTEM (SAFE FINAL)
+   INTAKEE — TAB SYSTEM (RESTORED)
 ================================ */
 
 const tabs = document.querySelectorAll(".bottom-nav a");
 const sections = document.querySelectorAll(".tab-section");
 
 function showTab(tabId) {
-  // Hide all sections via class
+  // HARD hide all sections
   sections.forEach(section => {
+    section.style.display = "none";
     section.classList.remove("active");
   });
 
   // Deactivate all tabs
   tabs.forEach(tab => tab.classList.remove("active"));
 
-  // Activate selected section
+  // Show selected section
   const activeSection = document.getElementById(tabId);
   const activeTab = document.querySelector(`.bottom-nav a[data-tab="${tabId}"]`);
 
   if (activeSection) {
+    activeSection.style.display = "block";
     activeSection.classList.add("active");
   }
 
@@ -40,9 +42,10 @@ tabs.forEach(tab => {
 });
 
 /* ===============================
-   LOAD FROM HASH
+   INITIAL LOAD
 ================================ */
 window.addEventListener("DOMContentLoaded", () => {
   const hash = window.location.hash.replace("#", "");
-  showTab(document.getElementById(hash) ? hash : "home");
+  const initialTab = document.getElementById(hash) ? hash : "home";
+  showTab(initialTab);
 });
