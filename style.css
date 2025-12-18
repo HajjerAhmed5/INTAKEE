@@ -26,7 +26,7 @@ body {
   padding-bottom: 90px;
 }
 
-/* ================= TAB VISIBILITY (FIX) ================= */
+/* ================= TAB VISIBILITY ================= */
 .tab-section {
   display: none;
 }
@@ -52,9 +52,10 @@ body {
   height: 115px;
 }
 
+/* Search bar */
 .search-bar {
   flex: 1;
-  display: flex;
+  display: none; /* controlled by tab */
   align-items: center;
   background: #111;
   padding: 10px 14px;
@@ -72,6 +73,11 @@ body {
   border: none;
   color: #fff;
   margin-left: 8px;
+}
+
+/* Login button */
+#openAuth {
+  display: none; /* Home only */
 }
 
 /* ================= BUTTONS ================= */
@@ -206,4 +212,36 @@ button {
 
 .bottom-nav a.active {
   color: #fff;
+}
+
+/* ========================================================================= */
+/* TAB-SPECIFIC HEADER VISIBILITY (KEY FIX) */
+/* ========================================================================= */
+
+/* Home */
+body[data-tab="home"] .search-bar,
+body[data-tab="videos"] .search-bar,
+body[data-tab="podcasts"] .search-bar,
+body[data-tab="clips"] .search-bar {
+  display: flex;
+}
+
+body[data-tab="home"] #openAuth {
+  display: inline-block;
+}
+
+/* Hide on these tabs */
+body[data-tab="profile"] .search-bar,
+body[data-tab="upload"] .search-bar,
+body[data-tab="settings"] .search-bar {
+  display: none;
+}
+
+body[data-tab="videos"] #openAuth,
+body[data-tab="podcasts"] #openAuth,
+body[data-tab="clips"] #openAuth,
+body[data-tab="profile"] #openAuth,
+body[data-tab="upload"] #openAuth,
+body[data-tab="settings"] #openAuth {
+  display: none;
 }
