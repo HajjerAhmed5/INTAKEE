@@ -265,3 +265,78 @@ body[data-tab="clips"] .search-bar {
 body[data-tab="home"] #openAuth {
   display: inline-block;
 }
+/* ======================================================
+   RESTORE ORIGINAL PAGE LAYOUT (UPLOAD / PROFILE / SETTINGS)
+   DO NOT TOUCH JS — CSS ONLY
+====================================================== */
+
+/* Shared page container */
+#upload,
+#profile,
+#settings {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 24px;
+}
+
+/* Card-style sections (old look) */
+.upload-container,
+#profile-uploads-grid,
+#profile-saved-grid,
+#profile-likes-grid,
+.settings-row {
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+/* Upload row spacing */
+.upload-container label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+.upload-container input,
+.upload-container select,
+.upload-container textarea {
+  width: 100%;
+  background: #111;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+/* Profile header spacing (old build feel) */
+#profile h2,
+#profile p {
+  margin-bottom: 8px;
+}
+
+.profile-tabs {
+  margin: 16px 0;
+}
+
+/* Settings section titles */
+#settings h1 {
+  font-size: 1.6rem;
+  margin-bottom: 18px;
+}
+
+#settings h3 {
+  margin-top: 22px;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #fff;
+}
+
+/* Settings rows hover (old subtle feel) */
+.settings-row:hover {
+  background: #151515;
+  cursor: pointer;
+}
