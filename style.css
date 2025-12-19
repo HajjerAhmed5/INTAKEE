@@ -380,3 +380,59 @@ body[data-tab="home"] #openAuth {
   clear: both;
   margin-top: 22px;
 }
+/* ================= PROFILE — EXACT MATCH ================= */
+
+#profile {
+  max-width: 100%;
+  padding-top: 80px;
+  text-align: center;
+}
+
+/* Name */
+#profile-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Handle */
+#profile-handle {
+  margin-top: 6px;
+  color: #aaa;
+  font-size: 0.95rem;
+}
+
+/* Bio */
+#profile-bio {
+  margin-top: 10px;
+  color: #aaa;
+  font-size: 0.95rem;
+}
+
+/* Profile tabs */
+.profile-tabs {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.profile-tabs button {
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.profile-tabs button.active {
+  background: #fff;
+  color: #000;
+}
+
+/* Hide all profile grids for guest (matches screenshot) */
+#profile-uploads-grid,
+#profile-saved-grid,
+#profile-likes-grid {
+  display: none;
+}
