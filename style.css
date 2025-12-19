@@ -1,5 +1,5 @@
 /* ========================================================================= */
-/* INTAKEE — FINAL STYLE.CSS (Dark Mode, Stable, Original Layout Preserved) */
+/* INTAKEE — FINAL STYLE.CSS (Dark Mode, Stable, Clean Layout)               */
 /* ========================================================================= */
 
 :root {
@@ -52,19 +52,15 @@ body {
   height: 115px;
 }
 
-/* Search bar */
+/* ================= SEARCH BAR ================= */
 .search-bar {
   flex: 1;
-  display: none; /* controlled by tab */
+  display: none;
   align-items: center;
   background: #111;
   padding: 10px 14px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-}
-
-.search-bar i {
-  color: #777;
 }
 
 .search-bar input {
@@ -75,22 +71,9 @@ body {
   margin-left: 8px;
 }
 
-/* Login button */
-#openAuth {
-  display: none; /* Home only */
-}
-
 /* ================= BUTTONS ================= */
 button {
   cursor: pointer;
-}
-
-.primary {
-  background: #000;
-  color: #fff;
-  border: 1px solid #fff;
-  padding: 6px 12px;
-  border-radius: 8px;
 }
 
 /* ================= FEED ================= */
@@ -101,95 +84,166 @@ button {
   margin-top: 14px;
 }
 
-/* ================= HOME FILTER ================= */
-.home-header-row {
+/* ================= PAGE CONTAINER ================= */
+#upload,
+#profile,
+#settings {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 24px;
+}
+
+.tab-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ========================================================================= */
+/* ======================= UPLOAD (NEW SYSTEM) ============================= */
+/* ========================================================================= */
+
+.upload-title {
+  margin-bottom: 16px;
+}
+
+/* Card */
+.upload-card {
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+/* Form fields */
+.upload-card label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+.upload-card input,
+.upload-card select,
+.upload-card textarea {
+  width: 100%;
+  background: #111;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+/* Bottom bar */
+.upload-bottom-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #333;
 }
 
-.filter-text {
-  background: none;
-  border: none;
-  color: #aaa;
-  margin-left: 12px;
+/* Buttons */
+.upload-actions {
+  display: flex;
+  gap: 12px;
 }
 
-.filter-text.active {
+.upload-btn,
+.live-btn {
+  background: #000;
   color: #fff;
+  border: 1px solid #fff;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-size: 14px;
   font-weight: 600;
 }
 
-/* ================= UPLOAD ================= */
-.upload-container {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
+.upload-btn:hover,
+.live-btn:hover {
+  background: #111;
 }
 
+/* 18+ toggle */
+.upload-18 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+/* Switch */
+.switch {
+  position: relative;
+  width: 42px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: #333;
+  border-radius: 22px;
+  transition: 0.3s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+  background: #fff;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(20px);
+  background: #000;
+}
+
+/* ========================================================================= */
 /* ================= PROFILE ================= */
+.profile-tabs {
+  margin: 16px 0;
+}
+
 .profile-tabs button {
   background: #000;
   color: #fff;
   border: 1px solid #fff;
-  padding: 6px 12px;
+  padding: 6px 14px;
   margin-right: 8px;
   border-radius: 20px;
 }
 
+/* ========================================================================= */
 /* ================= SETTINGS ================= */
-#settings {
-  max-width: 850px;
-  margin: 20px auto;
-  padding: 0 20px;
-}
-
 .settings-row {
-  padding: 14px 0;
-  border-bottom: 1px solid #222;
-  cursor: pointer;
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
 }
 
-/* ================= LEGAL MODAL ================= */
-.legal-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
+.settings-row:hover {
+  background: #151515;
 }
 
-.legal-modal.hidden {
-  display: none;
-}
-
-.legal-content {
-  background: #111;
-  width: 92%;
-  max-width: 700px;
-  max-height: 85vh;
-  border-radius: 14px;
-  display: flex;
-  flex-direction: column;
-}
-
-.legal-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 16px;
-  border-bottom: 1px solid #222;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  color: #aaa;
-  font-size: 20px;
-}
-
+/* ========================================================================= */
 /* ================= BOTTOM NAV ================= */
 .bottom-nav {
   position: fixed;
@@ -215,45 +269,12 @@ button {
 }
 
 /* ========================================================================= */
-/* TAB-SPECIFIC HEADER VISIBILITY (KEY FIX) */
-/* ========================================================================= */
-
-/* Home */
-body[data-tab="home"] .search-bar,
-body[data-tab="videos"] .search-bar,
-body[data-tab="podcasts"] .search-bar,
-body[data-tab="clips"] .search-bar {
-  display: flex;
-}
-
-body[data-tab="home"] #openAuth {
-  display: inline-block;
-}
-
-/* Hide on these tabs */
-body[data-tab="profile"] .search-bar,
-body[data-tab="upload"] .search-bar,
-body[data-tab="settings"] .search-bar {
-  display: none;
-}
-
-body[data-tab="videos"] #openAuth,
-body[data-tab="podcasts"] #openAuth,
-body[data-tab="clips"] #openAuth,
-body[data-tab="profile"] #openAuth,
-body[data-tab="upload"] #openAuth,
-body[data-tab="settings"] #openAuth {
-  display: none;
-}
-/* ================= HEADER VISIBILITY LOGIC ================= */
-
-/* Hide by default */
+/* ================= HEADER VISIBILITY ================= */
 .search-bar,
 #openAuth {
   display: none;
 }
 
-/* Search bar visible on content tabs */
 body[data-tab="home"] .search-bar,
 body[data-tab="videos"] .search-bar,
 body[data-tab="podcasts"] .search-bar,
@@ -261,82 +282,7 @@ body[data-tab="clips"] .search-bar {
   display: flex;
 }
 
-/* Login button ONLY on home */
 body[data-tab="home"] #openAuth {
   display: inline-block;
 }
-/* ======================================================
-   RESTORE ORIGINAL PAGE LAYOUT (UPLOAD / PROFILE / SETTINGS)
-   DO NOT TOUCH JS — CSS ONLY
-====================================================== */
 
-/* Shared page container */
-#upload,
-#profile,
-#settings {
-  max-width: 900px;
-  margin: 24px auto;
-  padding: 24px;
-}
-
-/* Card-style sections (old look) */
-.upload-container,
-#profile-uploads-grid,
-#profile-saved-grid,
-#profile-likes-grid,
-.settings-row {
-  background: #0f0f0f;
-  border: 1px solid #222;
-  border-radius: 12px;
-  padding: 18px;
-  margin-bottom: 16px;
-}
-
-/* Upload row spacing */
-.upload-container label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 0.85rem;
-  color: #aaa;
-}
-
-.upload-container input,
-.upload-container select,
-.upload-container textarea {
-  width: 100%;
-  background: #111;
-  border: 1px solid #333;
-  color: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 14px;
-}
-
-/* Profile header spacing (old build feel) */
-#profile h2,
-#profile p {
-  margin-bottom: 8px;
-}
-
-.profile-tabs {
-  margin: 16px 0;
-}
-
-/* Settings section titles */
-#settings h1 {
-  font-size: 1.6rem;
-  margin-bottom: 18px;
-}
-
-#settings h3 {
-  margin-top: 22px;
-  margin-bottom: 10px;
-  font-size: 1rem;
-  color: #fff;
-}
-
-/* Settings rows hover (old subtle feel) */
-.settings-row:hover {
-  background: #151515;
-  cursor: pointer;
-}
