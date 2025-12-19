@@ -306,3 +306,36 @@ body[data-tab="home"] #openAuth {
   color: #000;
 }
 
+/* ================= LEGAL MODAL HARD HIDE ================= */
+
+.legal-modal {
+  display: none !important;
+}
+
+.legal-modal:not(.hidden) {
+  display: flex !important;
+}
+
+.close-btn {
+  display: none !important;
+}
+
+.legal-modal:not(.hidden) .close-btn {
+  display: inline-block !important;
+}
+/* ================= HEADER AUTH BUTTON ================= */
+
+.header-login-btn {
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.header-login-btn:hover {
+  background: #111;
+}
