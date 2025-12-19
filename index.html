@@ -60,37 +60,53 @@
 
 <!-- ================= UPLOAD ================= -->
 <section id="upload" class="tab-section">
-  <h2>Upload Content</h2>
+  <div class="tab-inner">
 
-  <div class="upload-container">
-    <label>Type</label>
-    <select id="uploadTypeSelect">
-      <option value="video">Video</option>
-      <option value="clip">Clip</option>
-      <option value="podcast-audio">Podcast (Audio)</option>
-      <option value="podcast-video">Podcast (Video)</option>
-    </select>
+    <h2 class="upload-title">Upload</h2>
 
-    <label>Title</label>
-    <input id="uploadTitleInput" />
+    <div class="upload-card">
 
-    <label>Description</label>
-    <textarea id="uploadDescInput"></textarea>
+      <label>Type</label>
+      <select id="uploadTypeSelect">
+        <option value="video">Video</option>
+        <option value="clip">Clip</option>
+        <option value="podcast-audio">Podcast (Audio)</option>
+        <option value="podcast-video">Podcast (Video)</option>
+      </select>
 
-    <label>Thumbnail</label>
-    <input id="uploadThumbInput" type="file" accept="image/*" />
+      <label>Title</label>
+      <input id="uploadTitleInput" placeholder="Add a title" />
 
-    <label>Media File</label>
-    <input id="uploadFileInput" type="file" accept="video/*,audio/*" />
+      <label>Description</label>
+      <textarea id="uploadDescInput" placeholder="Write a description"></textarea>
 
-    <label>
-      <input type="checkbox" id="ageRestrictionToggle" /> 18+ Content
-    </label>
+      <label>Thumbnail</label>
+      <input id="uploadThumbInput" type="file" accept="image/*" />
 
-    <button id="btnUpload">Upload</button>
+      <label>Media File</label>
+      <input id="uploadFileInput" type="file" accept="video/*,audio/*" />
+
+      <!-- Bottom Bar -->
+      <div class="upload-bottom-bar">
+
+        <div class="upload-actions">
+          <button class="upload-btn">Upload</button>
+          <button class="live-btn">Go Live</button>
+        </div>
+
+        <div class="upload-18">
+          <span>18+</span>
+          <label class="switch">
+            <input type="checkbox" id="ageRestrictionToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+      </div>
+
+    </div>
   </div>
 </section>
-
 <!-- ================= PROFILE ================= -->
 <section id="profile" class="tab-section">
   <h2 id="profile-name">Guest</h2>
