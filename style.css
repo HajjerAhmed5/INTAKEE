@@ -285,4 +285,24 @@ body[data-tab="clips"] .search-bar {
 body[data-tab="home"] #openAuth {
   display: inline-block;
 }
+/* ================= HOME FILTER BUTTONS ================= */
+
+.filter-text {
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.filter-text:hover {
+  background: #111;
+}
+
+.filter-text.active {
+  background: #fff;
+  color: #000;
+}
 
