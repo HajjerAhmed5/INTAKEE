@@ -339,3 +339,44 @@ body[data-tab="home"] #openAuth {
 .header-login-btn:hover {
   background: #111;
 }
+/* ================= PROFILE HEADER LAYOUT ================= */
+
+#profile {
+  text-align: center;
+}
+
+/* Name + handle + bio */
+#profile-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+#profile-handle {
+  color: #aaa;
+  margin-top: 4px;
+}
+
+#profile-bio {
+  margin-top: 6px;
+  color: #aaa;
+}
+
+/* Edit Profile button positioning */
+#editProfileBtn {
+  display: inline-block;
+  margin-top: 18px;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* Push Edit Profile slightly right */
+#profile .header-login-btn,
+#editProfileBtn {
+  float: right;
+}
+
+/* Clear float so tabs stay centered */
+.profile-tabs {
+  clear: both;
+  margin-top: 22px;
+}
