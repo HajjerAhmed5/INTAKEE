@@ -465,15 +465,6 @@ body[data-tab="home"] #openAuth {
   align-items: center;
 }
 
-/* Avatar */
-.profile-avatar {
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  background: #1a1a1a;
-  border: 3px solid #000;
-}
-
 /* Edit button */
 .edit-profile-btn {
   background: #fff;
@@ -621,17 +612,16 @@ body[data-tab="home"] #openAuth {
 
 /* Avatar overlaps banner */
 #profile .profile-avatar {
-  width: 90px;
-  height: 90px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   background: #1a1a1a;
   position: absolute;
-  bottom: -45px;
+  bottom: -80px;
   left: 50%;
   transform: translateX(-50%);
-  border: 3px solid #000;
+  border: 4px solid #000;
 }
-
 /* Info below grid */
 #profile .profile-info {
   margin-top: 60px;
