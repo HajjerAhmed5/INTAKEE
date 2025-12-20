@@ -436,37 +436,33 @@ body[data-tab="home"] #openAuth {
 #profile-likes-grid {
   display: none;
 }
-/* ================= PROFILE PAGE ================= */
+/* ================= PROFILE PAGE (SCOPED) ================= */
 
-.profile-page {
+#profile .profile-page {
   max-width: 900px;
   margin: 0 auto;
   padding-bottom: 120px;
 }
 
-/* Top banner */
-.profile-banner {
+#profile .profile-banner {
   height: 140px;
   background: #0b0b0b;
   border-bottom: 1px solid var(--border);
 }
 
-/* Card */
-.profile-card {
+#profile .profile-card {
   margin-top: -60px;
   padding: 24px;
   text-align: center;
 }
 
-/* Top row */
-.profile-top {
+#profile .profile-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* Avatar */
-.profile-avatar {
+#profile .profile-avatar {
   width: 90px;
   height: 90px;
   border-radius: 50%;
@@ -474,8 +470,7 @@ body[data-tab="home"] #openAuth {
   border: 3px solid #000;
 }
 
-/* Edit button */
-.edit-profile-btn {
+#profile .edit-profile-btn {
   background: #fff;
   color: #000;
   border: none;
@@ -485,55 +480,52 @@ body[data-tab="home"] #openAuth {
   cursor: pointer;
 }
 
-/* Text */
-.profile-name {
+#profile .profile-name {
   margin-top: 10px;
   font-size: 20px;
   font-weight: 600;
 }
 
-.profile-handle {
+#profile .profile-handle {
   color: var(--muted);
   font-size: 14px;
 }
 
-.profile-subtext {
+#profile .profile-subtext {
   margin-top: 6px;
   font-size: 13px;
   color: var(--muted);
 }
 
-/* Stats */
-.profile-stats {
+#profile .profile-stats {
   display: flex;
   justify-content: center;
   gap: 28px;
   margin: 18px 0;
 }
 
-.profile-stats div {
+#profile .profile-stats div {
   text-align: center;
   font-size: 13px;
 }
 
-.profile-stats strong {
+#profile .profile-stats strong {
   display: block;
   font-size: 15px;
 }
 
-.profile-stats span {
+#profile .profile-stats span {
   color: var(--muted);
 }
 
-/* Action pills */
-.profile-actions {
+#profile .profile-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
 }
 
-.profile-actions button {
+#profile .profile-actions button {
   background: transparent;
   border: 1px solid var(--border);
   color: #fff;
@@ -543,7 +535,7 @@ body[data-tab="home"] #openAuth {
   cursor: pointer;
 }
 
-.profile-actions button.active {
+#profile .profile-actions button.active {
   background: #fff;
   color: #000;
 }
