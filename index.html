@@ -145,26 +145,55 @@
 
 </section>
 <!-- ================= SETTINGS ================= -->
-<section id="settings" class="tab-section">
-  <h1>Settings</h1>
+<div class="settings-page">
 
-  <h3>Privacy</h3>
-  <label><input type="checkbox" id="togglePrivateAccount"> Private Account</label>
-  <label><input type="checkbox" id="togglePrivateUploads"> Uploads Private</label>
-  <label><input type="checkbox" id="togglePrivateSaved"> Saved Private</label>
-  <label><input type="checkbox" id="togglePrivatePlaylists"> Playlists Private</label>
+  <h2 class="settings-title">Settings</h2>
 
-  <h3>Account</h3>
-  <button id="logoutBtn">Logout</button>
-  <button id="deleteAccountBtn">Delete Account</button>
+  <div class="settings-group">
+    <div class="settings-item">
+      <span>Account</span>
+      <span class="arrow">›</span>
+    </div>
 
-  <h3>Legal</h3>
-  <div class="settings-row" data-legal="privacy">Privacy Policy</div>
-  <div class="settings-row" data-legal="terms">Terms of Service</div>
-  <div class="settings-row" data-legal="guidelines">Community Guidelines</div>
-</section>
+    <div class="settings-item">
+      <span>Notifications</span>
+      <span class="arrow">›</span>
+    </div>
 
-</main>
+    <div class="settings-item">
+      <span>Appearance</span>
+      <span class="arrow">›</span>
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <div class="settings-item">
+      <span>Privacy Policy</span>
+      <span class="arrow">›</span>
+    </div>
+
+    <div class="settings-item">
+      <span>Terms of Service</span>
+      <span class="arrow">›</span>
+    </div>
+
+    <div class="settings-item">
+      <span>Community Guidelines</span>
+      <span class="arrow">›</span>
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <div class="settings-item danger">
+      <span>Log Out</span>
+    </div>
+
+    <div class="settings-item danger">
+      <span>Delete Account</span>
+    </div>
+  </div>
+
+</div>
 
 <!-- ================= BOTTOM NAV ================= -->
 <nav class="bottom-nav">
