@@ -446,7 +446,7 @@ body[data-tab="home"] #openAuth {
 
 /* Top banner */
 .profile-banner {
-  height: 140px;
+  height: 260px;
   background: #0b0b0b;
   border-bottom: 1px solid var(--border);
 }
