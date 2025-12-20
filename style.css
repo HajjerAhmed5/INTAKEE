@@ -436,3 +436,114 @@ body[data-tab="home"] #openAuth {
 #profile-likes-grid {
   display: none;
 }
+/* ================= PROFILE PAGE ================= */
+
+.profile-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 120px;
+}
+
+/* Top banner */
+.profile-banner {
+  height: 140px;
+  background: #0b0b0b;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Card */
+.profile-card {
+  margin-top: -60px;
+  padding: 24px;
+  text-align: center;
+}
+
+/* Top row */
+.profile-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Avatar */
+.profile-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  border: 3px solid #000;
+}
+
+/* Edit button */
+.edit-profile-btn {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Text */
+.profile-name {
+  margin-top: 10px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.profile-handle {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.profile-subtext {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Stats */
+.profile-stats {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin: 18px 0;
+}
+
+.profile-stats div {
+  text-align: center;
+  font-size: 13px;
+}
+
+.profile-stats strong {
+  display: block;
+  font-size: 15px;
+}
+
+.profile-stats span {
+  color: var(--muted);
+}
+
+/* Action pills */
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.profile-actions button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.profile-actions button.active {
+  background: #fff;
+  color: #000;
+}
