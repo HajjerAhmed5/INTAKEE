@@ -643,3 +643,15 @@ body[data-tab="home"] #openAuth {
   display: block;
   margin: 12px auto;
 }
+/* ===== EDIT PROFILE RIGHT ALIGN ===== */
+
+#profile .edit-profile-row {
+  max-width: 900px;
+  margin: 0 auto 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+#profile .edit-profile-btn {
+  margin: 0;
+}
