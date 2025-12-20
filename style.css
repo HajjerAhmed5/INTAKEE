@@ -595,3 +595,18 @@ body[data-tab="home"] #openAuth {
 #settings .settings-item.danger {
   color: #ff5c5c;
 }
+/* ===== REMOVE PROFILE TOP GAP COMPLETELY ===== */
+
+#profile {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+#profile .profile-page {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+#profile .profile-banner {
+  margin-top: 0 !important;
+}
