@@ -10,6 +10,7 @@ import {
   orderBy,
   getDocs,
   doc,
+  getDoc,
   updateDoc,
   arrayUnion,
   arrayRemove,
@@ -27,9 +28,7 @@ async function loadPosts() {
   const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
   const snap = await getDocs(q);
 
-  const posts = [];
-  snap.forEach((docSnap) => posts.push({ id: docSnap.id, ...docSnap.data() }));
-  return posts;
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
 /* AGE CHECK */
@@ -105,8 +104,11 @@ function createPostCard(post, userData) {
     `;
   }
 
-  const liked = userData?.likedPosts?.includes(post.id);
-  const saved = userData?.saved?.includes(post.id);
+  const likedPosts = userData?.likedPosts || [];
+  const savedPosts = userData?.saved || [];
+
+  const liked = likedPosts.includes(post.id);
+  const saved = savedPosts.includes(post.id);
 
   const date = post.createdAt?.toDate
     ? post.createdAt.toDate().toLocaleString()
@@ -124,7 +126,6 @@ function createPostCard(post, userData) {
     <div class="post-actions">
       <button class="like-btn ${liked ? "liked" : ""}">❤️</button>
       <span class="like-count">${post.likes || 0}</span>
-
       <button class="save-btn ${saved ? "saved" : ""}">🔖</button>
     </div>
   `;
@@ -154,20 +155,15 @@ function render(posts, user, userData) {
   posts.forEach((post) => {
     if (!canView(post, user)) return;
 
-    const card = createPostCard(post, userData);
-
-    homeFeed.appendChild(card.cloneNode(true));
-
-    if (post.type === "video" || post.type === "podcast-video") {
-      videosFeed.appendChild(card.cloneNode(true));
+    if (homeFeed) homeFeed.appendChild(createPostCard(post, userData));
+    if (videosFeed && (post.type === "video" || post.type === "podcast-video")) {
+      videosFeed.appendChild(createPostCard(post, userData));
     }
-
-    if (post.type === "clip") {
-      clipsFeed.appendChild(card.cloneNode(true));
+    if (clipsFeed && post.type === "clip") {
+      clipsFeed.appendChild(createPostCard(post, userData));
     }
-
-    if (post.type.startsWith("podcast")) {
-      podcastsFeed.appendChild(card.cloneNode(true));
+    if (podcastsFeed && post.type?.startsWith("podcast")) {
+      podcastsFeed.appendChild(createPostCard(post, userData));
     }
   });
 }
@@ -178,12 +174,9 @@ onAuthStateChanged(auth, async (user) => {
 
   let userData = null;
   if (user) {
-    const snap = await getDocs(query(collection(db, "users")));
-    snap.forEach((d) => {
-      if (d.id === user.uid) userData = d.data();
-    });
+    const snap = await getDoc(doc(db, "users", user.uid));
+    userData = snap.exists() ? snap.data() : null;
   }
 
   render(posts, user, userData);
 });
-
