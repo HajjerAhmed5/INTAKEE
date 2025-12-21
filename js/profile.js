@@ -1,9 +1,9 @@
 /* ===============================
-   INTAKEE — PROFILE SYSTEM (FINAL)
+   INTAKEE — PROFILE SYSTEM (FINAL, REAL)
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
   doc,
   getDoc,
@@ -11,7 +11,7 @@ import {
   query,
   where,
   getDocs
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ===============================
    DOM ELEMENTS
@@ -27,18 +27,14 @@ const statFollowing = document.getElementById("stat-following");
 const statLikes = document.getElementById("stat-likes");
 
 /* ===============================
-   PROFILE TABS
+   PROFILE GRIDS
 ================================ */
-const tabs = document.querySelectorAll(".pill");
-
 const grids = {
   uploads: document.getElementById("profile-uploads-grid"),
-  saved: document.getElementById("profile-saved-grid"),
-  likes: document.getElementById("profile-likes-grid"),
-  playlists: document.getElementById("profile-playlists-grid"),
-  history: document.getElementById("profile-history-grid"),
-  notifications: document.getElementById("profile-notifications-grid")
+  saved: document.getElementById("profile-saved-grid")
 };
+
+const tabs = document.querySelectorAll("[data-profile-tab]");
 
 /* ===============================
    AUTH → LOAD PROFILE
@@ -54,30 +50,33 @@ onAuthStateChanged(auth, async (user) => {
     statFollowers.textContent = "0";
     statFollowing.textContent = "0";
     statLikes.textContent = "0";
+
+    showTab("uploads");
     return;
   }
 
+  /* USER DOC */
   const userRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userRef);
-  if (!userSnap.exists()) return;
 
-  const data = userSnap.data();
+  const userData = userSnap.exists() ? userSnap.data() : {};
 
   /* BASIC INFO */
-  profileName.textContent = data.username || "User";
-  profileHandle.textContent = "@" + (data.username || "user");
-  profileBio.textContent = data.bio || "No bio yet.";
-  profilePhoto.src = data.photoURL || "default-avatar.png";
+  profileName.textContent = userData.username || "User";
+  profileHandle.textContent = "@" + (userData.username || "user");
+  profileBio.textContent = userData.bio || "No bio yet.";
+  profilePhoto.src = userData.photoURL || "default-avatar.png";
 
   /* STATS */
-  statPosts.textContent = data.posts || 0;
-  statFollowers.textContent = data.followers?.length || 0;
-  statFollowing.textContent = data.following?.length || 0;
-  statLikes.textContent = data.likes || 0;
+  statFollowers.textContent = userData.followers?.length || 0;
+  statFollowing.textContent = userData.following?.length || 0;
+  statLikes.textContent = userData.likedPosts?.length || 0;
 
   /* LOAD CONTENT */
-  loadUserUploads(user.uid);
-  loadSavedPosts(data);
+  await loadUserUploads(user.uid);
+  await loadSavedPosts(userData);
+
+  showTab("uploads");
 });
 
 /* ===============================
@@ -86,19 +85,17 @@ onAuthStateChanged(auth, async (user) => {
 async function loadUserUploads(uid) {
   grids.uploads.innerHTML = "";
 
-  const q = query(
-    collection(db, "posts"),
-    where("uid", "==", uid)
-  );
-
+  const q = query(collection(db, "posts"), where("uid", "==", uid));
   const snap = await getDocs(q);
 
+  statPosts.textContent = snap.size;
+
   if (snap.empty) {
-    grids.uploads.innerHTML = "<p class='muted'>No uploads yet.</p>";
+    grids.uploads.innerHTML = `<p class="muted">No uploads yet.</p>`;
     return;
   }
 
-  snap.forEach(docSnap => {
+  snap.forEach((docSnap) => {
     const post = docSnap.data();
     const div = document.createElement("div");
     div.className = "post-card";
@@ -113,8 +110,8 @@ async function loadUserUploads(uid) {
 async function loadSavedPosts(userData) {
   grids.saved.innerHTML = "";
 
-  if (!userData.saved?.length) {
-    grids.saved.innerHTML = "<p class='muted'>No saved posts.</p>";
+  if (!userData.saved || userData.saved.length === 0) {
+    grids.saved.innerHTML = `<p class="muted">No saved posts.</p>`;
     return;
   }
 
@@ -135,7 +132,7 @@ async function loadSavedPosts(userData) {
    TAB SWITCHING
 ================================ */
 function showTab(tabName) {
-  Object.values(grids).forEach(grid => {
+  Object.values(grids).forEach((grid) => {
     if (grid) grid.style.display = "none";
   });
 
@@ -143,17 +140,13 @@ function showTab(tabName) {
     grids[tabName].style.display = "grid";
   }
 
-  tabs.forEach(btn => btn.classList.remove("active"));
+  tabs.forEach((btn) => btn.classList.remove("active"));
   const activeBtn = document.querySelector(`[data-profile-tab="${tabName}"]`);
   if (activeBtn) activeBtn.classList.add("active");
 }
 
-tabs.forEach(btn => {
+tabs.forEach((btn) => {
   btn.addEventListener("click", () => {
     showTab(btn.dataset.profileTab);
   });
 });
-
-/* DEFAULT TAB */
-showTab("uploads");
-
