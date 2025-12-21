@@ -1,12 +1,6 @@
 /*
 ==========================================
-INTAKEE — FEED SYSTEM (CLEAN FINAL)
-Features:
-- Infinite scroll
-- Likes
-- Saves
-- Follows
-- Auth-safe
+INTAKEE — FEED SYSTEM (FINAL STABLE)
 ==========================================
 */
 
@@ -35,9 +29,18 @@ let lastVisible = null;
 let loading = false;
 const PAGE_SIZE = 6;
 
+/* ================= RESET ================= */
+function resetFeed() {
+  homeFeed.innerHTML = "";
+  lastVisible = null;
+  loading = false;
+  fetchPosts();
+}
+
 /* ================= AUTH ================= */
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
+  resetFeed(); // 🔥 re-render feed on login/logout
 });
 
 /* ================= FETCH POSTS ================= */
@@ -76,17 +79,13 @@ async function fetchPosts() {
 
 /* ================= RENDER POST ================= */
 function renderPost(post) {
-  // AGE RESTRICTION
   if (post.ageRestricted && !currentUser) return;
 
   const card = document.createElement("div");
   card.className = "post-card";
 
-  const liked =
-    currentUser && post.likedBy?.includes(currentUser.uid);
-
-  const saved =
-    currentUser && post.savedBy?.includes(currentUser.uid);
+  const liked = currentUser && post.likedBy?.includes(currentUser.uid);
+  const saved = currentUser && post.savedBy?.includes(currentUser.uid);
 
   const date = post.createdAt?.toDate
     ? post.createdAt.toDate().toLocaleString()
@@ -114,9 +113,7 @@ function renderPost(post) {
       <button class="like-btn ${liked ? "active" : ""}">
         ❤️ ${post.likes || 0}
       </button>
-      <button class="save-btn ${saved ? "active" : ""}">
-        🔖
-      </button>
+      <button class="save-btn ${saved ? "active" : ""}">🔖</button>
     </div>
   `;
 
@@ -136,7 +133,7 @@ function renderPost(post) {
 
     post.likes += isLiked ? -1 : 1;
     post.likedBy = isLiked
-      ? post.likedBy.filter((id) => id !== currentUser.uid)
+      ? post.likedBy.filter(id => id !== currentUser.uid)
       : [...(post.likedBy || []), currentUser.uid];
 
     card.querySelector(".like-btn").textContent = `❤️ ${post.likes}`;
@@ -157,7 +154,7 @@ function renderPost(post) {
     });
 
     post.savedBy = isSaved
-      ? post.savedBy.filter((id) => id !== currentUser.uid)
+      ? post.savedBy.filter(id => id !== currentUser.uid)
       : [...(post.savedBy || []), currentUser.uid];
 
     card.querySelector(".save-btn").classList.toggle("active");
@@ -167,8 +164,6 @@ function renderPost(post) {
   const followBtn = card.querySelector(".follow-btn");
   if (followBtn) {
     followBtn.onclick = async () => {
-      if (!currentUser) return alert("Login required");
-
       await updateDoc(doc(db, "users", currentUser.uid), {
         following: arrayUnion(post.uid)
       });
@@ -213,3 +208,7 @@ window.addEventListener("scroll", () => {
 
 /* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", fetchPosts);
+
+/* ================= EXPOSE FOR UPLOAD ================= */
+// Allows upload.js to refresh feed instantly
+window.refreshFeed = resetFeed;
