@@ -117,3 +117,4 @@ uploadBtn.addEventListener("click", async () => {
   uploadBtn.disabled = false;
   uploadBtn.textContent = "Upload";
 });
+if (window.refreshFeed) window.refreshFeed();
