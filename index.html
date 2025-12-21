@@ -185,3 +185,35 @@
 </body>
 </html>
 
+<!-- ================= AUTH MODAL ================= -->
+<dialog id="authDialog" class="auth-dialog">
+
+  <h2>Welcome to INTAKEE</h2>
+
+  <!-- SIGN UP -->
+  <h3>Create Account</h3>
+  <input id="signupEmail" type="email" placeholder="Email" />
+  <input id="signupUsername" placeholder="Username" />
+  <input id="signupPassword" type="password" placeholder="Password" />
+
+  <label class="age-check">
+    <input type="checkbox" id="signupAgeConfirm" />
+    I am 13 or older
+  </label>
+
+  <button id="signupBtn" class="primary">Sign Up</button>
+
+  <hr />
+
+  <!-- LOGIN -->
+  <h3>Log In</h3>
+  <input id="loginIdentifier" placeholder="Email or Username" />
+  <input id="loginPassword" type="password" placeholder="Password" />
+
+  <button id="loginBtn" class="primary">Log In</button>
+
+  <button id="forgotPasswordBtn">Forgot Password</button>
+  <button id="forgotUsernameBtn">Forgot Username</button>
+
+  <button id="closeAuthDialog" class="secondary">Close</button>
+</dialog>
