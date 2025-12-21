@@ -1,12 +1,13 @@
 /* 
 =====================================
 INTAKEE — AUTHENTICATION SYSTEM
-REAL APP VERSION
+REAL APP VERSION (FIXED)
 =====================================
 */
 
+import { auth, db } from "./firebase-init.js";
+
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
@@ -15,7 +16,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
 import {
-  getFirestore,
   doc,
   setDoc,
   getDoc,
@@ -24,10 +24,6 @@ import {
   where,
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-
-// ================= INIT =================
-export const auth = getAuth();
-export const db = getFirestore();
 
 // ================= GLOBAL USER STATE =================
 export let currentUser = null;
@@ -89,8 +85,8 @@ signupBtn?.addEventListener("click", async () => {
       username,
       bio: "",
       createdAt: Date.now(),
-      followers: 0,
-      following: 0,
+      followers: [],
+      following: [],
       posts: 0,
       likes: 0,
       saved: [],
