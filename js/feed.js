@@ -29,56 +29,61 @@ let lastVisible = null;
 let loading = false;
 const PAGE_SIZE = 6;
 
+/* ================= AUTH ================= */
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  resetFeed();
+});
+
 /* ================= RESET ================= */
 function resetFeed() {
+  if (!homeFeed) return;
   homeFeed.innerHTML = "";
   lastVisible = null;
   loading = false;
   fetchPosts();
 }
 
-/* ================= AUTH ================= */
-onAuthStateChanged(auth, (user) => {
-  currentUser = user;
-  resetFeed(); // 🔥 re-render feed on login/logout
-});
-
 /* ================= FETCH POSTS ================= */
 async function fetchPosts() {
-  if (loading) return;
+  if (loading || !db) return;
   loading = true;
 
-  let q = query(
-    collection(db, "posts"),
-    orderBy("createdAt", "desc"),
-    limit(PAGE_SIZE)
-  );
-
-  if (lastVisible) {
-    q = query(
+  try {
+    let q = query(
       collection(db, "posts"),
       orderBy("createdAt", "desc"),
-      startAfter(lastVisible),
       limit(PAGE_SIZE)
     );
+
+    if (lastVisible) {
+      q = query(
+        collection(db, "posts"),
+        orderBy("createdAt", "desc"),
+        startAfter(lastVisible),
+        limit(PAGE_SIZE)
+      );
+    }
+
+    const snap = await getDocs(q);
+
+    if (!snap.empty) {
+      lastVisible = snap.docs[snap.docs.length - 1];
+    }
+
+    snap.forEach((docSnap) => {
+      renderPost({ id: docSnap.id, ...docSnap.data() });
+    });
+  } catch (err) {
+    console.error("Feed error:", err);
   }
-
-  const snap = await getDocs(q);
-
-  if (!snap.empty) {
-    lastVisible = snap.docs[snap.docs.length - 1];
-  }
-
-  snap.forEach((docSnap) => {
-    const post = { id: docSnap.id, ...docSnap.data() };
-    renderPost(post);
-  });
 
   loading = false;
 }
 
 /* ================= RENDER POST ================= */
 function renderPost(post) {
+  if (!homeFeed) return;
   if (post.ageRestricted && !currentUser) return;
 
   const card = document.createElement("div");
@@ -87,21 +92,13 @@ function renderPost(post) {
   const liked = currentUser && post.likedBy?.includes(currentUser.uid);
   const saved = currentUser && post.savedBy?.includes(currentUser.uid);
 
-  const date = post.createdAt?.toDate
-    ? post.createdAt.toDate().toLocaleString()
-    : "";
+  const date =
+    post.createdAt?.toDate?.().toLocaleString() || "";
 
   card.innerHTML = `
     <div class="post-header">
-      <div>
-        <strong>@${post.username || "user"}</strong>
-        <div class="muted small">${date}</div>
-      </div>
-      ${
-        currentUser && post.uid !== currentUser.uid
-          ? `<button class="follow-btn">Follow</button>`
-          : ""
-      }
+      <strong>@${post.username || "user"}</strong>
+      <span class="muted small">${date}</span>
     </div>
 
     ${renderMedia(post)}
@@ -131,7 +128,7 @@ function renderPost(post) {
         : arrayUnion(currentUser.uid)
     });
 
-    post.likes += isLiked ? -1 : 1;
+    post.likes = (post.likes || 0) + (isLiked ? -1 : 1);
     post.likedBy = isLiked
       ? post.likedBy.filter(id => id !== currentUser.uid)
       : [...(post.likedBy || []), currentUser.uid];
@@ -159,23 +156,6 @@ function renderPost(post) {
 
     card.querySelector(".save-btn").classList.toggle("active");
   };
-
-  /* FOLLOW */
-  const followBtn = card.querySelector(".follow-btn");
-  if (followBtn) {
-    followBtn.onclick = async () => {
-      await updateDoc(doc(db, "users", currentUser.uid), {
-        following: arrayUnion(post.uid)
-      });
-
-      await updateDoc(doc(db, "users", post.uid), {
-        followers: arrayUnion(currentUser.uid)
-      });
-
-      followBtn.textContent = "Following";
-      followBtn.disabled = true;
-    };
-  }
 
   homeFeed.appendChild(card);
 }
@@ -209,6 +189,5 @@ window.addEventListener("scroll", () => {
 /* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", fetchPosts);
 
-/* ================= EXPOSE FOR UPLOAD ================= */
-// Allows upload.js to refresh feed instantly
+/* ================= EXPOSE ================= */
 window.refreshFeed = resetFeed;
