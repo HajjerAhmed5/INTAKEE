@@ -1,31 +1,24 @@
-// firebase-init.js
+// js/firebase-init.js
 
-// -------------------------------
-// MATCH VERSION WITH SCRIPT.JS
-// Firebase SDK 10.13.2 (Required)
-// -------------------------------
+// Firebase SDK v10.13.2 (LOCKED VERSION)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import {
-    getAuth,
-    setPersistence,
-    browserLocalPersistence
+import { 
+  getAuth, 
+  setPersistence, 
+  browserLocalPersistence 
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-import {
-    getFirestore
-} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
-import {
-    getStorage
-} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
 import { firebaseConfig } from "./firebase-config.js";
 
-// Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+// 1️⃣ Initialize Firebase ONCE
+const app = initializeApp(firebaseConfig);
 
-// Services
+// 2️⃣ Create services ONCE
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// Keep users logged in
+// 3️⃣ Persist login
 await setPersistence(auth, browserLocalPersistence);
