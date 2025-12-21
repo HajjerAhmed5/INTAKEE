@@ -11,7 +11,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Upload button + file input
+// Upload button + inputs
 const uploadBtn = document.getElementById("uploadBtn");
 const fileInput = document.getElementById("uploadFile");
 const titleInput = document.getElementById("uploadTitle");
@@ -32,8 +32,15 @@ if (uploadBtn) {
       return;
     }
 
+    // Determine INTAKEE content type
+    const contentType = file.type.startsWith("video")
+      ? "video"
+      : file.type.startsWith("audio")
+      ? "podcast"
+      : "clip";
+
     try {
-      // Storage path
+      // Firebase Storage path
       const storageRef = ref(
         storage,
         `uploads/${user.uid}/${Date.now()}_${file.name}`
@@ -43,7 +50,11 @@ if (uploadBtn) {
 
       uploadTask.on(
         "state_changed",
-        null,
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log(`Upload ${progress.toFixed(0)}%`);
+        },
         (error) => {
           console.error(error);
           alert("Upload failed");
@@ -51,15 +62,22 @@ if (uploadBtn) {
         async () => {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
+          // Save post metadata
           await addDoc(collection(db, "posts"), {
             uid: user.uid,
+            username: user.displayName || "Anonymous",
             title,
             fileURL: downloadURL,
-            type: file.type,
+            type: contentType,        // video | podcast | clip
+            mimeType: file.type,      // actual file MIME
+            likes: 0,
+            views: 0,
             createdAt: serverTimestamp()
           });
 
           alert("Upload successful 🎉");
+
+          // Reset inputs
           fileInput.value = "";
           titleInput.value = "";
         }
@@ -70,4 +88,3 @@ if (uploadBtn) {
     }
   });
 }
-
