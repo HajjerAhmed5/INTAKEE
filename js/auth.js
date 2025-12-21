@@ -48,10 +48,11 @@ const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
 const forgotUsernameBtn = document.getElementById("forgotUsernameBtn");
 
 const headerUsername = document.getElementById("headerUsername");
+const logoutBtn = document.getElementById("settings-logout");
 
 // ================= MODAL =================
-openAuthBtn?.addEventListener("click", () => authDialog.showModal());
-closeAuthDialog?.addEventListener("click", () => authDialog.close());
+openAuthBtn?.addEventListener("click", () => authDialog?.showModal());
+closeAuthDialog?.addEventListener("click", () => authDialog?.close());
 
 // ================= SIGN UP =================
 signupBtn?.addEventListener("click", async () => {
@@ -175,7 +176,6 @@ forgotUsernameBtn?.addEventListener("click", async () => {
 });
 
 // ================= LOGOUT =================
-const logoutBtn = document.getElementById("settings-logout");
 logoutBtn?.addEventListener("click", async () => {
   await signOut(auth);
   location.reload();
@@ -187,19 +187,21 @@ onAuthStateChanged(auth, async (user) => {
     currentUser = user;
 
     const snap = await getDoc(doc(db, "users", user.uid));
-    currentUserData = snap.data();
+    currentUserData = snap.exists() ? snap.data() : null;
 
-    openAuthBtn.style.display = "none";
-    headerUsername.style.display = "inline";
-    headerUsername.textContent = "@" + currentUserData.username;
+    if (openAuthBtn) openAuthBtn.style.display = "none";
+    if (headerUsername && currentUserData) {
+      headerUsername.style.display = "inline";
+      headerUsername.textContent = "@" + currentUserData.username;
+    }
 
     document.body.classList.add("logged-in");
   } else {
     currentUser = null;
     currentUserData = null;
 
-    openAuthBtn.style.display = "inline";
-    headerUsername.style.display = "none";
+    if (openAuthBtn) openAuthBtn.style.display = "inline";
+    if (headerUsername) headerUsername.style.display = "none";
 
     document.body.classList.remove("logged-in");
   }
