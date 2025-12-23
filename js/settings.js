@@ -1,20 +1,23 @@
-/* ===============================
-   INTAKEE — SETTINGS SYSTEM (FINAL)
-   ✔ Privacy toggles
-   ✔ Logout
-   ✔ Legal modals (FIXED)
-================================ */
+/*
+==========================================
+INTAKEE — SETTINGS SYSTEM (FINAL STABLE)
+- Uses firebase-init.js ONLY
+- No duplicate Firebase apps
+==========================================
+*/
 
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { auth, db } from "./firebase-init.js";
+
 import {
-  getFirestore,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+import {
   doc,
   getDoc,
   updateDoc
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-
-const auth = getAuth();
-const db = getFirestore();
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ===============================
    PRIVACY TOGGLES
@@ -26,19 +29,29 @@ const toggles = {
   playlistsPrivate: document.getElementById("togglePrivatePlaylists"),
 };
 
-auth.onAuthStateChanged(async (user) => {
+/* ===============================
+   LOAD USER SETTINGS
+================================ */
+onAuthStateChanged(auth, async (user) => {
   if (!user) return;
 
-  const snap = await getDoc(doc(db, "users", user.uid));
-  if (!snap.exists()) return;
+  try {
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (!snap.exists()) return;
 
-  const data = snap.data();
+    const data = snap.data();
 
-  Object.entries(toggles).forEach(([key, el]) => {
-    if (el) el.checked = Boolean(data[key]);
-  });
+    Object.entries(toggles).forEach(([key, el]) => {
+      if (el) el.checked = Boolean(data[key]);
+    });
+  } catch (err) {
+    console.error("Settings load error:", err);
+  }
 });
 
+/* ===============================
+   SAVE TOGGLES
+================================ */
 Object.entries(toggles).forEach(([key, el]) => {
   if (!el) return;
 
@@ -46,27 +59,31 @@ Object.entries(toggles).forEach(([key, el]) => {
     const user = auth.currentUser;
     if (!user) return;
 
-    await updateDoc(doc(db, "users", user.uid), {
-      [key]: el.checked
-    });
+    try {
+      await updateDoc(doc(db, "users", user.uid), {
+        [key]: el.checked
+      });
+    } catch (err) {
+      console.error("Settings save error:", err);
+    }
   });
 });
 
 /* ===============================
-   LOGOUT (SAFE)
+   LOGOUT
 ================================ */
 document.addEventListener("click", async (e) => {
-  const target = e.target.closest(".settings-row");
-  if (!target) return;
+  const row = e.target.closest(".settings-row");
+  if (!row) return;
 
-  if (target.textContent.trim() === "Logout") {
+  if (row.textContent.trim() === "Log Out") {
     await signOut(auth);
     location.reload();
   }
 });
 
 /* ===============================
-   LEGAL MODAL SYSTEM (FIXED)
+   LEGAL MODALS
 ================================ */
 const legalModal = document.getElementById("legalModal");
 const legalTitle = document.getElementById("legalTitle");
@@ -81,40 +98,35 @@ const legalContent = {
       <p>INTAKEE collects only the information required to operate the platform.</p>
       <p>We do not sell personal data.</p>
       <p>Uploaded content is public unless you choose privacy options.</p>
-      <p>By using INTAKEE, you agree to this policy.</p>
     `
   },
   terms: {
     title: "Terms of Service",
     body: `
       <p><strong>INTAKEE Terms of Service</strong></p>
-      <p>You are solely responsible for the content you upload.</p>
+      <p>You are responsible for all content you upload.</p>
       <p>INTAKEE is not liable for user-generated content.</p>
-      <p>We reserve the right to remove content that violates the law.</p>
-      <p>Using INTAKEE means you accept these terms.</p>
+      <p>Illegal content may be removed.</p>
     `
   },
   guidelines: {
     title: "Community Guidelines",
     body: `
-      <p><strong>INTAKEE Community Guidelines</strong></p>
       <ul>
         <li>No illegal content</li>
         <li>No sexual exploitation</li>
-        <li>No severe harassment or threats</li>
+        <li>No threats or violence</li>
       </ul>
-      <p>Violations may result in removal or account suspension.</p>
     `
   }
 };
 
-/* LEGAL ROW CLICK HANDLING — ISOLATED */
+/* OPEN LEGAL */
 document.addEventListener("click", (e) => {
   const row = e.target.closest(".settings-row[data-legal]");
   if (!row) return;
 
-  const type = row.dataset.legal;
-  const content = legalContent[type];
+  const content = legalContent[row.dataset.legal];
   if (!content) return;
 
   legalTitle.textContent = content.title;
@@ -122,12 +134,11 @@ document.addEventListener("click", (e) => {
   legalModal.classList.remove("hidden");
 });
 
-/* CLOSE MODAL */
+/* CLOSE LEGAL */
 closeBtn?.addEventListener("click", () => {
   legalModal.classList.add("hidden");
 });
 
-/* CLICK OUTSIDE TO CLOSE */
 legalModal?.addEventListener("click", (e) => {
   if (e.target === legalModal) {
     legalModal.classList.add("hidden");
