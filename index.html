@@ -19,9 +19,6 @@
     <i class="fa fa-search"></i>
     <input id="globalSearch" placeholder="Search for content or creators..." autocomplete="off" />
   </div>
-
-  <button id="openAuth" class="header-login-btn">Login / Sign Up</button>
-  <span id="headerUsername" class="header-username" style="display:none;">@username</span>
 </header>
 
 <main>
@@ -30,7 +27,14 @@
 <section id="home" class="tab-section active">
   <div class="home-header-row">
     <h2>Trending</h2>
+
+    <!-- LOGIN / USERNAME (HOME ONLY) -->
+    <div class="home-auth-row">
+      <button id="openAuth" class="header-login-btn">Login / Sign Up</button>
+      <span id="headerUsername" class="header-username" style="display:none;">@username</span>
+    </div>
   </div>
+
   <div id="home-feed" class="feed-grid"></div>
 </section>
 
@@ -55,11 +59,9 @@
 <!-- ================= UPLOAD ================= -->
 <section id="upload" class="tab-section">
   <div class="tab-inner">
-
     <h2 class="upload-title">Upload</h2>
 
     <div class="upload-card">
-
       <label>Type</label>
       <select id="uploadTypeSelect">
         <option value="video">Video</option>
@@ -94,7 +96,6 @@
           </label>
         </div>
       </div>
-
     </div>
   </div>
 </section>
@@ -150,7 +151,7 @@
   <a data-tab="settings"><i class="fa fa-gear"></i><span>Settings</span></a>
 </nav>
 
-<!-- ================= AUTH MODAL ================= -->
+<!-- ================= AUTH MODAL (ONLY ONE) ================= -->
 <dialog id="authDialog" class="auth-dialog">
   <h2>Welcome to INTAKEE</h2>
 
@@ -184,36 +185,3 @@
 
 </body>
 </html>
-
-<!-- ================= AUTH MODAL ================= -->
-<dialog id="authDialog" class="auth-dialog">
-
-  <h2>Welcome to INTAKEE</h2>
-
-  <!-- SIGN UP -->
-  <h3>Create Account</h3>
-  <input id="signupEmail" type="email" placeholder="Email" />
-  <input id="signupUsername" placeholder="Username" />
-  <input id="signupPassword" type="password" placeholder="Password" />
-
-  <label class="age-check">
-    <input type="checkbox" id="signupAgeConfirm" />
-    I am 13 or older
-  </label>
-
-  <button id="signupBtn" class="primary">Sign Up</button>
-
-  <hr />
-
-  <!-- LOGIN -->
-  <h3>Log In</h3>
-  <input id="loginIdentifier" placeholder="Email or Username" />
-  <input id="loginPassword" type="password" placeholder="Password" />
-
-  <button id="loginBtn" class="primary">Log In</button>
-
-  <button id="forgotPasswordBtn">Forgot Password</button>
-  <button id="forgotUsernameBtn">Forgot Username</button>
-
-  <button id="closeAuthDialog" class="secondary">Close</button>
-</dialog>
