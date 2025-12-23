@@ -1,11 +1,17 @@
 /*
 ==========================================
 INTAKEE — FEED SYSTEM (FINAL STABLE)
+- Uses firebase-init.js ONLY
+- No duplicate Firebase apps
 ==========================================
 */
 
 import { auth, db } from "./firebase-init.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
 import {
   collection,
   query,
@@ -18,7 +24,7 @@ import {
   arrayUnion,
   arrayRemove,
   increment
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ================= DOM ================= */
 const homeFeed = document.getElementById("home-feed");
@@ -128,11 +134,7 @@ function renderPost(post) {
         : arrayUnion(currentUser.uid)
     });
 
-    post.likes = (post.likes || 0) + (isLiked ? -1 : 1);
-    post.likedBy = isLiked
-      ? post.likedBy.filter(id => id !== currentUser.uid)
-      : [...(post.likedBy || []), currentUser.uid];
-
+    post.likes += isLiked ? -1 : 1;
     card.querySelector(".like-btn").textContent = `❤️ ${post.likes}`;
     card.querySelector(".like-btn").classList.toggle("active");
   };
@@ -149,10 +151,6 @@ function renderPost(post) {
         ? arrayRemove(currentUser.uid)
         : arrayUnion(currentUser.uid)
     });
-
-    post.savedBy = isSaved
-      ? post.savedBy.filter(id => id !== currentUser.uid)
-      : [...(post.savedBy || []), currentUser.uid];
 
     card.querySelector(".save-btn").classList.toggle("active");
   };
