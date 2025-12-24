@@ -5,7 +5,7 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-
 
 import { firebaseConfig } from "./firebase-config.js";
 
-// ✅ SAFE init (prevents duplicate Firebase apps)
+// ✅ SAFE init — prevents duplicate Firebase apps
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
