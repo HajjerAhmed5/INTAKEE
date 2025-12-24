@@ -5,6 +5,7 @@ INTAKEE — AUTH SYSTEM (FINAL STABLE)
 - Safe DOM guards
 - Email OR Username login
 - Dialog-based modal
+- FIXED signup flow (Auth + Firestore separated)
 =====================================
 */
 
@@ -55,11 +56,11 @@ const logoutBtn = document.getElementById("settings-logout");
 
 /* ================= MODAL ================= */
 openAuthBtn?.addEventListener("click", () => {
-  if (authDialog) authDialog.showModal();
+  authDialog?.showModal();
 });
 
 closeAuthDialog?.addEventListener("click", () => {
-  if (authDialog) authDialog.close();
+  authDialog?.close();
 });
 
 /* ================= SIGN UP ================= */
@@ -78,17 +79,25 @@ signupBtn?.addEventListener("click", async () => {
     return;
   }
 
+  // 1️⃣ Username uniqueness check (Firestore only)
+  const q = query(collection(db, "users"), where("username", "==", username));
+  const snap = await getDocs(q);
+  if (!snap.empty) {
+    alert("Username already taken.");
+    return;
+  }
+
+  // 2️⃣ AUTH (standalone)
+  let cred;
   try {
-    // Check username uniqueness
-    const q = query(collection(db, "users"), where("username", "==", username));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
-      alert("Username already taken.");
-      return;
-    }
+    cred = await createUserWithEmailAndPassword(auth, email, password);
+  } catch (err) {
+    alert(err.message);
+    return;
+  }
 
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-
+  // 3️⃣ FIRESTORE (allowed to fail without breaking auth)
+  try {
     await setDoc(doc(db, "users", cred.user.uid), {
       email,
       username,
@@ -102,11 +111,12 @@ signupBtn?.addEventListener("click", async () => {
       history: [],
       notifications: []
     });
-
-    authDialog?.close();
   } catch (err) {
-    alert(err.message);
+    console.warn("Firestore profile creation failed:", err);
   }
+
+  // 4️⃣ Always close modal on auth success
+  authDialog?.close();
 });
 
 /* ================= LOGIN ================= */
@@ -122,7 +132,7 @@ loginBtn?.addEventListener("click", async () => {
   try {
     let email = identifier;
 
-    // Username → email lookup
+    // Username → Email lookup
     if (!identifier.includes("@")) {
       const q = query(
         collection(db, "users"),
@@ -194,7 +204,8 @@ onAuthStateChanged(auth, async (user) => {
     const snap = await getDoc(doc(db, "users", user.uid));
     currentUserData = snap.exists() ? snap.data() : null;
 
-    if (openAuthBtn) openAuthBtn.style.display = "none";
+    openAuthBtn && (openAuthBtn.style.display = "none");
+
     if (headerUsername && currentUserData) {
       headerUsername.style.display = "inline";
       headerUsername.textContent = "@" + currentUserData.username;
@@ -205,8 +216,8 @@ onAuthStateChanged(auth, async (user) => {
     currentUser = null;
     currentUserData = null;
 
-    if (openAuthBtn) openAuthBtn.style.display = "inline";
-    if (headerUsername) headerUsername.style.display = "none";
+    openAuthBtn && (openAuthBtn.style.display = "inline");
+    headerUsername && (headerUsername.style.display = "none");
 
     document.body.classList.remove("logged-in");
   }
