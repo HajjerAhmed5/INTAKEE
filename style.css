@@ -443,8 +443,9 @@ body[data-tab="settings"] .search-bar {
   display: flex;
   align-items: flex-end;
   gap: 24px;
-  padding: 0 20px;
-  margin-top: -60px;
+  padding: 0 24px;
+  margin-top: -70px; /* pulls avatar up over banner */
+  position: relative;
 }
 
 .profile-avatar {
@@ -506,7 +507,9 @@ body[data-tab="settings"] .search-bar {
 .profile-tabs {
   display: flex;
   gap: 12px;
-  padding: 20px;
+  padding: 24px;
+  margin-top: 10px;
+  border-top: 1px solid #222;
   flex-wrap: wrap;
 }
 
@@ -516,12 +519,16 @@ body[data-tab="settings"] .search-bar {
   color: #fff;
   padding: 8px 16px;
   border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
 }
 
 .profile-tabs button.active {
   background: #fff;
   color: #000;
+  border-color: #fff;
 }
+
 /* === PROFILE AVATAR HARD RESET === */
 .profile-avatar {
   position: static !important;
