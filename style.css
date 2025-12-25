@@ -95,3 +95,28 @@
 #settings .settings-item.danger {
   color: #ff5c5c;
 }
+/* ===============================
+   SAFETY OVERRIDES — LAYOUT LOCK
+================================ */
+
+/* Prevent old settings styles */
+.settings-row {
+  display: none !important;
+}
+
+/* Lock Upload layout */
+#upload .upload-card {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Prevent header/search from bleeding */
+#settings .search-bar,
+#upload .search-bar {
+  display: none !important;
+}
+
+/* Ensure settings spacing is isolated */
+#settings {
+  padding-top: 0 !important;
+}
