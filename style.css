@@ -633,3 +633,19 @@ body[data-tab="settings"] .search-bar {
   background: #fff;
   color: #000;
 }
+/* Hide global header on Profile, Upload, Settings */
+body[data-tab="profile"] #mainHeader,
+body[data-tab="upload"] #mainHeader,
+body[data-tab="settings"] #mainHeader {
+  display: none;
+}
+.profile {
+  position: relative;
+}
+
+.profile-banner {
+  position: relative;
+}
+.profile-header {
+  margin-top: -60px;
+}
