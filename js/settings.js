@@ -1,9 +1,10 @@
 /* ===============================
-   INTAKEE — SETTINGS SYSTEM (FIXED)
+   INTAKEE — SETTINGS SYSTEM (FINAL)
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
-import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { signOut, onAuthStateChanged } from
+  "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
   doc,
   getDoc,
@@ -11,49 +12,109 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ===============================
-   PRIVACY TOGGLES
+   TOGGLES (MATCH HTML)
 ================================ */
-const toggles = {
-  privateAccount: document.getElementById("togglePrivateAccount"),
-  uploadsPrivate: document.getElementById("togglePrivateUploads"),
-  savedPrivate: document.getElementById("togglePrivateSaved"),
-  playlistsPrivate: document.getElementById("togglePrivatePlaylists"),
-};
+
+// Privacy
+const privateAccountToggle = document.querySelector(
+  '#settings input[data-setting="privateAccount"]'
+);
+const uploadsPrivacyToggle = document.querySelector(
+  '#settings input[data-setting="uploadsPrivate"]'
+);
+const savedPrivacyToggle = document.querySelector(
+  '#settings input[data-setting="savedPrivate"]'
+);
+
+// Notifications
+const engagementNotifToggle = document.querySelector(
+  '#settings input[data-setting="engagementNotifications"]'
+);
+const followersNotifToggle = document.querySelector(
+  '#settings input[data-setting="newFollowers"]'
+);
+const uploadsNotifToggle = document.querySelector(
+  '#settings input[data-setting="creatorUploads"]'
+);
+const systemNotifToggle = document.querySelector(
+  '#settings input[data-setting="systemUpdates"]'
+);
+
+// Playback
+const autoplayToggle = document.querySelector(
+  '#settings input[data-setting="autoplay"]'
+);
+const loopClipsToggle = document.querySelector(
+  '#settings input[data-setting="loopClips"]'
+);
+const pipToggle = document.querySelector(
+  '#settings input[data-setting="pip"]'
+);
+const backgroundPlayToggle = document.querySelector(
+  '#settings input[data-setting="backgroundPlay"]'
+);
+
+const allToggles = [
+  privateAccountToggle,
+  uploadsPrivacyToggle,
+  savedPrivacyToggle,
+  engagementNotifToggle,
+  followersNotifToggle,
+  uploadsNotifToggle,
+  systemNotifToggle,
+  autoplayToggle,
+  loopClipsToggle,
+  pipToggle,
+  backgroundPlayToggle
+];
+
+/* ===============================
+   LOAD USER SETTINGS
+================================ */
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;
 
-  const snap = await getDoc(doc(db, "users", user.uid));
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
   if (!snap.exists()) return;
 
   const data = snap.data();
 
-  Object.entries(toggles).forEach(([key, el]) => {
-    if (el) el.checked = Boolean(data[key]);
+  allToggles.forEach(toggle => {
+    if (!toggle) return;
+    const key = toggle.dataset.setting;
+    toggle.checked = Boolean(data[key]);
   });
 });
 
-Object.entries(toggles).forEach(([key, el]) => {
-  if (!el) return;
+/* ===============================
+   SAVE ON CHANGE
+================================ */
 
-  el.addEventListener("change", async () => {
+allToggles.forEach(toggle => {
+  if (!toggle) return;
+
+  toggle.addEventListener("change", async () => {
     const user = auth.currentUser;
     if (!user) return;
 
+    const key = toggle.dataset.setting;
+
     await updateDoc(doc(db, "users", user.uid), {
-      [key]: el.checked
+      [key]: toggle.checked
     });
   });
 });
 
 /* ===============================
-   LOGOUT
+   LOG OUT
 ================================ */
+
 document.addEventListener("click", async (e) => {
-  const btn = e.target.closest("#settings-logout");
-  if (!btn) return;
+  const logoutBtn = e.target.closest(".settings-item.danger");
+  if (!logoutBtn || logoutBtn.textContent !== "Log Out") return;
 
   await signOut(auth);
   location.reload();
 });
-
