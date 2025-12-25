@@ -313,3 +313,91 @@ h2 {
 .bottom-nav a.active {
   color: var(--text);
 }
+/* ===============================
+   AUTH MODAL — FINAL (LOCKED)
+   Matches reference screenshot
+================================ */
+
+.auth-dialog {
+  width: 420px;
+  max-width: 92%;
+  border: none;
+  border-radius: 18px;
+  padding: 28px 26px;
+  background: linear-gradient(180deg, #111, #000);
+  color: #fff;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+}
+
+.auth-dialog::backdrop {
+  background: rgba(0,0,0,0.75);
+}
+
+/* Headings */
+.auth-dialog h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.auth-dialog h3 {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 18px 0 8px;
+  color: #ddd;
+}
+
+/* Inputs */
+.auth-dialog input[type="email"],
+.auth-dialog input[type="text"],
+.auth-dialog input[type="password"],
+.auth-dialog input:not([type="checkbox"]) {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  border: 1px solid #222;
+  background: #0c0c0c;
+  color: #fff;
+  font-size: 14px;
+}
+
+.auth-dialog input::placeholder {
+  color: #777;
+}
+
+/* Checkbox row */
+.auth-dialog label {
+  font-size: 13px;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+
+/* Buttons (white pill style) */
+.auth-dialog button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 999px;
+  border: none;
+  background: #fff;
+  color: #000;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-dialog button:hover {
+  opacity: 0.9;
+}
+
+/* Divider */
+.auth-dialog hr {
+  border: none;
+  height: 1px;
+  background: #222;
+  margin: 18px 0;
+}
