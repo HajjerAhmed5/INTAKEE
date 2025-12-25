@@ -401,3 +401,26 @@ h2 {
   background: #222;
   margin: 18px 0;
 }
+/* ===============================
+   SEARCH BAR VISIBILITY (LOCKED)
+================================ */
+
+/* Hide search by default */
+.search-bar {
+  display: none !important;
+}
+
+/* Show search ONLY on content tabs */
+body[data-tab="home"] .search-bar,
+body[data-tab="videos"] .search-bar,
+body[data-tab="podcasts"] .search-bar,
+body[data-tab="clips"] .search-bar {
+  display: flex !important;
+}
+
+/* Explicitly hide on these tabs */
+body[data-tab="upload"] .search-bar,
+body[data-tab="profile"] .search-bar,
+body[data-tab="settings"] .search-bar {
+  display: none !important;
+}
