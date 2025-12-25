@@ -120,3 +120,18 @@
 #settings {
   padding-top: 0 !important;
 }
+/* ===============================
+   GLOBAL HEADER LOCK (FINAL)
+================================ */
+
+#mainHeader {
+  height: auto;
+  min-height: 56px;
+  padding: 10px 16px;
+}
+
+.app-logo {
+  height: 40px;
+  max-height: 40px;
+  width: auto;
+}
