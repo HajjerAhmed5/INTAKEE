@@ -1,544 +1,6 @@
 /* ========================================================================= */
-/* INTAKEE — FINAL STYLE.CSS (Dark Mode, Stable, Clean Layout)               */
+/* ================= SETTINGS — FINAL LAYOUT FIX =========================== */
 /* ========================================================================= */
-
-:root {
-  --bg: #000;
-  --panel: #0f0f0f;
-  --panel-2: #0a0a0a;
-  --border: #222;
-  --text: #fff;
-  --muted: #aaa;
-  --radius: 12px;
-}
-
-/* ================= RESET ================= */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, Arial, sans-serif;
-  padding-bottom: 90px;
-}
-
-/* ================= TAB VISIBILITY ================= */
-.tab-section {
-  display: none;
-}
-
-.tab-section.active {
-  display: block;
-}
-
-/* ================= HEADER ================= */
-#mainHeader {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
-  background: var(--panel-2);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 999;
-}
-
-.app-logo {
-  height: 115px;
-}
-
-/* ================= SEARCH BAR ================= */
-.search-bar {
-  flex: 1;
-  display: none;
-  align-items: center;
-  background: #111;
-  padding: 10px 14px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-}
-
-.search-bar input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #fff;
-  margin-left: 8px;
-}
-
-/* ================= BUTTONS ================= */
-button {
-  cursor: pointer;
-}
-
-/* ================= FEED ================= */
-.feed-grid {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  margin-top: 14px;
-}
-
-/* ================= PAGE CONTAINER ================= */
-#upload,
-#profile,
-#settings {
-  max-width: 900px;
-  margin: 24px auto;
-  padding: 24px;
-}
-
-.tab-inner {
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-/* ========================================================================= */
-/* ======================= UPLOAD (NEW SYSTEM) ============================= */
-/* ========================================================================= */
-
-.upload-title {
-  margin-bottom: 16px;
-}
-
-/* Card */
-.upload-card {
-  background: #0f0f0f;
-  border: 1px solid #222;
-  border-radius: 16px;
-  padding: 24px;
-}
-
-/* Form fields */
-.upload-card label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 0.85rem;
-  color: #aaa;
-}
-
-.upload-card input,
-.upload-card select,
-.upload-card textarea {
-  width: 100%;
-  background: #111;
-  border: 1px solid #333;
-  color: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 14px;
-}
-
-/* Bottom bar */
-.upload-bottom-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid #333;
-}
-
-/* Buttons */
-.upload-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.upload-btn,
-.live-btn {
-  background: #000;
-  color: #fff;
-  border: 1px solid #fff;
-  padding: 12px 26px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.upload-btn:hover,
-.live-btn:hover {
-  background: #111;
-}
-
-/* 18+ toggle */
-.upload-18 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-}
-
-/* Switch */
-.switch {
-  position: relative;
-  width: 42px;
-  height: 22px;
-}
-
-.switch input {
-  opacity: 0;
-}
-
-.slider {
-  position: absolute;
-  inset: 0;
-  background: #333;
-  border-radius: 22px;
-  transition: 0.3s;
-}
-
-.slider::before {
-  content: "";
-  position: absolute;
-  height: 18px;
-  width: 18px;
-  left: 2px;
-  bottom: 2px;
-  background: #fff;
-  border-radius: 50%;
-  transition: 0.3s;
-}
-
-.switch input:checked + .slider {
-  background: #fff;
-}
-
-.switch input:checked + .slider::before {
-  transform: translateX(20px);
-  background: #000;
-}
-
-/* ========================================================================= */
-/* ================= PROFILE ================= */
-.profile-tabs {
-  margin: 16px 0;
-}
-
-.profile-tabs button {
-  background: #000;
-  color: #fff;
-  border: 1px solid #fff;
-  padding: 6px 14px;
-  margin-right: 8px;
-  border-radius: 20px;
-}
-
-/* ========================================================================= */
-/* ================= SETTINGS ================= */
-.settings-row {
-  background: #0f0f0f;
-  border: 1px solid #222;
-  border-radius: 12px;
-  padding: 18px;
-  margin-bottom: 16px;
-}
-
-.settings-row:hover {
-  background: #151515;
-}
-
-/* ========================================================================= */
-/* ================= BOTTOM NAV ================= */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--panel-2);
-  border-top: 1px solid var(--border);
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding: 7px 0;
-}
-
-.bottom-nav a {
-  text-align: center;
-  color: #888;
-  font-size: 0.75rem;
-  text-decoration: none;
-}
-
-.bottom-nav a.active {
-  color: #fff;
-}
-
-/* ========================================================================= */
-/* ================= HEADER VISIBILITY ================= */
-.search-bar,
-#openAuth {
-  display: none;
-}
-
-body[data-tab="home"] .search-bar,
-body[data-tab="videos"] .search-bar,
-body[data-tab="podcasts"] .search-bar,
-body[data-tab="clips"] .search-bar {
-  display: flex;
-}
-
-body[data-tab="home"] #openAuth {
-  display: inline-block;
-}
-/* ================= HOME FILTER BUTTONS ================= */
-
-.filter-text {
-  background: #000;
-  color: #fff;
-  border: 1px solid #fff;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.filter-text:hover {
-  background: #111;
-}
-
-.filter-text.active {
-  background: #fff;
-  color: #000;
-}
-
-/* ================= LEGAL MODAL HARD HIDE ================= */
-
-.legal-modal {
-  display: none !important;
-}
-
-.legal-modal:not(.hidden) {
-  display: flex !important;
-}
-
-.close-btn {
-  display: none !important;
-}
-
-.legal-modal:not(.hidden) .close-btn {
-  display: inline-block !important;
-}
-/* ================= HEADER AUTH BUTTON ================= */
-
-.header-login-btn {
-  background: #000;
-  color: #fff;
-  border: 1px solid #fff;
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.header-login-btn:hover {
-  background: #111;
-}
-/* ================= PROFILE HEADER LAYOUT ================= */
-
-#profile {
-  text-align: center;
-}
-
-/* Name + handle + bio */
-#profile-name {
-  font-size: 1.4rem;
-  font-weight: 600;
-}
-
-#profile-handle {
-  color: #aaa;
-  margin-top: 4px;
-}
-
-#profile-bio {
-  margin-top: 6px;
-  color: #aaa;
-}
-
-/* Edit Profile button positioning */
-#editProfileBtn {
-  display: inline-block;
-  margin-top: 18px;
-  margin-left: auto;
-  margin-right: 0;
-}
-
-/* Push Edit Profile slightly right */
-#profile .header-login-btn,
-#editProfileBtn {
-  float: right;
-}
-
-/* Clear float so tabs stay centered */
-.profile-tabs {
-  clear: both;
-  margin-top: 22px;
-}
-/* ================= PROFILE — EXACT MATCH ================= */
-
-#profile {
-  max-width: 100%;
-  padding-top: 80px;
-  text-align: center;
-}
-
-/* Name */
-#profile-name {
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-/* Handle */
-#profile-handle {
-  margin-top: 6px;
-  color: #aaa;
-  font-size: 0.95rem;
-}
-
-/* Bio */
-#profile-bio {
-  margin-top: 10px;
-  color: #aaa;
-  font-size: 0.95rem;
-}
-
-/* Profile tabs */
-.profile-tabs {
-  margin-top: 22px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.profile-tabs button {
-  background: #000;
-  color: #fff;
-  border: 1px solid #fff;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 13px;
-}
-
-.profile-tabs button.active {
-  background: #fff;
-  color: #000;
-}
-
-/* Hide all profile grids for guest (matches screenshot) */
-#profile-uploads-grid,
-#profile-saved-grid,
-#profile-likes-grid {
-  display: none;
-}
-/* ================= PROFILE PAGE ================= */
-
-.profile-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding-bottom: 120px;
-}
-
-/* Top banner */
-.profile-banner {
-  height: 260px;
-  background: #0b0b0b;
-  border-bottom: 1px solid var(--border);
-}
-
-/* Card */
-.profile-card {
-  margin-top: -140px;
-  padding: 24px;
-  text-align: center;
-}
-
-/* Top row */
-.profile-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Edit button */
-.edit-profile-btn {
-  background: #fff;
-  color: #000;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-/* Text */
-.profile-name {
-  margin-top: 10px;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.profile-handle {
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.profile-subtext {
-  margin-top: 6px;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-/* Stats */
-.profile-stats {
-  display: flex;
-  justify-content: center;
-  gap: 28px;
-  margin: 18px 0;
-}
-
-.profile-stats div {
-  text-align: center;
-  font-size: 13px;
-}
-
-.profile-stats strong {
-  display: block;
-  font-size: 15px;
-}
-
-.profile-stats span {
-  color: var(--muted);
-}
-
-/* Action pills */
-.profile-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-}
-
-.profile-actions button {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.profile-actions button.active {
-  background: #fff;
-  color: #000;
-}
-/* ================= SETTINGS (SCOPED) ================= */
 
 #settings .settings-page {
   max-width: 720px;
@@ -552,6 +14,7 @@ body[data-tab="home"] #openAuth {
   margin-bottom: 18px;
 }
 
+/* Group container */
 #settings .settings-group {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -560,14 +23,25 @@ body[data-tab="home"] #openAuth {
   overflow: hidden;
 }
 
+/* Section header */
+#settings .settings-group-title {
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Row */
 #settings .settings-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px;
   font-size: 15px;
-  cursor: pointer;
   border-bottom: 1px solid var(--border);
+  cursor: pointer;
 }
 
 #settings .settings-item:last-child {
@@ -578,122 +52,46 @@ body[data-tab="home"] #openAuth {
   background: var(--panel-2);
 }
 
-#settings .settings-item .arrow {
+/* Chevron */
+#settings .chevron {
   color: var(--muted);
   font-size: 18px;
 }
 
+/* Toggle rows */
+#settings .settings-item.toggle {
+  cursor: default;
+}
+
+#settings .settings-item.toggle span:first-child {
+  flex: 1;
+}
+
+/* Static rows */
+#settings .settings-item.static {
+  cursor: default;
+}
+
+#settings .settings-item .muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Danger zone */
+#settings .settings-group.danger {
+  background: transparent;
+  border: none;
+}
+
+#settings .settings-group.danger .settings-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  border-radius: 14px;
+  justify-content: center;
+  font-weight: 600;
+}
+
 #settings .settings-item.danger {
   color: #ff5c5c;
-}
-/* ===== REMOVE PROFILE TOP GAP COMPLETELY ===== */
-
-#profile {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-
-#profile .profile-page {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-
-#profile .profile-banner {
-  margin-top: 0 !important;
-}
-/* ===== PROFILE LAYOUT FIX ===== */
-
-#profile .profile-banner {
-  height: 220px;
-  background: #0b0b0b;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-}
-
-/* Avatar overlaps banner */
-#profile .profile-avatar {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  background: #1a1a1a;
-  position: absolute;
-  bottom: -80px;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 4px solid #000;
-}
-/* Info below grid */
-#profile .profile-info {
-  margin-top: 60px;
-  text-align: center;
-}
-
-/* Button below grid */
-#profile .edit-profile-btn {
-  display: block;
-  margin: 12px auto;
-}
-/* ===== EDIT PROFILE RIGHT ALIGN ===== */
-
-#profile .edit-profile-row {
-  max-width: 900px;
-  margin: 0 auto 10px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-#profile .edit-profile-btn {
-  margin: 0;
-}
-/* ===============================
-   AUTH MODAL STYLING (FIX)
-================================ */
-
-.auth-dialog {
-  width: 360px;
-  max-width: 90%;
-  border: none;
-  border-radius: 16px;
-  padding: 24px;
-  background: #0f0f0f;
-  color: #fff;
-  box-shadow: 0 20px 60px rgba(0,0,0,.6);
-}
-
-.auth-dialog::backdrop {
-  background: rgba(0,0,0,0.65);
-}
-
-.auth-dialog h2,
-.auth-dialog h3 {
-  margin-bottom: 12px;
-}
-
-.auth-dialog input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  border: 1px solid #333;
-  background: #000;
-  color: #fff;
-}
-
-.auth-dialog button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  border-radius: 10px;
-  border: none;
-  background: #fff;
-  color: #000;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.auth-dialog hr {
-  border: none;
-  height: 1px;
-  background: #222;
-  margin: 16px 0;
 }
