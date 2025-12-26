@@ -162,17 +162,23 @@ h2 {
   border-radius: 999px;
   cursor: pointer;
 }
+/* ================= PROFILE PAGE ================= */
+.profile-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
 
-/* ================= PROFILE (FINAL FIX) ================= */
-
+/* ================= BANNER ================= */
 .profile-banner {
   position: relative;
   height: 260px;
   background: linear-gradient(180deg, #111, #000);
   border-radius: 16px;
+  overflow: visible;
 }
 
-/* Avatar sits ON the banner */
+/* ================= AVATAR ================= */
 .profile-avatar {
   position: absolute;
   bottom: -70px;
@@ -186,55 +192,56 @@ h2 {
   z-index: 10;
 }
 
-/* Header content */
+/* ================= HEADER ================= */
 .profile-header {
   display: flex;
   align-items: flex-start;
   gap: 24px;
-  padding: 110px 40px 24px;
+
+  padding: 90px 40px 24px;
 }
 
-/* Text/meta */
+/* ================= META ================= */
 .profile-meta {
   max-width: 520px;
 }
 
 .profile-name {
-  font-size: 24px;
-  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .profile-handle {
   color: #aaa;
-  margin: 4px 0;
+  margin-bottom: 8px;
 }
 
 .profile-bio {
-  color: #ccc;
   font-size: 14px;
-  margin: 8px 0 14px;
+  color: #ccc;
+  margin-bottom: 16px;
 }
 
-/* Stats */
+/* ================= STATS ================= */
 .profile-stats {
   display: flex;
   gap: 24px;
+  font-size: 14px;
 }
 
 .profile-stats div {
-  text-align: center;
-  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .profile-stats strong {
-  display: block;
   font-size: 16px;
 }
 
-/* Edit button */
+/* ================= EDIT BUTTON ================= */
 .edit-profile-btn {
   margin-left: auto;
-  margin-top: 12px;
   background: #fff;
   color: #000;
   border: none;
@@ -244,27 +251,30 @@ h2 {
   cursor: pointer;
 }
 
-/* Profile tabs */
+/* ================= PROFILE TABS ================= */
 .profile-tabs {
   display: flex;
   gap: 12px;
-  padding: 20px 40px;
-  flex-wrap: wrap;
+  padding: 16px 40px;
+  border-top: 1px solid #222;
 }
 
 .profile-tabs button {
-  background: transparent;
-  border: 1px solid #333;
-  color: #fff;
   padding: 8px 16px;
   border-radius: 999px;
+  border: 1px solid #333;
+  background: transparent;
+  color: #fff;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .profile-tabs button.active {
   background: #fff;
   color: #000;
 }
+
+
 
 /* ================= SETTINGS ================= */
 
