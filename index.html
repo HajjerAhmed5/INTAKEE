@@ -25,44 +25,78 @@
 
 <!-- ================= HOME ================= -->
 <section id="home" class="tab-section active">
+
+  <!-- Header row -->
   <div class="home-header-row">
     <h2>Trending</h2>
-    <!-- Trending Filters -->
-<div class="trending-filters">
-  <button class="active">All</button>
-  <button>Videos</button>
-  <button>Podcasts</button>
-  <button>Clips</button>
-  <button>Following</button>
-  <button>Newest</button>
-</div>
-    <!-- LOGIN / USERNAME (HOME ONLY) -->
+
+    <!-- Login button (disappears after login via JS later) -->
     <div class="home-auth-row">
       <button id="openAuth" class="header-login-btn">Login / Sign Up</button>
-      <span id="headerUsername" class="header-username" style="display:none;">@username</span>
     </div>
   </div>
 
-  <div id="home-feed" class="feed-grid"></div>
-<!-- ================= UNIFIED FEED CARD ================= -->
-<div class="feed-card">
-
-  <div class="feed-thumb">
-    <!-- thumbnail image later -->
+  <!-- Home filters (HOME ONLY) -->
+  <div class="home-filters">
+    <button class="filter-btn active">All</button>
+    <button class="filter-btn">Videos</button>
+    <button class="filter-btn">Podcasts</button>
+    <button class="filter-btn">Clips</button>
+    <button class="filter-btn">Following</button>
+    <button class="filter-btn">Newest</button>
   </div>
 
-  <div class="feed-info">
-    <h3 class="feed-title">Sample Title Goes Here</h3>
+  <!-- Feed -->
+  <div id="home-feed" class="feed-grid">
 
-    <div class="feed-meta">
-      <span class="feed-creator">@creatorname</span>
-      <span class="dot">•</span>
-      <span class="feed-views">12.4K views</span>
+    <!-- ===== Unified Feed Card ===== -->
+    <div class="feed-card">
+      <div class="feed-thumb"></div>
+
+      <div class="feed-info">
+        <h3 class="feed-title">This Is a Sample Video Title</h3>
+
+        <div class="feed-meta">
+          <span class="feed-creator">@creatorname</span>
+          <span class="dot">•</span>
+          <span class="feed-views">12.4K views</span>
+        </div>
+      </div>
     </div>
-  </div>
 
-</div>
+    <!-- ===== Unified Feed Card ===== -->
+    <div class="feed-card">
+      <div class="feed-thumb"></div>
+
+      <div class="feed-info">
+        <h3 class="feed-title">Podcast Episode: Real Talk</h3>
+
+        <div class="feed-meta">
+          <span class="feed-creator">@podcastname</span>
+          <span class="dot">•</span>
+          <span class="feed-views">8.1K plays</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Unified Feed Card ===== -->
+    <div class="feed-card">
+      <div class="feed-thumb"></div>
+
+      <div class="feed-info">
+        <h3 class="feed-title">Quick Clip That Went Viral</h3>
+
+        <div class="feed-meta">
+          <span class="feed-creator">@clipcreator</span>
+          <span class="dot">•</span>
+          <span class="feed-views">102K views</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </section>
+
 <!-- ================= VIDEOS ================= -->
 <section id="videos" class="tab-section">
   <h2>Videos</h2>
