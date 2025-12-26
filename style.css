@@ -618,3 +618,27 @@ body[data-tab="settings"] .search-bar {
   background: #fff;
   color: #000;
 }
+/* ================= TRENDING FILTERS (HOME ONLY) ================= */
+
+.trending-filters {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0 20px;
+  flex-wrap: wrap;
+}
+
+.trending-filters button {
+  background: transparent;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.trending-filters button.active {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
