@@ -508,75 +508,82 @@ body[data-tab="profile"] .search-bar,
 body[data-tab="settings"] .search-bar {
   display: none !important;
 }
-/* ================= PROFILE (FINAL) ================= */
-/* ===== PROFILE — CLEAN, SINGLE SOURCE ===== */
+/* ================= PROFILE — FINAL SINGLE SOURCE ================= */
 
 .profile-page {
   max-width: 1100px;
   margin: 0 auto;
-  padding-bottom: 100px;
+  padding-bottom: 120px;
 }
 
+/* Banner */
 .profile-banner {
-  height: 200px;
-  background: linear-gradient(180deg, #111, #000);
-  border-bottom: 1px solid #222;
-}
-
-.profile-header {
-  display: flex;
-  align-items: flex-end;
-  gap: 24px;
-  padding: 0 24px;
-  margin-top: -70px; /* pulls avatar up over banner */
   position: relative;
+  height: 260px;
+  background: linear-gradient(180deg, #111, #000);
+  border-radius: 16px;
 }
 
+/* Avatar overlaps banner */
 .profile-avatar {
+  position: absolute;
+  bottom: -70px;
+  left: 40px;
   width: 140px;
   height: 140px;
   border-radius: 50%;
   background: #222;
   border: 4px solid #000;
-  flex-shrink: 0;
+  z-index: 20;
 }
 
+/* Header */
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 90px 40px 24px;
+}
+
+/* Meta */
 .profile-meta {
-  padding-bottom: 10px;
+  max-width: 520px;
 }
 
 .profile-name {
   font-size: 24px;
-  margin: 0;
+  font-weight: 700;
 }
 
 .profile-handle {
   color: #aaa;
-  margin: 4px 0;
+  margin-bottom: 6px;
 }
 
 .profile-bio {
-  max-width: 420px;
-  color: #ccc;
   font-size: 14px;
-  margin: 8px 0 14px;
+  color: #ccc;
+  margin-bottom: 14px;
 }
 
+/* Stats */
 .profile-stats {
   display: flex;
   gap: 24px;
+  font-size: 14px;
 }
 
 .profile-stats div {
-  text-align: center;
-  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .profile-stats strong {
-  display: block;
   font-size: 16px;
 }
 
+/* Edit button */
 .edit-profile-btn {
   margin-left: auto;
   background: #fff;
@@ -588,35 +595,26 @@ body[data-tab="settings"] .search-bar {
   cursor: pointer;
 }
 
+/* Tabs */
 .profile-tabs {
   display: flex;
   gap: 12px;
-  padding: 24px;
-  margin-top: 10px;
+  padding: 16px 40px;
   border-top: 1px solid #222;
   flex-wrap: wrap;
 }
 
 .profile-tabs button {
-  background: transparent;
-  border: 1px solid #333;
-  color: #fff;
   padding: 8px 16px;
   border-radius: 999px;
-  font-size: 13px;
+  border: 1px solid #333;
+  background: transparent;
+  color: #fff;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .profile-tabs button.active {
   background: #fff;
   color: #000;
-  border-color: #fff;
 }
-
-/* === PROFILE AVATAR HARD RESET === */
-.profile-avatar {
-  position: static !important;
-  bottom: auto !important;
-  left: auto !important;
-}
-
