@@ -718,3 +718,43 @@ body[data-tab="settings"] .search-bar {
 .dot {
   opacity: 0.5;
 }
+/* ================= HOME FEED ================= */
+
+.home-feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.feed-card {
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.feed-card:hover {
+  transform: translateY(-4px);
+}
+
+.feed-thumb {
+  height: 140px;
+  background: linear-gradient(135deg, #222, #000);
+}
+
+.feed-info {
+  padding: 12px;
+}
+
+.feed-info h4 {
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.feed-info p {
+  font-size: 12px;
+  color: #aaa;
+}
