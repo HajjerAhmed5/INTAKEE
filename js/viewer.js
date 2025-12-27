@@ -12,6 +12,12 @@
  * - Follow / Unfollow
  * - View counter
  ****************************************************/
+const params = new URLSearchParams(window.location.search);
+const postId = params.get("id");
+
+if (!postId) {
+  document.body.innerHTML = "<p style='color:white'>Post not found</p>";
+}
 
 import {
   getFirestore, doc, getDoc, updateDoc, increment
