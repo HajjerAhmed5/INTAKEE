@@ -197,3 +197,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".feed-card").forEach((card, index) => {
+    card.addEventListener("click", () => {
+      window.location.href = `viewer.html?id=${index}`;
+    });
+  });
+});
