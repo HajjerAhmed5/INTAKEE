@@ -189,3 +189,11 @@ document.addEventListener("DOMContentLoaded", fetchPosts);
 
 /* ================= EXPOSE ================= */
 window.refreshFeed = resetFeed;
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".feed-card").forEach(card => {
+    card.addEventListener("click", () => {
+      // temporary behavior (we’ll replace this with viewer routing)
+      alert("Open post viewer next");
+    });
+  });
+});
