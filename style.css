@@ -826,3 +826,27 @@ body[data-tab="settings"] .settings-page {
 body[data-tab="settings"] #mainHeader {
   border-bottom: 1px solid #222;
 }
+/* ================= HOME FILTERS — HARD LOCK ================= */
+
+.home-filters {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0 20px;
+  flex-wrap: wrap;
+}
+
+.home-filters .filter-btn {
+  background: transparent !important;
+  border: 1px solid #333 !important;
+  color: #fff !important;
+  padding: 6px 14px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+}
+
+.home-filters .filter-btn.active {
+  background: #fff !important;
+  color: #000 !important;
+  border-color: #fff !important;
+}
