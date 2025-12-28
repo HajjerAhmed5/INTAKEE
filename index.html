@@ -282,13 +282,35 @@
 <!-- ================= AUTH MODAL ================= -->
 <dialog id="authDialog" class="auth-dialog">
   <h2>Welcome to INTAKEE</h2>
-  <input placeholder="Email or Username">
-  <input type="password" placeholder="Password">
-  <button>Log In</button>
-  <button>Sign Up</button>
-  <button id="closeAuthDialog">Close</button>
-</dialog>
 
+  <!-- CREATE ACCOUNT -->
+  <h3>Create Account</h3>
+
+  <input id="signupEmail" type="email" placeholder="Email" />
+  <input id="signupUsername" type="text" placeholder="Username" />
+  <input id="signupPassword" type="password" placeholder="Password" />
+
+  <label class="age-check">
+    <input id="signupAgeConfirm" type="checkbox" />
+    I am 13 or older
+  </label>
+
+  <button id="signupBtn">Sign Up</button>
+
+  <hr />
+
+  <!-- LOGIN -->
+  <h3>Log In</h3>
+
+  <input id="loginIdentifier" placeholder="Email or Username" />
+  <input id="loginPassword" type="password" placeholder="Password" />
+
+  <button id="loginBtn">Log In</button>
+  <button id="forgotPasswordBtn" class="ghost">Forgot Password</button>
+  <button id="forgotUsernameBtn" class="ghost">Forgot Username</button>
+
+  <button id="closeAuthDialog" class="ghost">Close</button>
+</dialog>
 <!-- ================= SCRIPTS ================= -->
 <script type="module" src="/js/auth.js"></script>
 <script type="module" src="/js/feed.js"></script>
