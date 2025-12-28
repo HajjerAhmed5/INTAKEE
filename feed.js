@@ -1,13 +1,14 @@
 /* ==========================================
-   INTAKEE — HOME FEED (STEP 2: FILTERS WORK)
+   INTAKEE — HOME FEED (FILTER-READY)
+   (Demo now → Firebase later)
 ========================================== */
 
 /* DOM */
 const feedGrid = document.querySelector("#home .feed-grid");
 const filterButtons = document.querySelectorAll(".home-filters .filter-btn");
 
-/* DEMO POSTS (PLACEHOLDER DATA) */
-const demoPosts = [
+/* SOURCE OF TRUTH (will be Firebase later) */
+let allPosts = [
   {
     id: 1,
     type: "video",
@@ -44,50 +45,57 @@ function createFeedCard(post) {
     </div>
   `;
 
-  // Placeholder click (real viewer later)
   card.addEventListener("click", () => {
     console.log("Clicked post:", post.id);
+    // viewer comes later
   });
 
   return card;
 }
 
-/* RENDER FEED */
-function renderHomeFeed(filter = "all") {
+/* RENDER */
+function renderFeed(posts) {
   if (!feedGrid) return;
 
   feedGrid.innerHTML = "";
-
-  const filteredPosts =
-    filter === "all"
-      ? demoPosts
-      : demoPosts.filter(post => post.type === filter);
-
-  filteredPosts.forEach(post => {
+  posts.forEach(post => {
     feedGrid.appendChild(createFeedCard(post));
   });
 }
 
-/* FILTER BUTTON HANDLERS */
+/* FILTER LOGIC */
+function applyFilter(filter) {
+  let filteredPosts = allPosts;
+
+  if (filter === "videos") {
+    filteredPosts = allPosts.filter(p => p.type === "video");
+  }
+
+  if (filter === "podcasts") {
+    filteredPosts = allPosts.filter(p => p.type === "podcast");
+  }
+
+  if (filter === "clips") {
+    filteredPosts = allPosts.filter(p => p.type === "clip");
+  }
+
+  // following & newest are placeholders for Firebase later
+
+  renderFeed(filteredPosts);
+}
+
+/* FILTER BUTTON EVENTS */
 filterButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    // Active state
     filterButtons.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
 
-    const label = btn.textContent.toLowerCase();
-
-    if (label === "all") renderHomeFeed("all");
-    if (label === "videos") renderHomeFeed("video");
-    if (label === "podcasts") renderHomeFeed("podcast");
-    if (label === "clips") renderHomeFeed("clip");
-    if (label === "following") renderHomeFeed("all"); // placeholder
-    if (label === "newest") renderHomeFeed("all"); // already newest
+    const filter = btn.textContent.toLowerCase();
+    applyFilter(filter);
   });
 });
 
 /* INIT */
 document.addEventListener("DOMContentLoaded", () => {
-  renderHomeFeed("all");
+  renderFeed(allPosts);
 });
-
