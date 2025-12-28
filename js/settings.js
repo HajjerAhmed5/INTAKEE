@@ -1,10 +1,12 @@
 /* ===============================
-   INTAKEE — SETTINGS SYSTEM (FINAL)
+   INTAKEE — SETTINGS SYSTEM (STABLE)
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
-import { signOut, onAuthStateChanged } from
-  "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import {
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
   doc,
   getDoc,
@@ -12,61 +14,36 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ===============================
-   TOGGLES (MATCH HTML)
+   HELPER: MAP SETTINGS BY LABEL
 ================================ */
 
-// Privacy
-const privateAccountToggle = document.querySelector(
-  '#settings input[data-setting="privateAccount"]'
-);
-const uploadsPrivacyToggle = document.querySelector(
-  '#settings input[data-setting="uploadsPrivate"]'
-);
-const savedPrivacyToggle = document.querySelector(
-  '#settings input[data-setting="savedPrivate"]'
-);
+function getToggle(labelText) {
+  const items = document.querySelectorAll("#settings .settings-item.toggle");
+  for (const item of items) {
+    if (item.textContent.includes(labelText)) {
+      return item.querySelector("input[type='checkbox']");
+    }
+  }
+  return null;
+}
 
-// Notifications
-const engagementNotifToggle = document.querySelector(
-  '#settings input[data-setting="engagementNotifications"]'
-);
-const followersNotifToggle = document.querySelector(
-  '#settings input[data-setting="newFollowers"]'
-);
-const uploadsNotifToggle = document.querySelector(
-  '#settings input[data-setting="creatorUploads"]'
-);
-const systemNotifToggle = document.querySelector(
-  '#settings input[data-setting="systemUpdates"]'
-);
+/* ===============================
+   TOGGLES (MATCH CURRENT HTML)
+================================ */
 
-// Playback
-const autoplayToggle = document.querySelector(
-  '#settings input[data-setting="autoplay"]'
-);
-const loopClipsToggle = document.querySelector(
-  '#settings input[data-setting="loopClips"]'
-);
-const pipToggle = document.querySelector(
-  '#settings input[data-setting="pip"]'
-);
-const backgroundPlayToggle = document.querySelector(
-  '#settings input[data-setting="backgroundPlay"]'
-);
-
-const allToggles = [
-  privateAccountToggle,
-  uploadsPrivacyToggle,
-  savedPrivacyToggle,
-  engagementNotifToggle,
-  followersNotifToggle,
-  uploadsNotifToggle,
-  systemNotifToggle,
-  autoplayToggle,
-  loopClipsToggle,
-  pipToggle,
-  backgroundPlayToggle
-];
+const toggles = {
+  privateAccount: getToggle("Private Account"),
+  uploadsPrivate: getToggle("Uploads Privacy"),
+  savedPrivate: getToggle("Saved Content"),
+  engagementNotifications: getToggle("Engagement"),
+  newFollowers: getToggle("New Followers"),
+  creatorUploads: getToggle("Creator Uploads"),
+  systemUpdates: getToggle("System"),
+  autoplay: getToggle("Auto-play"),
+  loopClips: getToggle("Auto-loop"),
+  pip: getToggle("Picture-in-Picture"),
+  backgroundPlay: getToggle("Background Play")
+};
 
 /* ===============================
    LOAD USER SETTINGS
@@ -81,10 +58,10 @@ onAuthStateChanged(auth, async (user) => {
 
   const data = snap.data();
 
-  allToggles.forEach(toggle => {
-    if (!toggle) return;
-    const key = toggle.dataset.setting;
-    toggle.checked = Boolean(data[key]);
+  Object.entries(toggles).forEach(([key, toggle]) => {
+    if (toggle && key in data) {
+      toggle.checked = Boolean(data[key]);
+    }
   });
 });
 
@@ -92,14 +69,12 @@ onAuthStateChanged(auth, async (user) => {
    SAVE ON CHANGE
 ================================ */
 
-allToggles.forEach(toggle => {
+Object.entries(toggles).forEach(([key, toggle]) => {
   if (!toggle) return;
 
   toggle.addEventListener("change", async () => {
     const user = auth.currentUser;
     if (!user) return;
-
-    const key = toggle.dataset.setting;
 
     await updateDoc(doc(db, "users", user.uid), {
       [key]: toggle.checked
@@ -112,9 +87,11 @@ allToggles.forEach(toggle => {
 ================================ */
 
 document.addEventListener("click", async (e) => {
-  const logoutBtn = e.target.closest(".settings-item.danger");
-  if (!logoutBtn || logoutBtn.textContent !== "Log Out") return;
+  const btn = e.target.closest(".settings-item");
+  if (!btn) return;
 
-  await signOut(auth);
-  location.reload();
+  if (btn.textContent.trim() === "Log Out") {
+    await signOut(auth);
+    location.reload();
+  }
 });
