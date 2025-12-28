@@ -1,11 +1,10 @@
 /* 
 =====================================
-INTAKEE — AUTH SYSTEM (FINAL STABLE)
-- Uses firebase-init.js
-- Safe DOM guards
+INTAKEE — AUTH SYSTEM (STABLE & SAFE)
+- No auto-open
+- Guards all DOM access
 - Email OR Username login
-- Dialog-based modal
-- FIXED signup flow (Auth + Firestore separated)
+- Works even if some elements are missing
 =====================================
 */
 
@@ -33,53 +32,52 @@ import {
 export let currentUser = null;
 export let currentUserData = null;
 
-/* ================= DOM ================= */
+/* ================= DOM (SAFE) ================= */
 const authDialog = document.getElementById("authDialog");
 const openAuthBtn = document.getElementById("openAuth");
-const closeAuthDialog = document.getElementById("closeAuthDialog");
+const closeAuthBtn = document.getElementById("closeAuthDialog");
 
+const loginBtn = document.getElementById("loginBtn");
 const signupBtn = document.getElementById("signupBtn");
+
+const loginIdentifier = document.getElementById("loginIdentifier");
+const loginPassword = document.getElementById("loginPassword");
+
 const signupEmail = document.getElementById("signupEmail");
 const signupPassword = document.getElementById("signupPassword");
 const signupUsername = document.getElementById("signupUsername");
 const signupAgeConfirm = document.getElementById("signupAgeConfirm");
 
-const loginBtn = document.getElementById("loginBtn");
-const loginIdentifier = document.getElementById("loginIdentifier");
-const loginPassword = document.getElementById("loginPassword");
-
 const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
-const forgotUsernameBtn = document.getElementById("forgotUsernameBtn");
-
-const headerUsername = document.getElementById("headerUsername");
-const logoutBtn = document.getElementById("settings-logout");
 
 /* ================= MODAL ================= */
 openAuthBtn?.addEventListener("click", () => {
   authDialog?.showModal();
 });
 
-closeAuthDialog?.addEventListener("click", () => {
+closeAuthBtn?.addEventListener("click", () => {
   authDialog?.close();
 });
 
 /* ================= SIGN UP ================= */
 signupBtn?.addEventListener("click", async () => {
-  const email = signupEmail?.value.trim();
-  const password = signupPassword?.value.trim();
-  const username = signupUsername?.value.trim().toLowerCase();
+  if (!signupEmail || !signupPassword || !signupUsername) return;
 
-  if (!signupAgeConfirm?.checked) {
-    alert("You must be 13 or older.");
-    return;
-  }
+  const email = signupEmail.value.trim();
+  const password = signupPassword.value.trim();
+  const username = signupUsername.value.trim().toLowerCase();
 
   if (!email || !password || !username) {
     alert("Fill in all fields.");
     return;
   }
 
-  // 1️⃣ Username uniqueness check (Firestore only)
+  if (signupAgeConfirm && !signupAgeConfirm.checked) {
+    alert("You must be 13 or older.");
+    return;
+  }
+
+  // Username uniqueness
   const q = query(collection(db, "users"), where("username", "==", username));
   const snap = await getDocs(q);
   if (!snap.empty) {
@@ -87,64 +85,50 @@ signupBtn?.addEventListener("click", async () => {
     return;
   }
 
-  // 2️⃣ AUTH (standalone)
-  let cred;
   try {
-    cred = await createUserWithEmailAndPassword(auth, email, password);
-  } catch (err) {
-    alert(err.message);
-    return;
-  }
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-  // 3️⃣ FIRESTORE (allowed to fail without breaking auth)
-  try {
     await setDoc(doc(db, "users", cred.user.uid), {
       email,
       username,
-      bio: "",
       createdAt: Date.now(),
       followers: [],
       following: [],
       posts: 0,
-      likes: 0,
-      saved: [],
-      history: [],
-      notifications: []
+      likes: 0
     });
-  } catch (err) {
-    console.warn("Firestore profile creation failed:", err);
-  }
 
-  // 4️⃣ Always close modal on auth success
-  authDialog?.close();
+    authDialog?.close();
+  } catch (err) {
+    alert(err.message);
+  }
 });
 
 /* ================= LOGIN ================= */
 loginBtn?.addEventListener("click", async () => {
-  const identifier = loginIdentifier?.value.trim();
-  const password = loginPassword?.value.trim();
+  if (!loginIdentifier || !loginPassword) return;
 
+  const identifier = loginIdentifier.value.trim();
+  const password = loginPassword.value.trim();
   if (!identifier || !password) {
-    alert("Enter email/username and password.");
+    alert("Enter credentials.");
     return;
   }
 
   try {
     let email = identifier;
 
-    // Username → Email lookup
+    // Username → email lookup
     if (!identifier.includes("@")) {
       const q = query(
         collection(db, "users"),
         where("username", "==", identifier.toLowerCase())
       );
       const snap = await getDocs(q);
-
       if (snap.empty) {
-        alert("No account found.");
+        alert("User not found.");
         return;
       }
-
       email = snap.docs[0].data().email;
     }
 
@@ -157,68 +141,30 @@ loginBtn?.addEventListener("click", async () => {
 
 /* ================= FORGOT PASSWORD ================= */
 forgotPasswordBtn?.addEventListener("click", async () => {
-  const email = loginIdentifier?.value.trim();
-  if (!email || !email.includes("@")) {
-    alert("Enter your email first.");
-    return;
-  }
-
-  try {
-    await sendPasswordResetEmail(auth, email);
-    alert("Password reset email sent.");
-  } catch (err) {
-    alert(err.message);
-  }
-});
-
-/* ================= FORGOT USERNAME ================= */
-forgotUsernameBtn?.addEventListener("click", async () => {
-  const email = loginIdentifier?.value.trim();
-  if (!email || !email.includes("@")) {
+  if (!loginIdentifier) return;
+  const email = loginIdentifier.value.trim();
+  if (!email.includes("@")) {
     alert("Enter your email.");
     return;
   }
-
-  const q = query(collection(db, "users"), where("email", "==", email));
-  const snap = await getDocs(q);
-
-  if (snap.empty) {
-    alert("No account found.");
-    return;
-  }
-
-  alert("Your username is @" + snap.docs[0].data().username);
-});
-
-/* ================= LOGOUT ================= */
-logoutBtn?.addEventListener("click", async () => {
-  await signOut(auth);
-  location.reload();
+  await sendPasswordResetEmail(auth, email);
+  alert("Password reset email sent.");
 });
 
 /* ================= AUTH STATE ================= */
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
-
     const snap = await getDoc(doc(db, "users", user.uid));
     currentUserData = snap.exists() ? snap.data() : null;
 
     openAuthBtn && (openAuthBtn.style.display = "none");
-
-    if (headerUsername && currentUserData) {
-      headerUsername.style.display = "inline";
-      headerUsername.textContent = "@" + currentUserData.username;
-    }
-
     document.body.classList.add("logged-in");
   } else {
     currentUser = null;
     currentUserData = null;
 
-    openAuthBtn && (openAuthBtn.style.display = "inline");
-    headerUsername && (headerUsername.style.display = "none");
-
+    openAuthBtn && (openAuthBtn.style.display = "inline-block");
     document.body.classList.remove("logged-in");
   }
 });
