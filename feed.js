@@ -1,11 +1,12 @@
 /* ==========================================
-   INTAKEE — HOME FEED (STEP 1: STATIC → DYNAMIC)
+   INTAKEE — HOME FEED (STEP 2: FILTERS WORK)
 ========================================== */
 
 /* DOM */
 const feedGrid = document.querySelector("#home .feed-grid");
+const filterButtons = document.querySelectorAll(".home-filters .filter-btn");
 
-/* FAKE POSTS (PLACEHOLDER DATA) */
+/* DEMO POSTS (PLACEHOLDER DATA) */
 const demoPosts = [
   {
     id: 1,
@@ -43,7 +44,7 @@ function createFeedCard(post) {
     </div>
   `;
 
-  // DO NOTHING ON CLICK (for now)
+  // Placeholder click (real viewer later)
   card.addEventListener("click", () => {
     console.log("Clicked post:", post.id);
   });
@@ -52,14 +53,41 @@ function createFeedCard(post) {
 }
 
 /* RENDER FEED */
-function renderHomeFeed() {
+function renderHomeFeed(filter = "all") {
   if (!feedGrid) return;
 
   feedGrid.innerHTML = "";
-  demoPosts.forEach(post => {
+
+  const filteredPosts =
+    filter === "all"
+      ? demoPosts
+      : demoPosts.filter(post => post.type === filter);
+
+  filteredPosts.forEach(post => {
     feedGrid.appendChild(createFeedCard(post));
   });
 }
 
+/* FILTER BUTTON HANDLERS */
+filterButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    // Active state
+    filterButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const label = btn.textContent.toLowerCase();
+
+    if (label === "all") renderHomeFeed("all");
+    if (label === "videos") renderHomeFeed("video");
+    if (label === "podcasts") renderHomeFeed("podcast");
+    if (label === "clips") renderHomeFeed("clip");
+    if (label === "following") renderHomeFeed("all"); // placeholder
+    if (label === "newest") renderHomeFeed("all"); // already newest
+  });
+});
+
 /* INIT */
-document.addEventListener("DOMContentLoaded", renderHomeFeed);
+document.addEventListener("DOMContentLoaded", () => {
+  renderHomeFeed("all");
+});
+
