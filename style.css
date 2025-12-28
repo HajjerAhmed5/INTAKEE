@@ -811,3 +811,28 @@ body[data-tab="settings"] .search-bar {
   gap: 24px;
   padding: 90px 40px 24px;
 }
+/* Hide search by default */
+.search-bar {
+  display: none !important;
+}
+body[data-tab="home"] .search-bar,
+body[data-tab="videos"] .search-bar,
+body[data-tab="podcasts"] .search-bar,
+body[data-tab="clips"] .search-bar {
+  display: flex !important;
+}
+/* ================= SETTINGS VISIBILITY FIX ================= */
+
+/* Ensure settings content is visible below header */
+body[data-tab="settings"] .tab-section {
+  padding-top: 40px;
+}
+
+/* Make sure settings page is not collapsed */
+body[data-tab="settings"] .settings-page {
+  display: block;
+  opacity: 1;
+}
+body[data-tab="settings"] #mainHeader {
+  border-bottom: 1px solid #222;
+}
