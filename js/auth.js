@@ -4,7 +4,7 @@ INTAKEE — AUTH SYSTEM (STABLE & SAFE)
 - No auto-open
 - Guards all DOM access
 - Email OR Username login
-- Works even if some elements are missing
+- Header username support
 =====================================
 */
 
@@ -49,6 +49,7 @@ const signupUsername = document.getElementById("signupUsername");
 const signupAgeConfirm = document.getElementById("signupAgeConfirm");
 
 const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+const headerUsername = document.getElementById("headerUsername");
 
 /* ================= MODAL ================= */
 openAuthBtn?.addEventListener("click", () => {
@@ -77,7 +78,6 @@ signupBtn?.addEventListener("click", async () => {
     return;
   }
 
-  // Username uniqueness
   const q = query(collection(db, "users"), where("username", "==", username));
   const snap = await getDocs(q);
   if (!snap.empty) {
@@ -110,6 +110,7 @@ loginBtn?.addEventListener("click", async () => {
 
   const identifier = loginIdentifier.value.trim();
   const password = loginPassword.value.trim();
+
   if (!identifier || !password) {
     alert("Enter credentials.");
     return;
@@ -118,7 +119,6 @@ loginBtn?.addEventListener("click", async () => {
   try {
     let email = identifier;
 
-    // Username → email lookup
     if (!identifier.includes("@")) {
       const q = query(
         collection(db, "users"),
@@ -142,11 +142,13 @@ loginBtn?.addEventListener("click", async () => {
 /* ================= FORGOT PASSWORD ================= */
 forgotPasswordBtn?.addEventListener("click", async () => {
   if (!loginIdentifier) return;
+
   const email = loginIdentifier.value.trim();
   if (!email.includes("@")) {
     alert("Enter your email.");
     return;
   }
+
   await sendPasswordResetEmail(auth, email);
   alert("Password reset email sent.");
 });
@@ -155,16 +157,29 @@ forgotPasswordBtn?.addEventListener("click", async () => {
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
+
     const snap = await getDoc(doc(db, "users", user.uid));
     currentUserData = snap.exists() ? snap.data() : null;
 
     openAuthBtn && (openAuthBtn.style.display = "none");
+
+    if (headerUsername && currentUserData?.username) {
+      headerUsername.textContent = "@" + currentUserData.username;
+      headerUsername.style.display = "inline-block";
+    }
+
     document.body.classList.add("logged-in");
   } else {
     currentUser = null;
     currentUserData = null;
 
     openAuthBtn && (openAuthBtn.style.display = "inline-block");
+
+    if (headerUsername) {
+      headerUsername.textContent = "";
+      headerUsername.style.display = "none";
+    }
+
     document.body.classList.remove("logged-in");
   }
 });
