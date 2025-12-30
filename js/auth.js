@@ -1,10 +1,9 @@
 /* 
 =====================================
-INTAKEE — AUTH SYSTEM (STABLE & SAFE)
-- No auto-open
-- Guards all DOM access
-- Email OR Username login
-- Header username support
+INTAKEE — AUTH SYSTEM (FIXED UX)
+- Instant login feedback
+- No delay confusion
+- Modal closes ONLY when auth confirmed
 =====================================
 */
 
@@ -29,10 +28,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ================= STATE ================= */
+let authReady = false;
 export let currentUser = null;
 export let currentUserData = null;
 
-/* ================= DOM (SAFE) ================= */
+/* ================= DOM ================= */
 const authDialog = document.getElementById("authDialog");
 const openAuthBtn = document.getElementById("openAuth");
 const closeAuthBtn = document.getElementById("closeAuthDialog");
@@ -52,38 +52,21 @@ const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
 const headerUsername = document.getElementById("headerUsername");
 
 /* ================= MODAL ================= */
-openAuthBtn?.addEventListener("click", () => {
-  authDialog?.showModal();
-});
-
-closeAuthBtn?.addEventListener("click", () => {
-  authDialog?.close();
-});
+openAuthBtn?.addEventListener("click", () => authDialog?.showModal());
+closeAuthBtn?.addEventListener("click", () => authDialog?.close());
 
 /* ================= SIGN UP ================= */
 signupBtn?.addEventListener("click", async () => {
-  if (!signupEmail || !signupPassword || !signupUsername) return;
+  const email = signupEmail?.value.trim();
+  const password = signupPassword?.value.trim();
+  const username = signupUsername?.value.trim().toLowerCase();
 
-  const email = signupEmail.value.trim();
-  const password = signupPassword.value.trim();
-  const username = signupUsername.value.trim().toLowerCase();
-
-  if (!email || !password || !username) {
-    alert("Fill in all fields.");
-    return;
-  }
-
-  if (signupAgeConfirm && !signupAgeConfirm.checked) {
-    alert("You must be 13 or older.");
-    return;
-  }
+  if (!email || !password || !username) return alert("Fill all fields.");
+  if (!signupAgeConfirm?.checked) return alert("You must be 13+.");
 
   const q = query(collection(db, "users"), where("username", "==", username));
   const snap = await getDocs(q);
-  if (!snap.empty) {
-    alert("Username already taken.");
-    return;
-  }
+  if (!snap.empty) return alert("Username taken.");
 
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -94,11 +77,8 @@ signupBtn?.addEventListener("click", async () => {
       createdAt: Date.now(),
       followers: [],
       following: [],
-      posts: 0,
-      likes: 0
+      likedPosts: []
     });
-
-    authDialog?.close();
   } catch (err) {
     alert(err.message);
   }
@@ -106,15 +86,10 @@ signupBtn?.addEventListener("click", async () => {
 
 /* ================= LOGIN ================= */
 loginBtn?.addEventListener("click", async () => {
-  if (!loginIdentifier || !loginPassword) return;
+  const identifier = loginIdentifier?.value.trim();
+  const password = loginPassword?.value.trim();
 
-  const identifier = loginIdentifier.value.trim();
-  const password = loginPassword.value.trim();
-
-  if (!identifier || !password) {
-    alert("Enter credentials.");
-    return;
-  }
+  if (!identifier || !password) return alert("Enter credentials.");
 
   try {
     let email = identifier;
@@ -125,15 +100,12 @@ loginBtn?.addEventListener("click", async () => {
         where("username", "==", identifier.toLowerCase())
       );
       const snap = await getDocs(q);
-      if (snap.empty) {
-        alert("User not found.");
-        return;
-      }
+      if (snap.empty) return alert("User not found.");
       email = snap.docs[0].data().email;
     }
 
     await signInWithEmailAndPassword(auth, email, password);
-    authDialog?.close();
+    // DO NOT close modal here — wait for auth state
   } catch (err) {
     alert(err.message);
   }
@@ -141,26 +113,23 @@ loginBtn?.addEventListener("click", async () => {
 
 /* ================= FORGOT PASSWORD ================= */
 forgotPasswordBtn?.addEventListener("click", async () => {
-  if (!loginIdentifier) return;
-
-  const email = loginIdentifier.value.trim();
-  if (!email.includes("@")) {
-    alert("Enter your email.");
-    return;
-  }
-
+  const email = loginIdentifier?.value.trim();
+  if (!email?.includes("@")) return alert("Enter email.");
   await sendPasswordResetEmail(auth, email);
-  alert("Password reset email sent.");
+  alert("Password reset sent.");
 });
 
-/* ================= AUTH STATE ================= */
+/* ================= AUTH STATE (THE FIX) ================= */
 onAuthStateChanged(auth, async (user) => {
+  authReady = true;
+
   if (user) {
     currentUser = user;
 
     const snap = await getDoc(doc(db, "users", user.uid));
     currentUserData = snap.exists() ? snap.data() : null;
 
+    // UI updates
     openAuthBtn && (openAuthBtn.style.display = "none");
 
     if (headerUsername && currentUserData?.username) {
@@ -169,6 +138,9 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     document.body.classList.add("logged-in");
+
+    // ✅ CLOSE MODAL ONLY NOW
+    authDialog?.close();
   } else {
     currentUser = null;
     currentUserData = null;
