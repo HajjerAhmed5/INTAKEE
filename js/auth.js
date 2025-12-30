@@ -1,11 +1,13 @@
-// Assume logged-out until proven otherwise
-document.body.classList.add("auth-checking");
+/* ===============================
+   INTAKEE — AUTH SYSTEM (FINAL)
+   Stable • Guarded • Instant UI
+================================ */
+
 import { auth, db } from "./firebase-init.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
-  signOut,
   onAuthStateChanged,
   setPersistence,
   browserLocalPersistence
@@ -40,14 +42,15 @@ const headerUsername = document.getElementById("headerUsername");
 const spinner = document.getElementById("authSpinner");
 const toast = document.getElementById("toast");
 
-/* ================= HELPERS ================= */
+/* ================= UI HELPERS ================= */
 const showSpinner = () => spinner?.classList.remove("hidden");
 const hideSpinner = () => spinner?.classList.add("hidden");
 
 const showToast = (msg) => {
+  if (!toast) return;
   toast.textContent = msg;
-  toast.classList.add("show");
   toast.classList.remove("hidden");
+  toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 2500);
 };
 
@@ -61,14 +64,15 @@ signupBtn?.addEventListener("click", async () => {
   const username = signupUsername.value.trim().toLowerCase();
 
   if (!email || !password || !username) return alert("Fill all fields.");
-  if (!signupAgeConfirm.checked) return alert("Must be 13+.");
+  if (!signupAgeConfirm?.checked) return alert("Must be 13+.");
 
   showSpinner();
 
   try {
+    // Check username availability
     const q = query(collection(db, "users"), where("username", "==", username));
     const snap = await getDocs(q);
-    if (!snap.empty) throw new Error("Username taken.");
+    if (!snap.empty) throw new Error("Username already taken.");
 
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -80,9 +84,11 @@ signupBtn?.addEventListener("click", async () => {
       following: [],
       likedPosts: []
     });
+
+    showToast("Account created 🎉");
   } catch (err) {
-    hideSpinner();
     alert(err.message);
+    hideSpinner();
   }
 });
 
@@ -90,6 +96,7 @@ signupBtn?.addEventListener("click", async () => {
 loginBtn?.addEventListener("click", async () => {
   const identifier = loginIdentifier.value.trim();
   const password = loginPassword.value.trim();
+
   if (!identifier || !password) return alert("Enter credentials.");
 
   showSpinner();
@@ -109,36 +116,39 @@ loginBtn?.addEventListener("click", async () => {
 
     await signInWithEmailAndPassword(auth, email, password);
   } catch (err) {
-    hideSpinner();
     alert(err.message);
+    hideSpinner();
   }
 });
 
 /* ================= FORGOT PASSWORD ================= */
 forgotPasswordBtn?.addEventListener("click", async () => {
   const email = loginIdentifier.value.trim();
-  if (!email.includes("@")) return alert("Enter email.");
+  if (!email.includes("@")) return alert("Enter your email.");
   await sendPasswordResetEmail(auth, email);
-  showToast("Password reset sent 📧");
+  showToast("Password reset email sent 📧");
 });
 
 /* ================= AUTH STATE ================= */
 onAuthStateChanged(auth, async (user) => {
-  document.body.classList.remove("auth-checking");
   hideSpinner();
 
-  if (user) {
-    const snap = await getDoc(doc(db, "users", user.uid));
-    const data = snap.data();
-
-    openAuthBtn.style.display = "none";
-    headerUsername.textContent = "@" + data.username;
-    headerUsername.style.display = "inline-block";
-
-    authDialog?.close();
-    showToast(`Logged in as @${data.username}`);
-  } else {
-    openAuthBtn.style.display = "inline-block";
-    headerUsername.style.display = "none";
+  if (!user) {
+    openAuthBtn && (openAuthBtn.style.display = "inline-block");
+    headerUsername && (headerUsername.style.display = "none");
+    return;
   }
+
+  // 🔒 Firestore ONLY after auth is confirmed
+  const snap = await getDoc(doc(db, "users", user.uid));
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+
+  openAuthBtn && (openAuthBtn.style.display = "none");
+  headerUsername.textContent = "@" + data.username;
+  headerUsername.style.display = "inline-block";
+
+  authDialog?.close();
+  showToast(`Logged in as @${data.username}`);
 });
