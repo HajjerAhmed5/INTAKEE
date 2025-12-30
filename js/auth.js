@@ -1,20 +1,12 @@
-/* 
-=====================================
-INTAKEE — AUTH SYSTEM (FIXED UX)
-- Instant login feedback
-- No delay confusion
-- Modal closes ONLY when auth confirmed
-=====================================
-*/
-
 import { auth, db } from "./firebase-init.js";
-
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 import {
@@ -27,18 +19,12 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-/* ================= STATE ================= */
-let authReady = false;
-export let currentUser = null;
-export let currentUserData = null;
-
 /* ================= DOM ================= */
 const authDialog = document.getElementById("authDialog");
 const openAuthBtn = document.getElementById("openAuth");
-const closeAuthBtn = document.getElementById("closeAuthDialog");
-
 const loginBtn = document.getElementById("loginBtn");
 const signupBtn = document.getElementById("signupBtn");
+const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
 
 const loginIdentifier = document.getElementById("loginIdentifier");
 const loginPassword = document.getElementById("loginPassword");
@@ -48,27 +34,40 @@ const signupPassword = document.getElementById("signupPassword");
 const signupUsername = document.getElementById("signupUsername");
 const signupAgeConfirm = document.getElementById("signupAgeConfirm");
 
-const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
 const headerUsername = document.getElementById("headerUsername");
+const spinner = document.getElementById("authSpinner");
+const toast = document.getElementById("toast");
 
-/* ================= MODAL ================= */
-openAuthBtn?.addEventListener("click", () => authDialog?.showModal());
-closeAuthBtn?.addEventListener("click", () => authDialog?.close());
+/* ================= HELPERS ================= */
+const showSpinner = () => spinner?.classList.remove("hidden");
+const hideSpinner = () => spinner?.classList.add("hidden");
+
+const showToast = (msg) => {
+  toast.textContent = msg;
+  toast.classList.add("show");
+  toast.classList.remove("hidden");
+  setTimeout(() => toast.classList.remove("show"), 2500);
+};
+
+/* ================= PERSISTENCE ================= */
+setPersistence(auth, browserLocalPersistence);
 
 /* ================= SIGN UP ================= */
 signupBtn?.addEventListener("click", async () => {
-  const email = signupEmail?.value.trim();
-  const password = signupPassword?.value.trim();
-  const username = signupUsername?.value.trim().toLowerCase();
+  const email = signupEmail.value.trim();
+  const password = signupPassword.value.trim();
+  const username = signupUsername.value.trim().toLowerCase();
 
   if (!email || !password || !username) return alert("Fill all fields.");
-  if (!signupAgeConfirm?.checked) return alert("You must be 13+.");
+  if (!signupAgeConfirm.checked) return alert("Must be 13+.");
 
-  const q = query(collection(db, "users"), where("username", "==", username));
-  const snap = await getDocs(q);
-  if (!snap.empty) return alert("Username taken.");
+  showSpinner();
 
   try {
+    const q = query(collection(db, "users"), where("username", "==", username));
+    const snap = await getDocs(q);
+    if (!snap.empty) throw new Error("Username taken.");
+
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
     await setDoc(doc(db, "users", cred.user.uid), {
@@ -80,16 +79,18 @@ signupBtn?.addEventListener("click", async () => {
       likedPosts: []
     });
   } catch (err) {
+    hideSpinner();
     alert(err.message);
   }
 });
 
 /* ================= LOGIN ================= */
 loginBtn?.addEventListener("click", async () => {
-  const identifier = loginIdentifier?.value.trim();
-  const password = loginPassword?.value.trim();
-
+  const identifier = loginIdentifier.value.trim();
+  const password = loginPassword.value.trim();
   if (!identifier || !password) return alert("Enter credentials.");
+
+  showSpinner();
 
   try {
     let email = identifier;
@@ -100,58 +101,41 @@ loginBtn?.addEventListener("click", async () => {
         where("username", "==", identifier.toLowerCase())
       );
       const snap = await getDocs(q);
-      if (snap.empty) return alert("User not found.");
+      if (snap.empty) throw new Error("User not found.");
       email = snap.docs[0].data().email;
     }
 
     await signInWithEmailAndPassword(auth, email, password);
-    // DO NOT close modal here — wait for auth state
   } catch (err) {
+    hideSpinner();
     alert(err.message);
   }
 });
 
 /* ================= FORGOT PASSWORD ================= */
 forgotPasswordBtn?.addEventListener("click", async () => {
-  const email = loginIdentifier?.value.trim();
-  if (!email?.includes("@")) return alert("Enter email.");
+  const email = loginIdentifier.value.trim();
+  if (!email.includes("@")) return alert("Enter email.");
   await sendPasswordResetEmail(auth, email);
-  alert("Password reset sent.");
+  showToast("Password reset sent 📧");
 });
 
-/* ================= AUTH STATE (THE FIX) ================= */
+/* ================= AUTH STATE ================= */
 onAuthStateChanged(auth, async (user) => {
-  authReady = true;
+  hideSpinner();
 
   if (user) {
-    currentUser = user;
-
     const snap = await getDoc(doc(db, "users", user.uid));
-    currentUserData = snap.exists() ? snap.data() : null;
+    const data = snap.data();
 
-    // UI updates
-    openAuthBtn && (openAuthBtn.style.display = "none");
+    openAuthBtn.style.display = "none";
+    headerUsername.textContent = "@" + data.username;
+    headerUsername.style.display = "inline-block";
 
-    if (headerUsername && currentUserData?.username) {
-      headerUsername.textContent = "@" + currentUserData.username;
-      headerUsername.style.display = "inline-block";
-    }
-
-    document.body.classList.add("logged-in");
-
-    // ✅ CLOSE MODAL ONLY NOW
     authDialog?.close();
+    showToast(`Logged in as @${data.username}`);
   } else {
-    currentUser = null;
-    currentUserData = null;
-
-    openAuthBtn && (openAuthBtn.style.display = "inline-block");
-
-    if (headerUsername) {
-      headerUsername.textContent = "";
-      headerUsername.style.display = "none";
-    }
-
-    document.body.classList.remove("logged-in");
+    openAuthBtn.style.display = "inline-block";
+    headerUsername.style.display = "none";
   }
 });
