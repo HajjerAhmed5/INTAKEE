@@ -1,3 +1,5 @@
+// Assume logged-out until proven otherwise
+document.body.classList.add("auth-checking");
 import { auth, db } from "./firebase-init.js";
 import {
   createUserWithEmailAndPassword,
@@ -122,6 +124,7 @@ forgotPasswordBtn?.addEventListener("click", async () => {
 
 /* ================= AUTH STATE ================= */
 onAuthStateChanged(auth, async (user) => {
+  document.body.classList.remove("auth-checking");
   hideSpinner();
 
   if (user) {
