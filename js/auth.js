@@ -131,24 +131,26 @@ forgotPasswordBtn?.addEventListener("click", async () => {
 
 /* ================= AUTH STATE ================= */
 onAuthStateChanged(auth, async (user) => {
+  authReady = true;
+  document.body.classList.remove("auth-checking");
   hideSpinner();
 
-  if (!user) {
-    openAuthBtn && (openAuthBtn.style.display = "inline-block");
-    headerUsername && (headerUsername.style.display = "none");
-    return;
+  if (user) {
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+
+    headerUsername.textContent = "@" + data.username;
+    headerUsername.style.display = "inline-block";
+
+    const openAuthBtn = document.getElementById("openAuth");
+    if (openAuthBtn) openAuthBtn.style.display = "none";
+
+    authDialog?.close();
+  } else {
+    headerUsername.style.display = "none";
+    const openAuthBtn = document.getElementById("openAuth");
+    if (openAuthBtn) openAuthBtn.style.display = "inline-block";
   }
-
-  // 🔒 Firestore ONLY after auth is confirmed
-  const snap = await getDoc(doc(db, "users", user.uid));
-  if (!snap.exists()) return;
-
-  const data = snap.data();
-
-  openAuthBtn && (openAuthBtn.style.display = "none");
-  headerUsername.textContent = "@" + data.username;
-  headerUsername.style.display = "inline-block";
-
-  authDialog?.close();
-  showToast(`Logged in as @${data.username}`);
 });
