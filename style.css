@@ -906,3 +906,7 @@ body[data-tab="settings"] #mainHeader {
 .toast.show {
   opacity: 1;
 }
+body.auth-checking {
+  pointer-events: none;
+  opacity: 0.98;
+}
