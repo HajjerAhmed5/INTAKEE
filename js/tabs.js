@@ -1,7 +1,9 @@
 /* ===============================
    INTAKEE — TAB SYSTEM (FINAL)
 ================================ */
-
+function isLoggedIn() {
+  return document.getElementById("headerUsername")?.textContent?.length > 0;
+}
 const tabs = document.querySelectorAll(".bottom-nav a");
 const sections = document.querySelectorAll(".tab-section");
 
