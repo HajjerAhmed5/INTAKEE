@@ -2,7 +2,7 @@
    INTAKEE — AUTH SYSTEM (FINAL)
    Stable • Guarded • Instant UI
 ================================ */
-
+let authReady = false;
 import { auth, db } from "./firebase-init.js";
 import {
   createUserWithEmailAndPassword,
