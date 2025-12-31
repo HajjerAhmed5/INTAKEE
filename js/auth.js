@@ -138,6 +138,7 @@ forgotPasswordBtn?.addEventListener("click", async () => {
 
 /* ================= AUTH STATE ================= */
 onAuthStateChanged(auth, async (user) => {
+   window.__AUTH_READY__ = true;
   hideSpinner();
 
   if (user) {
