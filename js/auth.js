@@ -155,5 +155,6 @@ onAuthStateChanged(auth, async (user) => {
   } else {
     headerUsername.style.display = "none";
     openAuthBtn && (openAuthBtn.style.display = "inline-block");
+    if (user && !auth.currentUser) return; 
   }
 });
