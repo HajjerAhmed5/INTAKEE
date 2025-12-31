@@ -1,5 +1,5 @@
 /* ===============================
-   INTAKEE — PROFILE SYSTEM (CLEAN)
+   INTAKEE — PROFILE SYSTEM (CLEAN + SAFE)
 ================================ */
 import { auth, db } from "./firebase-init.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
@@ -22,39 +22,44 @@ const statFollowers = document.querySelector(".profile-stats div:nth-child(2) st
 const statFollowing = document.querySelector(".profile-stats div:nth-child(3) strong");
 const statLikes = document.querySelector(".profile-stats div:nth-child(4) strong");
 
-/* ================= AUTH ================= */
-onAuthStateChanged(auth, async (user) => {
-  if (!profileName || !profileHandle || !profileBio) return;
+/* ================= WAIT FOR AUTH ================= */
+const waitForAuth = setInterval(() => {
+  if (!window.__AUTH_READY__) return;
+  clearInterval(waitForAuth);
 
-  // LOGGED OUT
-  if (!user) {
-    profileName.textContent = "Guest";
-    profileHandle.textContent = "@guest";
-    profileBio.textContent = "Sign in to personalize your profile.";
+  onAuthStateChanged(auth, async (user) => {
+    if (!profileName || !profileHandle || !profileBio) return;
 
-    if (statPosts) statPosts.textContent = "0";
-    if (statFollowers) statFollowers.textContent = "0";
-    if (statFollowing) statFollowing.textContent = "0";
-    if (statLikes) statLikes.textContent = "0";
-    return;
-  }
+    // LOGGED OUT
+    if (!user) {
+      profileName.textContent = "Guest";
+      profileHandle.textContent = "@guest";
+      profileBio.textContent = "Sign in to personalize your profile.";
 
-  // LOGGED IN
-  const snap = await getDoc(doc(db, "users", user.uid));
-  if (!snap.exists()) return;
+      if (statPosts) statPosts.textContent = "0";
+      if (statFollowers) statFollowers.textContent = "0";
+      if (statFollowing) statFollowing.textContent = "0";
+      if (statLikes) statLikes.textContent = "0";
+      return;
+    }
 
-  const data = snap.data();
+    // LOGGED IN
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (!snap.exists()) return;
 
-  profileName.textContent = data.username || "User";
-  profileHandle.textContent = "@" + (data.username || "user");
-  profileBio.textContent = data.bio || "No bio yet.";
+    const data = snap.data();
 
-  if (statFollowers) statFollowers.textContent = data.followers?.length || 0;
-  if (statFollowing) statFollowing.textContent = data.following?.length || 0;
-  if (statLikes) statLikes.textContent = data.likes || 0;
+    profileName.textContent = data.username || "User";
+    profileHandle.textContent = "@" + (data.username || "user");
+    profileBio.textContent = data.bio || "No bio yet.";
 
-  loadUserUploads(user.uid);
-});
+    if (statFollowers) statFollowers.textContent = data.followers?.length || 0;
+    if (statFollowing) statFollowing.textContent = data.following?.length || 0;
+    if (statLikes) statLikes.textContent = data.likes || 0;
+
+    loadUserUploads(user.uid);
+  });
+}, 50);
 
 /* ================= POSTS ================= */
 async function loadUserUploads(uid) {
