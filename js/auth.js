@@ -1,8 +1,8 @@
 /* ===============================
-   INTAKEE — AUTH SYSTEM (FINAL)
-   Stable • Guarded • Instant UI
+   INTAKEE — AUTH SYSTEM (FINAL FIXED)
+   Simple • Instant UI • Stable
 ================================ */
-let authReady = false;
+
 import { auth, db } from "./firebase-init.js";
 import {
   createUserWithEmailAndPassword,
@@ -26,6 +26,8 @@ import {
 /* ================= DOM ================= */
 const authDialog = document.getElementById("authDialog");
 const openAuthBtn = document.getElementById("openAuth");
+const closeAuthBtn = document.getElementById("closeAuthDialog");
+
 const loginBtn = document.getElementById("loginBtn");
 const signupBtn = document.getElementById("signupBtn");
 const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
@@ -54,6 +56,10 @@ const showToast = (msg) => {
   setTimeout(() => toast.classList.remove("show"), 2500);
 };
 
+/* ================= MODAL ================= */
+openAuthBtn?.addEventListener("click", () => authDialog?.showModal());
+closeAuthBtn?.addEventListener("click", () => authDialog?.close());
+
 /* ================= PERSISTENCE ================= */
 setPersistence(auth, browserLocalPersistence);
 
@@ -64,12 +70,11 @@ signupBtn?.addEventListener("click", async () => {
   const username = signupUsername.value.trim().toLowerCase();
 
   if (!email || !password || !username) return alert("Fill all fields.");
-  if (!signupAgeConfirm?.checked) return alert("Must be 13+.");
+  if (!signupAgeConfirm?.checked) return alert("You must be 13+.");
 
   showSpinner();
 
   try {
-    // Check username availability
     const q = query(collection(db, "users"), where("username", "==", username));
     const snap = await getDocs(q);
     if (!snap.empty) throw new Error("Username already taken.");
@@ -85,10 +90,12 @@ signupBtn?.addEventListener("click", async () => {
       likedPosts: []
     });
 
+    hideSpinner();
+    authDialog?.close();
     showToast("Account created 🎉");
   } catch (err) {
-    alert(err.message);
     hideSpinner();
+    alert(err.message);
   }
 });
 
@@ -96,7 +103,6 @@ signupBtn?.addEventListener("click", async () => {
 loginBtn?.addEventListener("click", async () => {
   const identifier = loginIdentifier.value.trim();
   const password = loginPassword.value.trim();
-
   if (!identifier || !password) return alert("Enter credentials.");
 
   showSpinner();
@@ -115,9 +121,10 @@ loginBtn?.addEventListener("click", async () => {
     }
 
     await signInWithEmailAndPassword(auth, email, password);
-  } catch (err) {
-    alert(err.message);
     hideSpinner();
+  } catch (err) {
+    hideSpinner();
+    alert(err.message);
   }
 });
 
@@ -131,8 +138,6 @@ forgotPasswordBtn?.addEventListener("click", async () => {
 
 /* ================= AUTH STATE ================= */
 onAuthStateChanged(auth, async (user) => {
-  authReady = true;
-  document.body.classList.remove("auth-checking");
   hideSpinner();
 
   if (user) {
@@ -144,13 +149,10 @@ onAuthStateChanged(auth, async (user) => {
     headerUsername.textContent = "@" + data.username;
     headerUsername.style.display = "inline-block";
 
-    const openAuthBtn = document.getElementById("openAuth");
-    if (openAuthBtn) openAuthBtn.style.display = "none";
-
+    openAuthBtn && (openAuthBtn.style.display = "none");
     authDialog?.close();
   } else {
     headerUsername.style.display = "none";
-    const openAuthBtn = document.getElementById("openAuth");
-    if (openAuthBtn) openAuthBtn.style.display = "inline-block";
+    openAuthBtn && (openAuthBtn.style.display = "inline-block");
   }
 });
