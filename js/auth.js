@@ -2,6 +2,7 @@
    INTAKEE — AUTH SYSTEM (FINAL FIXED)
    Simple • Instant UI • Stable
 ================================ */
+window.__AUTH_READY__ = true;
 
 import { auth, db } from "./firebase-init.js";
 import {
