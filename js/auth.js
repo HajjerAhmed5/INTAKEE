@@ -1,5 +1,6 @@
 /* ===============================
-   INTAKEE — AUTH SYSTEM (STABLE)
+   INTAKEE — AUTH SYSTEM (FINAL • STABLE)
+   Fixes race conditions & delays
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -21,6 +22,10 @@ import {
   where,
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+/* ================= STATE ================= */
+let isSigningUp = false;
+window.__AUTH_READY__ = false;
 
 /* ================= DOM ================= */
 const authDialog = document.getElementById("authDialog");
@@ -72,8 +77,10 @@ signupBtn?.addEventListener("click", async () => {
   if (!signupAgeConfirm?.checked) return alert("You must be 13+.");
 
   showSpinner();
+  isSigningUp = true;
 
   try {
+    // check username
     const q = query(collection(db, "users"), where("username", "==", username));
     const snap = await getDocs(q);
     if (!snap.empty) throw new Error("Username already taken.");
@@ -89,12 +96,13 @@ signupBtn?.addEventListener("click", async () => {
       likedPosts: []
     });
 
-    hideSpinner();
     authDialog?.close();
     showToast("Account created 🎉");
   } catch (err) {
-    hideSpinner();
     alert(err.message);
+  } finally {
+    isSigningUp = false;
+    hideSpinner();
   }
 });
 
@@ -135,9 +143,13 @@ forgotPasswordBtn?.addEventListener("click", async () => {
   showToast("Password reset email sent 📧");
 });
 
-/* ================= AUTH STATE (SINGLE SOURCE OF TRUTH) ================= */
+/* ================= AUTH STATE (SINGLE SOURCE) ================= */
 onAuthStateChanged(auth, async (user) => {
   window.__AUTH_READY__ = true;
+
+  // 🔑 prevents signup race condition
+  if (isSigningUp) return;
+
   hideSpinner();
 
   if (user) {
