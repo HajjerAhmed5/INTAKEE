@@ -1,8 +1,6 @@
 /* ===============================
-   INTAKEE — AUTH SYSTEM (FINAL FIXED)
-   Simple • Instant UI • Stable
+   INTAKEE — AUTH SYSTEM (STABLE)
 ================================ */
-window.__AUTH_READY__ = true;
 
 import { auth, db } from "./firebase-init.js";
 import {
@@ -45,7 +43,7 @@ const headerUsername = document.getElementById("headerUsername");
 const spinner = document.getElementById("authSpinner");
 const toast = document.getElementById("toast");
 
-/* ================= UI HELPERS ================= */
+/* ================= UI ================= */
 const showSpinner = () => spinner?.classList.remove("hidden");
 const hideSpinner = () => spinner?.classList.add("hidden");
 
@@ -122,14 +120,14 @@ loginBtn?.addEventListener("click", async () => {
     }
 
     await signInWithEmailAndPassword(auth, email, password);
-    hideSpinner();
   } catch (err) {
-    hideSpinner();
     alert(err.message);
+  } finally {
+    hideSpinner();
   }
 });
 
-/* ================= FORGOT PASSWORD ================= */
+/* ================= PASSWORD RESET ================= */
 forgotPasswordBtn?.addEventListener("click", async () => {
   const email = loginIdentifier.value.trim();
   if (!email.includes("@")) return alert("Enter your email.");
@@ -137,9 +135,9 @@ forgotPasswordBtn?.addEventListener("click", async () => {
   showToast("Password reset email sent 📧");
 });
 
-/* ================= AUTH STATE ================= */
+/* ================= AUTH STATE (SINGLE SOURCE OF TRUTH) ================= */
 onAuthStateChanged(auth, async (user) => {
-   window.__AUTH_READY__ = true;
+  window.__AUTH_READY__ = true;
   hideSpinner();
 
   if (user) {
@@ -147,15 +145,12 @@ onAuthStateChanged(auth, async (user) => {
     if (!snap.exists()) return;
 
     const data = snap.data();
-
     headerUsername.textContent = "@" + data.username;
     headerUsername.style.display = "inline-block";
-
     openAuthBtn && (openAuthBtn.style.display = "none");
     authDialog?.close();
   } else {
     headerUsername.style.display = "none";
     openAuthBtn && (openAuthBtn.style.display = "inline-block");
-    if (user && !auth.currentUser) return; 
   }
 });
