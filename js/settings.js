@@ -1,21 +1,10 @@
 /* ===============================
-   INTAKEE — SETTINGS SYSTEM (STABLE)
+   INTAKEE — SETTINGS SYSTEM (CLEAN)
 ================================ */
-import { auth } from "./firebase-init.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-
-let authReady = false;
-let currentUser = null;
-
-onAuthStateChanged(auth, (user) => {
-  authReady = true;
-  currentUser = user;
-});
-
 import { auth, db } from "./firebase-init.js";
 import {
-  signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
   doc,
@@ -24,9 +13,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ===============================
-   HELPER: MAP SETTINGS BY LABEL
+   HELPER: FIND TOGGLE BY LABEL
 ================================ */
-
 function getToggle(labelText) {
   const items = document.querySelectorAll("#settings .settings-item.toggle");
   for (const item of items) {
@@ -38,32 +26,21 @@ function getToggle(labelText) {
 }
 
 /* ===============================
-   TOGGLES (MATCH CURRENT HTML)
+   TOGGLES (MATCH HTML)
 ================================ */
-
 const toggles = {
   privateAccount: getToggle("Private Account"),
-  uploadsPrivate: getToggle("Uploads Privacy"),
-  savedPrivate: getToggle("Saved Content"),
-  engagementNotifications: getToggle("Engagement"),
-  newFollowers: getToggle("New Followers"),
-  creatorUploads: getToggle("Creator Uploads"),
-  systemUpdates: getToggle("System"),
-  autoplay: getToggle("Auto-play"),
-  loopClips: getToggle("Auto-loop"),
-  pip: getToggle("Picture-in-Picture"),
-  backgroundPlay: getToggle("Background Play")
+  engagementNotifications: getToggle("Likes"),
+  newUploads: getToggle("New Uploads")
 };
 
 /* ===============================
-   LOAD USER SETTINGS
+   LOAD SETTINGS AFTER AUTH
 ================================ */
-
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;
 
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
+  const snap = await getDoc(doc(db, "users", user.uid));
   if (!snap.exists()) return;
 
   const data = snap.data();
@@ -78,7 +55,6 @@ onAuthStateChanged(auth, async (user) => {
 /* ===============================
    SAVE ON CHANGE
 ================================ */
-
 Object.entries(toggles).forEach(([key, toggle]) => {
   if (!toggle) return;
 
@@ -95,7 +71,6 @@ Object.entries(toggles).forEach(([key, toggle]) => {
 /* ===============================
    LOG OUT
 ================================ */
-
 document.addEventListener("click", async (e) => {
   const btn = e.target.closest(".settings-item");
   if (!btn) return;
