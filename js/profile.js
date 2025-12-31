@@ -1,8 +1,9 @@
 /* ===============================
-   INTAKEE — PROFILE SYSTEM (CLEAN + SAFE)
+   INTAKEE — PROFILE SYSTEM (FINAL • STABLE)
+   No auth listeners • No race conditions
 ================================ */
+
 import { auth, db } from "./firebase-init.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
   doc,
   getDoc,
@@ -23,27 +24,29 @@ const statFollowing = document.querySelector(".profile-stats div:nth-child(3) st
 const statLikes = document.querySelector(".profile-stats div:nth-child(4) strong");
 
 /* ================= WAIT FOR AUTH ================= */
-const waitForAuth = setInterval(() => {
+const waitForAuth = setInterval(async () => {
   if (!window.__AUTH_READY__) return;
   clearInterval(waitForAuth);
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!profileName || !profileHandle || !profileBio) return;
+  if (!profileName || !profileHandle || !profileBio) return;
 
-    // LOGGED OUT
-    if (!user) {
-      profileName.textContent = "Guest";
-      profileHandle.textContent = "@guest";
-      profileBio.textContent = "Sign in to personalize your profile.";
+  const user = auth.currentUser;
 
-      if (statPosts) statPosts.textContent = "0";
-      if (statFollowers) statFollowers.textContent = "0";
-      if (statFollowing) statFollowing.textContent = "0";
-      if (statLikes) statLikes.textContent = "0";
-      return;
-    }
+  /* ===== LOGGED OUT ===== */
+  if (!user) {
+    profileName.textContent = "Guest";
+    profileHandle.textContent = "@guest";
+    profileBio.textContent = "Sign in to personalize your profile.";
 
-    // LOGGED IN
+    statPosts && (statPosts.textContent = "0");
+    statFollowers && (statFollowers.textContent = "0");
+    statFollowing && (statFollowing.textContent = "0");
+    statLikes && (statLikes.textContent = "0");
+    return;
+  }
+
+  /* ===== LOGGED IN ===== */
+  try {
     const snap = await getDoc(doc(db, "users", user.uid));
     if (!snap.exists()) return;
 
@@ -53,18 +56,25 @@ const waitForAuth = setInterval(() => {
     profileHandle.textContent = "@" + (data.username || "user");
     profileBio.textContent = data.bio || "No bio yet.";
 
-    if (statFollowers) statFollowers.textContent = data.followers?.length || 0;
-    if (statFollowing) statFollowing.textContent = data.following?.length || 0;
-    if (statLikes) statLikes.textContent = data.likes || 0;
+    statFollowers && (statFollowers.textContent = data.followers?.length || 0);
+    statFollowing && (statFollowing.textContent = data.following?.length || 0);
+    statLikes && (statLikes.textContent = data.likes || 0);
 
     loadUserUploads(user.uid);
-  });
+  } catch (err) {
+    console.warn("Profile load skipped:", err.message);
+  }
 }, 50);
 
 /* ================= POSTS ================= */
 async function loadUserUploads(uid) {
   if (!statPosts) return;
-  const q = query(collection(db, "posts"), where("uid", "==", uid));
-  const snap = await getDocs(q);
-  statPosts.textContent = snap.size;
+
+  try {
+    const q = query(collection(db, "posts"), where("uid", "==", uid));
+    const snap = await getDocs(q);
+    statPosts.textContent = snap.size;
+  } catch (err) {
+    console.warn("Upload count skipped:", err.message);
+  }
 }
