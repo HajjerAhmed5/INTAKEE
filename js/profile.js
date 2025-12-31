@@ -1,17 +1,6 @@
 /* ===============================
-   INTAKEE — PROFILE SYSTEM (FIXED & SAFE)
+   INTAKEE — PROFILE SYSTEM (CLEAN)
 ================================ */
-import { auth } from "./firebase-init.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-
-let authReady = false;
-let currentUser = null;
-
-onAuthStateChanged(auth, (user) => {
-  authReady = true;
-  currentUser = user;
-});
-
 import { auth, db } from "./firebase-init.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
@@ -23,25 +12,21 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-/* ===============================
-   DOM ELEMENTS (SAFE)
-================================ */
+/* ================= DOM ================= */
 const profileName = document.querySelector(".profile-name");
 const profileHandle = document.querySelector(".profile-handle");
 const profileBio = document.querySelector(".profile-bio");
-const profilePhoto = document.querySelector(".profile-avatar");
 
 const statPosts = document.querySelector(".profile-stats div:nth-child(1) strong");
 const statFollowers = document.querySelector(".profile-stats div:nth-child(2) strong");
 const statFollowing = document.querySelector(".profile-stats div:nth-child(3) strong");
 const statLikes = document.querySelector(".profile-stats div:nth-child(4) strong");
 
-/* ===============================
-   AUTH → LOAD PROFILE
-================================ */
+/* ================= AUTH ================= */
 onAuthStateChanged(auth, async (user) => {
   if (!profileName || !profileHandle || !profileBio) return;
 
+  // LOGGED OUT
   if (!user) {
     profileName.textContent = "Guest";
     profileHandle.textContent = "@guest";
@@ -51,13 +36,14 @@ onAuthStateChanged(auth, async (user) => {
     if (statFollowers) statFollowers.textContent = "0";
     if (statFollowing) statFollowing.textContent = "0";
     if (statLikes) statLikes.textContent = "0";
-
     return;
   }
 
-  const userRef = doc(db, "users", user.uid);
-  const snap = await getDoc(userRef);
-  const data = snap.exists() ? snap.data() : {};
+  // LOGGED IN
+  const snap = await getDoc(doc(db, "users", user.uid));
+  if (!snap.exists()) return;
+
+  const data = snap.data();
 
   profileName.textContent = data.username || "User";
   profileHandle.textContent = "@" + (data.username || "user");
@@ -67,15 +53,12 @@ onAuthStateChanged(auth, async (user) => {
   if (statFollowing) statFollowing.textContent = data.following?.length || 0;
   if (statLikes) statLikes.textContent = data.likes || 0;
 
-  await loadUserUploads(user.uid);
+  loadUserUploads(user.uid);
 });
 
-/* ===============================
-   LOAD USER UPLOADS (SAFE)
-================================ */
+/* ================= POSTS ================= */
 async function loadUserUploads(uid) {
   if (!statPosts) return;
-
   const q = query(collection(db, "posts"), where("uid", "==", uid));
   const snap = await getDocs(q);
   statPosts.textContent = snap.size;
