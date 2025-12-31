@@ -1,6 +1,16 @@
 /* ===============================
    INTAKEE — SETTINGS SYSTEM (STABLE)
 ================================ */
+import { auth } from "./firebase-init.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+let authReady = false;
+let currentUser = null;
+
+onAuthStateChanged(auth, (user) => {
+  authReady = true;
+  currentUser = user;
+});
 
 import { auth, db } from "./firebase-init.js";
 import {
