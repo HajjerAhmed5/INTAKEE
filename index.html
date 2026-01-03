@@ -314,13 +314,16 @@
   <button id="closeAuthDialog" class="ghost">Close</button>
 </dialog>
 <!-- ================= SCRIPTS ================= -->
+<!-- Firebase + Auth MUST load first -->
+<script type="module" src="/js/firebase-init.js"></script>
 <script type="module" src="/js/auth.js"></script>
-<script type="module" src="/js/feed.js"></script>
-<script type="module" src="/js/upload.js"></script>
+
+<!-- Everything else AFTER auth -->
 <script type="module" src="/js/profile.js"></script>
 <script type="module" src="/js/settings.js"></script>
+<script type="module" src="/js/feed.js"></script>
 <script type="module" src="/js/tabs.js"></script>
-
+<script type="module" src="/js/upload.js"></script>
 <!-- AUTH LOADING SPINNER -->
 <div id="authSpinner" class="auth-spinner hidden">
   <div class="spinner"></div>
