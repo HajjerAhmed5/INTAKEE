@@ -1,3 +1,12 @@
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 onAuthStateChanged(auth, async (user) => {
   window.__AUTH_READY__ = true;
   hideSpinner();
