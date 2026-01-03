@@ -1,46 +1,60 @@
 /* ===============================
-   INTAKEE — SETTINGS (AUTH SAFE)
+   INTAKEE — SETTINGS (FINAL STABLE)
+   - Auth-gated
+   - Firestore-safe
+   - DOM-safe
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
 import {
   doc,
   getDoc
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
-import {
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 /* ================= DOM ================= */
-const logoutBtn = document.querySelector(".settings-item.danger:last-child");
+const settingsUsername = document.querySelector(".settings-username");
+const settingsEmail = document.querySelector(".settings-email");
 
 /* ================= LOAD SETTINGS ================= */
 async function loadSettings(user) {
+  if (!user || !user.uid) {
+    console.warn("⚠️ loadSettings called without user");
+    return;
+  }
+
   try {
     const ref = doc(db, "users", user.uid);
     const snap = await getDoc(ref);
 
     if (!snap.exists()) {
-      console.warn("No settings document found");
+      console.warn("⚠️ Settings document missing");
       return;
     }
 
-    // Settings data available if you want it later
-    // const data = snap.data();
+    const data = snap.data();
+
+    if (settingsUsername) {
+      settingsUsername.textContent = "@" + (data.username || "user");
+    }
+
+    if (settingsEmail) {
+      settingsEmail.textContent = data.email || user.email;
+    }
+
+    console.log("✅ Settings loaded");
+
   } catch (err) {
-    console.error("Settings load failed:", err);
+    console.error("❌ Settings load failed:", err);
   }
 }
 
-/* ================= LOG OUT ================= */
-logoutBtn?.addEventListener("click", async () => {
-  await signOut(auth);
-  location.reload();
-});
-
 /* ================= AUTH GATE ================= */
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, (user) => {
   if (!user) {
     console.warn("⏳ Settings skipped — no user");
     return;
