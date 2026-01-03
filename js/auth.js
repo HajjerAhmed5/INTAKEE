@@ -1,5 +1,5 @@
 /* ===============================
-   INTAKEE — AUTH (FINAL STABLE)
+   INTAKEE — AUTH (FINAL FIX)
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -43,15 +43,6 @@ const loginPassword = document.getElementById("loginPassword");
 
 const headerUsername = document.getElementById("headerUsername");
 
-/* ================= DEBUG ================= */
-console.log("AUTH.JS LOADED");
-console.log("HEADER USERNAME ELEMENT:", headerUsername);
-
-/* ================= UI ================= */
-const hideSpinner = () => {
-  document.getElementById("authSpinner")?.classList.add("hidden");
-};
-
 /* ================= PERSISTENCE ================= */
 setPersistence(auth, browserLocalPersistence);
 
@@ -76,22 +67,20 @@ signupBtn?.addEventListener("click", async () => {
   }
 
   try {
-    // Check username uniqueness
+    // Ensure username is unique
     const q = query(collection(db, "users"), where("username", "==", username));
     const snap = await getDocs(q);
     if (!snap.empty) throw new Error("Username already taken");
 
-    // Create auth account
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-    // Create Firestore user doc
     await setDoc(doc(db, "users", cred.user.uid), {
       email,
       username,
       createdAt: Date.now()
     });
 
-    console.log("USER CREATED:", cred.user.uid);
+    authDialog?.close();
   } catch (err) {
     alert(err.message);
   }
@@ -99,7 +88,7 @@ signupBtn?.addEventListener("click", async () => {
 
 /* ================= LOGIN ================= */
 loginBtn?.addEventListener("click", async () => {
-  const identifier = loginIdentifier.value.trim();
+  const identifier = loginIdentifier.value.trim().toLowerCase();
   const password = loginPassword.value.trim();
 
   if (!identifier || !password) {
@@ -110,20 +99,16 @@ loginBtn?.addEventListener("click", async () => {
   try {
     let email = identifier;
 
-    // Username login
+    // Login via username
     if (!identifier.includes("@")) {
-      const q = query(
-        collection(db, "users"),
-        where("username", "==", identifier.toLowerCase())
-      );
-
+      const q = query(collection(db, "users"), where("username", "==", identifier));
       const snap = await getDocs(q);
       if (snap.empty) throw new Error("User not found");
-
       email = snap.docs[0].data().email;
     }
 
     await signInWithEmailAndPassword(auth, email, password);
+    authDialog?.close();
   } catch (err) {
     alert(err.message);
   }
@@ -138,39 +123,36 @@ forgotPasswordBtn?.addEventListener("click", async () => {
   }
 
   await sendPasswordResetEmail(auth, email);
-  alert("Password reset sent");
+  alert("Password reset email sent");
 });
 
-/* ================= AUTH STATE ================= */
+/* ================= AUTH STATE (FIXED) ================= */
 onAuthStateChanged(auth, async (user) => {
-  console.log("AUTH STATE CHANGED:", user);
-  hideSpinner();
+  if (!headerUsername) return;
 
   if (!user) {
-    headerUsername?.style && (headerUsername.style.display = "none");
-    openAuthBtn?.style && (openAuthBtn.style.display = "inline-block");
+    headerUsername.style.display = "none";
+    openAuthBtn && (openAuthBtn.style.display = "inline-block");
     return;
   }
 
-  // Logged in UI
-  headerUsername.textContent = "@loading";
+  // Show placeholder immediately (prevents @error)
+  headerUsername.textContent = "@user";
   headerUsername.style.display = "inline-block";
-  openAuthBtn.style.display = "none";
-  authDialog?.close();
+  openAuthBtn && (openAuthBtn.style.display = "none");
 
   try {
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-
-    console.log("USER DOC:", snap.exists(), snap.data());
+    const userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
 
     if (snap.exists()) {
-      headerUsername.textContent = "@" + snap.data().username;
-    } else {
-      headerUsername.textContent = "@nouserdoc";
+      const data = snap.data();
+      if (data.username) {
+        headerUsername.textContent = "@" + data.username;
+      }
     }
   } catch (err) {
-    console.error("USERNAME LOAD FAILED:", err);
-    headerUsername.textContent = "@error";
+    console.warn("Username load failed:", err);
+    headerUsername.textContent = "@user";
   }
 });
