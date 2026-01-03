@@ -1,50 +1,51 @@
 /* ===============================
-   INTAKEE — TAB SYSTEM (FINAL)
+   INTAKEE — TAB SYSTEM (AUTH-AWARE)
 ================================ */
-function isLoggedIn() {
-  return document.getElementById("headerUsername")?.textContent?.length > 0;
-}
+
 const tabs = document.querySelectorAll(".bottom-nav a");
 const sections = document.querySelectorAll(".tab-section");
+const authDialog = document.getElementById("authDialog");
 
+/* ================= AUTH CHECK ================= */
+function isLoggedIn() {
+  return window.__AUTH_READY__ && document.getElementById("headerUsername")?.textContent?.length > 0;
+}
+
+const PROTECTED_TABS = ["upload", "profile", "settings"];
+
+/* ================= SHOW TAB ================= */
 function showTab(tabId) {
-  // Hide ALL sections (hard reset)
+  // 🔐 block protected tabs
+  if (PROTECTED_TABS.includes(tabId) && !isLoggedIn()) {
+    authDialog?.showModal();
+    return;
+  }
+
+  // Hide all
   sections.forEach(section => {
     section.style.display = "none";
     section.classList.remove("active");
   });
 
-  // Deactivate all nav tabs
+  // Deactivate nav
   tabs.forEach(tab => tab.classList.remove("active"));
 
-  // Find section + nav
+  // Activate section
   const activeSection = document.getElementById(tabId);
-  const activeTab = document.querySelector(
-    `.bottom-nav a[data-tab="${tabId}"]`
-  );
+  const activeTab = document.querySelector(`.bottom-nav a[data-tab="${tabId}"]`);
 
-  // Show section (THIS FIXES SETTINGS)
   if (activeSection) {
     activeSection.style.display = "block";
     activeSection.classList.add("active");
   }
 
-  // Highlight nav
-  if (activeTab) {
-    activeTab.classList.add("active");
-  }
+  if (activeTab) activeTab.classList.add("active");
 
-  // Set body state (search bar logic depends on this)
   document.body.setAttribute("data-tab", tabId);
-
-  // Update URL hash safely
   history.replaceState(null, "", `#${tabId}`);
 }
 
-/* ===============================
-   CLICK HANDLERS
-================================ */
-
+/* ================= CLICK HANDLERS ================= */
 tabs.forEach(tab => {
   tab.addEventListener("click", e => {
     e.preventDefault();
@@ -52,10 +53,7 @@ tabs.forEach(tab => {
   });
 });
 
-/* ===============================
-   INITIAL LOAD
-================================ */
-
+/* ================= INITIAL LOAD ================= */
 window.addEventListener("DOMContentLoaded", () => {
   const hash = window.location.hash.replace("#", "");
   const initialTab = document.getElementById(hash) ? hash : "home";
