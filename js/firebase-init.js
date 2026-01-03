@@ -2,7 +2,11 @@ console.log("🔥 FIREBASE INIT LOADED — STABLE");
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import {
+  getFirestore,
+  enableIndexedDbPersistence,
+  enableNetwork
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
 /* ================= FIREBASE CONFIG ================= */
@@ -20,3 +24,13 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+/* ================= FIRESTORE SAFETY ================= */
+enableIndexedDbPersistence(db).catch(err => {
+  console.warn("⚠️ Persistence disabled:", err.code);
+});
+
+enableNetwork(db).catch(() => {
+  console.warn("⚠️ Firestore already online");
+});
+
