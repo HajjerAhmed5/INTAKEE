@@ -1,6 +1,5 @@
 /* ===============================
-   INTAKEE — AUTH SYSTEM (FINAL • STABLE)
-   Fixes race conditions & delays
+   INTAKEE — AUTH SYSTEM (FINAL • FIXED)
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -10,7 +9,8 @@ import {
   sendPasswordResetEmail,
   onAuthStateChanged,
   setPersistence,
-  browserLocalPersistence
+  browserLocalPersistence,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 import {
@@ -35,6 +35,7 @@ const closeAuthBtn = document.getElementById("closeAuthDialog");
 const loginBtn = document.getElementById("loginBtn");
 const signupBtn = document.getElementById("signupBtn");
 const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+const forgotUsernameBtn = document.getElementById("forgotUsernameBtn");
 
 const loginIdentifier = document.getElementById("loginIdentifier");
 const loginPassword = document.getElementById("loginPassword");
@@ -60,12 +61,14 @@ const showToast = (msg) => {
   setTimeout(() => toast.classList.remove("show"), 2500);
 };
 
+/* ================= INIT ================= */
+(async () => {
+  await setPersistence(auth, browserLocalPersistence);
+})();
+
 /* ================= MODAL ================= */
 openAuthBtn?.addEventListener("click", () => authDialog?.showModal());
 closeAuthBtn?.addEventListener("click", () => authDialog?.close());
-
-/* ================= PERSISTENCE ================= */
-setPersistence(auth, browserLocalPersistence);
 
 /* ================= SIGN UP ================= */
 signupBtn?.addEventListener("click", async () => {
@@ -80,7 +83,6 @@ signupBtn?.addEventListener("click", async () => {
   isSigningUp = true;
 
   try {
-    // check username
     const q = query(collection(db, "users"), where("username", "==", username));
     const snap = await getDocs(q);
     if (!snap.empty) throw new Error("Username already taken.");
@@ -96,8 +98,8 @@ signupBtn?.addEventListener("click", async () => {
       likedPosts: []
     });
 
-    authDialog?.close();
     showToast("Account created 🎉");
+    authDialog?.close();
   } catch (err) {
     alert(err.message);
   } finally {
@@ -118,10 +120,7 @@ loginBtn?.addEventListener("click", async () => {
     let email = identifier;
 
     if (!identifier.includes("@")) {
-      const q = query(
-        collection(db, "users"),
-        where("username", "==", identifier.toLowerCase())
-      );
+      const q = query(collection(db, "users"), where("username", "==", identifier.toLowerCase()));
       const snap = await getDocs(q);
       if (snap.empty) throw new Error("User not found.");
       email = snap.docs[0].data().email;
@@ -143,11 +142,14 @@ forgotPasswordBtn?.addEventListener("click", async () => {
   showToast("Password reset email sent 📧");
 });
 
-/* ================= AUTH STATE (SINGLE SOURCE) ================= */
+/* ================= USERNAME REMINDER ================= */
+forgotUsernameBtn?.addEventListener("click", () => {
+  alert("Enter your email to recover your username (feature coming next).");
+});
+
+/* ================= AUTH STATE ================= */
 onAuthStateChanged(auth, async (user) => {
   window.__AUTH_READY__ = true;
-
-  // 🔑 prevents signup race condition
   if (isSigningUp) return;
 
   hideSpinner();
