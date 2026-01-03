@@ -1,5 +1,5 @@
 /* ===============================
-   INTAKEE — AUTH (FINAL FIX)
+   INTAKEE — AUTH (FINAL STABLE)
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -10,8 +10,7 @@ import {
   sendPasswordResetEmail,
   onAuthStateChanged,
   setPersistence,
-  browserLocalPersistence,
-  signOut
+  browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 import {
@@ -23,6 +22,9 @@ import {
   where,
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+/* ================= GLOBAL STATE ================= */
+window.__AUTH_READY__ = false;
 
 /* ================= DOM ================= */
 const authDialog = document.getElementById("authDialog");
@@ -67,7 +69,7 @@ signupBtn?.addEventListener("click", async () => {
   }
 
   try {
-    // Ensure username is unique
+    // Check username uniqueness
     const q = query(collection(db, "users"), where("username", "==", username));
     const snap = await getDocs(q);
     if (!snap.empty) throw new Error("Username already taken");
@@ -99,9 +101,11 @@ loginBtn?.addEventListener("click", async () => {
   try {
     let email = identifier;
 
-    // Login via username
     if (!identifier.includes("@")) {
-      const q = query(collection(db, "users"), where("username", "==", identifier));
+      const q = query(
+        collection(db, "users"),
+        where("username", "==", identifier)
+      );
       const snap = await getDocs(q);
       if (snap.empty) throw new Error("User not found");
       email = snap.docs[0].data().email;
@@ -126,8 +130,10 @@ forgotPasswordBtn?.addEventListener("click", async () => {
   alert("Password reset email sent");
 });
 
-/* ================= AUTH STATE (FIXED) ================= */
+/* ================= AUTH STATE ================= */
 onAuthStateChanged(auth, async (user) => {
+  window.__AUTH_READY__ = true;
+
   if (!headerUsername) return;
 
   if (!user) {
@@ -136,23 +142,19 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // Show placeholder immediately (prevents @error)
+  // Logged-in UI
   headerUsername.textContent = "@user";
   headerUsername.style.display = "inline-block";
   openAuthBtn && (openAuthBtn.style.display = "none");
+  authDialog?.close();
 
+  // Load username from Firestore
   try {
-    const userRef = doc(db, "users", user.uid);
-    const snap = await getDoc(userRef);
-
-    if (snap.exists()) {
-      const data = snap.data();
-      if (data.username) {
-        headerUsername.textContent = "@" + data.username;
-      }
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (snap.exists() && snap.data().username) {
+      headerUsername.textContent = "@" + snap.data().username;
     }
-  } catch (err) {
-    console.warn("Username load failed:", err);
+  } catch {
     headerUsername.textContent = "@user";
   }
 });
