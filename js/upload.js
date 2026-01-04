@@ -1,51 +1,68 @@
- /* =====================================
-   INTAKEE — REAL UPLOAD SYSTEM (FINAL)
+/* =====================================
+   INTAKEE — UPLOAD SYSTEM (SAFE + STABLE)
+   - Matches current HTML
    - Auth protected
-   - Firebase Storage upload
-   - Firestore post creation
+   - No null crashes
 ===================================== */
 
 import { auth, db, storage } from "./firebase-init.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
   collection,
   addDoc,
-  serverTimestamp,
-  doc,
-  updateDoc,
-  increment
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import {
   ref,
   uploadBytes,
   getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-storage.js";
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
+
+/* ================= SAFE DOM GUARD ================= */
+const uploadSection = document.getElementById("upload");
+if (!uploadSection) {
+  console.log("upload.js: upload section not found — halted safely");
+  return;
+}
 
 /* ================= DOM ================= */
-const uploadBtn = document.getElementById("btnUpload");
-const uploadType = document.getElementById("uploadTypeSelect");
-const uploadTitle = document.getElementById("uploadTitleInput");
-const uploadDesc = document.getElementById("uploadDescInput");
-const uploadFile = document.getElementById("uploadFileInput");
-const uploadThumb = document.getElementById("uploadThumbInput");
-const ageToggle = document.getElementById("ageRestrictionToggle");
+const uploadBtn = uploadSection.querySelector(".upload-btn");
+const uploadType = uploadSection.querySelector("select");
+const uploadTitle = uploadSection.querySelector("input[placeholder='Add a title']");
+const uploadDesc = uploadSection.querySelector("textarea");
+const uploadFiles = uploadSection.querySelectorAll("input[type='file']");
 
-let currentUser = null;
+if (!uploadBtn) {
+  console.log("upload.js: upload button not found — halted safely");
+  return;
+}
+
+/* First file input = thumbnail (optional)
+   Second file input = media file (required) */
+const uploadThumb = uploadFiles[0] || null;
+const uploadFile = uploadFiles[1] || null;
 
 /* ================= AUTH ================= */
+let currentUser = null;
+
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
 });
 
-/* ================= UPLOAD ================= */
+/* ================= UPLOAD HANDLER ================= */
 uploadBtn.addEventListener("click", async () => {
   if (!currentUser) {
     alert("You must be logged in to upload.");
     return;
   }
 
-  if (!uploadTitle.value || !uploadFile.files.length) {
-    alert("Title and main file are required.");
+  if (!uploadTitle.value.trim()) {
+    alert("Title is required.");
+    return;
+  }
+
+  if (!uploadFile || !uploadFile.files.length) {
+    alert("Media file is required.");
     return;
   }
 
@@ -53,7 +70,7 @@ uploadBtn.addEventListener("click", async () => {
   uploadBtn.textContent = "Uploading...";
 
   try {
-    /* ---------- FILE UPLOAD ---------- */
+    /* ---------- MEDIA UPLOAD ---------- */
     const file = uploadFile.files[0];
     const fileRef = ref(
       storage,
@@ -63,10 +80,10 @@ uploadBtn.addEventListener("click", async () => {
     await uploadBytes(fileRef, file);
     const fileURL = await getDownloadURL(fileRef);
 
-    /* ---------- THUMBNAIL UPLOAD (OPTIONAL) ---------- */
+    /* ---------- THUMBNAIL (OPTIONAL) ---------- */
     let thumbnailURL = null;
 
-    if (uploadThumb.files.length) {
+    if (uploadThumb && uploadThumb.files.length) {
       const thumb = uploadThumb.files[0];
       const thumbRef = ref(
         storage,
@@ -78,43 +95,31 @@ uploadBtn.addEventListener("click", async () => {
     }
 
     /* ---------- SAVE POST ---------- */
-    const post = {
+    await addDoc(collection(db, "posts"), {
       uid: currentUser.uid,
-      username: currentUser.displayName || "user",
       type: uploadType.value,
       title: uploadTitle.value.trim(),
       description: uploadDesc.value.trim(),
       fileURL,
       thumbnail: thumbnailURL,
-      ageRestricted: ageToggle.checked,
       createdAt: serverTimestamp(),
       likes: 0,
-      likedBy: [],
-      savedBy: [],
       comments: 0
-    };
-
-    await addDoc(collection(db, "posts"), post);
-
-    await updateDoc(doc(db, "users", currentUser.uid), {
-      posts: increment(1)
     });
 
     alert("Upload successful!");
 
-    /* ---------- RESET FORM ---------- */
+    /* ---------- RESET ---------- */
     uploadTitle.value = "";
     uploadDesc.value = "";
     uploadFile.value = "";
-    uploadThumb.value = "";
-    ageToggle.checked = false;
+    if (uploadThumb) uploadThumb.value = "";
 
   } catch (err) {
-    console.error(err);
+    console.error("Upload error:", err);
     alert("Upload failed. Try again.");
   }
 
   uploadBtn.disabled = false;
   uploadBtn.textContent = "Upload";
 });
-if (window.refreshFeed) window.refreshFeed();
