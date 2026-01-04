@@ -905,10 +905,11 @@ body.auth-checking {
   pointer-events: none;
   opacity: 0.98;
 }
-/* ================= TAB VISIBILITY HARD FIX ================= */
+/* ================= FINAL TAB VISIBILITY FIX ================= */
 .tab-section.active {
   display: block !important;
-  visibility: visible !important;
-  height: auto !important;
-  min-height: calc(100vh - 160px);
+  min-height: calc(100vh - 200px);
+  padding-bottom: 120px;
+  visibility: visible;
+  opacity: 1;
 }
