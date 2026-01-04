@@ -1,8 +1,9 @@
 /* ===============================
-   INTAKEE — TAB SYSTEM (FINAL FIXED)
+   INTAKEE — TAB SYSTEM (AUTH SAFE)
 ================================ */
 
 import { auth } from "./firebase-init.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 const tabs = document.querySelectorAll(".bottom-nav a");
 const sections = document.querySelectorAll(".tab-section");
@@ -10,23 +11,30 @@ const authDialog = document.getElementById("authDialog");
 
 const PROTECTED_TABS = ["upload", "profile", "settings"];
 
-/* ================= AUTH CHECK ================= */
-function isLoggedIn() {
-  return !!auth.currentUser;
-}
+let AUTH_READY = false;
+let USER_LOGGED_IN = false;
+
+/* ================= AUTH READY ================= */
+onAuthStateChanged(auth, user => {
+  AUTH_READY = true;
+  USER_LOGGED_IN = !!user;
+});
 
 /* ================= SHOW TAB ================= */
 function showTab(tabId) {
+  // ⛔ Do nothing until Firebase finishes loading
+  if (!AUTH_READY) return;
+
   // 🔐 Block protected tabs ONLY if logged out
-  if (PROTECTED_TABS.includes(tabId) && !isLoggedIn()) {
+  if (PROTECTED_TABS.includes(tabId) && !USER_LOGGED_IN) {
     authDialog?.showModal();
     return;
   }
 
   // Hide all sections
   sections.forEach(section => {
-    section.classList.remove("active");
     section.style.display = "none";
+    section.classList.remove("active");
   });
 
   // Deactivate nav
@@ -61,5 +69,12 @@ tabs.forEach(tab => {
 window.addEventListener("DOMContentLoaded", () => {
   const hash = window.location.hash.replace("#", "");
   const initialTab = document.getElementById(hash) ? hash : "home";
-  showTab(initialTab);
+
+  // wait until auth is ready
+  const waitForAuth = setInterval(() => {
+    if (AUTH_READY) {
+      clearInterval(waitForAuth);
+      showTab(initialTab);
+    }
+  }, 50);
 });
