@@ -1,5 +1,5 @@
 /* ===============================
-   INTAKEE — AUTH (FINAL STABLE)
+   INTAKEE — AUTH (FINAL FIXED)
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -23,8 +23,9 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-/* ================= GLOBAL STATE ================= */
+/* ================= GLOBAL AUTH STATE ================= */
 window.__AUTH_READY__ = false;
+window.__AUTH_IN__ = false;
 
 /* ================= DOM ================= */
 const authDialog = document.getElementById("authDialog");
@@ -69,7 +70,6 @@ signupBtn?.addEventListener("click", async () => {
   }
 
   try {
-    // Check username uniqueness
     const q = query(collection(db, "users"), where("username", "==", username));
     const snap = await getDocs(q);
     if (!snap.empty) throw new Error("Username already taken");
@@ -130,9 +130,10 @@ forgotPasswordBtn?.addEventListener("click", async () => {
   alert("Password reset email sent");
 });
 
-/* ================= AUTH STATE ================= */
+/* ================= AUTH STATE (SOURCE OF TRUTH) ================= */
 onAuthStateChanged(auth, async (user) => {
   window.__AUTH_READY__ = true;
+  window.__AUTH_IN__ = !!user;
 
   if (!headerUsername) return;
 
@@ -142,7 +143,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // Logged-in UI
+  // Logged-in UI immediately
   headerUsername.textContent = "@user";
   headerUsername.style.display = "inline-block";
   openAuthBtn && (openAuthBtn.style.display = "none");
