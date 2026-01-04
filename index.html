@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INTAKEE — Videos, Podcasts & Clips</title>
-
-  <link rel="stylesheet" href="style.css"/>
+  <meta name="description" content="INTAKEE — freedom to create, simple to share." />
+  <link rel="stylesheet" href="style.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
 </head>
 
@@ -13,12 +13,11 @@
 
 <!-- ================= HEADER ================= -->
 <header id="mainHeader">
-  <div class="header-left">
-    <img src="logo.png" class="app-logo" />
-    <div class="search-bar">
-      <i class="fa fa-search"></i>
-      <input placeholder="Search for content or creators..." />
-    </div>
+  <img src="logo.png" class="app-logo" alt="INTAKEE Logo" />
+
+  <div class="search-bar">
+    <i class="fa fa-search"></i>
+    <input placeholder="Search for content or creators..." />
   </div>
 
   <button id="openAuth" class="header-login-btn">Login / Sign Up</button>
@@ -28,164 +27,164 @@
 <!-- ================= MAIN ================= -->
 <main>
 
-<!-- HOME -->
+<!-- ===== HOME ===== -->
 <section id="home" class="tab-section active">
-  <h2 class="page-title">Trending</h2>
+  <h2>Trending</h2>
 
   <div class="home-filters">
-    <button class="pill active">All</button>
-    <button class="pill">Videos</button>
-    <button class="pill">Podcasts</button>
-    <button class="pill">Clips</button>
-    <button class="pill">Following</button>
-    <button class="pill">Newest</button>
+    <button class="filter-btn active">All</button>
+    <button class="filter-btn">Videos</button>
+    <button class="filter-btn">Podcasts</button>
+    <button class="filter-btn">Clips</button>
+    <button class="filter-btn">Following</button>
+    <button class="filter-btn">Newest</button>
   </div>
 
   <div class="feed-grid"></div>
 </section>
 
-<!-- VIDEOS -->
+<!-- ===== VIDEOS ===== -->
 <section id="videos" class="tab-section">
-  <h2 class="page-title">Videos</h2>
+  <h2>Videos</h2>
   <div class="feed-grid"></div>
 </section>
 
-<!-- PODCASTS -->
+<!-- ===== PODCASTS ===== -->
 <section id="podcasts" class="tab-section">
-  <h2 class="page-title">Podcasts</h2>
+  <h2>Podcasts</h2>
   <div class="feed-grid"></div>
 </section>
 
-<!-- CLIPS -->
+<!-- ===== CLIPS ===== -->
 <section id="clips" class="tab-section">
-  <h2 class="page-title">Clips</h2>
+  <h2>Clips</h2>
   <div class="feed-grid"></div>
 </section>
 
-<!-- UPLOAD -->
+<!-- ===== UPLOAD ===== -->
 <section id="upload" class="tab-section">
-  <h2 class="page-title">Upload</h2>
+  <div class="tab-inner">
+    <h2>Upload</h2>
 
-  <div class="upload-card">
-    <label>Type</label>
-    <select>
-      <option>Video</option>
-      <option>Podcast</option>
-      <option>Clip</option>
-    </select>
+    <div class="upload-card">
+      <label>Type</label>
+      <select>
+        <option>Video</option>
+        <option>Podcast</option>
+        <option>Clip</option>
+      </select>
 
-    <label>Title</label>
-    <input placeholder="Add a title"/>
+      <label>Title</label>
+      <input placeholder="Add a title" />
 
-    <label>Description</label>
-    <textarea placeholder="Write a description"></textarea>
+      <label>Description</label>
+      <textarea placeholder="Write a description"></textarea>
 
-    <label>Thumbnail</label>
-    <input type="file"/>
+      <label>Thumbnail</label>
+      <input type="file" />
 
-    <label>Media File</label>
-    <input type="file"/>
+      <label>Media File</label>
+      <input type="file" />
 
-    <div class="upload-actions">
-      <button class="primary">Upload</button>
-      <button class="ghost">Go Live</button>
-
-      <div class="age-toggle">
-        <span>18+</span>
-        <input type="checkbox"/>
+      <div class="upload-bottom-bar">
+        <button class="upload-btn">Upload</button>
+        <button class="live-btn">Go Live</button>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PROFILE -->
+<!-- ===== PROFILE ===== -->
 <section id="profile" class="tab-section">
-  <div class="profile-header">
-    <div class="avatar"></div>
-    <div>
-      <h2 class="profile-name">Guest</h2>
-      <p class="profile-handle">@guest</p>
-      <p class="profile-bio">Sign in to personalize your profile.</p>
+  <div class="profile-page">
+
+    <div class="profile-banner">
+      <div class="profile-avatar"></div>
     </div>
 
-    <button class="edit-profile-btn">Edit Profile</button>
-  </div>
+    <div class="profile-header">
+      <div class="profile-meta">
+        <div class="profile-name">Guest</div>
+        <div class="profile-handle">@guest</div>
+        <div class="profile-bio">Sign in to personalize your profile.</div>
 
-  <div class="profile-stats">
-    <div><strong>0</strong><span>Posts</span></div>
-    <div><strong>0</strong><span>Followers</span></div>
-    <div><strong>0</strong><span>Following</span></div>
-    <div><strong>0</strong><span>Likes</span></div>
-  </div>
+        <div class="profile-stats">
+          <div><strong>0</strong>Posts</div>
+          <div><strong>0</strong>Followers</div>
+          <div><strong>0</strong>Following</div>
+          <div><strong>0</strong>Likes</div>
+        </div>
+      </div>
 
-  <div class="profile-tabs">
-    <button class="pill active">Uploads</button>
-    <button class="pill">Saved</button>
-    <button class="pill">Likes</button>
-    <button class="pill">Playlists</button>
-    <button class="pill">History</button>
-    <button class="pill">Notifications</button>
+      <button class="edit-profile-btn">Edit Profile</button>
+    </div>
+
+    <div class="profile-tabs">
+      <button class="active">Uploads</button>
+      <button>Saved</button>
+      <button>Likes</button>
+      <button>Playlists</button>
+      <button>History</button>
+      <button>Notifications</button>
+    </div>
+
   </div>
 </section>
 
-<!-- SETTINGS -->
+<!-- ===== SETTINGS ===== -->
 <section id="settings" class="tab-section">
-  <h2 class="page-title">Settings</h2>
+  <div class="settings-page">
 
-  <div class="settings-card">
-    <h4>Account</h4>
-    <div class="row">Change Email</div>
-    <div class="row">Change Password</div>
-    <div class="row danger">Delete Account</div>
-    <div class="row">Log Out</div>
-  </div>
+    <h2>Settings</h2>
 
-  <div class="settings-card">
-    <h4>Privacy</h4>
-    <div class="row toggle">Private Account</div>
-    <div class="row">Blocked Users</div>
-    <div class="row">Who Can See Followers</div>
-    <div class="row">Comment Controls</div>
-  </div>
+    <div class="settings-group">
+      <div class="settings-group-title">ACCOUNT</div>
+      <div class="settings-item">Change Email</div>
+      <div class="settings-item">Change Password</div>
+      <div class="settings-item">Log Out</div>
+    </div>
 
-  <div class="settings-card">
-    <h4>Notifications</h4>
-    <div class="row toggle">Likes & Dislikes</div>
-    <div class="row toggle">New Uploads</div>
-  </div>
+    <div class="settings-group">
+      <div class="settings-group-title">PRIVACY</div>
+      <div class="settings-item">
+        Private Account
+        <label class="switch">
+          <input type="checkbox" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="settings-item">Blocked Users</div>
+      <div class="settings-item">Comment Controls</div>
+    </div>
 
-  <div class="settings-card">
-    <h4>Appearance</h4>
-    <div class="row">Dark / Light Mode</div>
-    <div class="row">System Default</div>
-  </div>
+    <div class="settings-group">
+      <div class="settings-group-title">LEGAL & POLICIES</div>
+      <div class="settings-item">Terms of Service</div>
+      <div class="settings-item">Privacy Policy</div>
+      <div class="settings-item">Community Guidelines</div>
+      <div class="settings-item">Copyright & DMCA</div>
+    </div>
 
-  <div class="settings-card">
-    <h4>Safety & Moderation</h4>
-    <div class="row">Report Content</div>
-    <div class="row">Comment Filters</div>
-    <div class="row">Blocked Users</div>
-  </div>
+    <div class="settings-group">
+      <div class="settings-group-title">SUPPORT</div>
+      <div class="settings-item">
+        Contact Support
+        <span>intakee2025@gmail.com</span>
+      </div>
+    </div>
 
-  <div class="settings-card">
-    <h4>Legal & Policies</h4>
-    <div class="row">Terms of Service</div>
-    <div class="row">Privacy Policy</div>
-    <div class="row">Community Guidelines</div>
-    <div class="row">Copyright & DMCA</div>
-  </div>
+    <div class="settings-group danger">
+      <div class="settings-item">Delete Account</div>
+    </div>
 
-  <div class="settings-card">
-    <h4>Support</h4>
-    <div class="row">Contact Support — intakee2025@gmail.com</div>
   </div>
 </section>
 
 </main>
 
-<!-- ================= NAV ================= -->
+<!-- ================= BOTTOM NAV ================= -->
 <nav class="bottom-nav">
-  <a data-tab="home"><i class="fa fa-home"></i></a>
+  <a data-tab="home" class="active"><i class="fa fa-home"></i></a>
   <a data-tab="videos"><i class="fa fa-video"></i></a>
   <a data-tab="podcasts"><i class="fa fa-podcast"></i></a>
   <a data-tab="upload"><i class="fa fa-plus-circle"></i></a>
@@ -193,6 +192,30 @@
   <a data-tab="profile"><i class="fa fa-user"></i></a>
   <a data-tab="settings"><i class="fa fa-gear"></i></a>
 </nav>
+
+<!-- ================= AUTH MODAL ================= -->
+<dialog id="authDialog" class="auth-dialog">
+  <h2>Welcome to INTAKEE</h2>
+
+  <h3>Create Account</h3>
+  <input placeholder="Email" />
+  <input placeholder="Username" />
+  <input type="password" placeholder="Password" />
+  <div class="age-check">
+    <input type="checkbox" /> I am 13 or older
+  </div>
+  <button>Sign Up</button>
+
+  <hr />
+
+  <h3>Log In</h3>
+  <input placeholder="Email or Username" />
+  <input type="password" placeholder="Password" />
+  <button>Log In</button>
+  <button class="ghost">Forgot Password</button>
+  <button class="ghost">Forgot Username</button>
+  <button class="ghost" onclick="document.getElementById('authDialog').close()">Close</button>
+</dialog>
 
 <!-- ================= SCRIPTS ================= -->
 <script type="module" src="/js/firebase-init.js"></script>
