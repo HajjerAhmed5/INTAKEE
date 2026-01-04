@@ -1,21 +1,18 @@
 /* ===============================
-   INTAKEE — TAB SYSTEM (FINAL)
+   INTAKEE — TAB SYSTEM (FINAL FIXED)
 ================================ */
+
+import { auth } from "./firebase-init.js";
 
 const tabs = document.querySelectorAll(".bottom-nav a");
 const sections = document.querySelectorAll(".tab-section");
 const authDialog = document.getElementById("authDialog");
-const headerUsername = document.getElementById("headerUsername");
 
 const PROTECTED_TABS = ["upload", "profile", "settings"];
 
 /* ================= AUTH CHECK ================= */
 function isLoggedIn() {
-  return (
-    headerUsername &&
-    headerUsername.textContent &&
-    headerUsername.textContent.startsWith("@")
-  );
+  return !!auth.currentUser;
 }
 
 /* ================= SHOW TAB ================= */
@@ -63,7 +60,6 @@ tabs.forEach(tab => {
 /* ================= INITIAL LOAD ================= */
 window.addEventListener("DOMContentLoaded", () => {
   const hash = window.location.hash.replace("#", "");
-  const initialTab =
-    document.getElementById(hash) ? hash : "home";
+  const initialTab = document.getElementById(hash) ? hash : "home";
   showTab(initialTab);
 });
