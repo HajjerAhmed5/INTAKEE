@@ -11,6 +11,7 @@
 
 <body data-tab="home">
 
+<!-- ================= HEADER ================= -->
 <header id="mainHeader">
   <img src="logo.png" class="app-logo" alt="INTAKEE Logo" />
 
@@ -24,12 +25,11 @@
 
 <main>
 
+<!-- ================= HOME ================= -->
 <section id="home" class="tab-section active">
   <div class="home-header-row">
     <h2>Trending</h2>
-    <div class="home-auth-row">
-      <button id="openAuth" class="header-login-btn">Login / Sign Up</button>
-    </div>
+    <button id="openAuth" class="header-login-btn">Login / Sign Up</button>
   </div>
 
   <div class="home-filters">
@@ -44,13 +44,26 @@
   <div class="feed-grid"></div>
 </section>
 
-<section id="videos" class="tab-section"><div class="feed-grid"></div></section>
-<section id="podcasts" class="tab-section"><div class="feed-grid"></div></section>
-<section id="clips" class="tab-section"><div class="feed-grid"></div></section>
+<!-- ================= VIDEOS ================= -->
+<section id="videos" class="tab-section">
+  <div class="feed-grid"></div>
+</section>
 
+<!-- ================= PODCASTS ================= -->
+<section id="podcasts" class="tab-section">
+  <div class="feed-grid"></div>
+</section>
+
+<!-- ================= CLIPS ================= -->
+<section id="clips" class="tab-section">
+  <div class="feed-grid"></div>
+</section>
+
+<!-- ================= UPLOAD ================= -->
 <section id="upload" class="tab-section">
   <div class="tab-inner">
     <h2 class="upload-title">Upload</h2>
+
     <div class="upload-card">
       <input id="uploadTitleInput" placeholder="Add a title" />
       <textarea id="uploadDescInput" placeholder="Write a description"></textarea>
@@ -61,18 +74,59 @@
   </div>
 </section>
 
+<!-- ================= PROFILE ================= -->
 <section id="profile" class="tab-section">
-  <h2 class="profile-name">Your Name</h2>
-  <p class="profile-handle">@username</p>
-  <p class="profile-bio">This is your bio. (0/200)</p>
+  <div class="profile-page">
+
+    <div class="profile-banner">
+      <div class="profile-avatar"></div>
+    </div>
+
+    <div class="profile-header">
+      <div class="profile-meta">
+        <h2 class="profile-name">Your Name</h2>
+        <p class="profile-handle">@username</p>
+        <p class="profile-bio">This is your bio. (0/200)</p>
+      </div>
+
+      <button class="edit-profile-btn">Edit Profile</button>
+    </div>
+
+  </div>
 </section>
 
+<!-- ================= SETTINGS ================= -->
 <section id="settings" class="tab-section">
-  <h2 class="settings-title">Settings</h2>
-  <p class="settings-username"></p>
-  <p class="settings-email"></p>
+  <div class="settings-page">
+
+    <h2 class="settings-title">Settings</h2>
+
+    <div class="settings-group">
+      <div class="settings-group-title">ACCOUNT</div>
+
+      <div class="settings-item">
+        <span>Username</span>
+        <span class="settings-username"></span>
+      </div>
+
+      <div class="settings-item">
+        <span>Email</span>
+        <span class="settings-email"></span>
+      </div>
+    </div>
+
+    <div class="settings-group danger">
+      <div class="settings-group-title">DANGER ZONE</div>
+      <div class="settings-item">Log Out</div>
+      <div class="settings-item">Delete Account</div>
+    </div>
+
+  </div>
 </section>
 
+</main>
+
+<!-- ================= BOTTOM NAV ================= -->
 <nav class="bottom-nav">
   <a data-tab="home" class="active"><i class="fa fa-home"></i></a>
   <a data-tab="videos"><i class="fa fa-video"></i></a>
@@ -83,6 +137,7 @@
   <a data-tab="settings"><i class="fa fa-gear"></i></a>
 </nav>
 
+<!-- ================= AUTH MODAL ================= -->
 <dialog id="authDialog" class="auth-dialog">
   <h2>Welcome to INTAKEE</h2>
 
@@ -90,7 +145,10 @@
   <input id="signupUsername" type="text" placeholder="Username" />
   <input id="signupPassword" type="password" placeholder="Password" />
 
-  <label><input id="signupAgeConfirm" type="checkbox" /> I am 13+</label>
+  <label class="age-check">
+    <input id="signupAgeConfirm" type="checkbox" /> I am 13+
+  </label>
+
   <button id="signupBtn">Sign Up</button>
 
   <hr />
@@ -103,7 +161,7 @@
   <button id="closeAuthDialog" class="ghost">Close</button>
 </dialog>
 
-<!-- 🔥 SCRIPT ORDER (CRITICAL) -->
+<!-- ================= SCRIPTS ================= -->
 <script type="module" src="/js/firebase-init.js"></script>
 <script type="module" src="/js/auth.js"></script>
 <script type="module" src="/js/profile.js"></script>
