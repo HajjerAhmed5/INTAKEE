@@ -1,29 +1,27 @@
 /* ===============================
-   INTAKEE — TAB SYSTEM (FINAL FIX)
-   =============================== */
-
-import { auth } from "./firebase-init.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+   INTAKEE — TAB SYSTEM (FINAL STABLE)
+================================ */
 
 const sections = document.querySelectorAll(".tab-section");
 const tabs = document.querySelectorAll(".bottom-nav a");
 
 const PROTECTED_TABS = ["upload", "profile", "settings"];
 
-let USER_LOGGED_IN = false;
-let AUTH_READY = false;
+/* ================= HELPERS ================= */
+function isAuthReady() {
+  return window.__AUTH_READY__ === true;
+}
 
-/* ================= AUTH STATE ================= */
-onAuthStateChanged(auth, (user) => {
-  USER_LOGGED_IN = !!user;
-  AUTH_READY = true;
-});
+function isLoggedIn() {
+  return window.__AUTH_IN__ === true;
+}
 
 /* ================= SHOW TAB ================= */
 function showTab(tabId) {
-  // 🔒 Block protected tabs silently if logged out
-  if (PROTECTED_TABS.includes(tabId) && !USER_LOGGED_IN) {
+  // 🔒 Block protected tabs if logged out
+  if (PROTECTED_TABS.includes(tabId) && !isLoggedIn()) {
     console.warn("Blocked protected tab:", tabId);
+    document.getElementById("authDialog")?.showModal();
     return;
   }
 
@@ -53,8 +51,7 @@ tabs.forEach(tab => {
   tab.addEventListener("click", (e) => {
     e.preventDefault();
 
-    // Do NOTHING until auth is ready
-    if (!AUTH_READY) return;
+    if (!isAuthReady()) return;
 
     showTab(tab.dataset.tab);
   });
@@ -63,5 +60,12 @@ tabs.forEach(tab => {
 /* ================= INITIAL LOAD ================= */
 window.addEventListener("DOMContentLoaded", () => {
   const hash = window.location.hash.replace("#", "");
-  showTab(document.getElementById(hash) ? hash : "home");
+
+  // ⏳ Wait until auth is ready
+  const waitForAuth = setInterval(() => {
+    if (!isAuthReady()) return;
+
+    clearInterval(waitForAuth);
+    showTab(document.getElementById(hash) ? hash : "home");
+  }, 50);
 });
