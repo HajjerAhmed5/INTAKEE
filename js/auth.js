@@ -1,5 +1,5 @@
 /* ===============================
-   INTAKEE — AUTH (FINAL FIXED)
+   INTAKEE — AUTH (FINAL STABLE)
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -8,9 +8,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
-  onAuthStateChanged,
-  setPersistence,
-  browserLocalPersistence
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 import {
@@ -46,9 +44,6 @@ const loginPassword = document.getElementById("loginPassword");
 
 const headerUsername = document.getElementById("headerUsername");
 
-/* ================= PERSISTENCE ================= */
-setPersistence(auth, browserLocalPersistence);
-
 /* ================= MODAL ================= */
 openAuthBtn?.addEventListener("click", () => authDialog?.showModal());
 closeAuthBtn?.addEventListener("click", () => authDialog?.close());
@@ -70,6 +65,7 @@ signupBtn?.addEventListener("click", async () => {
   }
 
   try {
+    // Check username availability
     const q = query(collection(db, "users"), where("username", "==", username));
     const snap = await getDocs(q);
     if (!snap.empty) throw new Error("Username already taken");
@@ -101,6 +97,7 @@ loginBtn?.addEventListener("click", async () => {
   try {
     let email = identifier;
 
+    // Username login
     if (!identifier.includes("@")) {
       const q = query(
         collection(db, "users"),
@@ -121,19 +118,28 @@ loginBtn?.addEventListener("click", async () => {
 /* ================= PASSWORD RESET ================= */
 forgotPasswordBtn?.addEventListener("click", async () => {
   const email = loginIdentifier.value.trim();
+
   if (!email.includes("@")) {
     alert("Enter your email");
     return;
   }
 
-  await sendPasswordResetEmail(auth, email);
-  alert("Password reset email sent");
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Password reset email sent");
+  } catch (err) {
+    alert(err.message);
+  }
 });
 
 /* ================= AUTH STATE (SOURCE OF TRUTH) ================= */
 onAuthStateChanged(auth, async (user) => {
   window.__AUTH_READY__ = true;
   window.__AUTH_IN__ = !!user;
+
+  // Global UI state
+  document.body.classList.toggle("logged-in", !!user);
+  document.body.classList.toggle("logged-out", !user);
 
   if (!headerUsername) return;
 
@@ -143,7 +149,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // Logged-in UI immediately
+  // Logged in immediately
   headerUsername.textContent = "@user";
   headerUsername.style.display = "inline-block";
   openAuthBtn && (openAuthBtn.style.display = "none");
