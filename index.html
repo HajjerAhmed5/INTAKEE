@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>INTAKEE — Videos, Podcasts & Clips</title>
   <meta name="description" content="INTAKEE — freedom to create, simple to share." />
+
   <link rel="stylesheet" href="style.css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    rel="stylesheet"
+  />
 </head>
 
-<body data-tab="home">
+<body data-tab="home" class="logged-out">
 
 <!-- ================= HEADER ================= -->
 <header id="mainHeader">
@@ -20,8 +24,11 @@
     <input placeholder="Search for content or creators..." />
   </div>
 
-  <button id="openAuth" class="header-login-btn">Login / Sign Up</button>
-  <span id="headerUsername" class="header-username"></span>
+  <button id="openAuth" class="header-login-btn guest-only">
+    Login / Sign Up
+  </button>
+
+  <span id="headerUsername" class="header-username auth-only"></span>
 </header>
 
 <!-- ================= MAIN ================= -->
@@ -62,7 +69,7 @@
 </section>
 
 <!-- ===== UPLOAD ===== -->
-<section id="upload" class="tab-section">
+<section id="upload" class="tab-section auth-only">
   <div class="tab-inner">
     <h2>Upload</h2>
 
@@ -95,88 +102,49 @@
 </section>
 
 <!-- ===== PROFILE ===== -->
-<section id="profile" class="tab-section">
+<section id="profile" class="tab-section auth-only">
   <div class="profile-page">
-
     <div class="profile-banner">
       <div class="profile-avatar"></div>
     </div>
 
     <div class="profile-header">
       <div class="profile-meta">
-        <div class="profile-name">Guest</div>
-        <div class="profile-handle">@guest</div>
-        <div class="profile-bio">Sign in to personalize your profile.</div>
-
-        <div class="profile-stats">
-          <div><strong>0</strong>Posts</div>
-          <div><strong>0</strong>Followers</div>
-          <div><strong>0</strong>Following</div>
-          <div><strong>0</strong>Likes</div>
-        </div>
+        <div class="profile-name">User</div>
+        <div class="profile-handle">@user</div>
+        <div class="profile-bio">Welcome to INTAKEE.</div>
       </div>
 
       <button class="edit-profile-btn">Edit Profile</button>
     </div>
-
-    <div class="profile-tabs">
-      <button class="active">Uploads</button>
-      <button>Saved</button>
-      <button>Likes</button>
-      <button>Playlists</button>
-      <button>History</button>
-      <button>Notifications</button>
-    </div>
-
   </div>
 </section>
 
 <!-- ===== SETTINGS ===== -->
-<section id="settings" class="tab-section">
+<section id="settings" class="tab-section auth-only">
   <div class="settings-page">
-
     <h2>Settings</h2>
 
     <div class="settings-group">
       <div class="settings-group-title">ACCOUNT</div>
       <div class="settings-item">Change Email</div>
       <div class="settings-item">Change Password</div>
-      <div class="settings-item">Log Out</div>
+      <div class="settings-item" id="logoutBtn">Log Out</div>
     </div>
 
     <div class="settings-group">
-      <div class="settings-group-title">PRIVACY</div>
-      <div class="settings-item">
-        Private Account
-        <label class="switch">
-          <input type="checkbox" />
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="settings-item">Blocked Users</div>
-      <div class="settings-item">Comment Controls</div>
-    </div>
-
-    <div class="settings-group">
-      <div class="settings-group-title">LEGAL & POLICIES</div>
+      <div class="settings-group-title">LEGAL</div>
       <div class="settings-item">Terms of Service</div>
       <div class="settings-item">Privacy Policy</div>
       <div class="settings-item">Community Guidelines</div>
-      <div class="settings-item">Copyright & DMCA</div>
     </div>
 
     <div class="settings-group">
       <div class="settings-group-title">SUPPORT</div>
       <div class="settings-item">
-        Contact Support
-        <span>intakee2025@gmail.com</span>
+        Contact Support <span>intakee2025@gmail.com</span>
       </div>
     </div>
-
-    <div class="settings-group danger">
-      <div class="settings-item">Delete Account</div>
-    </div>
-
   </div>
 </section>
 
@@ -187,10 +155,10 @@
   <a data-tab="home" class="active"><i class="fa fa-home"></i></a>
   <a data-tab="videos"><i class="fa fa-video"></i></a>
   <a data-tab="podcasts"><i class="fa fa-podcast"></i></a>
-  <a data-tab="upload"><i class="fa fa-plus-circle"></i></a>
+  <a data-tab="upload" class="auth-only"><i class="fa fa-plus-circle"></i></a>
   <a data-tab="clips"><i class="fa fa-bolt"></i></a>
-  <a data-tab="profile"><i class="fa fa-user"></i></a>
-  <a data-tab="settings"><i class="fa fa-gear"></i></a>
+  <a data-tab="profile" class="auth-only"><i class="fa fa-user"></i></a>
+  <a data-tab="settings" class="auth-only"><i class="fa fa-gear"></i></a>
 </nav>
 
 <!-- ================= AUTH MODAL ================= -->
@@ -198,23 +166,28 @@
   <h2>Welcome to INTAKEE</h2>
 
   <h3>Create Account</h3>
-  <input placeholder="Email" />
-  <input placeholder="Username" />
-  <input type="password" placeholder="Password" />
+  <input id="signupEmail" placeholder="Email" />
+  <input id="signupUsername" placeholder="Username" />
+  <input id="signupPassword" type="password" placeholder="Password" />
+
   <div class="age-check">
-    <input type="checkbox" /> I am 13 or older
+    <input id="signupAgeConfirm" type="checkbox" /> I am 13 or older
   </div>
-  <button>Sign Up</button>
+
+  <button id="signupBtn">Sign Up</button>
 
   <hr />
 
   <h3>Log In</h3>
-  <input placeholder="Email or Username" />
-  <input type="password" placeholder="Password" />
-  <button>Log In</button>
-  <button class="ghost">Forgot Password</button>
-  <button class="ghost">Forgot Username</button>
-  <button class="ghost" onclick="document.getElementById('authDialog').close()">Close</button>
+  <input id="loginIdentifier" placeholder="Email or Username" />
+  <input id="loginPassword" type="password" placeholder="Password" />
+
+  <button id="loginBtn">Log In</button>
+  <button id="forgotPasswordBtn" class="ghost">Forgot Password</button>
+
+  <button class="ghost" onclick="document.getElementById('authDialog').close()">
+    Close
+  </button>
 </dialog>
 
 <!-- ================= SCRIPTS ================= -->
@@ -228,3 +201,4 @@
 
 </body>
 </html>
+
