@@ -1,8 +1,9 @@
 /* ===============================
-   INTAKEE — UPLOAD (FINAL FIX v2)
+   INTAKEE — UPLOAD (STABLE FIX)
 ================================ */
 
 import { auth, db, storage } from "./firebase-init.js";
+
 import {
   collection,
   addDoc,
@@ -11,70 +12,74 @@ import {
 
 import {
   ref,
-  uploadBytesResumable,
+  uploadBytes,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
 /* ================= DOM ================= */
 const uploadSection = document.getElementById("upload");
+if (!uploadSection) {
+  console.warn("Upload section not found");
+} else {
+  const titleInput = uploadSection.querySelector("input[placeholder='Add a title'], input[placeholder='Title']");
+  const descriptionInput = uploadSection.querySelector("textarea");
 
-if (uploadSection) {
-  const titleInput = uploadSection.querySelector("input[name='title']");
-  const descriptionInput = uploadSection.querySelector("textarea[name='description']");
-  const mediaInput = uploadSection.querySelector("input[name='media']");
-  const thumbnailInput = uploadSection.querySelector("input[name='thumbnail']");
-  const uploadBtn = uploadSection.querySelector(".upload-btn");
+  const fileInputs = uploadSection.querySelectorAll("input[type='file']");
+  const thumbnailInput = fileInputs[0]; // FIRST choose file
+  const mediaInput = fileInputs[1];     // SECOND choose file
+
+  const uploadBtn = uploadSection.querySelector(".upload-btn, button");
 
   uploadBtn.addEventListener("click", async () => {
     const user = auth.currentUser;
 
     if (!user) {
-      alert("You must be logged in.");
+      alert("You must be logged in to upload.");
       return;
     }
 
-    if (!mediaInput || !mediaInput.files || !mediaInput.files[0]) {
+    const title = titleInput?.value.trim();
+    const description = descriptionInput?.value.trim() || "";
+    const mediaFile = mediaInput?.files[0];
+    const thumbnailFile = thumbnailInput?.files[0] || null;
+
+    if (!title) {
+      alert("Please add a title.");
+      return;
+    }
+
+    if (!mediaFile) {
       alert("Please select a media file.");
       return;
     }
 
-    const title = titleInput.value.trim();
-    const description = descriptionInput.value.trim();
-    const mediaFile = mediaInput.files[0];
-    const thumbFile = thumbnailInput?.files?.[0] || null;
-
-    if (!title) {
-      alert("Title is required.");
-      return;
-    }
-
-    uploadBtn.disabled = true;
-    uploadBtn.textContent = "Uploading...";
-
     try {
-      /* ===== MEDIA ===== */
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = "Uploading...";
+
+      /* ========= UPLOAD MEDIA ========= */
       const mediaRef = ref(
         storage,
-        `uploads/${user.uid}/${Date.now()}-${mediaFile.name}`
+        `uploads/${user.uid}/media-${Date.now()}-${mediaFile.name}`
       );
 
-      const mediaSnap = await uploadBytesResumable(mediaRef, mediaFile);
-      const mediaURL = await getDownloadURL(mediaSnap.ref);
+      await uploadBytes(mediaRef, mediaFile);
+      const mediaURL = await getDownloadURL(mediaRef);
 
-      /* ===== THUMBNAIL (OPTIONAL) ===== */
+      /* ========= UPLOAD THUMBNAIL (OPTIONAL) ========= */
       let thumbnailURL = null;
 
-      if (thumbFile) {
+      if (thumbnailFile) {
         const thumbRef = ref(
           storage,
-          `thumbnails/${user.uid}/${Date.now()}-${thumbFile.name}`
+          `uploads/${user.uid}/thumb-${Date.now()}-${thumbnailFile.name}`
         );
 
-        const thumbSnap = await uploadBytesResumable(thumbRef, thumbFile);
-        thumbnailURL = await getDownloadURL(thumbSnap.ref);
+        await uploadBytes(thumbRef, thumbnailFile);
+        thumbnailURL = await getDownloadURL(thumbRef);
       }
 
-      /* ===== FIRESTORE ===== */
+      /* ========= SAVE POST ========= */
       await addDoc(collection(db, "posts"), {
         userId: user.uid,
         title,
@@ -88,13 +93,13 @@ if (uploadSection) {
       alert("Upload successful!");
 
       titleInput.value = "";
-      descriptionInput.value = "";
+      if (descriptionInput) descriptionInput.value = "";
       mediaInput.value = "";
-      if (thumbnailInput) thumbnailInput.value = "";
+      thumbnailInput.value = "";
 
     } catch (err) {
-      console.error("UPLOAD ERROR:", err);
-      alert("Upload failed. Check console.");
+      console.error("Upload failed:", err);
+      alert("Upload failed. Check console for details.");
     } finally {
       uploadBtn.disabled = false;
       uploadBtn.textContent = "Upload";
