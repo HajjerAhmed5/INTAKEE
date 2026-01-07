@@ -1,5 +1,5 @@
 /* ===============================
-   INTAKEE — UPLOAD (FIXED & SAFE)
+   INTAKEE — UPLOAD (FINAL FIX)
 ================================ */
 
 import { auth, db, storage } from "./firebase-init.js";
@@ -20,17 +20,19 @@ import {
 /* ================= INIT ================= */
 const uploadSection = document.getElementById("upload");
 
-// ✅ SAFE EXIT — NO ILLEGAL RETURN
 if (!uploadSection) {
-  console.warn("Upload section not found. Skipping upload.js");
+  console.warn("Upload section not found. upload.js skipped.");
 } else {
 
-  const typeSelect = uploadSection.querySelector("select");
+  const inputs = uploadSection.querySelectorAll("input[type='file']");
   const titleInput = uploadSection.querySelector("input[placeholder='Add a title']");
   const descInput = uploadSection.querySelector("textarea");
-  const thumbInput = uploadSection.querySelector("input[name='thumbnail']");
-  const fileInput = uploadSection.querySelector("input[name='media']");
+  const typeSelect = uploadSection.querySelector("select");
   const uploadBtn = uploadSection.querySelector(".upload-btn");
+
+  // ✅ STRICT mapping based on UI order
+  const thumbnailInput = inputs[0];
+  const mediaInput = inputs[1];
 
   let currentUser = null;
 
@@ -44,14 +46,19 @@ if (!uploadSection) {
       return;
     }
 
+    if (!mediaInput || !mediaInput.files.length) {
+      alert("Please select a media file.");
+      return;
+    }
+
     const title = titleInput.value.trim();
     const description = descInput.value.trim();
-    const file = fileInput.files[0];
-    const thumbnail = thumbInput?.files[0] || null;
     const type = typeSelect.value;
+    const mediaFile = mediaInput.files[0];
+    const thumbFile = thumbnailInput?.files[0] || null;
 
-    if (!title || !file) {
-      alert("Title and media file are required.");
+    if (!title) {
+      alert("Title is required.");
       return;
     }
 
@@ -59,30 +66,30 @@ if (!uploadSection) {
       uploadBtn.disabled = true;
       uploadBtn.textContent = "Uploading...";
 
-      // 📤 Upload media
+      /* ===== Upload media ===== */
       const mediaRef = ref(
         storage,
-        `uploads/${currentUser.uid}/${Date.now()}-${file.name}`
+        `uploads/${currentUser.uid}/${Date.now()}-${mediaFile.name}`
       );
 
-      await uploadBytes(mediaRef, file);
+      await uploadBytes(mediaRef, mediaFile);
       const mediaURL = await getDownloadURL(mediaRef);
 
-      // 🖼 Upload thumbnail (optional)
+      /* ===== Upload thumbnail (optional) ===== */
       let thumbnailURL = null;
-      if (thumbnail) {
+
+      if (thumbFile) {
         const thumbRef = ref(
           storage,
-          `thumbnails/${currentUser.uid}/${Date.now()}-${thumbnail.name}`
+          `thumbnails/${currentUser.uid}/${Date.now()}-${thumbFile.name}`
         );
-        await uploadBytes(thumbRef, thumbnail);
+        await uploadBytes(thumbRef, thumbFile);
         thumbnailURL = await getDownloadURL(thumbRef);
       }
 
-      // 📝 Save post
+      /* ===== Save Firestore doc ===== */
       await addDoc(collection(db, "posts"), {
         userId: currentUser.uid,
-        username: currentUser.displayName || "unknown",
         title,
         description,
         type,
@@ -91,15 +98,15 @@ if (!uploadSection) {
         createdAt: serverTimestamp()
       });
 
-      alert("Upload successful!");
+      alert("✅ Upload successful!");
 
       titleInput.value = "";
       descInput.value = "";
-      fileInput.value = "";
-      if (thumbInput) thumbInput.value = "";
+      mediaInput.value = "";
+      if (thumbnailInput) thumbnailInput.value = "";
 
     } catch (err) {
-      console.error("UPLOAD ERROR:", err);
+      console.error("UPLOAD FAILED:", err);
       alert("Upload failed. Check console.");
     } finally {
       uploadBtn.disabled = false;
