@@ -1,5 +1,8 @@
 /* ===============================
    INTAKEE — UPLOAD (STABLE FIX)
+   - Correct file input targeting
+   - Thumbnail optional
+   - Media file REQUIRED
 ================================ */
 
 import { auth, db, storage } from "./firebase-init.js";
@@ -19,90 +22,99 @@ import {
 /* ================= DOM ================= */
 const uploadSection = document.getElementById("upload");
 if (!uploadSection) {
-  console.warn("Upload section not found");
-} else {
-  const titleInput = uploadSection.querySelector("input[placeholder='Add a title'], input[placeholder='Title']");
-  const descriptionInput = uploadSection.querySelector("textarea");
+  console.warn("❌ Upload section not found");
+  return;
+}
 
-  const fileInputs = uploadSection.querySelectorAll("input[type='file']");
-  const thumbnailInput = fileInputs[0]; // FIRST choose file
-  const mediaInput = fileInputs[1];     // SECOND choose file
+const titleInput = uploadSection.querySelector("input[placeholder='Add a title'], input[placeholder='Title']");
+const descInput  = uploadSection.querySelector("textarea");
+const uploadBtn  = uploadSection.querySelector(".upload-btn");
 
-  const uploadBtn = uploadSection.querySelector(".upload-btn, button");
+/**
+ * IMPORTANT:
+ * Your UI order is:
+ * 1. Thumbnail input
+ * 2. Media file input
+ */
+const fileInputs = uploadSection.querySelectorAll("input[type='file']");
+const thumbnailInput = fileInputs[0] || null;
+const mediaInput     = fileInputs[1] || null;
 
-  uploadBtn.addEventListener("click", async () => {
-    const user = auth.currentUser;
+/* ================= UPLOAD HANDLER ================= */
+uploadBtn.addEventListener("click", async () => {
+  const user = auth.currentUser;
 
-    if (!user) {
-      alert("You must be logged in to upload.");
-      return;
-    }
+  if (!user) {
+    alert("You must be logged in to upload.");
+    return;
+  }
 
-    const title = titleInput?.value.trim();
-    const description = descriptionInput?.value.trim() || "";
-    const mediaFile = mediaInput?.files[0];
-    const thumbnailFile = thumbnailInput?.files[0] || null;
+  if (!mediaInput || !mediaInput.files || !mediaInput.files.length) {
+    alert("Please select a media file.");
+    return;
+  }
 
-    if (!title) {
-      alert("Please add a title.");
-      return;
-    }
+  const mediaFile = mediaInput.files[0];
+  const thumbnailFile = thumbnailInput?.files?.[0] || null;
 
-    if (!mediaFile) {
-      alert("Please select a media file.");
-      return;
-    }
+  const title = titleInput?.value?.trim() || "";
+  const description = descInput?.value?.trim() || "";
 
-    try {
-      uploadBtn.disabled = true;
-      uploadBtn.textContent = "Uploading...";
+  if (!title) {
+    alert("Please add a title.");
+    return;
+  }
 
-      /* ========= UPLOAD MEDIA ========= */
-      const mediaRef = ref(
+  try {
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = "Uploading...";
+
+    /* ---------- Upload MEDIA ---------- */
+    const mediaRef = ref(
+      storage,
+      `uploads/${user.uid}/${Date.now()}-${mediaFile.name}`
+    );
+
+    await uploadBytes(mediaRef, mediaFile);
+    const mediaURL = await getDownloadURL(mediaRef);
+
+    /* ---------- Upload THUMBNAIL (optional) ---------- */
+    let thumbnailURL = null;
+
+    if (thumbnailFile) {
+      const thumbRef = ref(
         storage,
-        `uploads/${user.uid}/media-${Date.now()}-${mediaFile.name}`
+        `thumbnails/${user.uid}/${Date.now()}-${thumbnailFile.name}`
       );
 
-      await uploadBytes(mediaRef, mediaFile);
-      const mediaURL = await getDownloadURL(mediaRef);
-
-      /* ========= UPLOAD THUMBNAIL (OPTIONAL) ========= */
-      let thumbnailURL = null;
-
-      if (thumbnailFile) {
-        const thumbRef = ref(
-          storage,
-          `uploads/${user.uid}/thumb-${Date.now()}-${thumbnailFile.name}`
-        );
-
-        await uploadBytes(thumbRef, thumbnailFile);
-        thumbnailURL = await getDownloadURL(thumbRef);
-      }
-
-      /* ========= SAVE POST ========= */
-      await addDoc(collection(db, "posts"), {
-        userId: user.uid,
-        title,
-        description,
-        mediaURL,
-        thumbnailURL,
-        type: "video",
-        createdAt: serverTimestamp()
-      });
-
-      alert("Upload successful!");
-
-      titleInput.value = "";
-      if (descriptionInput) descriptionInput.value = "";
-      mediaInput.value = "";
-      thumbnailInput.value = "";
-
-    } catch (err) {
-      console.error("Upload failed:", err);
-      alert("Upload failed. Check console for details.");
-    } finally {
-      uploadBtn.disabled = false;
-      uploadBtn.textContent = "Upload";
+      await uploadBytes(thumbRef, thumbnailFile);
+      thumbnailURL = await getDownloadURL(thumbRef);
     }
-  });
-}
+
+    /* ---------- Save to Firestore ---------- */
+    await addDoc(collection(db, "posts"), {
+      userId: user.uid,
+      title,
+      description,
+      mediaURL,
+      thumbnailURL,
+      type: "video",
+      createdAt: serverTimestamp()
+    });
+
+    alert("✅ Upload successful!");
+
+    // Reset form
+    titleInput.value = "";
+    descInput.value = "";
+    mediaInput.value = "";
+    if (thumbnailInput) thumbnailInput.value = "";
+
+  } catch (err) {
+    console.error("❌ Upload failed:", err);
+    alert("Upload failed. Check console.");
+  } finally {
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = "Upload";
+  }
+});
