@@ -1,17 +1,16 @@
 /*
 ==========================================
-INTAKEE — UPLOAD SYSTEM (FINAL WORKING)
+INTAKEE — UPLOAD SYSTEM (FINAL / SAFE)
 ==========================================
 */
 
 import { auth, storage, db } from "./firebase-init.js";
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { onAuthStateChanged } from
+  "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 import {
   ref,
-  uploadBytes,
+  uploadBytesResumable,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
@@ -21,44 +20,31 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-/* ================= DOM ================= */
+/* DOM */
 const uploadBtn = document.querySelector(".upload-btn");
+const typeInput = document.querySelector("#upload select");
+const titleInput = document.querySelector("#upload input[type='text']");
+const descInput = document.querySelector("#upload textarea");
+const thumbInput = document.querySelector("#upload input[type='file']:nth-of-type(1)");
+const mediaInput = document.querySelector("#upload input[type='file']:nth-of-type(2)");
 
-/* ================= AUTH ================= */
 let currentUser = null;
 
-// Disable upload until auth resolves
-uploadBtn.disabled = true;
-
+/* AUTH */
 onAuthStateChanged(auth, user => {
   currentUser = user;
-  uploadBtn.disabled = !user;
 });
 
-/* ================= UPLOAD ================= */
+/* UPLOAD */
 uploadBtn.addEventListener("click", async () => {
   if (!currentUser) {
-    alert("Please log in.");
+    alert("Please log in");
     return;
   }
 
-  // SAFE DOM TARGETING
-  const type = document.querySelector("#upload select").value;
-  const title = document
-    .querySelector("#upload input[placeholder='Add a title']")
-    .value
-    .trim();
-  const description = document
-    .querySelector("#upload textarea")
-    .value
-    .trim();
-
-  const fileInputs = document.querySelectorAll("#upload input[type='file']");
-  const thumbnailFile = fileInputs[0]?.files[0] || null;
-  const mediaFile = fileInputs[1]?.files[0] || null;
-
+  const mediaFile = mediaInput.files[0];
   if (!mediaFile) {
-    alert("Please select a media file.");
+    alert("Select a media file");
     return;
   }
 
@@ -69,35 +55,33 @@ uploadBtn.addEventListener("click", async () => {
     const uid = currentUser.uid;
     const time = Date.now();
 
-    /* ========= MEDIA UPLOAD ========= */
+    // Upload media ONLY — no preview, no fetch
     const mediaRef = ref(
       storage,
       `uploads/${uid}/${time}_${mediaFile.name}`
     );
 
-    await uploadBytes(mediaRef, mediaFile);
+    await uploadBytesResumable(mediaRef, mediaFile);
+
     const mediaURL = await getDownloadURL(mediaRef);
 
-    /* ========= THUMBNAIL UPLOAD (OPTIONAL) ========= */
-    let thumbnailURL = null;
-
-    if (thumbnailFile) {
+    let thumbURL = null;
+    if (thumbInput.files[0]) {
       const thumbRef = ref(
         storage,
-        `thumbnails/${uid}/${time}_${thumbnailFile.name}`
+        `thumbnails/${uid}/${time}_${thumbInput.files[0].name}`
       );
-
-      await uploadBytes(thumbRef, thumbnailFile);
-      thumbnailURL = await getDownloadURL(thumbRef);
+      await uploadBytesResumable(thumbRef, thumbInput.files[0]);
+      thumbURL = await getDownloadURL(thumbRef);
     }
 
-    /* ========= SAVE POST ========= */
+    // Save Firestore doc ONLY
     await addDoc(collection(db, "posts"), {
-      type,
-      title: title || "Untitled",
-      description,
+      type: typeInput.value,
+      title: titleInput.value.trim(),
+      description: descInput.value.trim(),
       mediaURL,
-      thumbnailURL,
+      thumbnailURL: thumbURL,
       uid,
       username: currentUser.displayName || "user",
       createdAt: serverTimestamp(),
@@ -108,8 +92,8 @@ uploadBtn.addEventListener("click", async () => {
     location.hash = "#home";
 
   } catch (err) {
-    console.error("UPLOAD ERROR:", err);
-    alert("Upload failed. Check console.");
+    console.error("UPLOAD FAILED:", err);
+    alert("Upload failed — check console");
   }
 
   uploadBtn.textContent = "Upload";
