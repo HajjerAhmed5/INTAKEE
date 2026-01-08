@@ -1,16 +1,17 @@
 /*
 ==========================================
-INTAKEE — UPLOAD SYSTEM (CORS-SAFE)
+INTAKEE — UPLOAD SYSTEM (FINAL WORKING)
 ==========================================
 */
 
 import { auth, storage, db } from "./firebase-init.js";
-import { onAuthStateChanged } from
-  "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 import {
   ref,
-  uploadBytesResumable,
+  uploadBytes,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
@@ -22,13 +23,16 @@ import {
 
 /* ================= DOM ================= */
 const uploadBtn = document.querySelector(".upload-btn");
-const inputs = document.querySelectorAll("#upload input, #upload textarea, #upload select");
 
 /* ================= AUTH ================= */
 let currentUser = null;
 
+// Disable upload until auth resolves
+uploadBtn.disabled = true;
+
 onAuthStateChanged(auth, user => {
   currentUser = user;
+  uploadBtn.disabled = !user;
 });
 
 /* ================= UPLOAD ================= */
@@ -38,11 +42,20 @@ uploadBtn.addEventListener("click", async () => {
     return;
   }
 
-  const type = inputs[0].value;
-  const title = inputs[1].value.trim();
-  const description = inputs[2].value.trim();
-  const thumbnailFile = inputs[3].files[0];
-  const mediaFile = inputs[4].files[0];
+  // SAFE DOM TARGETING
+  const type = document.querySelector("#upload select").value;
+  const title = document
+    .querySelector("#upload input[placeholder='Add a title']")
+    .value
+    .trim();
+  const description = document
+    .querySelector("#upload textarea")
+    .value
+    .trim();
+
+  const fileInputs = document.querySelectorAll("#upload input[type='file']");
+  const thumbnailFile = fileInputs[0]?.files[0] || null;
+  const mediaFile = fileInputs[1]?.files[0] || null;
 
   if (!mediaFile) {
     alert("Please select a media file.");
@@ -56,19 +69,17 @@ uploadBtn.addEventListener("click", async () => {
     const uid = currentUser.uid;
     const time = Date.now();
 
-    /* STORAGE PATHS */
+    /* ========= MEDIA UPLOAD ========= */
     const mediaRef = ref(
       storage,
       `uploads/${uid}/${time}_${mediaFile.name}`
     );
 
-    const mediaTask = uploadBytesResumable(mediaRef, mediaFile);
-
-    await mediaTask;
-
+    await uploadBytes(mediaRef, mediaFile);
     const mediaURL = await getDownloadURL(mediaRef);
 
-    let thumbURL = null;
+    /* ========= THUMBNAIL UPLOAD (OPTIONAL) ========= */
+    let thumbnailURL = null;
 
     if (thumbnailFile) {
       const thumbRef = ref(
@@ -76,18 +87,17 @@ uploadBtn.addEventListener("click", async () => {
         `thumbnails/${uid}/${time}_${thumbnailFile.name}`
       );
 
-      const thumbTask = uploadBytesResumable(thumbRef, thumbnailFile);
-      await thumbTask;
-      thumbURL = await getDownloadURL(thumbRef);
+      await uploadBytes(thumbRef, thumbnailFile);
+      thumbnailURL = await getDownloadURL(thumbRef);
     }
 
-    /* SAVE POST */
+    /* ========= SAVE POST ========= */
     await addDoc(collection(db, "posts"), {
       type,
-      title,
+      title: title || "Untitled",
       description,
       mediaURL,
-      thumbnailURL: thumbURL,
+      thumbnailURL,
       uid,
       username: currentUser.displayName || "user",
       createdAt: serverTimestamp(),
