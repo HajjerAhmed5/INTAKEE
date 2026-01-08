@@ -1,8 +1,5 @@
 /* ===============================
-   INTAKEE — UPLOAD (STABLE FIX)
-   - Correct file input targeting
-   - Thumbnail optional
-   - Media file REQUIRED
+   INTAKEE — UPLOAD (STABLE FINAL)
 ================================ */
 
 import { auth, db, storage } from "./firebase-init.js";
@@ -21,27 +18,23 @@ import {
 
 /* ================= DOM ================= */
 const uploadSection = document.getElementById("upload");
+
 if (!uploadSection) {
-  console.warn("❌ Upload section not found");
-  return;
+  console.warn("Upload section not found — upload.js loaded safely");
 }
 
-const titleInput = uploadSection.querySelector("input[placeholder='Add a title'], input[placeholder='Title']");
-const descInput  = uploadSection.querySelector("textarea");
-const uploadBtn  = uploadSection.querySelector(".upload-btn");
+/* Safe DOM queries */
+const titleInput = uploadSection?.querySelector("input[placeholder='Add a title'], input[placeholder='Title']");
+const descInput  = uploadSection?.querySelector("textarea");
+const uploadBtn  = uploadSection?.querySelector(".upload-btn");
 
-/**
- * IMPORTANT:
- * Your UI order is:
- * 1. Thumbnail input
- * 2. Media file input
- */
-const fileInputs = uploadSection.querySelectorAll("input[type='file']");
+/* File inputs (UI order matters) */
+const fileInputs = uploadSection?.querySelectorAll("input[type='file']") || [];
 const thumbnailInput = fileInputs[0] || null;
 const mediaInput     = fileInputs[1] || null;
 
 /* ================= UPLOAD HANDLER ================= */
-uploadBtn.addEventListener("click", async () => {
+uploadBtn?.addEventListener("click", async () => {
   const user = auth.currentUser;
 
   if (!user) {
@@ -49,7 +42,7 @@ uploadBtn.addEventListener("click", async () => {
     return;
   }
 
-  if (!mediaInput || !mediaInput.files || !mediaInput.files.length) {
+  if (!mediaInput || !mediaInput.files || mediaInput.files.length === 0) {
     alert("Please select a media file.");
     return;
   }
@@ -69,7 +62,7 @@ uploadBtn.addEventListener("click", async () => {
     uploadBtn.disabled = true;
     uploadBtn.textContent = "Uploading...";
 
-    /* ---------- Upload MEDIA ---------- */
+    /* Upload media */
     const mediaRef = ref(
       storage,
       `uploads/${user.uid}/${Date.now()}-${mediaFile.name}`
@@ -78,20 +71,18 @@ uploadBtn.addEventListener("click", async () => {
     await uploadBytes(mediaRef, mediaFile);
     const mediaURL = await getDownloadURL(mediaRef);
 
-    /* ---------- Upload THUMBNAIL (optional) ---------- */
+    /* Upload thumbnail (optional) */
     let thumbnailURL = null;
-
     if (thumbnailFile) {
       const thumbRef = ref(
         storage,
         `thumbnails/${user.uid}/${Date.now()}-${thumbnailFile.name}`
       );
-
       await uploadBytes(thumbRef, thumbnailFile);
       thumbnailURL = await getDownloadURL(thumbRef);
     }
 
-    /* ---------- Save to Firestore ---------- */
+    /* Save Firestore doc */
     await addDoc(collection(db, "posts"), {
       userId: user.uid,
       title,
@@ -104,7 +95,6 @@ uploadBtn.addEventListener("click", async () => {
 
     alert("✅ Upload successful!");
 
-    // Reset form
     titleInput.value = "";
     descInput.value = "";
     mediaInput.value = "";
