@@ -76,31 +76,36 @@
     <div class="upload-card">
       <label>Type</label>
       <select>
-        <option>Video</option>
-        <option>Podcast</option>
-        <option>Clip</option>
+        <option value="video">Video</option>
+        <option value="podcast">Podcast</option>
+        <option value="clip">Clip</option>
       </select>
 
       <label>Title</label>
-      <input placeholder="Add a title" />
+      <input type="text" placeholder="Add a title" />
 
       <label>Description</label>
       <textarea placeholder="Write a description"></textarea>
 
       <label>Thumbnail</label>
-      <input type="file" />
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+      />
 
       <label>Media File</label>
-      <input type="file" />
+      <input
+        type="file"
+        accept="video/mp4,video/webm,video/quicktime"
+      />
 
       <div class="upload-bottom-bar">
         <button class="upload-btn">Upload</button>
-        <button class="live-btn">Go Live</button>
+        <button class="live-btn" type="button">Go Live</button>
       </div>
     </div>
   </div>
 </section>
-
 <!-- ===== PROFILE ===== -->
 <section id="profile" class="tab-section auth-only">
   <div class="profile-page">
