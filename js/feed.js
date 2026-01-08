@@ -1,42 +1,41 @@
 /*
 ==========================================
-INTAKEE — FEED SYSTEM (FIXED + REAL)
+INTAKEE — FEED SYSTEM (FINAL + SAFE)
+- No fetch / XHR
+- Uses <video src="">
+- Firebase-compatible
 ==========================================
 */
 
 import { auth, db } from "./firebase-init.js";
 import { onAuthStateChanged } from
   "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
 import {
   collection,
   query,
   orderBy,
   limit,
   startAfter,
-  getDocs,
-  doc,
-  updateDoc,
-  arrayUnion,
-  arrayRemove,
-  increment
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-/* DOM — CORRECT CONTAINER */
+/* ================= DOM ================= */
 const homeFeed = document.querySelector("#home .feed-grid");
 
-/* STATE */
+/* ================= STATE ================= */
 let currentUser = null;
 let lastVisible = null;
 let loading = false;
 const PAGE_SIZE = 6;
 
-/* AUTH */
+/* ================= AUTH ================= */
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   resetFeed();
 });
 
-/* RESET */
+/* ================= RESET ================= */
 function resetFeed() {
   if (!homeFeed) return;
   homeFeed.innerHTML = "";
@@ -45,7 +44,7 @@ function resetFeed() {
   fetchPosts();
 }
 
-/* FETCH POSTS */
+/* ================= FETCH POSTS ================= */
 async function fetchPosts() {
   if (loading || !homeFeed) return;
   loading = true;
@@ -78,25 +77,42 @@ async function fetchPosts() {
   loading = false;
 }
 
-/* RENDER POST */
+/* ================= RENDER POST ================= */
 function renderPost(post) {
   if (post.ageRestricted && !currentUser) return;
 
   const card = document.createElement("div");
   card.className = "feed-card";
 
-  const liked = currentUser && post.likedBy?.includes(currentUser.uid);
-  const saved = currentUser && post.savedBy?.includes(currentUser.uid);
+  /* ===== MEDIA ELEMENT (NO CORS) ===== */
+  let mediaEl;
 
-  card.innerHTML = `
-    <div class="feed-thumb"></div>
-    <div class="feed-info">
-      <h4>${post.title || "Untitled"}</h4>
-      <p>@${post.username || "user"} • ${post.views || 0} views</p>
-    </div>
+  if (post.type === "video" || post.type === "clip") {
+    mediaEl = document.createElement("video");
+    mediaEl.src = post.mediaURL;
+    mediaEl.muted = true;
+    mediaEl.playsInline = true;
+    mediaEl.preload = "metadata";
+    mediaEl.controls = false;
+  } else {
+    mediaEl = document.createElement("img");
+    mediaEl.src = post.thumbnailURL || "/default-thumb.png";
+  }
+
+  mediaEl.className = "feed-media";
+
+  /* ===== INFO ===== */
+  const info = document.createElement("div");
+  info.className = "feed-info";
+  info.innerHTML = `
+    <h4>${post.title || "Untitled"}</h4>
+    <p>@${post.username || "user"} • ${post.views || 0} views</p>
   `;
 
-  /* OPEN VIEWER — REAL ID */
+  card.appendChild(mediaEl);
+  card.appendChild(info);
+
+  /* ===== OPEN VIEWER ===== */
   card.addEventListener("click", () => {
     window.location.href = `/viewer.html?id=${post.id}`;
   });
@@ -104,7 +120,7 @@ function renderPost(post) {
   homeFeed.appendChild(card);
 }
 
-/* INFINITE SCROLL */
+/* ================= INFINITE SCROLL ================= */
 window.addEventListener("scroll", () => {
   if (
     window.innerHeight + window.scrollY >=
@@ -114,5 +130,5 @@ window.addEventListener("scroll", () => {
   }
 });
 
-/* INIT */
+/* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", fetchPosts);
