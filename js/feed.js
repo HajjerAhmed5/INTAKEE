@@ -1,9 +1,6 @@
 /*
 ==========================================
-INTAKEE — FEED SYSTEM (FINAL + SAFE)
-- No fetch / XHR
-- Uses <video src="">
-- Firebase-compatible
+INTAKEE — FEED SYSTEM (FINAL, WORKING)
 ==========================================
 */
 
@@ -16,119 +13,86 @@ import {
   query,
   orderBy,
   limit,
-  startAfter,
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-/* ================= DOM ================= */
-const homeFeed = document.querySelector("#home .feed-grid");
+/* ================= FEED MAP ================= */
+const feeds = {
+  home: document.querySelector("#home .feed-grid"),
+  videos: document.querySelector("#videos .feed-grid"),
+  podcasts: document.querySelector("#podcasts .feed-grid"),
+  clips: document.querySelector("#clips .feed-grid")
+};
 
-/* ================= STATE ================= */
+const PAGE_SIZE = 20;
 let currentUser = null;
-let lastVisible = null;
-let loading = false;
-const PAGE_SIZE = 6;
 
 /* ================= AUTH ================= */
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, user => {
   currentUser = user;
-  resetFeed();
+  loadAllFeeds();
 });
 
-/* ================= RESET ================= */
-function resetFeed() {
-  if (!homeFeed) return;
-  homeFeed.innerHTML = "";
-  lastVisible = null;
-  loading = false;
-  fetchPosts();
-}
+/* ================= LOAD ALL FEEDS ================= */
+async function loadAllFeeds() {
+  Object.values(feeds).forEach(f => f && (f.innerHTML = ""));
 
-/* ================= FETCH POSTS ================= */
-async function fetchPosts() {
-  if (loading || !homeFeed) return;
-  loading = true;
-
-  let q = query(
+  const q = query(
     collection(db, "posts"),
     orderBy("createdAt", "desc"),
     limit(PAGE_SIZE)
   );
 
-  if (lastVisible) {
-    q = query(
-      collection(db, "posts"),
-      orderBy("createdAt", "desc"),
-      startAfter(lastVisible),
-      limit(PAGE_SIZE)
-    );
-  }
-
   const snap = await getDocs(q);
 
-  if (!snap.empty) {
-    lastVisible = snap.docs[snap.docs.length - 1];
-  }
-
-  snap.forEach(docSnap => {
-    renderPost({ id: docSnap.id, ...docSnap.data() });
+  snap.forEach(doc => {
+    const post = { id: doc.id, ...doc.data() };
+    renderPost(post);
   });
-
-  loading = false;
 }
 
 /* ================= RENDER POST ================= */
 function renderPost(post) {
-  if (post.ageRestricted && !currentUser) return;
+  const type = (post.type || "").toLowerCase();
 
-  const card = document.createElement("div");
-  card.className = "feed-card";
+  const targets = [
+    feeds.home,
+    type === "video" && feeds.videos,
+    type === "podcast" && feeds.podcasts,
+    type === "clip" && feeds.clips
+  ].filter(Boolean);
 
-  /* ===== MEDIA ELEMENT (NO CORS) ===== */
-  let mediaEl;
+  targets.forEach(feed => {
+    const card = document.createElement("div");
+    card.className = "feed-card";
 
-  if (post.type === "video" || post.type === "clip") {
-    mediaEl = document.createElement("video");
-    mediaEl.src = post.mediaURL;
-    mediaEl.muted = true;
-    mediaEl.playsInline = true;
-    mediaEl.preload = "metadata";
-    mediaEl.controls = false;
-  } else {
-    mediaEl = document.createElement("img");
-    mediaEl.src = post.thumbnailURL || "/default-thumb.png";
-  }
+    let media;
+    if (type === "video" || type === "clip") {
+      media = document.createElement("video");
+      media.src = post.mediaURL;
+      media.muted = true;
+      media.playsInline = true;
+      media.preload = "metadata";
+    } else {
+      media = document.createElement("img");
+      media.src = post.thumbnailURL || "/default-thumb.png";
+    }
 
-  mediaEl.className = "feed-media";
+    media.className = "feed-media";
 
-  /* ===== INFO ===== */
-  const info = document.createElement("div");
-  info.className = "feed-info";
-  info.innerHTML = `
-    <h4>${post.title || "Untitled"}</h4>
-    <p>@${post.username || "user"} • ${post.views || 0} views</p>
-  `;
+    card.innerHTML = `
+      <div class="feed-info">
+        <h4>${post.title || "Untitled"}</h4>
+        <p>@${post.username || "user"} • ${post.views || 0} views</p>
+      </div>
+    `;
 
-  card.appendChild(mediaEl);
-  card.appendChild(info);
+    card.prepend(media);
 
-  /* ===== OPEN VIEWER ===== */
-  card.addEventListener("click", () => {
-    window.location.href = `/viewer.html?id=${post.id}`;
+    card.onclick = () => {
+      window.location.href = `/viewer.html?id=${post.id}`;
+    };
+
+    feed.appendChild(card);
   });
-
-  homeFeed.appendChild(card);
 }
-
-/* ================= INFINITE SCROLL ================= */
-window.addEventListener("scroll", () => {
-  if (
-    window.innerHeight + window.scrollY >=
-    document.body.offsetHeight - 200
-  ) {
-    fetchPosts();
-  }
-});
-
-/* ================= INIT ================= */
-document.addEventListener("DOMContentLoaded", fetchPosts);
