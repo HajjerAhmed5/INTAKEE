@@ -1,5 +1,9 @@
 /* ===============================
-   INTAKEE — PROFILE (FINAL, LOCKED)
+   INTAKEE — PROFILE (FINAL, PROD SAFE)
+   - No "Guest" bug
+   - Avatar + Banner upload
+   - Editable bio
+   - Firestore-backed
 ================================ */
 
 import { auth, db, storage } from "./firebase-init.js";
@@ -35,10 +39,18 @@ const statEls = document.querySelectorAll(".profile-stats strong");
 /* ================= STATE ================= */
 let currentUser = null;
 let editMode = false;
+let authInitialized = false;
 
 /* ================= AUTH ================= */
 onAuthStateChanged(auth, async (user) => {
+  // 🔥 Ignore Firebase’s initial null ping
+  if (!authInitialized) {
+    authInitialized = true;
+    if (!user) return;
+  }
+
   if (!user) {
+    currentUser = null;
     setGuestProfile();
     return;
   }
@@ -83,7 +95,7 @@ async function loadProfile(user) {
     banner.style.backgroundPosition = "center";
   }
 
-  loadStats(user.uid);
+  await loadStats(user.uid);
 }
 
 /* ================= STATS ================= */
@@ -93,12 +105,12 @@ async function loadStats(uid) {
   );
 
   statEls[0].textContent = postsSnap.size; // Posts
-  statEls[1].textContent = 0; // Followers (later)
-  statEls[2].textContent = 0; // Following (later)
-  statEls[3].textContent = 0; // Likes (later)
+  statEls[1].textContent = 0; // Followers
+  statEls[2].textContent = 0; // Following
+  statEls[3].textContent = 0; // Likes
 }
 
-/* ================= EDIT MODE ================= */
+/* ================= EDIT BIO ================= */
 editBtn?.addEventListener("click", async () => {
   if (!currentUser) return;
 
@@ -115,10 +127,8 @@ editBtn?.addEventListener("click", async () => {
   }
 });
 
-/* ================= AVATAR UPLOAD ================= */
+/* ================= IMAGE UPLOAD ================= */
 avatar?.addEventListener("click", () => uploadImage("avatar"));
-
-/* ================= BANNER UPLOAD ================= */
 banner?.addEventListener("click", () => uploadImage("banner"));
 
 async function uploadImage(type) {
@@ -160,4 +170,7 @@ function setGuestProfile() {
   profileHandle.textContent = "@guest";
   profileBio.textContent = "Sign in to personalize your profile.";
   statEls.forEach(el => (el.textContent = "0"));
+
+  avatar.style.backgroundImage = "";
+  banner.style.backgroundImage = "";
 }
