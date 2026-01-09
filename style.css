@@ -913,3 +913,22 @@ body.auth-checking {
   visibility: visible;
   opacity: 1;
 }
+/* ================= AUTH VISIBILITY (FIX) ================= */
+
+/* LOGGED IN */
+body.logged-in .auth-only {
+  display: block !important;
+}
+
+body.logged-in .guest-only {
+  display: none !important;
+}
+
+/* LOGGED OUT */
+body.logged-out .auth-only {
+  display: none !important;
+}
+
+body.logged-out .guest-only {
+  display: block !important;
+}
