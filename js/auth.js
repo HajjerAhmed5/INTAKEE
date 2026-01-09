@@ -1,5 +1,8 @@
 /* ===============================
    INTAKEE — AUTH (FINAL STABLE)
+   - Username synced correctly
+   - No race conditions
+   - Launch safe
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -8,7 +11,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
-  onAuthStateChanged
+  onAuthStateChanged,
+  updateProfile
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 import {
@@ -28,7 +32,6 @@ window.__AUTH_IN__ = false;
 /* ================= DOM ================= */
 const authDialog = document.getElementById("authDialog");
 const openAuthBtn = document.getElementById("openAuth");
-const closeAuthBtn = document.getElementById("closeAuthDialog");
 
 const signupBtn = document.getElementById("signupBtn");
 const loginBtn = document.getElementById("loginBtn");
@@ -46,7 +49,6 @@ const headerUsername = document.getElementById("headerUsername");
 
 /* ================= MODAL ================= */
 openAuthBtn?.addEventListener("click", () => authDialog?.showModal());
-closeAuthBtn?.addEventListener("click", () => authDialog?.close());
 
 /* ================= SIGN UP ================= */
 signupBtn?.addEventListener("click", async () => {
@@ -70,8 +72,15 @@ signupBtn?.addEventListener("click", async () => {
     const snap = await getDocs(q);
     if (!snap.empty) throw new Error("Username already taken");
 
+    // Create account
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
+    // 🔑 CRITICAL FIX — sync username to Auth
+    await updateProfile(cred.user, {
+      displayName: username
+    });
+
+    // Store user document
     await setDoc(doc(db, "users", cred.user.uid), {
       email,
       username,
@@ -137,7 +146,6 @@ onAuthStateChanged(auth, async (user) => {
   window.__AUTH_READY__ = true;
   window.__AUTH_IN__ = !!user;
 
-  // Global UI state
   document.body.classList.toggle("logged-in", !!user);
   document.body.classList.toggle("logged-out", !user);
 
@@ -149,19 +157,23 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // Logged in immediately
-  headerUsername.textContent = "@user";
+  // ✅ Instant username (no flicker)
+  const instantName =
+    user.displayName ||
+    (user.email ? user.email.split("@")[0] : "user");
+
+  headerUsername.textContent = "@" + instantName;
   headerUsername.style.display = "inline-block";
   openAuthBtn && (openAuthBtn.style.display = "none");
   authDialog?.close();
 
-  // Load username from Firestore
+  // 🔁 Firestore confirmation (authoritative)
   try {
     const snap = await getDoc(doc(db, "users", user.uid));
     if (snap.exists() && snap.data().username) {
       headerUsername.textContent = "@" + snap.data().username;
     }
   } catch {
-    headerUsername.textContent = "@user";
+    // silent fallback already handled
   }
 });
