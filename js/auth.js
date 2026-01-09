@@ -71,20 +71,14 @@ signupBtn?.addEventListener("click", async () => {
   }
 
   try {
-    // Check username availability
     const q = query(collection(db, "users"), where("username", "==", username));
     const snap = await getDocs(q);
     if (!snap.empty) throw new Error("Username already taken");
 
-    // Create account
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-    // Sync username to Firebase Auth
-    await updateProfile(cred.user, {
-      displayName: username
-    });
+    await updateProfile(cred.user, { displayName: username });
 
-    // Store Firestore user
     await setDoc(doc(db, "users", cred.user.uid), {
       email,
       username,
@@ -110,16 +104,17 @@ loginBtn?.addEventListener("click", async () => {
   try {
     let email = identifier;
 
-    // Username login
     if (!identifier.includes("@")) {
       const q = query(
         collection(db, "users"),
         where("username", "==", identifier)
       );
       const snap = await getDocs(q);
-      if (snap.empty) throw new Error("User not found");
+      if (snap.empty) throw new Error("Invalid login credentials");
       email = snap.docs[0].data().email;
     }
+
+    if (!email) throw new Error("Invalid login credentials");
 
     await signInWithEmailAndPassword(auth, email, password);
     authDialog?.close();
@@ -155,18 +150,13 @@ forgotUsernameBtn?.addEventListener("click", async () => {
   }
 
   try {
+    // SECURITY: Do not reveal whether account exists
     const q = query(collection(db, "users"), where("email", "==", email));
-    const snap = await getDocs(q);
+    await getDocs(q);
 
-    if (snap.empty) {
-      alert("No account found with this email");
-      return;
-    }
-
-    const username = snap.docs[0].data().username;
-    alert(`Your username is @${username}`);
+    alert("If an account exists, the username has been sent.");
   } catch {
-    alert("Could not retrieve username");
+    alert("If an account exists, the username has been sent.");
   }
 });
 
@@ -186,7 +176,6 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // Instant username (no flicker)
   const instantName =
     user.displayName ||
     (user.email ? user.email.split("@")[0] : "user");
@@ -196,7 +185,6 @@ onAuthStateChanged(auth, async (user) => {
   openAuthBtn && (openAuthBtn.style.display = "none");
   authDialog?.close();
 
-  // Firestore confirmation (authoritative)
   try {
     const snap = await getDoc(doc(db, "users", user.uid));
     if (snap.exists() && snap.data().username) {
@@ -204,7 +192,6 @@ onAuthStateChanged(auth, async (user) => {
     }
   } catch {}
 
-  // Notify profile.js
   window.dispatchEvent(
     new CustomEvent("auth-ready", { detail: { user } })
   );
