@@ -1,9 +1,8 @@
 /* ===============================
-   INTAKEE — AUTH (FINAL LOCKED)
-   - Firestore is username source of truth
-   - Email NEVER shown
-   - Header + Profile always match
-   - No Guest state after login
+   INTAKEE — AUTH (FORCED FIX)
+   - Absolute source of truth
+   - Kills Guest forever
+   - Header + Profile always sync
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -27,6 +26,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ================= DOM ================= */
+const body = document.body;
 const authDialog = document.getElementById("authDialog");
 const openAuthBtn = document.getElementById("openAuth");
 const headerUsername = document.getElementById("headerUsername");
@@ -44,39 +44,22 @@ const signupAgeConfirm = document.getElementById("signupAgeConfirm");
 const loginIdentifier = document.getElementById("loginIdentifier");
 const loginPassword = document.getElementById("loginPassword");
 
-/* ================= MODAL ================= */
-openAuthBtn?.addEventListener("click", () => authDialog?.showModal());
-
 /* ================= SIGN UP ================= */
 signupBtn?.addEventListener("click", async () => {
   const email = signupEmail.value.trim().toLowerCase();
   const password = signupPassword.value.trim();
   const username = signupUsername.value.trim().toLowerCase();
 
-  if (!email || !password || !username) {
-    alert("Fill all fields");
-    return;
-  }
+  if (!email || !password || !username) return alert("Fill all fields");
+  if (!signupAgeConfirm.checked) return alert("You must be 13+");
 
-  if (!signupAgeConfirm.checked) {
-    alert("You must be 13+");
-    return;
-  }
-
-  // Check username uniqueness
   const q = query(collection(db, "users"), where("username", "==", username));
   const snap = await getDocs(q);
-  if (!snap.empty) {
-    alert("Username already taken");
-    return;
-  }
+  if (!snap.empty) return alert("Username already taken");
 
   const cred = await createUserWithEmailAndPassword(auth, email, password);
-
-  // Sync once (not UI source)
   await updateProfile(cred.user, { displayName: username });
 
-  // Firestore user document
   await setDoc(doc(db, "users", cred.user.uid), {
     username,
     email,
@@ -90,22 +73,14 @@ signupBtn?.addEventListener("click", async () => {
 loginBtn?.addEventListener("click", async () => {
   const identifier = loginIdentifier.value.trim().toLowerCase();
   const password = loginPassword.value.trim();
-
-  if (!identifier || !password) {
-    alert("Missing fields");
-    return;
-  }
+  if (!identifier || !password) return alert("Missing fields");
 
   let email = identifier;
 
-  // Username login
   if (!identifier.includes("@")) {
     const q = query(collection(db, "users"), where("username", "==", identifier));
     const snap = await getDocs(q);
-    if (snap.empty) {
-      alert("Invalid login credentials");
-      return;
-    }
+    if (snap.empty) return alert("Invalid credentials");
     email = snap.docs[0].data().email;
   }
 
@@ -116,31 +91,32 @@ loginBtn?.addEventListener("click", async () => {
 /* ================= PASSWORD RESET ================= */
 forgotPasswordBtn?.addEventListener("click", async () => {
   const email = loginIdentifier.value.trim().toLowerCase();
-  if (!email.includes("@")) {
-    alert("Enter your email");
-    return;
-  }
+  if (!email.includes("@")) return alert("Enter your email");
   await sendPasswordResetEmail(auth, email);
   alert("Password reset email sent");
 });
 
-/* ================= USERNAME RECOVERY ================= */
-forgotUsernameBtn?.addEventListener("click", () => {
-  alert("If an account exists, recovery instructions were sent.");
-});
-
-/* ================= AUTH STATE ================= */
+/* ================= AUTH STATE — FORCED ================= */
 onAuthStateChanged(auth, async (user) => {
-  document.body.classList.toggle("logged-in", !!user);
-  document.body.classList.toggle("logged-out", !user);
+  console.log("🔥 AUTH STATE:", user);
 
   if (!user) {
-    headerUsername.style.display = "none";
+    body.classList.remove("logged-in");
+    body.classList.add("logged-out");
+
     openAuthBtn.style.display = "inline-block";
+    headerUsername.style.display = "none";
+
+    window.dispatchEvent(
+      new CustomEvent("auth-ready", { detail: { user: null } })
+    );
     return;
   }
 
-  // 🔒 ALWAYS read username from Firestore
+  // FORCE logged-in state
+  body.classList.remove("logged-out");
+  body.classList.add("logged-in");
+
   const snap = await getDoc(doc(db, "users", user.uid));
   const username = snap.exists()
     ? snap.data().username
@@ -150,7 +126,7 @@ onAuthStateChanged(auth, async (user) => {
   headerUsername.style.display = "inline-block";
   openAuthBtn.style.display = "none";
 
-  // 🔔 Notify profile.js
+  // FORCE profile update
   window.dispatchEvent(
     new CustomEvent("auth-ready", { detail: { user, username } })
   );
