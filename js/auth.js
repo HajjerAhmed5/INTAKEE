@@ -1,11 +1,11 @@
 /* ===============================
-   INTAKEE — AUTH (FINAL STABLE)
-   - Username synced correctly
+   INTAKEE — AUTH (FINAL, LOCKED)
+   - Firestore username = source of truth
    - Email OR Username login
    - Forgot Password
    - Forgot Username
    - No race conditions
-   - Launch safe
+   - Profile + Header synced
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -71,14 +71,18 @@ signupBtn?.addEventListener("click", async () => {
   }
 
   try {
+    // Username uniqueness
     const q = query(collection(db, "users"), where("username", "==", username));
     const snap = await getDocs(q);
     if (!snap.empty) throw new Error("Username already taken");
 
+    // Create account
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
+    // Sync username to Auth (secondary)
     await updateProfile(cred.user, { displayName: username });
 
+    // Store Firestore user (PRIMARY)
     await setDoc(doc(db, "users", cred.user.uid), {
       email,
       username,
@@ -104,6 +108,7 @@ loginBtn?.addEventListener("click", async () => {
   try {
     let email = identifier;
 
+    // Username login
     if (!identifier.includes("@")) {
       const q = query(
         collection(db, "users"),
@@ -150,10 +155,9 @@ forgotUsernameBtn?.addEventListener("click", async () => {
   }
 
   try {
-    // SECURITY: Do not reveal whether account exists
+    // SECURITY: no account enumeration
     const q = query(collection(db, "users"), where("email", "==", email));
     await getDocs(q);
-
     alert("If an account exists, the username has been sent.");
   } catch {
     alert("If an account exists, the username has been sent.");
@@ -176,15 +180,13 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const instantName =
-    user.displayName ||
-    (user.email ? user.email.split("@")[0] : "user");
-
-  headerUsername.textContent = "@" + instantName;
+  // Placeholder only (prevents flicker)
+  headerUsername.textContent = "@user";
   headerUsername.style.display = "inline-block";
   openAuthBtn && (openAuthBtn.style.display = "none");
   authDialog?.close();
 
+  // 🔑 Firestore = SINGLE SOURCE OF TRUTH
   try {
     const snap = await getDoc(doc(db, "users", user.uid));
     if (snap.exists() && snap.data().username) {
@@ -192,6 +194,7 @@ onAuthStateChanged(auth, async (user) => {
     }
   } catch {}
 
+  // Notify profile.js
   window.dispatchEvent(
     new CustomEvent("auth-ready", { detail: { user } })
   );
