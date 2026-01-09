@@ -1,5 +1,5 @@
 /* ===============================
-   INTAKEE — PROFILE (REAL APP v2)
+   INTAKEE — PROFILE (FINAL, LOCKED)
 ================================ */
 
 import { auth, db, storage } from "./firebase-init.js";
@@ -28,11 +28,13 @@ const profileName = document.querySelector(".profile-name");
 const profileHandle = document.querySelector(".profile-handle");
 const profileBio = document.querySelector(".profile-bio");
 const avatar = document.querySelector(".profile-avatar");
+const banner = document.querySelector(".profile-banner");
 const editBtn = document.querySelector(".edit-profile-btn");
 const statEls = document.querySelectorAll(".profile-stats strong");
 
 /* ================= STATE ================= */
 let currentUser = null;
+let editMode = false;
 
 /* ================= AUTH ================= */
 onAuthStateChanged(auth, async (user) => {
@@ -47,27 +49,38 @@ onAuthStateChanged(auth, async (user) => {
 
 /* ================= LOAD PROFILE ================= */
 async function loadProfile(user) {
-  const refDoc = doc(db, "users", user.uid);
-  const snap = await getDoc(refDoc);
+  const userRef = doc(db, "users", user.uid);
+  const snap = await getDoc(userRef);
 
+  // Create profile if missing
   if (!snap.exists()) {
-    await setDoc(refDoc, {
+    await setDoc(userRef, {
       username: user.email.split("@")[0],
       bio: "",
-      avatarURL: ""
+      avatarURL: "",
+      bannerURL: "",
+      private: false,
+      blockedUsers: []
     });
   }
 
-  const data = (await getDoc(refDoc)).data();
+  const data = (await getDoc(userRef)).data();
 
   profileName.textContent = data.username;
   profileHandle.textContent = "@" + data.username;
-  profileBio.textContent = data.bio || "This is your bio. Tell people about yourself.";
+  profileBio.textContent =
+    data.bio || "This is your bio. Tell people about yourself.";
 
   if (data.avatarURL) {
     avatar.style.backgroundImage = `url(${data.avatarURL})`;
     avatar.style.backgroundSize = "cover";
     avatar.style.backgroundPosition = "center";
+  }
+
+  if (data.bannerURL) {
+    banner.style.backgroundImage = `url(${data.bannerURL})`;
+    banner.style.backgroundSize = "cover";
+    banner.style.backgroundPosition = "center";
   }
 
   loadStats(user.uid);
@@ -79,31 +92,36 @@ async function loadStats(uid) {
     query(collection(db, "posts"), where("uid", "==", uid))
   );
 
-  statEls[0].textContent = postsSnap.size;
-  statEls[1].textContent = 0;
-  statEls[2].textContent = 0;
-  statEls[3].textContent = 0;
+  statEls[0].textContent = postsSnap.size; // Posts
+  statEls[1].textContent = 0; // Followers (later)
+  statEls[2].textContent = 0; // Following (later)
+  statEls[3].textContent = 0; // Likes (later)
 }
 
-/* ================= EDIT PROFILE ================= */
+/* ================= EDIT MODE ================= */
 editBtn?.addEventListener("click", async () => {
-  const newName = prompt("Edit username", profileName.textContent);
-  if (!newName) return;
+  if (!currentUser) return;
 
-  const newBio = prompt("Edit bio", profileBio.textContent || "");
+  editMode = !editMode;
+  editBtn.textContent = editMode ? "Save Profile" : "Edit Profile";
 
-  await updateDoc(doc(db, "users", currentUser.uid), {
-    username: newName.toLowerCase(),
-    bio: newBio
-  });
+  profileBio.contentEditable = editMode;
+  profileBio.style.outline = editMode ? "1px solid #333" : "none";
 
-  profileName.textContent = newName;
-  profileHandle.textContent = "@" + newName.toLowerCase();
-  profileBio.textContent = newBio;
+  if (!editMode) {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      bio: profileBio.textContent.trim()
+    });
+  }
 });
 
 /* ================= AVATAR UPLOAD ================= */
-avatar?.addEventListener("click", async () => {
+avatar?.addEventListener("click", () => uploadImage("avatar"));
+
+/* ================= BANNER UPLOAD ================= */
+banner?.addEventListener("click", () => uploadImage("banner"));
+
+async function uploadImage(type) {
   if (!currentUser) return;
 
   const input = document.createElement("input");
@@ -114,22 +132,27 @@ avatar?.addEventListener("click", async () => {
     const file = input.files[0];
     if (!file) return;
 
-    const avatarRef = ref(storage, `avatars/${currentUser.uid}`);
-    await uploadBytes(avatarRef, file);
+    const path =
+      type === "avatar"
+        ? `avatars/${currentUser.uid}`
+        : `banners/${currentUser.uid}`;
 
-    const url = await getDownloadURL(avatarRef);
+    const imgRef = ref(storage, path);
+    await uploadBytes(imgRef, file);
+    const url = await getDownloadURL(imgRef);
 
     await updateDoc(doc(db, "users", currentUser.uid), {
-      avatarURL: url
+      [`${type}URL`]: url
     });
 
-    avatar.style.backgroundImage = `url(${url})`;
-    avatar.style.backgroundSize = "cover";
-    avatar.style.backgroundPosition = "center";
+    const target = type === "avatar" ? avatar : banner;
+    target.style.backgroundImage = `url(${url})`;
+    target.style.backgroundSize = "cover";
+    target.style.backgroundPosition = "center";
   };
 
   input.click();
-});
+}
 
 /* ================= GUEST ================= */
 function setGuestProfile() {
