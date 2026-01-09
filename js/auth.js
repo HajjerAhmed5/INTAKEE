@@ -2,8 +2,8 @@
    INTAKEE — AUTH (FINAL LOCKED)
    - Firestore is username source of truth
    - Email NEVER shown
-   - No @user fallback
-   - Profile + Header always match
+   - Header + Profile always match
+   - No Guest state after login
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -25,10 +25,6 @@ import {
   where,
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
-
-/* ================= GLOBAL AUTH STATE ================= */
-window.__AUTH_READY__ = false;
-window.__AUTH_IN__ = false;
 
 /* ================= DOM ================= */
 const authDialog = document.getElementById("authDialog");
@@ -57,18 +53,30 @@ signupBtn?.addEventListener("click", async () => {
   const password = signupPassword.value.trim();
   const username = signupUsername.value.trim().toLowerCase();
 
-  if (!email || !password || !username) return alert("Fill all fields");
-  if (!signupAgeConfirm.checked) return alert("You must be 13+");
+  if (!email || !password || !username) {
+    alert("Fill all fields");
+    return;
+  }
 
+  if (!signupAgeConfirm.checked) {
+    alert("You must be 13+");
+    return;
+  }
+
+  // Check username uniqueness
   const q = query(collection(db, "users"), where("username", "==", username));
   const snap = await getDocs(q);
-  if (!snap.empty) return alert("Username already taken");
+  if (!snap.empty) {
+    alert("Username already taken");
+    return;
+  }
 
   const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-  // Sync once for consistency (not display source)
+  // Sync once (not UI source)
   await updateProfile(cred.user, { displayName: username });
 
+  // Firestore user document
   await setDoc(doc(db, "users", cred.user.uid), {
     username,
     email,
@@ -82,14 +90,22 @@ signupBtn?.addEventListener("click", async () => {
 loginBtn?.addEventListener("click", async () => {
   const identifier = loginIdentifier.value.trim().toLowerCase();
   const password = loginPassword.value.trim();
-  if (!identifier || !password) return alert("Missing fields");
+
+  if (!identifier || !password) {
+    alert("Missing fields");
+    return;
+  }
 
   let email = identifier;
 
+  // Username login
   if (!identifier.includes("@")) {
     const q = query(collection(db, "users"), where("username", "==", identifier));
     const snap = await getDocs(q);
-    if (snap.empty) return alert("Invalid credentials");
+    if (snap.empty) {
+      alert("Invalid login credentials");
+      return;
+    }
     email = snap.docs[0].data().email;
   }
 
@@ -100,21 +116,21 @@ loginBtn?.addEventListener("click", async () => {
 /* ================= PASSWORD RESET ================= */
 forgotPasswordBtn?.addEventListener("click", async () => {
   const email = loginIdentifier.value.trim().toLowerCase();
-  if (!email.includes("@")) return alert("Enter your email");
+  if (!email.includes("@")) {
+    alert("Enter your email");
+    return;
+  }
   await sendPasswordResetEmail(auth, email);
   alert("Password reset email sent");
 });
 
 /* ================= USERNAME RECOVERY ================= */
-forgotUsernameBtn?.addEventListener("click", async () => {
+forgotUsernameBtn?.addEventListener("click", () => {
   alert("If an account exists, recovery instructions were sent.");
 });
 
 /* ================= AUTH STATE ================= */
 onAuthStateChanged(auth, async (user) => {
-  window.__AUTH_READY__ = true;
-  window.__AUTH_IN__ = !!user;
-
   document.body.classList.toggle("logged-in", !!user);
   document.body.classList.toggle("logged-out", !user);
 
@@ -124,9 +140,8 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // 🔒 ALWAYS FETCH USERNAME FROM FIRESTORE
+  // 🔒 ALWAYS read username from Firestore
   const snap = await getDoc(doc(db, "users", user.uid));
-
   const username = snap.exists()
     ? snap.data().username
     : user.displayName;
@@ -135,6 +150,7 @@ onAuthStateChanged(auth, async (user) => {
   headerUsername.style.display = "inline-block";
   openAuthBtn.style.display = "none";
 
+  // 🔔 Notify profile.js
   window.dispatchEvent(
     new CustomEvent("auth-ready", { detail: { user, username } })
   );
