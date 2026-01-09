@@ -1,9 +1,5 @@
 /* ===============================
-   INTAKEE — PROFILE (FINAL FINAL)
-   - Auth-gated
-   - Firestore-safe
-   - DOM-safe
-   - No race conditions
+   INTAKEE — PROFILE (FINAL, LOCKED)
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -17,28 +13,55 @@ const profileName = document.querySelector(".profile-name");
 const profileHandle = document.querySelector(".profile-handle");
 const profileBio = document.querySelector(".profile-bio");
 
+let profileLoaded = false;
+
 /* ================= LOAD PROFILE ================= */
 async function loadProfile(user) {
+  if (profileLoaded) return;
+  profileLoaded = true;
+
   try {
     const snap = await getDoc(doc(db, "users", user.uid));
-    if (!snap.exists()) return;
+
+    if (!snap.exists()) {
+      setGuestProfile();
+      return;
+    }
 
     const data = snap.data();
 
-    profileName && (profileName.textContent = data.username || "User");
-    profileHandle && (profileHandle.textContent = "@" + (data.username || "user"));
-    profileBio && (
-      profileBio.textContent = data.bio || "This is your bio. (0/200)"
-    );
+    if (profileName) {
+      profileName.textContent = data.username || "User";
+    }
 
-    console.log("✅ Profile loaded:", data.username);
+    if (profileHandle) {
+      profileHandle.textContent = "@" + (data.username || "user");
+    }
+
+    if (profileBio) {
+      profileBio.textContent =
+        data.bio || "This is your bio. Tell people about yourself.";
+    }
+
+    console.log("✅ Profile loaded:", data.username || user.uid);
+
   } catch (err) {
     console.error("❌ Profile load failed:", err);
+    setGuestProfile();
+  }
+}
+
+/* ================= GUEST FALLBACK ================= */
+function setGuestProfile() {
+  if (profileName) profileName.textContent = "User";
+  if (profileHandle) profileHandle.textContent = "@user";
+  if (profileBio) {
+    profileBio.textContent = "This is your bio. Tell people about yourself.";
   }
 }
 
 /* ================= AUTH GATE ================= */
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, user => {
   if (!user) return;
   loadProfile(user);
 });
