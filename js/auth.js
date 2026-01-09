@@ -1,6 +1,9 @@
 /* ===============================
    INTAKEE — AUTH (FINAL STABLE)
    - Username synced correctly
+   - Email OR Username login
+   - Forgot Password
+   - Forgot Username
    - No race conditions
    - Launch safe
 ================================ */
@@ -36,6 +39,7 @@ const openAuthBtn = document.getElementById("openAuth");
 const signupBtn = document.getElementById("signupBtn");
 const loginBtn = document.getElementById("loginBtn");
 const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+const forgotUsernameBtn = document.getElementById("forgotUsernameBtn");
 
 const signupEmail = document.getElementById("signupEmail");
 const signupPassword = document.getElementById("signupPassword");
@@ -52,7 +56,7 @@ openAuthBtn?.addEventListener("click", () => authDialog?.showModal());
 
 /* ================= SIGN UP ================= */
 signupBtn?.addEventListener("click", async () => {
-  const email = signupEmail.value.trim();
+  const email = signupEmail.value.trim().toLowerCase();
   const password = signupPassword.value.trim();
   const username = signupUsername.value.trim().toLowerCase();
 
@@ -75,12 +79,12 @@ signupBtn?.addEventListener("click", async () => {
     // Create account
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-    // 🔑 CRITICAL FIX — sync username to Auth
+    // Sync username to Firebase Auth
     await updateProfile(cred.user, {
       displayName: username
     });
 
-    // Store user document
+    // Store Firestore user
     await setDoc(doc(db, "users", cred.user.uid), {
       email,
       username,
@@ -126,9 +130,9 @@ loginBtn?.addEventListener("click", async () => {
 
 /* ================= PASSWORD RESET ================= */
 forgotPasswordBtn?.addEventListener("click", async () => {
-  const email = loginIdentifier.value.trim();
+  const email = loginIdentifier.value.trim().toLowerCase();
 
-  if (!email.includes("@")) {
+  if (!email || !email.includes("@")) {
     alert("Enter your email");
     return;
   }
@@ -138,6 +142,31 @@ forgotPasswordBtn?.addEventListener("click", async () => {
     alert("Password reset email sent");
   } catch (err) {
     alert(err.message);
+  }
+});
+
+/* ================= USERNAME RECOVERY ================= */
+forgotUsernameBtn?.addEventListener("click", async () => {
+  const email = loginIdentifier.value.trim().toLowerCase();
+
+  if (!email || !email.includes("@")) {
+    alert("Enter your email to recover username");
+    return;
+  }
+
+  try {
+    const q = query(collection(db, "users"), where("email", "==", email));
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      alert("No account found with this email");
+      return;
+    }
+
+    const username = snap.docs[0].data().username;
+    alert(`Your username is @${username}`);
+  } catch {
+    alert("Could not retrieve username");
   }
 });
 
@@ -157,7 +186,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // ✅ Instant username (no flicker)
+  // Instant username (no flicker)
   const instantName =
     user.displayName ||
     (user.email ? user.email.split("@")[0] : "user");
@@ -167,15 +196,15 @@ onAuthStateChanged(auth, async (user) => {
   openAuthBtn && (openAuthBtn.style.display = "none");
   authDialog?.close();
 
-  // 🔁 Firestore confirmation (authoritative)
-   try {
+  // Firestore confirmation (authoritative)
+  try {
     const snap = await getDoc(doc(db, "users", user.uid));
     if (snap.exists() && snap.data().username) {
       headerUsername.textContent = "@" + snap.data().username;
     }
   } catch {}
 
-  // 🔔 TELL PROFILE.JS AUTH IS READY
+  // Notify profile.js
   window.dispatchEvent(
     new CustomEvent("auth-ready", { detail: { user } })
   );
