@@ -1,12 +1,12 @@
 /* ===============================
-   INTAKEE — AUTH (FORCED FIX)
-   - Absolute source of truth
-   - Kills Guest forever
-   - Header + Profile always sync
+   INTAKEE — AUTH (FINAL FIXED)
+   - Firestore is source of truth
+   - Header + Profile sync
+   - Tabs work
+   - Modal opens
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
-
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -14,7 +14,6 @@ import {
   onAuthStateChanged,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-
 import {
   doc,
   setDoc,
@@ -25,6 +24,10 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
+/* ================= GLOBAL FLAGS ================= */
+window.__AUTH_READY__ = false;
+window.__AUTH_IN__ = false;
+
 /* ================= DOM ================= */
 const body = document.body;
 const authDialog = document.getElementById("authDialog");
@@ -34,7 +37,6 @@ const headerUsername = document.getElementById("headerUsername");
 const signupBtn = document.getElementById("signupBtn");
 const loginBtn = document.getElementById("loginBtn");
 const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
-const forgotUsernameBtn = document.getElementById("forgotUsernameBtn");
 
 const signupEmail = document.getElementById("signupEmail");
 const signupPassword = document.getElementById("signupPassword");
@@ -43,6 +45,13 @@ const signupAgeConfirm = document.getElementById("signupAgeConfirm");
 
 const loginIdentifier = document.getElementById("loginIdentifier");
 const loginPassword = document.getElementById("loginPassword");
+
+/* ================= OPEN AUTH MODAL ================= */
+openAuthBtn?.addEventListener("click", () => {
+  if (authDialog && !authDialog.open) {
+    authDialog.showModal();
+  }
+});
 
 /* ================= SIGN UP ================= */
 signupBtn?.addEventListener("click", async () => {
@@ -54,8 +63,7 @@ signupBtn?.addEventListener("click", async () => {
   if (!signupAgeConfirm.checked) return alert("You must be 13+");
 
   const q = query(collection(db, "users"), where("username", "==", username));
-  const snap = await getDocs(q);
-  if (!snap.empty) return alert("Username already taken");
+  if (!(await getDocs(q)).empty) return alert("Username taken");
 
   const cred = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(cred.user, { displayName: username });
@@ -66,7 +74,7 @@ signupBtn?.addEventListener("click", async () => {
     createdAt: Date.now()
   });
 
-  authDialog?.close();
+  authDialog.close();
 });
 
 /* ================= LOGIN ================= */
@@ -85,7 +93,7 @@ loginBtn?.addEventListener("click", async () => {
   }
 
   await signInWithEmailAndPassword(auth, email, password);
-  authDialog?.close();
+  authDialog.close();
 });
 
 /* ================= PASSWORD RESET ================= */
@@ -93,40 +101,35 @@ forgotPasswordBtn?.addEventListener("click", async () => {
   const email = loginIdentifier.value.trim().toLowerCase();
   if (!email.includes("@")) return alert("Enter your email");
   await sendPasswordResetEmail(auth, email);
-  alert("Password reset email sent");
+  alert("Password reset sent");
 });
 
-/* ================= AUTH STATE — FORCED ================= */
+/* ================= AUTH STATE ================= */
 onAuthStateChanged(auth, async (user) => {
-  console.log("🔥 AUTH STATE:", user);
+  window.__AUTH_READY__ = true;
+  window.__AUTH_IN__ = !!user;
 
   if (!user) {
-    body.classList.remove("logged-in");
     body.classList.add("logged-out");
+    body.classList.remove("logged-in");
 
-    openAuthBtn.style.display = "inline-block";
     headerUsername.style.display = "none";
+    openAuthBtn.style.display = "inline-block";
 
-    window.dispatchEvent(
-      new CustomEvent("auth-ready", { detail: { user: null } })
-    );
+    window.dispatchEvent(new CustomEvent("auth-ready", { detail: { user: null } }));
     return;
   }
 
-  // FORCE logged-in state
   body.classList.remove("logged-out");
   body.classList.add("logged-in");
 
   const snap = await getDoc(doc(db, "users", user.uid));
-  const username = snap.exists()
-    ? snap.data().username
-    : user.displayName;
+  const username = snap.exists() ? snap.data().username : user.displayName;
 
   headerUsername.textContent = "@" + username;
   headerUsername.style.display = "inline-block";
   openAuthBtn.style.display = "none";
 
-  // FORCE profile update
   window.dispatchEvent(
     new CustomEvent("auth-ready", { detail: { user, username } })
   );
