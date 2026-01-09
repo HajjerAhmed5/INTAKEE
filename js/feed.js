@@ -1,6 +1,6 @@
 /*
 ==========================================
-INTAKEE — FEED SYSTEM (FINAL, WORKING)
+INTAKEE — FEED SYSTEM (FINAL, LOCKED)
 ==========================================
 */
 
@@ -26,33 +26,63 @@ const feeds = {
 
 const PAGE_SIZE = 20;
 let currentUser = null;
+let feedsLoaded = false;
 
 /* ================= AUTH ================= */
 onAuthStateChanged(auth, user => {
   currentUser = user;
-  loadAllFeeds();
+  if (!feedsLoaded) {
+    feedsLoaded = true;
+    loadAllFeeds();
+  }
 });
 
 /* ================= LOAD ALL FEEDS ================= */
 async function loadAllFeeds() {
-  Object.values(feeds).forEach(f => f && (f.innerHTML = ""));
-
-  const q = query(
-    collection(db, "posts"),
-    orderBy("createdAt", "desc"),
-    limit(PAGE_SIZE)
-  );
-
-  const snap = await getDocs(q);
-
-  snap.forEach(doc => {
-    const post = { id: doc.id, ...doc.data() };
-    renderPost(post);
+  Object.values(feeds).forEach(feed => {
+    if (feed) feed.innerHTML = "";
   });
+
+  try {
+    const q = query(
+      collection(db, "posts"),
+      orderBy("createdAt", "desc"),
+      limit(PAGE_SIZE)
+    );
+
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      showEmptyState();
+      return;
+    }
+
+    snap.forEach(docSnap => {
+      const post = { id: docSnap.id, ...docSnap.data() };
+      renderPost(post);
+    });
+
+  } catch (err) {
+    console.error("❌ Feed load failed:", err);
+    showEmptyState();
+  }
+}
+
+/* ================= EMPTY STATE ================= */
+function showEmptyState() {
+  if (feeds.home) {
+    feeds.home.innerHTML = `
+      <div class="empty-feed">
+        <p>No posts yet.</p>
+      </div>
+    `;
+  }
 }
 
 /* ================= RENDER POST ================= */
 function renderPost(post) {
+  if (!post.mediaURL && !post.thumbnailURL) return;
+
   const type = (post.type || "").toLowerCase();
 
   const targets = [
@@ -63,11 +93,14 @@ function renderPost(post) {
   ].filter(Boolean);
 
   targets.forEach(feed => {
+    if (!feed) return;
+
     const card = document.createElement("div");
     card.className = "feed-card";
 
     let media;
-    if (type === "video" || type === "clip") {
+
+    if ((type === "video" || type === "clip") && post.mediaURL) {
       media = document.createElement("video");
       media.src = post.mediaURL;
       media.muted = true;
@@ -80,14 +113,15 @@ function renderPost(post) {
 
     media.className = "feed-media";
 
-    card.innerHTML = `
-      <div class="feed-info">
-        <h4>${post.title || "Untitled"}</h4>
-        <p>@${post.username || "user"} • ${post.views || 0} views</p>
-      </div>
+    const info = document.createElement("div");
+    info.className = "feed-info";
+    info.innerHTML = `
+      <h4>${post.title || "Untitled"}</h4>
+      <p>@${post.username || "user"} • ${post.views || 0} views</p>
     `;
 
-    card.prepend(media);
+    card.appendChild(media);
+    card.appendChild(info);
 
     card.onclick = () => {
       window.location.href = `/viewer.html?id=${post.id}`;
