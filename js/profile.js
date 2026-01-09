@@ -1,17 +1,32 @@
 /* ===============================
-   INTAKEE — PROFILE (FINAL, LOCKED)
+   INTAKEE — PROFILE (FINAL STABLE)
+   - Auth-gated
+   - Firestore-safe
+   - Stats enabled
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
 import { onAuthStateChanged } from
   "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-import { doc, getDoc } from
-  "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ================= DOM ================= */
 const profileName = document.querySelector(".profile-name");
 const profileHandle = document.querySelector(".profile-handle");
 const profileBio = document.querySelector(".profile-bio");
+
+/* OPTIONAL STATS (safe if missing) */
+const postsCountEl = document.querySelector(".stat-posts");
+const likesCountEl = document.querySelector(".stat-likes");
+const savedCountEl = document.querySelector(".stat-saved");
 
 let profileLoaded = false;
 
@@ -21,29 +36,31 @@ async function loadProfile(user) {
   profileLoaded = true;
 
   try {
-    const snap = await getDoc(doc(db, "users", user.uid));
+    /* USER DOC */
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    const userData = userSnap.exists() ? userSnap.data() : {};
 
-    if (!snap.exists()) {
-      setGuestProfile();
-      return;
-    }
+    profileName && (profileName.textContent = userData.username || "User");
+    profileHandle &&
+      (profileHandle.textContent = "@" + (userData.username || "user"));
+    profileBio &&
+      (profileBio.textContent =
+        userData.bio || "This is your bio. Tell people about yourself.");
 
-    const data = snap.data();
+    /* POSTS COUNT */
+    const postsQuery = query(
+      collection(db, "posts"),
+      where("uid", "==", user.uid)
+    );
+    const postsSnap = await getDocs(postsQuery);
 
-    if (profileName) {
-      profileName.textContent = data.username || "User";
-    }
+    postsCountEl && (postsCountEl.textContent = postsSnap.size);
 
-    if (profileHandle) {
-      profileHandle.textContent = "@" + (data.username || "user");
-    }
+    /* PLACEHOLDERS (SAFE FOR LAUNCH) */
+    likesCountEl && (likesCountEl.textContent = "0");
+    savedCountEl && (savedCountEl.textContent = "0");
 
-    if (profileBio) {
-      profileBio.textContent =
-        data.bio || "This is your bio. Tell people about yourself.";
-    }
-
-    console.log("✅ Profile loaded:", data.username || user.uid);
+    console.log("✅ Profile loaded:", userData.username || user.uid);
 
   } catch (err) {
     console.error("❌ Profile load failed:", err);
@@ -53,11 +70,14 @@ async function loadProfile(user) {
 
 /* ================= GUEST FALLBACK ================= */
 function setGuestProfile() {
-  if (profileName) profileName.textContent = "User";
-  if (profileHandle) profileHandle.textContent = "@user";
-  if (profileBio) {
-    profileBio.textContent = "This is your bio. Tell people about yourself.";
-  }
+  profileName && (profileName.textContent = "User");
+  profileHandle && (profileHandle.textContent = "@user");
+  profileBio &&
+    (profileBio.textContent = "This is your bio. Tell people about yourself.");
+
+  postsCountEl && (postsCountEl.textContent = "0");
+  likesCountEl && (likesCountEl.textContent = "0");
+  savedCountEl && (savedCountEl.textContent = "0");
 }
 
 /* ================= AUTH GATE ================= */
