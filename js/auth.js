@@ -168,12 +168,15 @@ onAuthStateChanged(auth, async (user) => {
   authDialog?.close();
 
   // 🔁 Firestore confirmation (authoritative)
-  try {
+   try {
     const snap = await getDoc(doc(db, "users", user.uid));
     if (snap.exists() && snap.data().username) {
       headerUsername.textContent = "@" + snap.data().username;
     }
-  } catch {
-    // silent fallback already handled
-  }
+  } catch {}
+
+  // 🔔 TELL PROFILE.JS AUTH IS READY
+  window.dispatchEvent(
+    new CustomEvent("auth-ready", { detail: { user } })
+  );
 });
