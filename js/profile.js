@@ -1,17 +1,12 @@
 /* ===============================
-   INTAKEE — PROFILE (FINAL LOCKED)
-   - Firestore is single source of truth
-   - Never shows Guest when signed in
-   - Never shows email
-   - Edit Profile works
-   - Refresh & reset safe
+   INTAKEE — PROFILE (FINAL WORKING)
+   - Auth.js is the ONLY auth listener
+   - Firestore is source of truth
+   - No Guest flicker
+   - Username always correct
 ================================ */
 
-import { auth, db } from "./firebase-init.js";
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-
+import { db } from "./firebase-init.js";
 import {
   doc,
   getDoc,
@@ -33,27 +28,28 @@ const editBtn       = document.querySelector(".edit-profile-btn");
 /* ================= STATE ================= */
 let currentUser = null;
 
-/* ================= AUTH STATE ================= */
-onAuthStateChanged(auth, async (user) => {
+/* ================= AUTH READY (ONLY ENTRY POINT) ================= */
+window.addEventListener("auth-ready", async (e) => {
+  const { user, username } = e.detail || {};
+
   if (!user) {
-    currentUser = null;
     setGuestProfile();
     return;
   }
 
   currentUser = user;
-  await loadProfile(user);
+  await loadProfile(user, username);
 });
 
 /* ================= LOAD PROFILE ================= */
-async function loadProfile(user) {
+async function loadProfile(user, usernameFromAuth) {
   const ref = doc(db, "users", user.uid);
   let snap = await getDoc(ref);
 
-  // Create user doc if missing (safe fallback)
+  // Create Firestore doc if missing
   if (!snap.exists()) {
     await setDoc(ref, {
-      username: user.displayName || user.email.split("@")[0],
+      username: usernameFromAuth,
       email: user.email,
       bio: "",
       createdAt: Date.now()
@@ -63,17 +59,10 @@ async function loadProfile(user) {
 
   const data = snap.data();
 
-  // HARD LOCK: never allow invalid username
-  if (!data.username) {
-    await updateDoc(ref, {
-      username: user.displayName || user.email.split("@")[0]
-    });
-    data.username = user.displayName || user.email.split("@")[0];
-  }
+  const username = data.username || usernameFromAuth;
 
-  // Render profile
-  profileName.textContent   = data.username;
-  profileHandle.textContent = "@" + data.username;
+  profileName.textContent   = username;
+  profileHandle.textContent = "@" + username;
   profileBio.textContent =
     data.bio || "This is your bio. Tell people about yourself.";
 
@@ -87,9 +76,9 @@ async function loadStats(uid) {
   );
 
   statEls[0].textContent = postsSnap.size; // Posts
-  statEls[1].textContent = "0";            // Followers (future)
-  statEls[2].textContent = "0";            // Following (future)
-  statEls[3].textContent = "0";            // Likes (future)
+  statEls[1].textContent = "0";            // Followers
+  statEls[2].textContent = "0";            // Following
+  statEls[3].textContent = "0";            // Likes
 }
 
 /* ================= EDIT BIO ================= */
