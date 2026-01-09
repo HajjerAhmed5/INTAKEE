@@ -1,8 +1,13 @@
 /* ===============================
-   INTAKEE — PROFILE (SOURCE OF TRUTH)
+   INTAKEE — PROFILE (FINAL STABLE)
+   - Firestore is source of truth
+   - No Guest flicker
+   - Edit profile works
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
+import { onAuthStateChanged } from
+  "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 import {
   doc,
@@ -25,11 +30,10 @@ const editBtn = document.querySelector(".edit-profile-btn");
 /* ================= STATE ================= */
 let currentUser = null;
 
-/* ================= AUTH READY LISTENER ================= */
-window.addEventListener("auth-ready", async (e) => {
-  const user = e.detail.user;
-
+/* ================= AUTH STATE ================= */
+onAuthStateChanged(auth, async (user) => {
   if (!user) {
+    currentUser = null;
     setGuestProfile();
     return;
   }
@@ -41,16 +45,19 @@ window.addEventListener("auth-ready", async (e) => {
 /* ================= LOAD PROFILE ================= */
 async function loadProfile(user) {
   const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
+  let snap = await getDoc(ref);
 
   if (!snap.exists()) {
     await setDoc(ref, {
-      username: user.displayName || user.email.split("@")[0],
-      bio: ""
+      username: user.displayName,
+      email: user.email,
+      bio: "",
+      createdAt: Date.now()
     });
+    snap = await getDoc(ref);
   }
 
-  const data = (await getDoc(ref)).data();
+  const data = snap.data();
 
   profileName.textContent = data.username;
   profileHandle.textContent = "@" + data.username;
@@ -93,4 +100,3 @@ function setGuestProfile() {
   profileBio.textContent = "Sign in to personalize your profile.";
   statEls.forEach(el => (el.textContent = "0"));
 }
-
