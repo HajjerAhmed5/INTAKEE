@@ -1,5 +1,8 @@
 /* ===============================
-   INTAKEE — TAB SYSTEM (FINAL, LOCKED)
+   INTAKEE — TAB SYSTEM (FIXED)
+   - Tabs always switch
+   - Protected tabs still gated
+   - Auth-safe
 ================================ */
 
 const sections = document.querySelectorAll(".tab-section");
@@ -8,24 +11,16 @@ const tabs = document.querySelectorAll(".bottom-nav a");
 const PROTECTED_TABS = ["upload", "profile", "settings"];
 
 /* ================= HELPERS ================= */
-function isAuthReady() {
-  return window.__AUTH_READY__ === true;
-}
-
 function isLoggedIn() {
-  return window.__AUTH_IN__ === true;
+  return document.body.classList.contains("logged-in");
 }
 
 /* ================= SHOW TAB ================= */
 function showTab(tabId) {
   // 🔒 Block protected tabs if logged out
   if (PROTECTED_TABS.includes(tabId) && !isLoggedIn()) {
-    console.warn("Blocked protected tab:", tabId);
-
     const dialog = document.getElementById("authDialog");
-    if (dialog && !dialog.open) {
-      dialog.showModal();
-    }
+    if (dialog && !dialog.open) dialog.showModal();
     return;
   }
 
@@ -59,7 +54,6 @@ function showTab(tabId) {
 tabs.forEach(tab => {
   tab.addEventListener("click", e => {
     e.preventDefault();
-    if (!isAuthReady()) return;
     showTab(tab.dataset.tab);
   });
 });
@@ -67,10 +61,5 @@ tabs.forEach(tab => {
 /* ================= INITIAL LOAD ================= */
 window.addEventListener("DOMContentLoaded", () => {
   const hash = window.location.hash.replace("#", "") || "home";
-
-  const waitForAuth = setInterval(() => {
-    if (!isAuthReady()) return;
-    clearInterval(waitForAuth);
-    showTab(document.getElementById(hash) ? hash : "home");
-  }, 50);
+  showTab(document.getElementById(hash) ? hash : "home");
 });
