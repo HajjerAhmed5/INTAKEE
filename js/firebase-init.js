@@ -2,7 +2,11 @@ console.log("🔥 FIREBASE INIT LOADED — CLEAN");
 
 /* ================= FIREBASE CORE ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import {
+  getAuth,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
@@ -22,4 +26,13 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-console.log("✅ Firebase ready (no offline mode)");
+/* ================= AUTH PERSISTENCE (CRITICAL) ================= */
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("✅ Auth persistence: LOCAL");
+  })
+  .catch((err) => {
+    console.error("❌ Auth persistence error:", err);
+  });
+
+console.log("✅ Firebase ready (FAST MODE)");
