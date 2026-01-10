@@ -1,12 +1,12 @@
 /* ===============================
-   INTAKEE — PROFILE (FINAL STABLE)
+   INTAKEE — PROFILE (FINAL + MEDIA)
    - Auth.js is the only auth source
-   - Firestore is optional (never blocks UI)
    - Offline-safe
+   - Bio + avatar + banner upload
    - No console crashes
 ================================ */
 
-import { db } from "./firebase-init.js";
+import { db, storage } from "./firebase-init.js";
 import {
   doc,
   getDoc,
@@ -18,12 +18,20 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
+
 /* ================= DOM ================= */
 const profileName   = document.querySelector(".profile-name");
 const profileHandle = document.querySelector(".profile-handle");
 const profileBio    = document.querySelector(".profile-bio");
 const statEls       = document.querySelectorAll(".profile-stats strong");
 const editBtn       = document.querySelector(".edit-profile-btn");
+const avatarEl      = document.querySelector(".profile-avatar");
+const bannerEl      = document.querySelector(".profile-banner");
 
 /* ================= STATE ================= */
 let currentUser = null;
@@ -39,44 +47,54 @@ window.addEventListener("auth-ready", async (e) => {
 
   currentUser = user;
 
-  // Render immediately (never wait on Firestore)
+  // Render immediately
   renderProfile({
     username,
     bio: "Welcome to your INTAKEE profile."
   });
 
-  // Load Firestore data in background
+  enableImageUploads();
+
+  // Load Firestore in background
   await loadProfileFromFirestore(user, username);
 });
 
 /* ================= FIRESTORE PROFILE LOAD ================= */
 async function loadProfileFromFirestore(user, usernameFromAuth) {
-  const ref = doc(db, "users", user.uid);
+  const refDoc = doc(db, "users", user.uid);
 
   try {
-    let snap = await getDoc(ref);
+    let snap = await getDoc(refDoc);
 
-    // Create user doc if missing
     if (!snap.exists()) {
-      await setDoc(ref, {
+      await setDoc(refDoc, {
         username: usernameFromAuth,
         email: user.email,
         bio: "",
+        avatarURL: "",
+        bannerURL: "",
         createdAt: Date.now()
       });
-      snap = await getDoc(ref);
+      snap = await getDoc(refDoc);
     }
 
     const data = snap.data() || {};
-    const username = data.username || usernameFromAuth;
 
     renderProfile({
-      username,
+      username: data.username || usernameFromAuth,
       bio: data.bio || "This is your bio. Tell people about yourself."
     });
 
+    if (data.avatarURL && avatarEl) {
+      avatarEl.style.backgroundImage = `url(${data.avatarURL})`;
+    }
+
+    if (data.bannerURL && bannerEl) {
+      bannerEl.style.backgroundImage = `url(${data.bannerURL})`;
+    }
+
     loadStatsSafe(user.uid);
-  } catch (err) {
+  } catch {
     console.warn("⚠️ Profile Firestore unavailable");
     loadStatsFallback();
   }
@@ -84,8 +102,6 @@ async function loadProfileFromFirestore(user, usernameFromAuth) {
 
 /* ================= RENDER ================= */
 function renderProfile({ username, bio }) {
-  if (!profileName || !profileHandle || !profileBio) return;
-
   profileName.textContent   = username;
   profileHandle.textContent = "@" + username;
   profileBio.textContent    = bio;
@@ -96,6 +112,49 @@ function renderProfile({ username, bio }) {
   }
 }
 
+/* ================= IMAGE UPLOADS ================= */
+function enableImageUploads() {
+  if (avatarEl) avatarEl.onclick = () => uploadImage("avatar");
+  if (bannerEl) bannerEl.onclick = () => uploadImage("banner");
+}
+
+async function uploadImage(type) {
+  if (!currentUser) return;
+
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const path = `users/${currentUser.uid}/${type}.jpg`;
+    const storageRef = ref(storage, path);
+
+    try {
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        [`${type}URL`]: url
+      });
+
+      if (type === "avatar" && avatarEl) {
+        avatarEl.style.backgroundImage = `url(${url})`;
+      }
+
+      if (type === "banner" && bannerEl) {
+        bannerEl.style.backgroundImage = `url(${url})`;
+      }
+    } catch {
+      alert("Upload failed. Try again.");
+    }
+  };
+
+  input.click();
+}
+
 /* ================= STATS ================= */
 async function loadStatsSafe(uid) {
   try {
@@ -103,10 +162,10 @@ async function loadStatsSafe(uid) {
       query(collection(db, "posts"), where("uid", "==", uid))
     );
 
-    statEls[0].textContent = postsSnap.size; // Posts
-    statEls[1].textContent = "0";            // Followers
-    statEls[2].textContent = "0";            // Following
-    statEls[3].textContent = "0";            // Likes
+    statEls[0].textContent = postsSnap.size;
+    statEls[1].textContent = "0";
+    statEls[2].textContent = "0";
+    statEls[3].textContent = "0";
   } catch {
     loadStatsFallback();
   }
@@ -136,8 +195,6 @@ async function handleEditBio() {
 
 /* ================= GUEST ================= */
 function setGuestProfile() {
-  if (!profileName || !profileHandle || !profileBio) return;
-
   profileName.textContent   = "Guest";
   profileHandle.textContent = "@guest";
   profileBio.textContent    = "Sign in to personalize your profile.";
@@ -146,8 +203,7 @@ function setGuestProfile() {
 
   if (editBtn) {
     editBtn.textContent = "Sign In";
-    editBtn.onclick = () => {
+    editBtn.onclick = () =>
       document.getElementById("authDialog")?.showModal();
-    };
   }
 }
