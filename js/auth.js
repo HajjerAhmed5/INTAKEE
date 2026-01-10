@@ -1,8 +1,8 @@
 /* ===============================
-   INTAKEE — AUTH (FAST + POLISHED)
+   INTAKEE — AUTH (FAST + CACHED)
    - Welcome messages
-   - Faster perceived login
-   - Firestore username support
+   - Username/email cache
+   - Firestore only used once per device
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -29,6 +29,30 @@ import {
 /* ================= GLOBAL FLAGS ================= */
 window.__AUTH_READY__ = false;
 window.__AUTH_IN__ = false;
+
+/* ================= LOCAL USER CACHE ================= */
+const cacheUser = (user, username, email) => {
+  localStorage.setItem(
+    "intakee_user",
+    JSON.stringify({
+      uid: user.uid,
+      email,
+      username
+    })
+  );
+};
+
+const getCachedUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem("intakee_user"));
+  } catch {
+    return null;
+  }
+};
+
+const clearCachedUser = () => {
+  localStorage.removeItem("intakee_user");
+};
 
 /* ================= DOM ================= */
 const body = document.body;
@@ -67,20 +91,22 @@ signupBtn?.addEventListener("click", async () => {
     if (!signupAgeConfirm.checked)
       throw new Error("You must be 13 or older");
 
-    // Username check (only unavoidable delay)
+    // Username uniqueness (only unavoidable delay)
     const q = query(collection(db, "users"), where("username", "==", username));
     if (!(await getDocs(q)).empty)
       throw new Error("Username already taken");
 
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-    // Fire & forget profile updates (do NOT block UI)
+    // Non-blocking updates
     updateProfile(cred.user, { displayName: username });
     setDoc(doc(db, "users", cred.user.uid), {
       username,
       email,
       createdAt: Date.now()
     });
+
+    cacheUser(cred.user, username, email);
 
     authDialog?.close();
     setTimeout(() => alert("Welcome to INTAKEE 👋"), 200);
@@ -100,7 +126,14 @@ loginBtn?.addEventListener("click", async () => {
 
     let email = identifier;
 
-    if (!identifier.includes("@")) {
+    // ⚡ FAST PATH — cached username
+    const cached = getCachedUser();
+    if (cached && cached.username === identifier) {
+      email = cached.email;
+    }
+
+    // 🐢 FALLBACK — Firestore (only first time per device)
+    if (!identifier.includes("@") && email === identifier) {
       const q = query(
         collection(db, "users"),
         where("username", "==", identifier)
@@ -135,6 +168,7 @@ forgotPasswordBtn?.addEventListener("click", async () => {
 
 /* ================= SIGN OUT ================= */
 window.logout = async () => {
+  clearCachedUser();
   await signOut(auth);
 };
 
@@ -163,6 +197,8 @@ onAuthStateChanged(auth, async (user) => {
   const username = snap.exists()
     ? snap.data().username
     : user.displayName;
+
+  cacheUser(user, username, user.email);
 
   if (headerUsername) {
     headerUsername.textContent = "@" + username;
