@@ -1,9 +1,8 @@
 /* ===============================
-   INTAKEE — PROFILE (FINAL + MEDIA)
-   - Auth.js is the only auth source
+   INTAKEE — PROFILE (FINAL, FIXED)
+   - Bio persists
+   - Avatar & banner upload work
    - Offline-safe
-   - Bio + avatar + banner upload
-   - No console crashes
 ================================ */
 
 import { db, storage } from "./firebase-init.js";
@@ -12,7 +11,6 @@ import {
   doc,
   getDoc,
   setDoc,
-  updateDoc,
   collection,
   query,
   where,
@@ -37,7 +35,7 @@ const bannerEl      = document.querySelector(".profile-banner");
 /* ================= STATE ================= */
 let currentUser = null;
 
-/* ================= SAFE FILE INPUTS (AUTO-INJECT) ================= */
+/* ================= FILE INPUTS ================= */
 const avatarInput = document.createElement("input");
 avatarInput.type = "file";
 avatarInput.accept = "image/*";
@@ -62,7 +60,6 @@ window.addEventListener("auth-ready", async (e) => {
 
   currentUser = user;
 
-  // Immediate render (never wait on Firestore)
   renderProfile({
     username,
     bio: "Welcome to your INTAKEE profile."
@@ -70,19 +67,18 @@ window.addEventListener("auth-ready", async (e) => {
 
   enableUploads();
 
-  // Background Firestore load
   await loadProfileFromFirestore(user, username);
 });
 
-/* ================= FIRESTORE LOAD ================= */
+/* ================= LOAD PROFILE ================= */
 async function loadProfileFromFirestore(user, usernameFromAuth) {
-  const refDoc = doc(db, "users", user.uid);
+  const userRef = doc(db, "users", user.uid);
 
   try {
-    let snap = await getDoc(refDoc);
+    let snap = await getDoc(userRef);
 
     if (!snap.exists()) {
-      await setDoc(refDoc, {
+      await setDoc(userRef, {
         username: usernameFromAuth,
         email: user.email,
         bio: "",
@@ -90,7 +86,7 @@ async function loadProfileFromFirestore(user, usernameFromAuth) {
         bannerURL: "",
         createdAt: Date.now()
       });
-      snap = await getDoc(refDoc);
+      snap = await getDoc(userRef);
     }
 
     const data = snap.data() || {};
@@ -109,16 +105,14 @@ async function loadProfileFromFirestore(user, usernameFromAuth) {
     }
 
     loadStatsSafe(user.uid);
-  } catch {
-    console.warn("⚠️ Firestore unavailable — using cached UI");
+  } catch (err) {
+    console.warn("⚠️ Firestore unavailable", err);
     loadStatsFallback();
   }
 }
 
 /* ================= RENDER ================= */
 function renderProfile({ username, bio }) {
-  if (!profileName) return;
-
   profileName.textContent   = username;
   profileHandle.textContent = "@" + username;
   profileBio.textContent    = bio;
@@ -146,16 +140,19 @@ bannerInput.addEventListener("change", e => {
 async function uploadImage(file, type) {
   if (!file || !currentUser) return;
 
-  const path = `users/${currentUser.uid}/${type}.jpg`;
+  // 🔑 CORRECT PATH (matches bucket & rules)
+  const path = `profile/${currentUser.uid}/${type}.jpg`;
   const storageRef = ref(storage, path);
 
   try {
     await uploadBytes(storageRef, file);
     const url = await getDownloadURL(storageRef);
 
-    await updateDoc(doc(db, "users", currentUser.uid), {
-      [`${type}URL`]: url
-    });
+    await setDoc(
+      doc(db, "users", currentUser.uid),
+      { [`${type}URL`]: url },
+      { merge: true }
+    );
 
     if (type === "avatar" && avatarEl) {
       avatarEl.style.backgroundImage = `url(${url})`;
@@ -164,7 +161,6 @@ async function uploadImage(file, type) {
     if (type === "banner" && bannerEl) {
       bannerEl.style.backgroundImage = `url(${url})`;
     }
-
   } catch (err) {
     alert("Image upload failed");
     console.error(err);
@@ -201,18 +197,18 @@ async function handleEditBio() {
   profileBio.textContent = newBio.trim();
 
   try {
-    await updateDoc(doc(db, "users", currentUser.uid), {
-      bio: newBio.trim()
-    });
-  } catch {
-    console.warn("⚠️ Bio saved locally only");
+    await setDoc(
+      doc(db, "users", currentUser.uid),
+      { bio: newBio.trim() },
+      { merge: true }
+    );
+  } catch (err) {
+    console.warn("⚠️ Bio save failed", err);
   }
 }
 
 /* ================= GUEST ================= */
 function setGuestProfile() {
-  if (!profileName) return;
-
   profileName.textContent   = "Guest";
   profileHandle.textContent = "@guest";
   profileBio.textContent    = "Sign in to personalize your profile.";
