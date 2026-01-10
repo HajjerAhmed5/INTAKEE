@@ -1,8 +1,9 @@
 /* ===============================
-   INTAKEE — AUTH (FAST + CACHED)
-   - Welcome messages
-   - Username/email cache
-   - Firestore only used once per device
+   INTAKEE — AUTH (FINAL STABLE)
+   - No Firestore dependency for UI
+   - Offline-safe
+   - Cached + Auth-first username
+   - Deterministic (no “sometimes”)
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -91,14 +92,13 @@ signupBtn?.addEventListener("click", async () => {
     if (!signupAgeConfirm.checked)
       throw new Error("You must be 13 or older");
 
-    // Username uniqueness (only unavoidable delay)
     const q = query(collection(db, "users"), where("username", "==", username));
     if (!(await getDocs(q)).empty)
       throw new Error("Username already taken");
 
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-    // Non-blocking updates
+    // Non-blocking writes
     updateProfile(cred.user, { displayName: username });
     setDoc(doc(db, "users", cred.user.uid), {
       username,
@@ -109,7 +109,7 @@ signupBtn?.addEventListener("click", async () => {
     cacheUser(cred.user, username, email);
 
     authDialog?.close();
-    setTimeout(() => alert("Welcome to INTAKEE 👋"), 200);
+    setTimeout(() => alert("Welcome to INTAKEE 👋"), 150);
   } catch (err) {
     alert(err.message);
   }
@@ -126,13 +126,13 @@ loginBtn?.addEventListener("click", async () => {
 
     let email = identifier;
 
-    // ⚡ FAST PATH — cached username
+    // FAST PATH — local cache
     const cached = getCachedUser();
     if (cached && cached.username === identifier) {
       email = cached.email;
     }
 
-    // 🐢 FALLBACK — Firestore (only first time per device)
+    // Fallback — Firestore (only if needed)
     if (!identifier.includes("@") && email === identifier) {
       const q = query(
         collection(db, "users"),
@@ -146,7 +146,7 @@ loginBtn?.addEventListener("click", async () => {
     await signInWithEmailAndPassword(auth, email, password);
 
     authDialog?.close();
-    setTimeout(() => alert("Welcome back 👋"), 150);
+    setTimeout(() => alert("Welcome back 👋"), 120);
   } catch (err) {
     alert(err.message);
   }
@@ -172,11 +172,12 @@ window.logout = async () => {
   await signOut(auth);
 };
 
-/* ================= AUTH STATE ================= */
+/* ================= AUTH STATE (FIXED) ================= */
 onAuthStateChanged(auth, async (user) => {
   window.__AUTH_READY__ = true;
   window.__AUTH_IN__ = !!user;
 
+  /* ===== LOGGED OUT ===== */
   if (!user) {
     body.classList.add("logged-out");
     body.classList.remove("logged-in");
@@ -190,13 +191,21 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  /* ===== LOGGED IN ===== */
   body.classList.remove("logged-out");
   body.classList.add("logged-in");
 
-  const snap = await getDoc(doc(db, "users", user.uid));
-  const username = snap.exists()
-    ? snap.data().username
-    : user.displayName;
+  // 🔥 AUTH-FIRST USERNAME (NO CRASHES)
+  let username = user.displayName || "user";
+
+  try {
+    const snap = await getDoc(doc(db, "users", user.uid));
+    if (snap.exists() && snap.data().username) {
+      username = snap.data().username;
+    }
+  } catch {
+    console.warn("⚠️ Firestore unavailable — using auth/cached username");
+  }
 
   cacheUser(user, username, user.email);
 
