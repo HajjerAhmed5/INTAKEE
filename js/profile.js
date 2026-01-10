@@ -1,9 +1,9 @@
 /* ===============================
-   INTAKEE — PROFILE (FINAL WORKING)
-   - Auth.js is the ONLY auth listener
-   - Firestore is source of truth
-   - No Guest flicker
-   - Username always correct
+   INTAKEE — PROFILE (FINAL STABLE)
+   - Auth.js is the only auth source
+   - Firestore is optional (never blocks UI)
+   - Offline-safe
+   - No console crashes
 ================================ */
 
 import { db } from "./firebase-init.js";
@@ -28,77 +28,126 @@ const editBtn       = document.querySelector(".edit-profile-btn");
 /* ================= STATE ================= */
 let currentUser = null;
 
-/* ================= AUTH READY (ONLY ENTRY POINT) ================= */
+/* ================= AUTH READY ================= */
 window.addEventListener("auth-ready", async (e) => {
   const { user, username } = e.detail || {};
 
-  if (!user) {
+  if (!user || !username) {
     setGuestProfile();
     return;
   }
 
   currentUser = user;
-  await loadProfile(user, username);
+
+  // Render immediately (never wait on Firestore)
+  renderProfile({
+    username,
+    bio: "Welcome to your INTAKEE profile."
+  });
+
+  // Load Firestore data in background
+  await loadProfileFromFirestore(user, username);
 });
 
-/* ================= LOAD PROFILE ================= */
-async function loadProfile(user, usernameFromAuth) {
+/* ================= FIRESTORE PROFILE LOAD ================= */
+async function loadProfileFromFirestore(user, usernameFromAuth) {
   const ref = doc(db, "users", user.uid);
-  let snap = await getDoc(ref);
 
-  // Create Firestore doc if missing
-  if (!snap.exists()) {
-    await setDoc(ref, {
-      username: usernameFromAuth,
-      email: user.email,
-      bio: "",
-      createdAt: Date.now()
+  try {
+    let snap = await getDoc(ref);
+
+    // Create user doc if missing
+    if (!snap.exists()) {
+      await setDoc(ref, {
+        username: usernameFromAuth,
+        email: user.email,
+        bio: "",
+        createdAt: Date.now()
+      });
+      snap = await getDoc(ref);
+    }
+
+    const data = snap.data() || {};
+    const username = data.username || usernameFromAuth;
+
+    renderProfile({
+      username,
+      bio: data.bio || "This is your bio. Tell people about yourself."
     });
-    snap = await getDoc(ref);
+
+    loadStatsSafe(user.uid);
+  } catch (err) {
+    console.warn("⚠️ Profile Firestore unavailable");
+    loadStatsFallback();
   }
+}
 
-  const data = snap.data();
-
-  const username = data.username || usernameFromAuth;
+/* ================= RENDER ================= */
+function renderProfile({ username, bio }) {
+  if (!profileName || !profileHandle || !profileBio) return;
 
   profileName.textContent   = username;
   profileHandle.textContent = "@" + username;
-  profileBio.textContent =
-    data.bio || "This is your bio. Tell people about yourself.";
+  profileBio.textContent    = bio;
 
-  await loadStats(user.uid);
+  if (editBtn) {
+    editBtn.textContent = "Edit Profile";
+    editBtn.onclick = handleEditBio;
+  }
 }
 
 /* ================= STATS ================= */
-async function loadStats(uid) {
-  const postsSnap = await getDocs(
-    query(collection(db, "posts"), where("uid", "==", uid))
-  );
+async function loadStatsSafe(uid) {
+  try {
+    const postsSnap = await getDocs(
+      query(collection(db, "posts"), where("uid", "==", uid))
+    );
 
-  statEls[0].textContent = postsSnap.size; // Posts
-  statEls[1].textContent = "0";            // Followers
-  statEls[2].textContent = "0";            // Following
-  statEls[3].textContent = "0";            // Likes
+    statEls[0].textContent = postsSnap.size; // Posts
+    statEls[1].textContent = "0";            // Followers
+    statEls[2].textContent = "0";            // Following
+    statEls[3].textContent = "0";            // Likes
+  } catch {
+    loadStatsFallback();
+  }
+}
+
+function loadStatsFallback() {
+  statEls.forEach(el => (el.textContent = "0"));
 }
 
 /* ================= EDIT BIO ================= */
-editBtn?.addEventListener("click", async () => {
+async function handleEditBio() {
   if (!currentUser) return;
 
   const newBio = prompt("Edit bio", profileBio.textContent);
   if (newBio === null) return;
 
-  await updateDoc(doc(db, "users", currentUser.uid), {
-    bio: newBio.trim()
-  });
-
   profileBio.textContent = newBio.trim();
-});
+
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      bio: newBio.trim()
+    });
+  } catch {
+    console.warn("⚠️ Bio update failed (offline)");
+  }
+}
 
 /* ================= GUEST ================= */
 function setGuestProfile() {
+  if (!profileName || !profileHandle || !profileBio) return;
+
   profileName.textContent   = "Guest";
   profileHandle.textContent = "@guest";
-  profileBio.textContent   = "Sign in to personalize your profile.";
+  profileBio.textContent    = "Sign in to personalize your profile.";
+
   statEls.forEach(el => (el.textContent = "0"));
+
+  if (editBtn) {
+    editBtn.textContent = "Sign In";
+    editBtn.onclick = () => {
+      document.getElementById("authDialog")?.showModal();
+    };
+  }
 }
