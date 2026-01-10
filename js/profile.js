@@ -7,6 +7,7 @@
 ================================ */
 
 import { db, storage } from "./firebase-init.js";
+
 import {
   doc,
   getDoc,
@@ -36,6 +37,20 @@ const bannerEl      = document.querySelector(".profile-banner");
 /* ================= STATE ================= */
 let currentUser = null;
 
+/* ================= SAFE FILE INPUTS (AUTO-INJECT) ================= */
+const avatarInput = document.createElement("input");
+avatarInput.type = "file";
+avatarInput.accept = "image/*";
+avatarInput.hidden = true;
+
+const bannerInput = document.createElement("input");
+bannerInput.type = "file";
+bannerInput.accept = "image/*";
+bannerInput.hidden = true;
+
+document.body.appendChild(avatarInput);
+document.body.appendChild(bannerInput);
+
 /* ================= AUTH READY ================= */
 window.addEventListener("auth-ready", async (e) => {
   const { user, username } = e.detail || {};
@@ -47,19 +62,19 @@ window.addEventListener("auth-ready", async (e) => {
 
   currentUser = user;
 
-  // Render immediately
+  // Immediate render (never wait on Firestore)
   renderProfile({
     username,
     bio: "Welcome to your INTAKEE profile."
   });
 
-  enableImageUploads();
+  enableUploads();
 
-  // Load Firestore in background
+  // Background Firestore load
   await loadProfileFromFirestore(user, username);
 });
 
-/* ================= FIRESTORE PROFILE LOAD ================= */
+/* ================= FIRESTORE LOAD ================= */
 async function loadProfileFromFirestore(user, usernameFromAuth) {
   const refDoc = doc(db, "users", user.uid);
 
@@ -95,13 +110,15 @@ async function loadProfileFromFirestore(user, usernameFromAuth) {
 
     loadStatsSafe(user.uid);
   } catch {
-    console.warn("⚠️ Profile Firestore unavailable");
+    console.warn("⚠️ Firestore unavailable — using cached UI");
     loadStatsFallback();
   }
 }
 
 /* ================= RENDER ================= */
 function renderProfile({ username, bio }) {
+  if (!profileName) return;
+
   profileName.textContent   = username;
   profileHandle.textContent = "@" + username;
   profileBio.textContent    = bio;
@@ -112,47 +129,46 @@ function renderProfile({ username, bio }) {
   }
 }
 
-/* ================= IMAGE UPLOADS ================= */
-function enableImageUploads() {
-  if (avatarEl) avatarEl.onclick = () => uploadImage("avatar");
-  if (bannerEl) bannerEl.onclick = () => uploadImage("banner");
+/* ================= UPLOAD HANDLERS ================= */
+function enableUploads() {
+  if (avatarEl) avatarEl.onclick = () => avatarInput.click();
+  if (bannerEl) bannerEl.onclick = () => bannerInput.click();
 }
 
-async function uploadImage(type) {
-  if (!currentUser) return;
+avatarInput.addEventListener("change", e => {
+  uploadImage(e.target.files[0], "avatar");
+});
 
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/*";
+bannerInput.addEventListener("change", e => {
+  uploadImage(e.target.files[0], "banner");
+});
 
-  input.onchange = async () => {
-    const file = input.files[0];
-    if (!file) return;
+async function uploadImage(file, type) {
+  if (!file || !currentUser) return;
 
-    const path = `users/${currentUser.uid}/${type}.jpg`;
-    const storageRef = ref(storage, path);
+  const path = `users/${currentUser.uid}/${type}.jpg`;
+  const storageRef = ref(storage, path);
 
-    try {
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
+  try {
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
 
-      await updateDoc(doc(db, "users", currentUser.uid), {
-        [`${type}URL`]: url
-      });
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      [`${type}URL`]: url
+    });
 
-      if (type === "avatar" && avatarEl) {
-        avatarEl.style.backgroundImage = `url(${url})`;
-      }
-
-      if (type === "banner" && bannerEl) {
-        bannerEl.style.backgroundImage = `url(${url})`;
-      }
-    } catch {
-      alert("Upload failed. Try again.");
+    if (type === "avatar" && avatarEl) {
+      avatarEl.style.backgroundImage = `url(${url})`;
     }
-  };
 
-  input.click();
+    if (type === "banner" && bannerEl) {
+      bannerEl.style.backgroundImage = `url(${url})`;
+    }
+
+  } catch (err) {
+    alert("Image upload failed");
+    console.error(err);
+  }
 }
 
 /* ================= STATS ================= */
@@ -189,12 +205,14 @@ async function handleEditBio() {
       bio: newBio.trim()
     });
   } catch {
-    console.warn("⚠️ Bio update failed (offline)");
+    console.warn("⚠️ Bio saved locally only");
   }
 }
 
 /* ================= GUEST ================= */
 function setGuestProfile() {
+  if (!profileName) return;
+
   profileName.textContent   = "Guest";
   profileHandle.textContent = "@guest";
   profileBio.textContent    = "Sign in to personalize your profile.";
