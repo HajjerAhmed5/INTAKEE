@@ -231,21 +231,20 @@
 
 <script>
 /* ===============================
-   INTAKEE — UI AUTH SYNC (INLINE)
-   - No HTML changes
-   - No JS file changes
+   INTAKEE — UI AUTH SYNC (TIMING SAFE)
+   - Handles late-loaded scripts
    - Header + Profile fixed
 ================================ */
 
-window.addEventListener("auth-ready", (e) => {
-  const user = e.detail.user;
-  const username = e.detail.username;
+function syncAuthUI(detail) {
+  const user = detail?.user || null;
+  const username = detail?.username || null;
 
-  // ===== HEADER =====
+  /* ===== HEADER ===== */
   const loginBtn = document.getElementById("openAuth");
   const headerUsername = document.getElementById("headerUsername");
 
-  if (user) {
+  if (user && username) {
     if (headerUsername) {
       headerUsername.textContent = "@" + username;
       headerUsername.style.display = "inline-block";
@@ -256,7 +255,7 @@ window.addEventListener("auth-ready", (e) => {
     if (loginBtn) loginBtn.style.display = "inline-block";
   }
 
-  // ===== PROFILE =====
+  /* ===== PROFILE ===== */
   const profileName = document.querySelector(".profile-name");
   const profileHandle = document.querySelector(".profile-handle");
   const profileBio = document.querySelector(".profile-bio");
@@ -264,7 +263,7 @@ window.addEventListener("auth-ready", (e) => {
 
   if (!profileName || !profileHandle || !editBtn) return;
 
-  if (!user) {
+  if (!user || !username) {
     profileName.textContent = "Guest";
     profileHandle.textContent = "@guest";
     profileBio.textContent = "Sign in to personalize your profile.";
@@ -282,5 +281,23 @@ window.addEventListener("auth-ready", (e) => {
 
   editBtn.textContent = "Edit Profile";
   editBtn.onclick = null;
+}
+
+/* ===== LISTEN FOR FUTURE AUTH EVENTS ===== */
+window.addEventListener("auth-ready", (e) => {
+  syncAuthUI(e.detail);
 });
+
+/* ===== HANDLE ALREADY-READY AUTH ===== */
+setTimeout(() => {
+  if (window.__AUTH_READY__ && window.__AUTH_IN__) {
+    const cached = JSON.parse(localStorage.getItem("intakee_user") || "{}");
+    if (cached.username) {
+      syncAuthUI({
+        user: { uid: cached.uid },
+        username: cached.username
+      });
+    }
+  }
+}, 0);
 </script>
