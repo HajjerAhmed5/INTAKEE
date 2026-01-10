@@ -20,19 +20,16 @@ export const firebaseConfig = {
   appId: "1:40666230072:web:3e3875043b11d795b565cd"
 };
 
-/* ================= INIT ================= */
+/* ================= INIT APP ================= */
 export const app = initializeApp(firebaseConfig);
+
+/* ================= AUTH (PERSISTENCE FIRST) ================= */
 export const auth = getAuth(app);
+await setPersistence(auth, browserLocalPersistence);
+console.log("✅ Auth persistence: LOCAL");
+
+/* ================= SERVICES ================= */
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-/* ================= AUTH PERSISTENCE (CRITICAL) ================= */
-setPersistence(auth, browserLocalPersistence)
-  .then(() => {
-    console.log("✅ Auth persistence: LOCAL");
-  })
-  .catch((err) => {
-    console.error("❌ Auth persistence error:", err);
-  });
-
-console.log("✅ Firebase ready (FAST MODE)");
+console.log("✅ Firebase ready (STABLE MODE)");
