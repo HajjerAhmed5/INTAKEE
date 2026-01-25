@@ -913,3 +913,45 @@ body.auth-checking {
   visibility: visible;
   opacity: 1;
 }
+/* ===============================
+   Bottom Navigation — Icon + Label
+   Safe enhancement (non-breaking)
+================================ */
+
+/* Bottom nav layout */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 64px;
+  background: #000;
+  border-top: 1px solid #1a1a1a;
+}
+
+/* Each tab */
+.bottom-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #888;
+  font-size: 11px;
+  text-decoration: none;
+  min-width: 48px;
+}
+
+/* Icon */
+.bottom-nav a i {
+  font-size: 18px;
+}
+
+/* Active tab */
+.bottom-nav a.active {
+  color: #fff;
+}
+
+/* Optional hover (desktop safe) */
+.bottom-nav a:hover {
+  color: #fff;
+}
