@@ -1,6 +1,6 @@
 /*
 ==========================================
-INTAKEE — UPLOAD SYSTEM (FINAL / SAFE)
+INTAKEE — UPLOAD SYSTEM (FAST + SAFE)
 ==========================================
 */
 
@@ -10,7 +10,7 @@ import { onAuthStateChanged } from
 
 import {
   ref,
-  uploadBytesResumable,
+  uploadBytes,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
@@ -20,68 +20,89 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-/* DOM */
-const uploadBtn = document.querySelector(".upload-btn");
-const typeInput = document.querySelector("#upload select");
-const titleInput = document.querySelector("#upload input[type='text']");
-const descInput = document.querySelector("#upload textarea");
-const thumbInput = document.querySelector("#upload input[type='file']:nth-of-type(1)");
-const mediaInput = document.querySelector("#upload input[type='file']:nth-of-type(2)");
+/* ================= DOM (SAFE SELECTORS) ================= */
+const uploadSection = document.getElementById("upload");
+if (!uploadSection) {
+  console.warn("Upload section not found");
+  throw new Error("Upload UI missing");
+}
+
+const uploadBtn = uploadSection.querySelector(".upload-btn");
+const typeInput = uploadSection.querySelector("select");
+const titleInput = uploadSection.querySelector("input[type='text']");
+const descInput = uploadSection.querySelector("textarea");
+const fileInputs = uploadSection.querySelectorAll("input[type='file']");
+const thumbInput = fileInputs[0];
+const mediaInput = fileInputs[1];
 
 let currentUser = null;
+let authReady = false;
 
-/* AUTH */
+/* ================= AUTH ================= */
 onAuthStateChanged(auth, user => {
-  currentUser = user;
+  authReady = true;
+  currentUser = user || null;
 });
 
-/* UPLOAD */
+/* ================= UPLOAD HANDLER ================= */
 uploadBtn.addEventListener("click", async () => {
+  if (!authReady) {
+    alert("Auth still loading — try again");
+    return;
+  }
+
   if (!currentUser) {
-    alert("Please log in");
+    alert("Please log in to upload");
     return;
   }
 
-  const mediaFile = mediaInput.files[0];
+  const mediaFile = mediaInput?.files?.[0];
   if (!mediaFile) {
-    alert("Select a media file");
+    alert("Please select a media file");
     return;
   }
 
-  uploadBtn.textContent = "Uploading...";
+  const title = titleInput.value.trim();
+  if (!title) {
+    alert("Title is required");
+    return;
+  }
+
   uploadBtn.disabled = true;
+  uploadBtn.textContent = "Uploading…";
 
   try {
     const uid = currentUser.uid;
-    const time = Date.now();
+    const timestamp = Date.now();
 
-    // Upload media ONLY — no preview, no fetch
+    /* ===== MEDIA UPLOAD ===== */
     const mediaRef = ref(
       storage,
-      `uploads/${uid}/${time}_${mediaFile.name}`
+      `uploads/${uid}/${timestamp}_${mediaFile.name}`
     );
 
-    await uploadBytesResumable(mediaRef, mediaFile);
-
+    await uploadBytes(mediaRef, mediaFile);
     const mediaURL = await getDownloadURL(mediaRef);
 
-    let thumbURL = null;
-    if (thumbInput.files[0]) {
+    /* ===== THUMBNAIL (OPTIONAL) ===== */
+    let thumbnailURL = null;
+    if (thumbInput?.files?.[0]) {
+      const thumbFile = thumbInput.files[0];
       const thumbRef = ref(
         storage,
-        `thumbnails/${uid}/${time}_${thumbInput.files[0].name}`
+        `thumbnails/${uid}/${timestamp}_${thumbFile.name}`
       );
-      await uploadBytesResumable(thumbRef, thumbInput.files[0]);
-      thumbURL = await getDownloadURL(thumbRef);
+      await uploadBytes(thumbRef, thumbFile);
+      thumbnailURL = await getDownloadURL(thumbRef);
     }
 
-    // Save Firestore doc ONLY
+    /* ===== FIRESTORE ===== */
     await addDoc(collection(db, "posts"), {
       type: typeInput.value,
-      title: titleInput.value.trim(),
+      title,
       description: descInput.value.trim(),
       mediaURL,
-      thumbnailURL: thumbURL,
+      thumbnailURL,
       uid,
       username: currentUser.displayName || "user",
       createdAt: serverTimestamp(),
@@ -89,11 +110,19 @@ uploadBtn.addEventListener("click", async () => {
     });
 
     alert("Upload successful!");
-    location.hash = "#home";
+
+    // Reset form (no reload)
+    titleInput.value = "";
+    descInput.value = "";
+    mediaInput.value = "";
+    if (thumbInput) thumbInput.value = "";
+
+    // Optional: jump to Home
+    window.location.hash = "#home";
 
   } catch (err) {
     console.error("UPLOAD FAILED:", err);
-    alert("Upload failed — check console");
+    alert("Upload failed. Please try again.");
   }
 
   uploadBtn.textContent = "Upload";
