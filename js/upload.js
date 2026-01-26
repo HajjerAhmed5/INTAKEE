@@ -1,6 +1,6 @@
 /*
 ==========================================
-INTAKEE — UPLOAD SYSTEM (FAST + SAFE)
+INTAKEE — UPLOAD SYSTEM (FINAL / GUARANTEED)
 ==========================================
 */
 
@@ -20,34 +20,37 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-/* ================= DOM (SAFE SELECTORS) ================= */
+/* ================= DOM ================= */
 const uploadSection = document.getElementById("upload");
-if (!uploadSection) {
-  console.warn("Upload section not found");
-  throw new Error("Upload UI missing");
-}
-
-const uploadBtn = uploadSection.querySelector(".upload-btn");
-const typeInput = uploadSection.querySelector("select");
-const titleInput = uploadSection.querySelector("input[type='text']");
-const descInput = uploadSection.querySelector("textarea");
-const fileInputs = uploadSection.querySelectorAll("input[type='file']");
-const thumbInput = fileInputs[0];
-const mediaInput = fileInputs[1];
+const uploadBtn = uploadSection?.querySelector(".upload-btn");
+const typeInput = uploadSection?.querySelector("select");
+const titleInput = uploadSection?.querySelector("input[type='text']");
+const descInput = uploadSection?.querySelector("textarea");
+const fileInputs = uploadSection?.querySelectorAll("input[type='file']");
+const thumbInput = fileInputs?.[0];
+const mediaInput = fileInputs?.[1];
 
 let currentUser = null;
 let authReady = false;
 
 /* ================= AUTH ================= */
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    // 🔑 FORCE token refresh (this is the magic fix)
+    await user.getIdToken(true);
+    currentUser = user;
+  } else {
+    currentUser = null;
+  }
+
   authReady = true;
-  currentUser = user || null;
+  console.log("✅ Auth ready for upload:", !!user);
 });
 
-/* ================= UPLOAD HANDLER ================= */
+/* ================= UPLOAD ================= */
 uploadBtn.addEventListener("click", async () => {
   if (!authReady) {
-    alert("Auth still loading — try again");
+    alert("Auth still loading — wait 1 second and try again");
     return;
   }
 
@@ -75,16 +78,17 @@ uploadBtn.addEventListener("click", async () => {
     const uid = currentUser.uid;
     const timestamp = Date.now();
 
-    /* ===== MEDIA UPLOAD ===== */
+    /* ===== MEDIA ===== */
     const mediaRef = ref(
       storage,
       `uploads/${uid}/${timestamp}_${mediaFile.name}`
     );
 
+    console.log("⬆️ Uploading media...");
     await uploadBytes(mediaRef, mediaFile);
     const mediaURL = await getDownloadURL(mediaRef);
 
-    /* ===== THUMBNAIL (OPTIONAL) ===== */
+    /* ===== THUMBNAIL ===== */
     let thumbnailURL = null;
     if (thumbInput?.files?.[0]) {
       const thumbFile = thumbInput.files[0];
@@ -109,20 +113,18 @@ uploadBtn.addEventListener("click", async () => {
       views: 0
     });
 
-    alert("Upload successful!");
+    alert("✅ Upload successful!");
 
-    // Reset form (no reload)
     titleInput.value = "";
     descInput.value = "";
     mediaInput.value = "";
     if (thumbInput) thumbInput.value = "";
 
-    // Optional: jump to Home
     window.location.hash = "#home";
 
   } catch (err) {
-    console.error("UPLOAD FAILED:", err);
-    alert("Upload failed. Please try again.");
+    console.error("❌ UPLOAD FAILED:", err);
+    alert(err.message || "Upload failed");
   }
 
   uploadBtn.textContent = "Upload";
