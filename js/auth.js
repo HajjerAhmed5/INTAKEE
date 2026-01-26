@@ -1,9 +1,9 @@
 /* ===============================
-   INTAKEE — AUTH (FINAL STABLE)
-   - No Firestore dependency for UI
+   INTAKEE — AUTH (FAST + STABLE)
+   - INSTANT UI on login
+   - Firestore runs in background
    - Offline-safe
-   - Cached + Auth-first username
-   - Deterministic (no “sometimes”)
+   - Cached username
 ================================ */
 
 import { auth, db } from "./firebase-init.js";
@@ -31,15 +31,11 @@ import {
 window.__AUTH_READY__ = false;
 window.__AUTH_IN__ = false;
 
-/* ================= LOCAL USER CACHE ================= */
+/* ================= LOCAL CACHE ================= */
 const cacheUser = (user, username, email) => {
   localStorage.setItem(
     "intakee_user",
-    JSON.stringify({
-      uid: user.uid,
-      email,
-      username
-    })
+    JSON.stringify({ uid: user.uid, email, username })
   );
 };
 
@@ -74,7 +70,7 @@ const signupAgeConfirm = document.getElementById("signupAgeConfirm");
 const loginIdentifier = document.getElementById("loginIdentifier");
 const loginPassword = document.getElementById("loginPassword");
 
-/* ================= OPEN AUTH MODAL ================= */
+/* ================= OPEN AUTH ================= */
 openAuthBtn?.addEventListener("click", () => {
   if (authDialog && !authDialog.open) authDialog.showModal();
 });
@@ -98,8 +94,8 @@ signupBtn?.addEventListener("click", async () => {
 
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-    // Non-blocking writes
     updateProfile(cred.user, { displayName: username });
+
     setDoc(doc(db, "users", cred.user.uid), {
       username,
       email,
@@ -109,7 +105,7 @@ signupBtn?.addEventListener("click", async () => {
     cacheUser(cred.user, username, email);
 
     authDialog?.close();
-    setTimeout(() => alert("Welcome to INTAKEE 👋"), 150);
+    alert("Welcome to INTAKEE 👋");
   } catch (err) {
     alert(err.message);
   }
@@ -126,13 +122,11 @@ loginBtn?.addEventListener("click", async () => {
 
     let email = identifier;
 
-    // FAST PATH — local cache
     const cached = getCachedUser();
     if (cached && cached.username === identifier) {
       email = cached.email;
     }
 
-    // Fallback — Firestore (only if needed)
     if (!identifier.includes("@") && email === identifier) {
       const q = query(
         collection(db, "users"),
@@ -146,7 +140,6 @@ loginBtn?.addEventListener("click", async () => {
     await signInWithEmailAndPassword(auth, email, password);
 
     authDialog?.close();
-    setTimeout(() => alert("Welcome back 👋"), 120);
   } catch (err) {
     alert(err.message);
   }
@@ -157,7 +150,7 @@ forgotPasswordBtn?.addEventListener("click", async () => {
   try {
     const email = loginIdentifier.value.trim().toLowerCase();
     if (!email.includes("@"))
-      throw new Error("Enter your email address");
+      throw new Error("Enter your email");
 
     await sendPasswordResetEmail(auth, email);
     alert("Password reset email sent");
@@ -166,14 +159,14 @@ forgotPasswordBtn?.addEventListener("click", async () => {
   }
 });
 
-/* ================= SIGN OUT ================= */
+/* ================= LOG OUT ================= */
 window.logout = async () => {
   clearCachedUser();
   await signOut(auth);
 };
 
-/* ================= AUTH STATE (FIXED) ================= */
-onAuthStateChanged(auth, async (user) => {
+/* ================= AUTH STATE (FAST) ================= */
+onAuthStateChanged(auth, (user) => {
   window.__AUTH_READY__ = true;
   window.__AUTH_IN__ = !!user;
 
@@ -181,6 +174,8 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) {
     body.classList.add("logged-out");
     body.classList.remove("logged-in");
+
+    clearCachedUser();
 
     if (headerUsername) headerUsername.style.display = "none";
     if (openAuthBtn) openAuthBtn.style.display = "inline-block";
@@ -191,21 +186,15 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  /* ===== LOGGED IN ===== */
+  /* ===== LOGGED IN (INSTANT) ===== */
   body.classList.remove("logged-out");
   body.classList.add("logged-in");
 
-  // 🔥 AUTH-FIRST USERNAME (NO CRASHES)
-  let username = user.displayName || "user";
-
-  try {
-    const snap = await getDoc(doc(db, "users", user.uid));
-    if (snap.exists() && snap.data().username) {
-      username = snap.data().username;
-    }
-  } catch {
-    console.warn("⚠️ Firestore unavailable — using auth/cached username");
-  }
+  const cached = getCachedUser();
+  let username =
+    cached?.username ||
+    user.displayName ||
+    "user";
 
   cacheUser(user, username, user.email);
 
@@ -219,4 +208,21 @@ onAuthStateChanged(auth, async (user) => {
   window.dispatchEvent(
     new CustomEvent("auth-ready", { detail: { user, username } })
   );
+
+  /* ===== BACKGROUND FIRESTORE SYNC ===== */
+  getDoc(doc(db, "users", user.uid))
+    .then((snap) => {
+      if (snap.exists() && snap.data().username) {
+        const fresh = snap.data().username;
+        cacheUser(user, fresh, user.email);
+        if (headerUsername) headerUsername.textContent = "@" + fresh;
+
+        window.dispatchEvent(
+          new CustomEvent("auth-ready", {
+            detail: { user, username: fresh }
+          })
+        );
+      }
+    })
+    .catch(() => {});
 });
