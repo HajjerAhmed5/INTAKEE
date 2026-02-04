@@ -12,13 +12,14 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-
 
 /* ================= FIREBASE CONFIG ================= */
 export const firebaseConfig = {
-  apiKey: "AIzaSyA1R2XYEpkFI_hODPWWvPQGRAELIBRrj0",
+  apiKey: "AIzaSyA0TOAWxcxCZ37a8BsV1Cjg0dCJl1DxW3A",
   authDomain: "intakee-upload.firebaseapp.com",
   projectId: "intakee-upload",
   storageBucket: "intakee-upload.appspot.com",
   messagingSenderId: "27015360730",
   appId: "1:27015360730:web:4e3df9db3ad85cf2db35e3"
 };
+
 /* ================= INIT APP ================= */
 export const app = initializeApp(firebaseConfig);
 
