@@ -1,6 +1,6 @@
 /*
 ==========================================
-INTAKEE — PROFILE (CORS SAFE / FINAL)
+INTAKEE — UPLOAD SYSTEM (FINAL / STABLE)
 ==========================================
 */
 
@@ -15,114 +15,111 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
 import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc
+  collection,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 /* ================= DOM ================= */
-const avatarEl = document.querySelector(".profile-avatar");
-const bannerEl = document.querySelector(".profile-banner");
-const avatarInput = document.getElementById("avatarInput");
-const bannerInput = document.getElementById("bannerInput");
+const uploadSection = document.getElementById("upload");
+const uploadBtn = uploadSection?.querySelector(".upload-btn");
+const typeInput = uploadSection?.querySelector("select");
+const titleInput = uploadSection?.querySelector("input[type='text']");
+const descInput = uploadSection?.querySelector("textarea");
+const mediaInput = uploadSection?.querySelector("#mediaInput");
+const thumbInput = uploadSection?.querySelector("#thumbnailInput");
 
 let currentUser = null;
+let authReady = false;
 
 /* ================= AUTH ================= */
-onAuthStateChanged(auth, async user => {
-  if (!user) return;
-
-  currentUser = user;
-  await loadProfile();
+onAuthStateChanged(auth, user => {
+  currentUser = user || null;
+  authReady = true;
+  console.log("✅ Auth ready for upload:", !!user);
 });
 
-/* ================= LOAD PROFILE ================= */
-async function loadProfile() {
-  try {
-    const uid = currentUser.uid;
-    const userDocRef = doc(db, "users", uid);
-    const snap = await getDoc(userDocRef);
-
-    if (!snap.exists()) return;
-
-    const data = snap.data();
-
-    /* ===== AVATAR ===== */
-    if (data.avatarPath) {
-      const avatarRef = ref(storage, data.avatarPath);
-      const avatarURL = await getDownloadURL(avatarRef);
-      avatarEl.style.backgroundImage = `url(${avatarURL})`;
+/* ================= UPLOAD ================= */
+if (uploadBtn) {
+  uploadBtn.addEventListener("click", async () => {
+    if (!authReady) {
+      alert("Auth still loading. Try again.");
+      return;
     }
 
-    /* ===== BANNER ===== */
-    if (data.bannerPath) {
-      const bannerRef = ref(storage, data.bannerPath);
-      const bannerURL = await getDownloadURL(bannerRef);
-      bannerEl.style.backgroundImage = `url(${bannerURL})`;
+    if (!currentUser) {
+      alert("Please log in to upload.");
+      return;
     }
 
-  } catch (err) {
-    console.error("❌ Profile load failed:", err);
-  }
+    const mediaFile = mediaInput?.files?.[0];
+    if (!mediaFile) {
+      alert("Please choose a media file.");
+      return;
+    }
+
+    const title = titleInput.value.trim();
+    if (!title) {
+      alert("Title is required.");
+      return;
+    }
+
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = "Uploading…";
+
+    try {
+      const uid = currentUser.uid;
+      const type = typeInput.value;
+      const timestamp = Date.now();
+
+      /* ===== MEDIA UPLOAD ===== */
+      const mediaPath = `uploads/${type}/${uid}/${timestamp}_${mediaFile.name}`;
+      const mediaRef = ref(storage, mediaPath);
+
+      await uploadBytes(mediaRef, mediaFile);
+      const mediaURL = await getDownloadURL(mediaRef);
+
+      /* ===== THUMBNAIL (OPTIONAL) ===== */
+      let thumbnailURL = "";
+      if (thumbInput?.files?.[0]) {
+        const thumbFile = thumbInput.files[0];
+        const thumbPath = `thumbnails/${uid}/${timestamp}_${thumbFile.name}`;
+        const thumbRef = ref(storage, thumbPath);
+
+        await uploadBytes(thumbRef, thumbFile);
+        thumbnailURL = await getDownloadURL(thumbRef);
+      }
+
+      /* ===== FIRESTORE ===== */
+      await addDoc(collection(db, "posts"), {
+        type,
+        title,
+        description: descInput.value.trim(),
+        mediaURL,
+        thumbnailURL,
+        uid,
+        username: currentUser.displayName || "user",
+        createdAt: serverTimestamp(),
+        views: 0
+      });
+
+      alert("✅ Upload successful!");
+
+      titleInput.value = "";
+      descInput.value = "";
+      mediaInput.value = "";
+      if (thumbInput) thumbInput.value = "";
+
+      window.location.hash = "#home";
+
+    } catch (err) {
+      console.error("❌ Upload failed:", err);
+      alert("Upload failed. Check console.");
+    }
+
+    uploadBtn.textContent = "Upload";
+    uploadBtn.disabled = false;
+  });
+} else {
+  console.error("❌ Upload button not found");
 }
-
-/* ================= UPLOAD AVATAR ================= */
-avatarEl?.addEventListener("click", () => avatarInput.click());
-
-avatarInput?.addEventListener("change", async () => {
-  if (!currentUser) return;
-
-  const file = avatarInput.files[0];
-  if (!file) return;
-
-  try {
-    const uid = currentUser.uid;
-    const path = `profile/${uid}/avatar.jpg`;
-    const avatarRef = ref(storage, path);
-
-    await uploadBytes(avatarRef, file);
-    const url = await getDownloadURL(avatarRef);
-
-    avatarEl.style.backgroundImage = `url(${url})`;
-
-    await setDoc(
-      doc(db, "users", uid),
-      { avatarPath: path },
-      { merge: true }
-    );
-
-  } catch (err) {
-    console.error("❌ Avatar upload failed:", err);
-  }
-});
-
-/* ================= UPLOAD BANNER ================= */
-bannerEl?.addEventListener("click", () => bannerInput.click());
-
-bannerInput?.addEventListener("change", async () => {
-  if (!currentUser) return;
-
-  const file = bannerInput.files[0];
-  if (!file) return;
-
-  try {
-    const uid = currentUser.uid;
-    const path = `profile/${uid}/banner.jpg`;
-    const bannerRef = ref(storage, path);
-
-    await uploadBytes(bannerRef, file);
-    const url = await getDownloadURL(bannerRef);
-
-    bannerEl.style.backgroundImage = `url(${url})`;
-
-    await setDoc(
-      doc(db, "users", uid),
-      { bannerPath: path },
-      { merge: true }
-    );
-
-  } catch (err) {
-    console.error("❌ Banner upload failed:", err);
-  }
-});
