@@ -7,7 +7,10 @@ import {
   setPersistence,
   browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import {
+  getFirestore,
+  enableNetwork
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
 /* ================= FIREBASE CONFIG ================= */
@@ -23,13 +26,17 @@ export const firebaseConfig = {
 /* ================= INIT APP ================= */
 export const app = initializeApp(firebaseConfig);
 
-/* ================= AUTH (PERSISTENCE FIRST) ================= */
+/* ================= AUTH ================= */
 export const auth = getAuth(app);
 await setPersistence(auth, browserLocalPersistence);
 console.log("✅ Auth persistence: LOCAL");
 
-/* ================= SERVICES ================= */
+/* ================= FIRESTORE ================= */
 export const db = getFirestore(app);
+await enableNetwork(db);
+console.log("🌐 Firestore forced ONLINE");
+
+/* ================= STORAGE ================= */
 export const storage = getStorage(app);
 
 console.log("✅ Firebase ready (STABLE MODE)");
